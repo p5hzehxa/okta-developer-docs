@@ -122,8 +122,7 @@ Consider the following examples for ways to customize your SSR flow using a regi
 * **Trigger an approval flow:** Initiate a manager or administrator approval process before finalizing user provisioning or access.
 * **Trigger marketing content:** Add new users to an automated marketing sequence based on user attributes or certain events.
 * **Block known bad actors:** Integrate with a third-party threat intelligence service to block registration attempts from known malicious IP addresses or email domains.
-* **Domain validation:** Validate the domain of a user trying to register and deny requests from unauthorized or public email providers. See [Set up for profile enrollment (SSR) scenario](/docs/guides/registration-inline-hook/nodejs/main/#set-up-for-profile-enrollment-ssr-scenario) for an example of how to do this. 
-  * Instead of using an inline hook, you can also use an Okta Expression Language expression in the user profile policy to block certain email domains.
+* **Domain validation:** Validate the domain of a user trying to register and deny requests from unauthorized or public email providers. See [Set up for profile enrollment (SSR) scenario](/docs/guides/registration-inline-hook/nodejs/main/#set-up-for-profile-enrollment-ssr-scenario) for an example of how to do this.
 * **Input restrictions:** Use an inline hook to restrict certain inputs in the registration form. For example, check the `login` attribute for forbidden characters (like emojis or specific symbols) and deny access if a user attempts to register with them. 
   * Alternatively, create a more interactive registration form by using [custom code in the widget](#customize-the-widget-with-the-code-editor) to restrict users from entering forbidden characters.
 
