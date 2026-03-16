@@ -1,0 +1,1617 @@
+openapi: 3.0.3
+info:
+  title: Okta Admin Management API
+  description: Allows customers to easily access the Okta Management APIs
+  termsOfService: https://developer.okta.com/terms/
+  contact:
+    name: Okta Developer Team
+    url: https://developer.okta.com/
+    email: devex-public@okta.com
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 5.1.0
+  x-logo:
+    url: logo.svg
+    backgroundColor: transparent
+    altText: Okta Developer
+externalDocs:
+  description: Find more info here
+  url: https://developer.okta.com/docs/reference/
+servers:
+  - url: https://{yourOktaDomain}
+    variables:
+      yourOktaDomain:
+        default: subdomain.okta.com
+        description: The domain of your organization. This can be a provided subdomain of an official okta domain (okta.com, oktapreview.com, etc) or one of your configured custom domains.
+
+x-tagGroups:
+  - name: Access Controls
+    tags:
+      - ApiToken
+      - AttackProtection
+      - Behavior
+      - BotProtection
+      - CAPTCHA
+      - NetworkZone
+      - Policy
+      - Session
+      - ThreatInsight
+      - TrustedOrigin
+  - name: Admin Roles
+    tags:
+      - RoleAssignmentAUser
+      - RoleAssignmentBGroup
+      - RoleAssignmentClient
+      - RoleBTargetAdmin
+      - RoleBTargetBGroup
+      - RoleBTargetClient
+      - RoleCResourceSet
+      - RoleCResourceSetResource
+      - RoleDResourceSetBinding
+      - RoleDResourceSetBindingMember
+      - RoleECustom
+      - RoleECustomPermission
+      - GovernanceBundle
+      - Subscription
+  - name: Applications
+    tags:
+      - Application
+      - ApplicationConnections
+      - ApplicationCrossAppAccessConnections
+      - ApplicationFeatures
+      - ApplicationGrants
+      - ApplicationGroups
+      - ApplicationInterclientTrustMappings
+      - ApplicationLogos
+      - ApplicationPolicies
+      - ApplicationSSO
+      - ApplicationSSOCredentialKey
+      - ApplicationSSOPublicKeys
+      - ApplicationSSOFederatedClaims
+      - ApplicationTokens
+      - ApplicationUsers
+      - ApiServiceIntegrations
+      - OktaApplicationSettings
+      - ApplicationExpressConfiguration
+      - GroupPushMapping
+      - YourOinIntegrations
+      - UnconfirmedUsers
+  - name: Authenticators
+    tags:
+      - Authenticator
+      - WebAuthnPreregistration
+      - PushProvider
+  - name: Authorization Servers
+    tags:
+      - AuthorizationServer
+      - AuthorizationServerAssoc
+      - AuthorizationServerClaims
+      - AuthorizationServerClients
+      - AuthorizationServerKeys
+      - OAuth2ResourceServerCredentialsKeys
+      - AuthorizationServerPolicies
+      - AuthorizationServerRules
+      - AuthorizationServerScopes
+  - name: Customizations
+    tags:
+      - AssociatedDomainCustomizations
+      - Brands
+      - CustomDomain
+      - CustomPages
+      - CustomTelephonyProvider
+      - CustomTemplates
+      - EmailDomain
+      - EmailServer
+      - Template
+      - Themes
+  - name: Devices
+    tags:
+      - Device
+      - DeviceAccess
+      - DeviceAssurance
+      - DeviceIntegrations
+      - DevicePostureCheck
+  - name: External Identity Sources
+    tags:
+      - AgentPools
+      - DirectoriesIntegration
+      - IdentityProvider
+      - IdentityProviderKeys
+      - IdentityProviderSigningKeys
+      - IdentityProviderUsers
+      - IdentitySource
+  - name: Groups
+    tags:
+      - Group
+      - GroupOwner
+      - GroupRule
+  - name: Hooks
+    tags:
+      - EventHook
+      - HookKey
+      - InlineHook
+  - name: Org Management
+    tags:
+      - OktaPersonalSettings
+      - OrgSettingAdmin
+      - OrgSettingCommunication
+      - OrgSettingContact
+      - OrgSettingCustomization
+      - OrgSettingGeneral
+      - OrgSettingMetadata
+      - OrgSettingSupport
+      - Feature
+      - EmailCustomization
+      - OrgCreator
+      - DisasterRecovery
+  - name: Rate Limits
+    tags:
+      - RateLimitSettings
+      - PrincipalRateLimit
+  - name: Realms
+    tags:
+      - Realm
+      - RealmAssignment
+  - name: Schemas
+    tags:
+      - Schema
+      - LinkedObject
+      - UISchema
+  - name: Service Accounts
+    tags:
+      - ServiceAccount
+      - OktaManagedUserAccount
+      - PrivilegedResource
+  - name: Signal Sharing
+    tags:
+      - SSFReceiver
+      - SSFSecurityEventToken
+      - SSFTransmitter
+      - RiskEvent
+      - RiskProvider
+  - name: System Log
+    tags:
+      - SystemLog
+      - LogStream
+  - name: Users
+    tags:
+      - User
+      - UserAuthenticatorEnrollments
+      - UserClassification
+      - UserCred
+      - UserFactor
+      - UserGrant
+      - UserLifecycle
+      - UserLinkedObject
+      - UserOAuth
+      - UserResources
+      - UserRisk
+      - UserSessions
+      - UserType
+      - ProfileMapping
+  - name: Operations
+    tags:
+      - OperationsIntegration
+
+tags:
+  - name: ApiServiceIntegrations
+    x-displayName: API Service Integrations
+    description: |
+      This API provides operations to manage API service integration instances in your org.
+
+      For a current list of available API service integrations, see the [Okta Integration Network catalog](https://www.okta.com/integrations/?capability=api).
+
+      See [Add an API Service Integration](https://help.okta.com/okta_help.htm?type=oie&id=ext-add-api-service-integration) for corresponding admin instructions using the Admin Console.
+      If you want to build an API service integration, see [API service integrations in the OIN](https://developer.okta.com/docs/guides/oin-api-service-overview/).
+  - name: ApiToken
+    x-displayName: API Tokens
+    description: The API Tokens API provides operations to manage SSWS API tokens for your org.
+  - name: Application
+    x-displayName: Applications
+    description: |-
+      The Applications API provides operations to manage apps in your org.
+
+      To create a custom app integration instance, use the [Create an Application](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/application/other/createapplication) operation with the schema provided in the request payload.
+
+      To create an app instance from the Okta Integration Network (OIN), use the [Create an Application](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/application/other/createapplication)
+      operation with the corresponding OIN app schema in the request body.
+  - name: ApplicationConnections
+    x-displayName: Application Connections
+    description: |
+      The Application Connections API provides operations for configuring connections to an app.
+
+      Okta supports token-based and OAuth 2.0-based provisioning connections for supported apps.
+      The following available provisioning connections are supported by the indicated apps:
+
+        | <div style="width:100px">Connection</div> | Description | <div style="width:150px">Apps supported</div> |
+        | -------------------------------- | -------------- | ----------- |
+        | Token  | The provisioning API connection is based on bearer token authentication. |  <ul><li>Okta Org2Org (`okta_org2org`)</li> <li>Zscaler 2.0 (`zscalerbyz`)</li></ul> |
+        | OAuth 2.0  | The provisioning API connection is based on OAuth 2.0 authentication. | <ul><li>Google Workspace (`google`)</li> <li>Microsoft Office 365 (`office365`)</li> <li>Okta Org2Org (`okta_org2org`)</li>  <li>Slack (`slack`)</li> <li>Zoom (`zoomus`)</li></ul> |
+
+        > **Note:** The Okta Org2Org (`okta_org2org`) app isn't available in Okta Integrator Free Plan orgs. If you need to test this feature in your Integrator Free Plan org, contact your Okta account team.
+
+  - name: ApplicationCrossAppAccessConnections
+    x-displayName: Application Cross App Access Connections
+    description: |
+      The Application Cross App Access Connections API provides operations to configure and manage Cross App Access connections between a requesting app and a resource app.
+
+      To establish the Cross App Access connection, both the requesting app and the resource app must support the `Connect with Okta` App Feature.
+  - name: ApplicationExpressConfiguration
+    x-displayName: Application Express Configuration
+    description: |
+      The Application Express Configuration API provides operations to enable express federation setup for SSO and provisioning capabilities.
+  - name: ApplicationSSOCredentialKey
+    x-displayName: Application Key Credentials
+    description: |
+      The Application Key Credentials API provides a set of operations to manage an app's key store credentials.
+  - name: ApplicationSSOPublicKeys
+    x-displayName: Application Public Keys
+    description: |
+      The Application Public Keys API provides a set of operations to manage public JSON keys used for OAuth 2.0 client authentication as described in [Client authentication methods](https://developer.okta.com/docs/api/openapi/okta-oauth/guides/client-auth/) or for encrypting ID tokens. Encrypting ID tokens is self-service [Early Access](https://developer.okta.com/docs/api/openapi/okta-management/guides/release-lifecycle/#early-access-ea).
+  - name: ApplicationSSOFederatedClaims
+    x-displayName: Application Federated Claims
+    description: |
+      The federated claims for an application
+  - name: ApplicationGroups
+    x-displayName: Application Groups
+    description: The Application Groups API provides a set of operations to manage group assignment for an app.
+  - name: ApplicationGrants
+    x-displayName: Application Grants
+    description: |
+      The Application Grants API provides a set of operations to manage scope consent grants for an app.
+
+      A scope consent grant represents an app's permission to include specific Okta scopes in OAuth 2.0 Bearer tokens.
+      If the app doesn't have permission to grant consent for a particular Okta scope, token requests that contain the scope are denied.
+  - name: ApplicationFeatures
+    x-displayName: Application Features
+    description: |
+      The Application Features API supports operations to configure app provisioning feature settings.
+
+      You must have app provisioning enabled to configure provisioning features. See [Update the default Provisioning Connection](https://developer.okta.com/docs/api/openapi/okta-management/management/applicationconnections/updatedefaultprovisioningconnectionforapplication).
+
+      The following available provisioning features are supported by the indicated apps:
+
+      | <div style="width:190px">Feature</div> | Description | <div style="width:150px">Apps supported</div> |
+      | -------------------- | -------------- | ----------- |
+      | `USER_PROVISIONING`  | Similar to the app **Provisioning** > **To App** setting in the Admin Console, user profiles are pushed from Okta to the third-party app. You can configure rules for creating users, deactivating users, and syncing passwords. | <ul><li>Google Workspace (`google`)</li> <li>Microsoft Office 365 (`office365`)</li> <li>Okta Org2Org (`okta_org2org`)</li> <li>Slack (`slack`)</li> <li>Zoom (`zoomus`)</li> <li>Zscaler 2.0 (`zscalerbyz`)</li></ul> |
+      | `INBOUND_PROVISIONING` | Similar to the app **Provisioning** > **To Okta** provisioning setting in the Admin Console, user profiles are imported from the third-party app into Okta. You can schedule user import and configure rules for user creation and matching. | <ul><li>Google Workspace (`google`)</li> <li>Microsoft Office 365 (`office365`)</li> <li>Okta Org2Org (`okta_org2org`)</li> <li>Slack (`slack`)</li> <li>Zoom (`zoomus`)</li></ul> |
+
+      > **Note:** The Okta Org2Org (`okta_org2org`) app isn't available in Okta Integrator Free Plan orgs. If you need to test this feature in your Integrator Free Plan org, contact your Okta account team.
+
+  - name: ApplicationLogos
+    x-displayName: Application Logos
+    description: Provides a resource to manage the application instance logo
+  - name: ApplicationPolicies
+    x-displayName: Application Policies
+    description: The Application Policies API provides a resource to manage app sign-in policies associated with an app.
+  - name: ApplicationSSO
+    x-displayName: Application SSO
+    description: Provides a Single Sign-On (SSO) resource for an application
+  - name: ApplicationInterclientTrustMappings
+    x-okta-lifecycle:
+      features:
+        - NATIVE_TO_WEB_ONE_TIME_TOKEN_EXCHANGE
+    x-displayName: Application Interclient Trust Mappings
+    description: Resource to manage interclient trust mappings for an app
+  - name: ApplicationTokens
+    x-displayName: Application Tokens
+    description: |
+      Resource to manage OAuth 2.0 tokens for an app
+      > **Note:** To configure refresh tokens for an app, see
+      > [grant_types](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/application/other/createapplication!path=4/settings/oauthClient/grant_types&t=request)
+      > and [refresh_token](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/application/other/createapplication!path=4/settings/oauthClient/refresh_token&t=request).
+  - name: ApplicationUsers
+    x-displayName: Application Users
+    description: |
+      The Application Users API provides operations to manage app users and their assignments.
+      The object returned from assigning a user to an app is known as the application user.
+
+      You can assign users to apps for:
+        * SSO only
+        * SSO and provisioning
+  - name: UnconfirmedUsers
+    x-displayName: Unconfirmed Users
+    description: |
+      The Unconfirmed Users API provides operations for managing unconfirmed accounts, such as rogue or orphaned accounts, in an org.
+  - name: AssociatedDomainCustomizations
+    x-okta-lifecycle:
+      features:
+        - ASSOCIATED_DOMAIN_CUSTOMIZATION
+    x-displayName: Associated Domain Customizations
+    description: |-
+      The Associated Domain Customizations API provides operations to manage associated domain customizations in your org. You can create associations between your custom domains and three well-known endpoints:
+      * `/.well-known/apple-app-site-association`
+      * `/.well-known/assetlinks.json`
+      * `/.well-known/webauthn`
+
+      See [Customize associated domains](https://developer.okta.com/docs/guides/custom-well-known-uri/main/) for more information about the endpoints and how to customize them.
+
+      > **Notes:**
+      > * You can't update the well-known URI files for the default brand.
+      > * The maximum file size of each well-known URI file is 100 KB.
+  - name: OktaApplicationSettings
+    x-displayName: Okta Application Settings
+    description: The Okta Application Settings API provides operations to manage settings for Okta apps in your org.
+  - name: OperationsIntegration
+    x-displayName: Okta Service Operations API
+    description: The Okta Service Operations API provides operations for retrieving and monitoring the status of asynchronous operations across Okta services.
+  - name: AttackProtection
+    x-displayName: Attack Protection
+    description: The Attack Protection API provides operations to configure the User Lockout Settings and the Authenticator Settings in your org to protect against password abuse.
+  - name: Authenticator
+    x-displayName: Authenticators
+    description: |-
+      The Authenticators Administration API provides operations to configure which authenticators are available to end users for use when they sign in to apps.
+
+      End users are required to use one or more authenticators based on the security requirements of the app sign-in policy.
+
+      Okta Identity Engine currently supports authenticators for the following factors:
+
+      **Knowledge-based:**
+      * Password
+      * Security Question
+      * Temporary access code (TAC)
+
+      **Possession-based:**
+      * Phone (SMS, voice call)
+      * Email
+      * WebAuthn
+        > **Note:** There are several limitations when you create or modify a `webauthn` authenticator. See [Configure the FIDO2 (WebAuthn) authenticator](https://help.okta.com/okta_help.htm?type=oie&id=ext-webauthn) and [FIDO2 (WebAuthn) support and behavior](https://help.okta.com/okta_help.htm?type=oie&id=webauthn-compatability).
+      * Duo
+      * Custom app
+
+      > <x-lifecycle class="ea"></x-lifecycle>
+      > **Note:** When the **Passkeys Rebrand** self-service Early Access feature is enabled, the FIDO2 (WebAuthn) authenticator is called Passkeys (FIDO2 WebAuthn), and there are new settings and updates to the authenticator page layout.
+      >
+      > See [Configure the FIDO2 (WebAuthn) authenticator](https://help.okta.com/okta_help.htm?type=oie&id=csh-configure-webauthn) and [`settings`](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Authenticator/#tag/Authenticator/operation/replaceAuthenticatorMethod!path=8/settings&t=request). To enable the **Passkeys Rebrand** feature, see [Enable self-service features](https://help.okta.com/okta_help.htm?id=ext_Manage_Early_Access_features).
+
+  - name: AuthorizationServer
+    x-displayName: Authorization Servers
+    description: |-
+      Authorization Servers generate OAuth 2.0 and OpenID Connect tokens, including access tokens and ID tokens. The Okta Management API gives you the ability to configure and manage Authorization Servers and the security policies that are attached to them.
+
+      **Work with the Default Authorization Server**
+
+      Okta provides a pre-configured Custom Authorization Server with the name `default`. This Default Authorization Server includes a basic access policy and rule, which you can edit to control access. It allows you to specify `default` instead of the `authorizationServerId` in requests to it:
+
+      `https://${yourOktaDomain}/api/v1/authorizationServers/default`
+
+      vs
+
+      `https://${yourOktaDomain}/api/v1/authorizationServers/${authorizationServerId}` for other Custom Authorization Servers
+  - name: AuthorizationServerAssoc
+    x-displayName: Authorization Server Associated Servers
+    description: Associated authorization servers allow you to designate a trusted authorization server that you associate with another authorization server. This type of association provides a way to configure [token exchange](https://developer.okta.com/docs/guides/set-up-token-exchange/main/#trusted-servers) between other authorization servers under the same Okta tenant.
+  - name: AuthorizationServerClaims
+    x-displayName: Authorization Server Claims
+    description: Provides operations to manage custom token claims for the given `authServerId` and `claimId`
+  - name: AuthorizationServerClients
+    x-displayName: Authorization Server Clients
+    description: |-
+      These endpoints allow you to manage tokens issued by an authorization server for a particular client. For example, you can revoke every active refresh token for a specific client. You can also revoke specific tokens or manage tokens at the user level.
+
+      Read [Validate access tokens](https://developer.okta.com/docs/guides/validate-access-tokens/dotnet/main/) and [Validate ID tokens](https://developer.okta.com/docs/guides/validate-id-tokens/main/) to understand more about how OAuth 2.0 tokens work.
+  - name: AuthorizationServerKeys
+    x-displayName: Authorization Server Keys
+    description: |-
+      Provides operations to manage [JSON Web Key](https://datatracker.ietf.org/doc/html/rfc7517) credentials for the given `authServerId`.
+
+      > **Note:** Looking for how to obtain the jwks_uri for your org or custom authorization server? See the [well-known OpenID metadata endpoint](https://developer.okta.com/docs/api/openapi/okta-oauth/oauth/customas/getwellknownopenidconfigurationcustomas) and the [well-known OAuth 2.0 metadata endpoint](https://developer.okta.com/docs/api/openapi/okta-oauth/oauth/customas/getwellknownoauthconfigurationcustomas).
+  - name: OAuth2ResourceServerCredentialsKeys
+    x-displayName: Authorization Server Public Keys
+    x-okta-lifecycle:
+      features:
+        - OIDC_TOKEN_ENCRYPTION
+    description: |-
+      Provides operations to manage public [JSON Web Key](https://datatracker.ietf.org/doc/html/rfc7517) credentials used for encrypting tokens minted by the custom authorization server.
+  - name: AuthorizationServerPolicies
+    x-displayName: Authorization Server Policies
+    description: Provides operations to manage policies for the given `authServerId`.
+  - name: AuthorizationServerRules
+    x-displayName: Authorization Server Rules
+    description: Provides operations to manage policy rules for the given `authServerId`, `policyId`, and `ruleId`.
+  - name: AuthorizationServerScopes
+    x-displayName: Authorization Server Scopes
+    description: Provides operations to manage custom token scopes for the given `authServerId` and `scopeId`. See [scope properties](https://developer.okta.com/docs/api/openapi/okta-oauth/guides/overview/#scope-properties).
+  - name: Behavior
+    x-displayName: Behavior Rules
+    description: The Behavior Rules API provides operations to manage the behavior detection rules for your organization.
+  - name: Brands
+    x-displayName: Brands
+    description: |-
+      These endpoints allow you to manage Brands, and their metadata, in your orgs. With Brands, you can customize the following:
+      * [The Okta-hosted sign-in page](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/CustomPages/)
+      * [The sign-out page](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/CustomPages/)
+      * [Error pages](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/CustomPages/)
+      * [Email templates](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/CustomTemplates/)
+      * [The Okta End-User Dashboard](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Themes/)
+
+      > **Note:**  Some of the curl code examples on this page include SSWS API token authentication. However, Okta recommends using scoped OAuth 2.0 and OIDC access tokens to authenticate with Okta management APIs. OAuth 2.0 and OIDC access tokens provide fine-grain control over the bearer's actions on specific endpoints. See [Okta API authentication methods](https://developer.okta.com/docs/api/openapi/okta-oauth/guides/overview/).
+  - name: BotProtection
+    x-displayName: Bot Protection
+    description: |-
+      Provides operations to manage the bot protection configuration for your org.
+
+      Bot protection helps prevent automated attacks by detecting bots and triggering enforcement during user sign-in flows, self-service registration, and self-service password recovery flows.
+  - name: CAPTCHA
+    x-displayName: CAPTCHAs
+    description: |-
+      As an option to increase org security, Okta supports CAPTCHA services to prevent automated sign-in attempts. You can integrate one of two providers: [hCaptcha](https://www.hcaptcha.com/) or [reCAPTCHA v2](https://developers.google.com/recaptcha/docs/invisible).
+
+      The vendor implementations supported by Okta are both invisible. They each run risk-analysis software in the background during user sign in to determine the likelihood that the user is a bot. This risk analysis is based on the settings that you configure with the provider that you choose.
+
+      Before you configure your org to use CAPTCHA, sign in to the vendor of your choice or sign up for an account. For more details, refer to [CAPTCHA integration](https://help.okta.com/okta_help.htm?type=oie&id=csh-captcha).
+  - name: CustomDomain
+    x-displayName: Custom Domains
+    description: The Custom Domains API provides operations to manage custom domains for your organization.
+  - name: CustomPages
+    x-displayName: Custom Pages
+    description: |-
+      These endpoints allow you to customize the contents of various pages, including:
+      * The Okta-hosted sign-in page
+      * Error pages
+      * The sign-out page
+
+      > **Note:**  Some of the curl code examples on this page include SSWS API token authentication. However, Okta recommends using scoped OAuth 2.0 and OIDC access tokens to authenticate with Okta management APIs. OAuth 2.0 and OIDC access tokens provide fine-grain control over the bearer's actions on specific endpoints. See [Okta API authentication methods](https://developer.okta.com/docs/api/openapi/okta-oauth/guides/overview/).
+  - name: CustomTemplates
+    x-displayName: Custom Email Templates
+    description: |-
+      These endpoints allow you to programmatically manage email customizations.
+
+      Okta provides many customizable email templates. For example, the `UserActivation` email template allows users to activate their account. Use email customizations to override a template's default content. See the [list of email templates](https://developer.okta.com/docs/guides/custom-email/main/#use-customizable-email-templates).
+
+      Each template has default content that Okta translates to any one of the supported languages. The following settings determine the language for emails sent from Okta to a user, if the user hasn't selected a specific display language:
+      * The user's locale property value (if specified)
+      * The org's display language
+
+      See [Supported languages](https://developer.okta.com/docs/guides/custom-email/main/#supported-languages).
+
+      The following constraints apply to email customizations:
+      * If an email template has any customizations at all, exactly one of them must be the default (where `isDefault` is `true`). Okta uses the default customization when no other customization applies to the user's language settings.
+      * Each email template can have only one customization for each supported language.
+
+      ### Enable other locales
+      <ApiLifecycle access="ea"></ApiLifecycle>
+
+      Use the [BCP 47 format](https://www.rfc-editor.org/info/bcp47) to enable more locales than Okta's 27 default languages.
+
+      Once you create a customization with the new locale, the locale appears in the Admin Console along with the default-supported locales.
+
+      Include `null` in the subject or body of the email customization. Okta replaces `null` with a default value based on the following order of priority:
+
+      - An existing default email customization, if one exists
+      - Okta-provided translated content for the specified language, if one exists
+      - Okta-provided translated content for the brand locale, if it's set
+      - Okta-provided content in English
+  - name: Device
+    x-displayName: Devices
+    description: |-
+      The Okta Devices API provides a centralized integration platform to fetch and manage device information. Okta administrators can use these APIs to manage workforce identity Device object information.
+
+      The Devices API supports the following device operations:
+      * GET or DELETE device objects
+      * Perform lifecycle transitions on the device objects. Device lifecycle is defined as transitions of the device status by the associated operations. The device object follows a predefined lifecycle transition flow. Device lifecycle operations are idempotent and its calls are synchronous.
+
+      The Devices API supports the following authorization schemes:
+      * SSWS: [API tokens](https://developer.okta.com/docs/reference/core-okta-api/#authentication)
+      * Bearer: [OAuth2.0 and OpenID Connect](https://developer.okta.com/docs/concepts/oauth-openid/)
+
+      > **Notes:**
+      > * For devices to enroll in Okta and show up in the Devices API, the following actions are required:
+      >   * Admins: Enable Okta FastPass. See [Enable FastPass](https://help.okta.com/okta_help.htm?type=oie&id=ext-fp-enable).
+      >   * End users with existing mobile Okta Verify enrollments: After you upgrade your org to Okta Identity Engine, direct end users with existing Okta Verify enrollments to use [FastPass](https://help.okta.com/okta_help.htm?type=oie&id=csh-fp-main).
+      > * End users with a new enrollment in Okta Verify on an Okta Identity Engine org have a device record created in the device inventory by default.
+      > See [Device Registration](https://help.okta.com/okta_help.htm?type=oie&id=csh-device-registration) and [Login Using Okta Verify](https://help.okta.com/okta_help.htm?type=eu&id=ext-ov-user-overview).
+  - name: DeviceAccess
+    x-displayName: Device Access
+    description: The Device Access API provides operations to configure device access settings.
+  - name: DeviceAssurance
+    x-displayName: Device Assurance Policies
+    description: The Device Assurance Policies API provides operations to manage device assurance policies in your organization.
+  - name: DevicePostureCheck
+    x-displayName: Device Posture Checks
+    description: The Device Posture Checks API provides operations to manage custom device posture checks for use in device assurance policies in your organization.
+  - name: DeviceIntegrations
+    x-displayName: Device Integrations
+    description: |-
+      The Device Integrations API provides operations to retrieve, and activate or deactivate, an endpoint security integration in your organization. Examples of device integrations include the following:
+      * Device Posture Provider
+      * Windows Security Center
+      * Chrome Device Trust
+      * OSQuery
+      * Android Device Trust
+  - name: DirectoriesIntegration
+    x-displayName: Directories Integration
+    description: |-
+      The Directories Integration API provides operations to manage Active Directory (AD) and Lightweight Directory Access Protocol (LDAP) objects in a connected on-premises directory through Okta.
+            
+      Okta can only manage group memberships for users and groups imported into Okta using the AD or LDAP integration. You can't use this API to manage users and groups that weren't imported through an AD or LDAP integration or are outside of the integration's org unit scope.
+
+  - name: AgentPools
+    x-displayName: Directory Agent Pools
+    description: The Agent Pools API provides operations to manage the update settings of the directory agents for your org.
+  - name: DisasterRecovery
+    x-displayName: Enhanced Disaster Recovery
+    description: |-
+      <x-lifecycle class="ea"></x-lifecycle><br>
+      > **Note:** Enhanced Disaster Recovery is a [self-service Early Access (EA)](/docs/concepts/feature-lifecycle-management/#self-service-features) feature. See [Manage Early Access and Beta features](https://help.okta.com/okta_help.htm?id=ext_secur_manage_ea_bata) to enable the feature.
+
+      The Enhanced Disaster Recovery API provides operations to perform disaster recovery for your org. It ensures service continuity during total regional infrastructure outages, allowing users to remain signed in. The self-service failover and failback processes complete in under five minutes.
+
+      The API supports the following operations:
+
+      * Failover
+      * Failback
+      * Status of your org domains
+
+      When you use the Enhanced Disaster Recovery APIs:
+
+      * The base URL for the Disaster Recovery APIs is `https://drapp.{yourOrgSubDomain}.okta.com/`. Replace `{yourOrgSubDomain}` with your Okta org subdomain. For example, if your Okta domain is `https://example.okta.com`, use `https://drapp.example.okta.com/` as the base URL.
+
+      * Disaster Recovery operations are idempotent, which means that if you attempt multiple failovers or failbacks on the same domain(s) the outcome remains the same.
+
+      The Disaster Recovery API supports the following authorization scheme:
+      * Bearer - [OAuth2.0 and OpenID Connect](https://developer.okta.com/docs/concepts/oauth-openid/)
+
+      See also:
+      * [Manage org recovery with Okta Enhanced Disaster Recovery](https://developer.okta.com/docs/guides/manage-orgs-okta-edr/main/)
+      * [Enhanced Disaster Recovery](https://help.okta.com/okta_help.htm?type=oie&id=enhanced-disaster-recovery)
+  - name: EmailDomain
+    x-displayName: Email Domains
+    description: The Email Domains API provides operations to manage email domains for your organization.
+  - name: EmailServer
+    x-displayName: Email Servers
+    description: |-
+      The Email Servers API allows you to configure a custom external email provider to send email notifications. By default, notifications such as the welcome email or an account recovery email are sent through an Okta-managed SMTP server. Adding a custom email provider gives you more control over your email delivery.
+
+      When you configure a custom email provider with an OAuth 2.0 authentication method, review [Custom email providers with OAuth 2.0](https://developer.okta.com/docs/guides/custom-smtp/main/).
+  - name: EventHook
+    x-displayName: Event Hooks
+    description: |-
+      The Event Hooks API provides operations to manage event hooks for your organization.
+
+      For general information on event hooks and how to create and use them, see [Event hooks](https://developer.okta.com/docs/concepts/event-hooks/). The following documentation is only for the management API, which provides a CRUD interface for registering event hooks.
+
+      For a step-by-step guide on implementing an example event hook, see the [Event hook](https://developer.okta.com/docs/guides/event-hook-implementation/) guide.
+
+      When you create an event hook, you need to specify which events you want to subscribe to. To see the list of event types currently eligible for use in event hooks, use the [Event Types](https://developer.okta.com/docs/reference/api/event-types/#catalog) catalog and search with the parameter `event-hook-eligible`.
+  - name: Feature
+    x-displayName: Features
+    description: |-
+      The Okta Features API provides operations to manage self-service Early Access (EA) and Beta features in your org.
+
+      > **Note:** Important background information for this API is available on the [Feature Lifecycle Management](https://developer.okta.com/docs/concepts/feature-lifecycle-management/) page.
+  - name: GovernanceBundle
+    x-displayName: IAM Governance Bundles
+    description: |-
+      The IAM Governance Bundle API provides operations for managing governance entitlement bundles, including roles and resources associated with the bundles, for the Admin Console.
+      For details on governance bundles for the Admin Console, see [Govern Okta admin roles](https://help.okta.com/okta_help.htm?type=oie&id=csh-governance-admin-roles) and [Entitlement Management](https://help.okta.com/okta_help.htm?type=oie&id=ext-entitlement-mgt).
+  - name: Group
+    x-displayName: Groups
+    description: The Groups API provides operations to manage Okta groups and their user members in your org.
+  - name: GroupRule
+    x-displayName: Group Rules
+    description: The Group Rules API provides operations to manage rules for Okta groups in your org.
+  - name: GroupOwner
+    x-displayName: Group Owners
+    description: |-
+      The Group Owners API provides operations to manage owners of Okta groups in your org.
+
+      > **Note**: This API is only available if you're subscribed to Okta Identity Governance. Contact Okta Support for more information.
+  - name: GroupPushMapping
+    x-displayName: Group Push Mappings
+    description: |-
+      The Group Push Mappings API provides operations to manage group push mappings for your org. You must have provisioning enabled in the target app to use group push mappings. See [Manage Group Push](https://help.okta.com/okta_help.htm?type=oie&id=ext-manage-group-push).
+  - name: HookKey
+    x-displayName: Hook Keys
+    description: |-
+      The Okta Key Management API provides a CRUD interface for JSON Web Keys (JWK) used with other parts of the application, such as inline hooks. For information on how to create inline hooks, see [inline hooks](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/inlinehook/).
+
+      > **Note:** Some of the curl code examples on this page include SSWS API token authentication. However, Okta recommends using scoped OAuth 2.0 and OIDC access tokens to authenticate with Okta management APIs. OAuth 2.0 and OIDC access tokens provide fine-grain control over the bearer's actions on specific endpoints. See [Okta API authentication methods](https://developer.okta.com/docs/api/openapi/okta-oauth/guides/overview/).
+  - name: IdentityProvider
+    x-displayName: Identity Providers
+    description: The Identity Providers API provides operations to manage federations with external identity providers (IdPs). For example, your app can support signing in with credentials from Apple, Facebook, Google, LinkedIn, Microsoft, an enterprise IdP using SAML 2.0, or an IdP using the OpenID Connect (`OIDC`) protocol.
+  - name: IdentityProviderKeys
+    x-displayName: Identity Provider Keys
+    description: The Identity Provider Keys API provides operations to manage key credentials for identity providers (IdPs).
+  - name: IdentityProviderSigningKeys
+    x-displayName: Identity Provider Signing Keys
+    description: |-
+      The Identity Provider Signing Keys API provides operations to manage signing key credentials and certificate signing requests (CSRs) for identity providers (IdPs).
+      > **Note:** Okta currently uses the same key for both request signing and the decryption of SAML assertions that the IdP encrypts. Changing your signing key also changes your decryption key.
+  - name: IdentityProviderUsers
+    x-displayName: Identity Provider Users
+    description: The Identity Provider Users API provides operations to manage identity provider (IdP) users.
+  - name: IdentitySource
+    x-displayName: Identity Sources
+    description: The Okta Identity Source API provides a mechanism to synchronize an HR source (the custom identity source) with Okta user profiles in an org. See [Build an Anything-as-a-Source custom client integration](https://developer.okta.com/docs/guides/anything-as-a-source/).
+  - name: InlineHook
+    x-displayName: Inline Hooks
+    description: |-
+      The Inline Hooks API provides operations to manage inline hooks for your organization.
+
+      For general information on inline hooks and how to create and use them, see [inline hooks](https://developer.okta.com/docs/concepts/inline-hooks/). The following documentation is only for the management API, which provides a CRUD interface for registering inline hooks.
+  - name: LinkedObject
+    x-displayName: Linked Objects
+    description: |-
+      Users have relationships to each other, like manager and subordinate or customer and sales representative. You can create users with relationships by using the Linked Objects API to represent the relationship.
+
+      1. Create a linked object definition such as Manager:Subordinate or Case Worker:Client. These pairs are represented by a `primary` attribute and an `associated` attribute.
+      2. Link users together to create the relationship between the two. You create a linked object value with a single request that links one `primary` and one `associated` user.
+
+      For each relationship:
+
+      * A user has at most one `primary` link (a user has a single manager), but can have many `associated` links (a user can have many subordinates).
+      * A user can be the `primary` in one relationship and the `associated` in another.
+      * A user can be both the `primary` and `associated` in the same relationship.
+
+      Okta Expression Language function for [linked objects](https://developer.okta.com/docs/reference/okta-expression-language/#linked-object-function) provides access to the details about a linked user.
+
+      > **Note:** The linked objects feature isn't available for OpenID Connect claims.
+
+      ## Example usage
+
+      Okta allows you to create up to 200 linked object definitions. These definitions are one-to-many, for example:
+
+      * A manager has many subordinates. Each subordinate has one manager.
+      * A sales representative has many customers. Each customer has one sales rep.
+      * A case worker has many clients. Each client has one case worker.
+
+      Most orgs have more than one manager or sales representative. You can create the linked object definition once, and then assign the `primary` relationship to as many users as you have people in that relationship.
+
+      You can assign the `associated` relationship for a single `primary` user to as many users as needed. The `associated` user can be related to only one `primary` per linked object definition. But you can assign a user to more than one linked object definition.
+
+      For example, assume that you've created one linked object definition for manager (`primary`) and for subordinates (`associated`):
+
+      * Joe is Frank's manager.
+      * Bob is Joe's manager, but Jane's subordinate.
+      * Jane is the CEO, so she reports to herself.
+
+      Thus, you can create chains of relationships (Jane > Bob > Joe > Frank) or terminal relationships (Jane is both `primary` and `associated` user).
+
+      Then, if you create another linked object relationship for scrum team membership, you could assign relationships to the same four users:
+
+      * Bob is the scrum lead for the Identity Scrum team.
+      * Joe and Frank are both contributors to the team.
+
+      Bob can be the `primary` for a Manager:Subordinate, an `associated` user for that same linked object definition, and also the `primary` for the Scrumlead:Contributor linked object definition.
+
+      To represent a relationship, create a linked object definition that specifies a `primary` (parent) relationship and an `associated` (child) relationship, and then add a link in which the appropriate user is assigned to each side of that link type.
+
+      ## Links between user types
+
+      If you created multiple user types (see [User Types](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserType/)), they all share the same linked object definitions. For example, if you have separate user types for employees and contractors, a link could designate an employee as the manager for a contractor, with the contractor being a subordinate of that employee.
+
+      ## Link definition operations
+
+      Link definition operations allow you to manage the creation and removal of the link definitions. If you remove a link definition, links based on that definition are unavailable.
+
+      > **Note:** Links reappear if you recreate the definition. However, Okta is likely to change this behavior so that links don't reappear. Don't rely on this behavior in production environments.
+  - name: LogStream
+    x-displayName: Log Streaming
+    description: The Log Streaming API provides operations to manage log stream configurations for an org. You can configure up to two log stream integrations per org.
+  - name: YourOinIntegrations
+    x-okta-lifecycle:
+      lifecycle: PRODUCT_DEV
+      isGenerallyAvailable: false
+      SKUs: []
+    x-displayName: Your OIN Integrations
+    description: |
+      > **Warning**: This API is private and subject to change without notice.
+
+       The Your OIN Integrations API allows you to submit and manage your Okta integration for verification and publication on the Okta Integration Network (OIN) catalog. The submission operations follow the processes available through the OIN Wizard. See [Submit an integration with the OIN Wizard](https://developer.okta.com/docs/guides/submit-oin-app/).
+
+       Only SSO integrations are currently supported in the Your OIN Integrations API.
+       > **Note:** This API is only available in Okta Developer-Edition orgs.
+
+  - name: NetworkZone
+    x-displayName: Network Zones
+    description: |-
+      The Network Zones API provides operations to manage system default and custom zones in your Okta org.
+      Network Zones are configurable boundaries that you can use to grant or restrict access to resources in your organization.
+      They're used for two purposes:
+      * `POLICY`: Network Zones used to guide policy decisions
+      * `BLOCKLIST`: Network Zones used to deny access from certain IP addresses, locations, Autonomous System Numbers (ASNs), proxy types, or IP service categories before policy evaluation
+      > **Note:** The Network Zone blocklist applies to all URLs for the org.
+
+      See [Network zones](https://help.okta.com/okta_help.htm?id=ext_Security_Network) in the Okta product documentation.
+
+      Your Okta org provides the following default system Network Zones that you can modify and use:
+      * `LegacyIpZone`: The system default IP Network Zone
+      * `BlockedIpZone`: The system default IP Blocklist Network Zone
+      * `DefaultEnhancedDynamicZone`: The system default Enhanced Dynamic Network Zone
+
+      You can create and use the following custom Network Zones:
+      * IP Network Zone (`IP`): Allows you to define network perimeters around a set of IPs
+      * Dynamic Network Zone (`DYNAMIC`): Allows you to define network perimeters around location, IP type, or ASNs
+      * Enhanced Dynamic Network Zone (`DYNAMIC_V2`): Extends the Dynamic Network Zone and allows you to include or exclude specific locations, ASNs, or IP service categories
+
+      > **Note:** To create multiple Network Zones, you must have Adaptive MFA enabled in your Okta org.
+  - name: OktaManagedUserAccount
+    x-displayName: Okta Managed User Accounts
+    description: |-
+      The Okta Managed User Accounts API provides operations to manage user accounts in Okta Universal Directory with Okta Privileged Access (OPA).
+
+      You can also manage Okta users with Okta Privileged Access through the Admin Console. Okta users designated with privileged access are treated as service accounts and appear in the **Service Accounts** section of the Admin Console. You can then use Okta Privileged Access to implement security measures for the user account that's designated as a service account. See [Manage service accounts](https://help.okta.com/okta_help.htm?type=oie&id=ud-privileged-acnt).
+
+      > **Note:** This feature is available only if you're subscribed to Okta Privileged Access. Ensure that you've set up the Okta Privileged Access app before managing Okta user accounts through this API.
+  - name: OktaPersonalSettings
+    x-displayName: Okta Personal Settings
+    description: The Okta Personal Settings API provides operations to manage the [Okta Personal](https://www.okta.com/products/okta-personal/workforce) settings of your Okta org.
+  - name: OrgSettingMetadata
+    x-displayName: Org Metadata
+    description: The Org Metadata API provides operation to fetch metadata for your Okta org.
+  - name: OrgSettingGeneral
+    x-displayName: Org General Settings
+    description: The Org General Settings API provides operations to manage the general settings of your Okta org.
+  - name: OrgSettingContact
+    x-displayName: Org Contacts
+    description: The Org Contacts API provides operations to manage the contact types of your Okta org.
+  - name: EmailCustomization
+    x-displayName: Org Email Settings
+    description: The Org Email Settings API provides operations to modify the email bounce list for your Okta org.
+  - name: OrgSettingCustomization
+    x-displayName: Org Customization
+    description: The Org Customization API provides operations to retrieve and modify custom settings for your Okta org.
+  - name: OrgSettingAdmin
+    x-displayName: Org Admin Settings
+    description: The Org Admin Settings API provides operations to manage the admin settings for your Okta org.
+  - name: OrgSettingCommunication
+    x-displayName: Org Communication Settings
+    description: 'The Org Communication Settings API provides operations to manage the communication settings for your Okta org. For example, opt users in or out of communication emails.'
+  - name: OrgSettingSupport
+    x-displayName: Org Support Settings
+    description: The Org Support Settings API provides operations to manage the support settings for your Okta org.
+  - name: OrgCreator
+    x-displayName: Org Creator
+    description: |-
+      > **Note:** You need to have the **Platform&mdash;Multi-org Deployment** product to enable the **Org Creator API** feature. Contact your Okta account team for more information.
+
+      The Org Creator API provides an operation to create Okta orgs (child orgs) based on features from your current org (the parent org). See [Org Creator](https://developer.okta.com/docs/concepts/org-creator/).
+  - name: Policy
+    x-displayName: Policies
+    description: |-
+      The Okta Policy API enables an administrator to perform policy and policy rule operations. The policy framework is used by Okta to control rules and settings that govern many things:
+      - user session lifetime
+      - whether multi-factor authentication is required when signing in
+      - what MFA factors may be employed
+      - password complexity requirements
+      - what types of self-service operations are permitted under various circumstances
+      - which identity provider to route users to
+
+      Policy settings for a particular policy type, such as `SIGN_ON` policy, consist of one or more policy objects, each of which contains one or more policy rules. Policies and rules contain conditions that determine whether they are applicable to a particular user at a particular time.
+
+      See:
+      * [Authenticator enrollment policies](https://developer.okta.com/docs/concepts/policies/#authenticator-enrollment-policies): `MFA_ENROLL`
+      * [App sign-in policies](https://developer.okta.com/docs/concepts/policies/#app-sign-in-policies): `ACCESS_POLICY`
+      * <x-lifecycle class="ea"></x-lifecycle> [Client update policies](https://developer.okta.com/docs/concepts/policies/#client-update-policies): `CLIENT_UPDATE`
+      * <x-lifecycle class="ea"></x-lifecycle> [Device signal collection policies](https://developer.okta.com/docs/guides/device-signal-collection-policies/main/): `DEVICE_SIGNAL_COLLECTION`
+      * [Entity risk policies](https://developer.okta.com/docs/concepts/policies/#identity-threat-protection-policies): `ENTITY_RISK`
+      * [Global session policies](https://developer.okta.com/docs/concepts/policies/#global-session-policies): `SIGN_ON`
+      * [IdP discovery policies](https://developer.okta.com/docs/concepts/policies/#route-to-other-identity-providers): `IDP_DISCOVERY`
+      * [Password policies](https://developer.okta.com/docs/concepts/policies/#password-policies): `PASSWORD`
+      * [Identity Threat Protection policies](https://developer.okta.com/docs/concepts/policies/#identity-threat-protection-policies): `POST_AUTH_SESSION`
+      * [User profile policies](https://developer.okta.com/docs/concepts/policies/#user-profile-policies): `PROFILE_ENROLLMENT`
+
+      ### Policy evaluation
+      When a policy needs to be retrieved for a particular user, for example when the user attempts to sign in to Okta, or when the user initiates a self-service operation, then a policy evaluation takes place.
+      During policy evaluation each policy of the appropriate type is considered in turn, in the order indicated by the policy priority.
+
+      Each of the conditions associated with the policy is evaluated. If one or more of the conditions can't be met, then the next policy in the list is considered. If the conditions can be met, then each of the rules associated with the policy is considered in turn, in the order specified by the rule priority.
+      Each of the conditions associated with a given rule is evaluated. If all of the conditions associated with a rule are met, then the settings contained in the rule, and in the associated policy, are applied to the user. If none of the policy rules have conditions that can be met, then the next policy in the list is considered.
+
+      ### Rule priority
+      Rules have a priority that govern the order that they are considered during evaluation. The highest priority rule has a priority of `1`. For example, if a particular policy had two rules:
+      * Rule A has priority `1` and applies to LDAP API scenarios.
+      * Rule B has priority `2` and applies to ANYWHERE (network connection) scenarios.
+
+      If a request came in from the LDAP endpoint, the action in rule A is taken, and rule B isn't evaluated. This occurs because even though requests coming from anywhere match the ANYWHERE location condition of rule B, rule A has higher priority and is evaluated first.
+
+      ### Default rules
+      Only the default policy contains a default rule. In Identity Engine, you can't delete default rules, but can edit them, except for:
+        * The property `usePersistentCookie` of the default global session policy's default rule, which is read-only.
+        * The default identity provider routing rule and the default rule of the default authenticator enrollment policy, which are also read-only.
+
+      #### Policy limitations
+      Different policy types control settings for different operations. All policy types share a common framework, message structure, and API, but have different policy settings and rule data. Keep in mind the following policy-specific limitations.
+
+      #### App sign-in policy
+      The app sign-in policy has the following limitations:
+      * You can have a maximum of 5000 app sign-in policies in an org. There is a max limit of 100 rules allowed per policy. When you create an app sign-in policy, you automatically also create a default policy rule with the lowest priority of `99`. The highest priority that you can set an app sign-in policy rule to is `0`.
+      * When you [merge duplicate app sign-in policies](https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/consolidate-auth-policies.htm?cshid=ext-merge-auth-policies), policy and mapping CRUD operations may be unavailable during the consolidation. When the consolidation is complete, you receive an email.
+
+      #### IdP discovery policy
+      The IdP discovery policy has the following limitations:
+      * You can add up to 10 providers to a single `idp` policy action.
+      * You can define only one provider for the following IdP types: `AgentlessDSSO`, `IWA`, `X509`.
+      * You can't define a provider if `idpSelectionType` is `DYNAMIC`.
+      * You can't define a `providerExpression` if `idpSelectionType` is `SPECIFIC`.
+      * If a user identifier condition is defined together with an `OKTA` provider, sign-in requests are handled by Okta exclusively.
+
+      #### Password policy
+      The password policy is enforced only for Okta and AD-sourced users. For AD-sourced users, ensure that your Active Directory policies don't conflict with the Okta policies.
+
+      #### User profile policy
+      The user profile policy has the following limitations:
+      * You can't update or delete the required base attributes in the default user profile: `email`, `firstName`, or `lastName`.
+      * You can have a maximum of 500 user profile policies in an org. A user profile policy can only have one rule associated with it. Adding more rules isn't allowed.
+
+      The default rule is required and is always the last rule in the priority order. If you add rules to the default policy, they have a higher priority than the default rule. The `system` object determines whether a rule is created by a system or by a user. The default rule is the only rule that has this attribute. See [Configure multiple identifiers](https://developer.okta.com/docs/guides/multiple-identifiers/main/).
+  - name: PrincipalRateLimit
+    x-displayName: Principal Rate Limits
+    description: The Principal Rate Limits API provides operations to manage Principal Rate Limits for your organization.
+  - name: ProfileMapping
+    x-displayName: Profile Mappings
+    description: The Mappings API provides operations to manage the mapping of profile properties between an Okta user and an app user using [Okta Expression Language](https://developer.okta.com/docs/reference/okta-expression-language). You can find more information on Okta user and app user profiles in Okta's [User profiles](https://developer.okta.com/docs/concepts/user-profiles/#what-is-the-okta-universal-directory).
+  - name: PushProvider
+    x-displayName: Push Providers
+    x-okta-lifecycle:
+      features:
+        - CUSTOM_PUSH_AUTHENTICATOR
+    description: |-
+      The Okta Push Providers API provides a centralized integration platform to fetch and manage push provider configurations. Okta administrators can use these APIs to provide their push provider credentials, for example from APNs and FCM, so that Okta can send push notifications to their own custom app authenticator applications.
+
+      The Push Providers API supports the following **Authorization Schemes**:
+      * SSWS - [API tokens](https://developer.okta.com/docs/reference/core-okta-api/#authentication)
+      * Bearer - [OAuth2.0 and OpenID Connect](https://developer.okta.com/docs/concepts/oauth-openid/)
+
+      > **Notes:**
+      > * Some of the curl code examples on this page include SSWS API token authentication. However, Okta recommends using scoped OAuth 2.0 and OIDC access tokens to authenticate with Okta management APIs. OAuth 2.0 and OIDC access tokens provide fine-grain control over the bearer's actions on specific endpoints. See [Okta API authentication methods](https://developer.okta.com/docs/reference/core-okta-api/#authentication).
+      > * You can use the Push Providers API as part of the "Create a custom authenticator" flow. See the [Custom authenticator integration guide](https://developer.okta.com/docs/guides/authenticators-custom-authenticator/android/main/).
+  - name: RateLimitSettings
+    x-displayName: Rate Limit Settings
+    description: The Rate Limit Settings APIs provide operations to manage settings and configurations surrounding rate limiting in your Okta organization.
+  - name: Realm
+    x-displayName: Realms
+    description: |-
+      > **Note:** This API is only available if you're subscribed to Okta Identity Governance, Secure Partner Access, or Advanced Directory Management. Contact Okta Support for more information.
+
+      The Realms API provides operations to manage realms. See [Manage realms](https://help.okta.com/okta_help.htm?type=oie&id=csh-realms).
+
+  - name: RealmAssignment
+    x-displayName: Realm Assignments
+    description: |-
+      > **Note:** This API is only available if you're subscribed to Okta Identity Governance or Secure Partner Access, or Advanced Directory Management. Contact Okta Support for more information.
+
+      The Realm Assignments API provides operations to manage realm assignments. See [Realm assignments](https://help.okta.com/okta_help.htm?type=oie&id=csh-realms-assignment) and [Manage realms](https://help.okta.com/okta_help.htm?type=oie&id=csh-realms).
+
+      > **Note:** When you create realm assignments in bulk, realm assignment priorities must be unique.
+
+  - name: RoleCResourceSet
+    x-displayName: Resource Sets
+    description: The Resource Sets API provides operations to manage resource sets as a custom set of resources. See [Supported resources](https://developer.okta.com/docs/api/openapi/okta-management/guides/roles/#supported-resources).
+  - name: RoleCResourceSetResource
+    x-displayName: Resource Set Resources
+    description: The Resource Set Resources API provides operations to manage resources within a resource set. You can add or remove resources in resource sets. See [Supported resources](https://developer.okta.com/docs/api/openapi/okta-management/guides/roles/#supported-resources).
+  - name: RoleDResourceSetBinding
+    x-displayName: Role Resource Set Bindings
+    description: |-
+      The Role Resource Set Bindings API provides operations to assign members to a [Custom Role](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/roleecustom/) that targets resources in a [Resource Set](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleCResourceSet/). These operations allow you to assign custom roles to admins who are scoped to the designated resources in a resource set.
+
+      The returned role resource set binding is a single unique combination of a resource set, a custom role, and members.
+
+      > **Note:** If you use a custom role with permissions that don't apply to the resources in the resource set, it doesn't affect the admin role. For example,
+       the `okta.users.userprofile.manage` permission gives the admin no privileges if it's granted to a resource set that only includes `https://{yourOktaDomain}/api/v1/groups/{targetGroupId}`
+       resources. If you want the admin to be able to manage the users within the group, the resource set must include the corresponding `https://{yourOktaDomain}/api/v1/groups/{targetGroupId}/users` resources.
+
+  - name: RoleDResourceSetBindingMember
+    x-displayName: Role Resource Set Binding Members
+    description: The Role Resource Set Binding Members API provides operations to manage members in a [Role Resource Set Binding](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleDResourceSetBinding/).
+  - name: RiskEvent
+    x-displayName: Risk Events
+    description: |-
+      The Risk Events API provides the ability for third-party risk providers to send risk events to Okta. See [Third-party risk provider integration](https://developer.okta.com/docs/guides/third-party-risk-integration/) for guidance on integrating third-party risk providers with Okta.
+       > **Note:** This API will be deprecated on December 31, 2024. Use the [SSF Receiver API](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/SSFReceiver/) instead to receive security-related events and other data-subject signals. Also, use the [SSF Security Event Tokens API](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/SSFSecurityEventToken/) for third-party security event providers.
+  - name: RiskProvider
+    x-displayName: Risk Providers
+    description: |-
+      The Risk Providers API enables you to manage the Risk Providers within Okta. See [Third-party risk provider integration](https://developer.okta.com/docs/guides/third-party-risk-integration/) for guidance on integrating third-party risk providers with Okta.
+      > **Note:** This API will be deprecated on December 31, 2024. Use the [SSF Receiver API](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/SSFReceiver/) instead to receive security-related events and other data-subject signals. Also, use the [SSF Security Event Tokens API](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/SSFSecurityEventToken/) for third-party security event providers.
+  - name: UserRisk
+    x-displayName: User Risk
+    description: |-
+      <x-lifecycle class="oie"></x-lifecycle>
+      > This feature is only available with Identity Threat Protection in Identity Engine.
+
+      The User Risk API enables you to manage a user's risk level within Okta.
+    x-okta-lifecycle:
+      features:
+        - ENABLE_USER_RISK_CHANGE_EVALUATIONS
+  - name: RoleECustom
+    x-displayName: Custom Roles
+    description: |-
+      The Custom Roles API provides operations to manage custom roles that limit an admin's access to a subset of permissions and resources.
+  - name: RoleECustomPermission
+    x-displayName: Custom Role Permissions
+    description: The Custom Role Permissions API provides operations to manage the permissions assigned to a custom role.
+  - name: RoleAssignmentAUser
+    x-displayName: User Role Assignments
+    description: The User Role Assignments APIs allow you to assign roles and designate third-party admin status to users.
+  - name: RoleAssignmentBGroup
+    x-displayName: Group Role Assignments
+    description: The Group Role Assignments APIs allow you to assign roles and designate third-party admin status to groups.
+  - name: RoleAssignmentClient
+    x-displayName: Client Role Assignments
+    description: The Client Role Assignments APIs allow you to assign roles and designate third-party admin status to public client apps.
+  - name: RoleBTargetAdmin
+    x-displayName: User Role Targets
+    description: |-
+      User role targets are a way of limiting the app or group resources for a [standard role](https://developer.okta.com/docs/api/openapi/okta-management/guides/roles/#standard-roles) that's assigned to an admin user within your org.
+      You can define admin roles to target groups, apps, and app instances.
+
+      * **Group targets:** Grant an admin permission to manage only a specified group. For example, an admin role may be assigned to manage only the IT group.
+      * **App targets:** Grant an admin permission to manage all instances of an OIN-cataloged app integration. For example, an admin role can manage all customer instances of an OIN-cataloged app, such as Salesforce or Facebook.
+      * **App instance targets:** Grant an admin permission to manage an instance of an OIN-catalog app. For example, there may be a few Salesforce app instances configured for each sales region of an org. You can configure an admin to manage two Salesforce instances in a specific region and not the other regional Salesforce instances.
+
+      > **Note:** You can only use the User Role Targets API with [standard roles](https://developer.okta.com/docs/api/openapi/okta-management/guides/roles/#standard-roles). For custom roles, use [Resource Sets](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleCResourceSet/) to define specific targets. See the [Role Assignments concept](https://developer.okta.com/docs/concepts/role-assignment/).
+  - name: RoleBTargetBGroup
+    x-displayName: Group Role Targets
+    description: |-
+      Group role targets allow you to limit the app or group resources for a [standard role](https://developer.okta.com/docs/api/openapi/okta-management/guides/roles/#standard-roles) that's assigned to a group within your org.
+      You can define admin roles to target groups, apps, and app instances.
+
+      * **Group targets:** Grant an admin permission to manage only a specified group. For example, an admin role may be assigned to manage only the IT group.
+      * **App targets:** Grant an admin permission to manage all instances of an OIN-cataloged app integration. For example, an admin role can manage all customer instances of an OIN-cataloged app, such as Salesforce or Facebook.
+      * **App instance targets:** Grant an admin permission to manage an instance of an OIN-catalog app. For example, there may be a few Salesforce app instances configured for each sales region of an org. You can configure an admin to manage two Salesforce instances in a specific region and not the other regional Salesforce instances.
+
+      > **Note:** You can only use the Group Role Targets API with [standard roles](https://developer.okta.com/docs/api/openapi/okta-management/guides/roles/#standard-roles). For custom roles, use [Resource Sets](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleCResourceSet/) to define specific targets. See the [Role Assignments concept](https://developer.okta.com/docs/concepts/role-assignment/).
+  - name: RoleBTargetClient
+    x-displayName: Client Role Targets
+    description: |-
+      Client role targets allow you to limit the app or group resources for a [standard role](https://developer.okta.com/docs/api/openapi/okta-management/guides/roles/#standard-roles) that's assigned to a client (app) within your org.
+      You can define admin roles to target groups, apps, and app instances.
+
+      * **Group targets:** Grant an admin permission to manage only a specified group. For example, an admin role may be assigned to manage only the IT group.
+      * **App targets:** Grant an admin permission to manage all instances of an OIN-cataloged app integration. For example, an admin role can manage all customer instances of an OIN-cataloged app, such as Salesforce or Facebook.
+      * **App instance targets:** Grant an admin permission to manage an instance of an OIN-catalog app. For example, there may be a few Salesforce app instances configured for each sales region of an org. You can configure an admin to manage two Salesforce instances in a specific region and not the other regional Salesforce instances.
+
+      > **Note:** You can only use the Client Role Targets API with [standard roles](https://developer.okta.com/docs/api/openapi/okta-management/guides/roles/#standard-roles). For custom roles, use [Resource Sets](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleCResourceSet/) to define specific targets. See the [Role Assignments concept](https://developer.okta.com/docs/concepts/role-assignment/).
+  - name: Schema
+    x-displayName: Schemas
+    description: |-
+      The Schemas API provides operations to manage custom user profiles as well as endpoints to discover the structure of the log stream configuration.
+
+      Okta's [Universal Directory](https://help.okta.com/okta_help.htm?id=ext_About_Universal_Directory) allows admins to define custom user profiles for Okta users and apps.
+      Okta adopts a subset of [JSON Schema Draft 4](https://tools.ietf.org/html/draft-zyp-json-schema-04) as the schema language to describe and validate extensible user profiles.
+      For log stream schemas, Okta uses [JSON Schema Draft 2020-12](https://json-schema.org/specification.html).
+      [JSON Schema](http://json-schema.org/) is a lightweight declarative format for describing the structure, constraints, and validation of JSON documents.
+
+      > **Note:** Okta implements only a subset of [JSON Schema Draft 4](https://tools.ietf.org/html/draft-zyp-json-schema-04) and [JSON Schema Draft 2020-12](https://json-schema.org/specification.html). This document describes which parts apply to Okta, and any extensions Okta has made to [JSON Schema Draft 4](https://tools.ietf.org/html/draft-zyp-json-schema-04) and [JSON Schema Draft 2020-12](https://json-schema.org/specification.html).
+
+      ### Unique Attributes
+      You can enforce uniqueness for custom properties in Okta user profiles or the Okta group profile, such as an employee identification number. You can declare a maximum of five unique properties for each user type and five unique properties in the Okta group profile. Different user types can have the same or different unique properties (up to the limit of five per type).
+
+      Unique properties in Okta user profiles share a single namespace across all [user types](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserType/) in an org. If user types A and B both contain the property `ice cream` and you identify it as unique in both profiles, then if a user of type A has the value `chocolate`, no other users of type A or B (or any other user type that declares `ice cream` as unique) can have that value.
+
+      Properties that aren't unique also aren't tracked for uniqueness. Suppose the property `candy` is unique in type E and not unique in type F. If a user of type E has the value `caramel` for the `candy` property, no other users of type E can also have the value `caramel`, but any number of users of type F can already have or later be assigned the value `caramel`. Furthermore, because `candy` is not unique in type F, any values users of type F may have are not considered when enforcing uniqueness for users of type E. No matter how many users of type F already have the value `cotton`, it might be assigned to a user of type E as long as no other such user already has that value.
+
+      If you attempt to create or update a user with a duplicate value for a custom user property with a uniqueness restriction, the user creation or update operation fails. The user isn't created or updated until you enter a unique value. Similarly, creating or updating a group fails when the request contains a value for a unique custom group property that is duplicated by another group.
+
+      `null` values don't enter into the uniqueness calculation. If the unique property isn't also specified as being required, you can also omit the value entirely. Multiple users or groups can omit the property and not violate uniqueness.
+
+      To enforce uniqueness for custom properties, you can either add new unique custom properties or update existing custom properties to be unique.
+
+      #### Add new unique custom property
+
+      You can use the [add property to user profile schema](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Schema/#tag/Schema/operation/updateUserProfile) request or the [add property to group profile schema](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Schema/#tag/Schema/operation/updateGroupSchema) request to add one or more unique custom user or group properties. Specify `"unique": true` on the properties to be marked as unique. The response shows the properties with `"unique": "UNIQUE_VALIDATED"` and uniqueness is then enforced on those properties.
+
+      #### Update existing custom property to be unique
+
+      You can use the [update user profile schema property](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Schema/#tag/Schema/operation/updateUserProfile) request or the [update group profile schema property](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Schema/#tag/Schema/operation/updateGroupSchema) request to mark existing custom user or group properties as unique by specifying `"unique": true` on the properties to be marked as unique.
+
+      After the request to mark existing custom properties as unique is submitted, an asynchronous validation check is performed to make sure that there are no existing duplicate entries. If you have a significant number of users or groups, the validation can take some time.
+
+      A uniqueness status of `"unique": "PENDING_UNIQUENESS"` indicates that the validation check is still in progress. Use the Universal Directory page in the Admin Console (**Directory** > **Directory Integrations**) to track the status of the validation check. After the validation completes, if you submit a retrieve user schema request or a retreive group schema request, the property's uniqueness status changes to `UNIQUE_VALIDATED` if no duplicate records are found, and uniqueness is then enforced on that property. Otherwise, if duplicate records are found, the `unique` attribute of the schema property isn't shown in the get schema request and uniqueness isn't enforced on the schema property.
+
+      #### Update existing unique custom property to be non-unique
+
+      You can use the [update user profile schema property](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Schema/#tag/Schema/operation/updateUserProfile) request or the [update group profile schema property](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Schema/#tag/Schema/operation/updateGroupSchema) request to change existing unique custom user or group properties to be non-unique by specifying `"unique": false` on the properties to be changed to non-unique. The response shows the properties without the `unique` attribute and the uniqueness constraint is then removed on those properties.
+
+      **Note:** If multiple user types declare a property as unique and you remove the uniqueness constraint on one type, there may be a delay before users of other types that declare the property as unique can be assigned values formerly held by users of the first type.
+
+  - name: SSFReceiver
+    x-displayName: SSF Receiver
+    description: |-
+      <x-lifecycle class="oie"></x-lifecycle>
+      > This is a feature of Identity Threat Protection with Okta AI. It's also offered with limited support to orgs with [Adaptive MFA](https://okta.my.salesforce.com/sfc/p/#A0000000KWYD/a/4z000000rJ1i/OTjS8PbMNZItVbs4ER6XpO0s72javcjMUHhaRU3CYnY) enabled, where you must be directly assigned the super admin role to perform tasks.
+
+      Okta uses the [Shared Signals Framework (SSF)](https://sharedsignals.guide/) to receive security-related events and other data-subject signals from third-party security vendors. In this scenario, commonly used terms for third-party vendors that send signals are "transmitters", Okta is the "receiver", and the connection between the two entities is referred to as a "stream."
+
+      The SSF Receiver API allows you to manage SSF vendor stream configurations between the transmitter and Okta. A stream is configured by [creating a Security Events Provider](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/SSFReceiver/#tag/SSFReceiver/operation/createSecurityEventsProviderInstance) object in your Okta org. You can create a Security Events Provider object in Okta with a published well-known URL or an issuer-and-JWKS combination.
+
+      After the Security Events Provider object is created for a transmitter, the provider can use the [SSF Security Event Tokens](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/SSFSecurityEventToken/) API to publish events to Okta. While the SSF allows ingestion through push and poll-based operations, Okta currently supports only push-based operations.
+  - name: SSFSecurityEventToken
+    x-displayName: SSF Security Event Tokens
+    description: |-
+      <x-lifecycle class="oie"></x-lifecycle>
+      > This feature is only available with Identity Threat Protection in Identity Engine.
+
+      The Shared Signals Framework (SSF) Security Event Tokens API allows third-party security event providers to send Security Event Tokens (SETs) to Okta. The provider must be configured in Okta as a Security Events Provider instance before transmitting a SET to Okta. See [Create a Security Events Provider](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/SSFReceiver/#tag/SSFReceiver/operation/createSecurityEventsProviderInstance). After the token is verified, any appropriate action is performed upon ingestion.
+
+      Okta uses the Shared Signals Framework (SSF) defined by the [OpenID Shared Signals and Events Framework specification](https://openid.net/specs/openid-sse-framework-1_0.html). A risk signal is ingested as a Security Event Token (SET), a type of JSON Web Token (JWT) that must comply with the SET RFC: [RFC 8417 - Security Event Token(SET)](https://datatracker.ietf.org/doc/html/rfc8417). The `security.events.provider.receive_event` System Log event is created when a SET is published to Okta successfully.
+  - name: SSFTransmitter
+    x-displayName: SSF Transmitter
+    description: |-
+      <x-lifecycle class="oie"></x-lifecycle>
+
+      Okta uses the [Shared Signals Framework (SSF)](https://openid.net/specs/openid-sharedsignals-framework-1_0-ID3.html) to send security-related events and other data-subject signals to third-party security vendors. In this scenario, commonly used terms for third-party vendors that receive signals are "receivers", Okta is the "transmitter", and the connection between the two entities is referred to as a "stream."
+
+      The SSF Transmitter API allows you to manage SSF stream configurations between the receiver that receives signals transmitted by Okta. Okta sends signals in the form of [Security Event Tokens (SETs)](https://datatracker.ietf.org/doc/html/rfc8417) to a third-party SSF receiver.
+
+      Okta's SSF Transmitter currently supports two types of CAEP events: [Session Revoked](https://openid.net/specs/openid-caep-1_0-ID2.html#name-session-revoked) and [Credential Change](https://openid.net/specs/openid-caep-1_0-ID2.html#name-credential-change).
+
+      The following Okta events are mapped to the CAEP Session Revoked event:
+        - user.session.end
+
+      The following Okta events are mapped to the CAEP Credential Change event:
+        - user.mfa.factor.activate
+        - user.mfa.factor.deactivate
+        - user.mfa.factor.suspend
+        - user.mfa.factor.unsuspend
+        - user.mfa.factor.update
+        - user.mfa.factor.reset_all
+        - user.account.reset_password
+        - user.account.update_password
+
+      To enable the transmission of signals from Okta, you must create an SSF Stream using the SSF Transmitter API and configure the third-party receiver to accept signals from Okta.
+  - name: Session
+    x-displayName: Sessions
+    description: |-
+      Okta uses a cookie-based authentication mechanism to maintain a user's authentication Session across web requests. The Okta Sessions API provides operations to create and manage authentication Sessions for users in your Okta organization.
+
+      >**Notes:**
+      > * Some browsers block third-party cookies by default, which disrupts Okta functionality in certain flows. See [Mitigate the impact of third-party cookie deprecation](https://help.okta.com/okta_help.htm?type=oie&id=ext-third-party-cookies).
+      > * The Sessions API doesn't support direct authentication. Direct authentication is supported through the [Authentication API](https://developer.okta.com/docs/reference/api/authn/#authentication-operations) or through OIDC using the [Resource Owner Password flow](https://developer.okta.com/docs/guides/implement-grant-type/ropassword/main/).
+
+      ### Session cookie
+
+      Okta uses an HTTP session cookie to provide access to your Okta organization and applications across web requests for an interactive user agent such as a web browser. A session cookie has an expiration configurable by an administrator for the organization and is valid until the cookie expires or the user closes the Session (logout) or browser application.
+
+      ### Session token
+
+      A [session token](https://developer.okta.com/docs/reference/api/authn/#session-token) is a one-time bearer token that provides proof of authentication and may be redeemed for an interactive SSO session in Okta in a user agent. Session tokens can only be used **once** to establish a Session for a user and are revoked when the token expires.
+
+      Okta provides a very rich [Authentication API](https://developer.okta.com/docs/reference/api/authn/) to validate a [user's primary credentials](https://developer.okta.com/docs/reference/api/authn/#primary-authentication) and secondary [MFA factor](https://developer.okta.com/docs/reference/api/authn/#verify-factor). A session token is returned after successful authentication, which can be later exchanged for a session cookie that uses one of the following flows:
+
+      - [Retrieve a session cookie by visiting the OpenID Connect Authorization Endpoint](https://developer.okta.com/docs/guides/session-cookie/main/#retrieve-a-session-cookie-through-the-openid-connect-authorization-endpoint)
+      - [Retrieve a session cookie by visiting a session redirect link](https://developer.okta.com/docs/guides/session-cookie/main/#retrieve-a-session-cookie-by-visiting-a-session-redirect-link)
+      - [Retrieve a session cookie by visiting an application embed link](https://developer.okta.com/docs/guides/session-cookie/main/#retrieve-a-session-cookie-by-visiting-an-application-embed-link)
+
+      >**Note:** **Session tokens** are secrets and should be protected at rest and during transit. A session token for a user is equivalent to having the user's actual credentials.
+  - name: Subscription
+    x-displayName: Subscriptions
+    description: The Subscriptions API provides operations to manage email subscription settings for Okta administrator notifications.
+  - name: SystemLog
+    x-displayName: System Log
+    description: |-
+      The Okta System Log records system events that are related to your organization in order to provide an audit trail that can be used to understand platform activity and to diagnose problems.
+
+      The System Log API provides near real-time, read-only access to your organization's System Log and is the programmatic counterpart of the [System Log UI](https://help.okta.com/okta_help.htm?id=ext_Reports_SysLog).
+
+      The terms "event" and "log event" are often used interchangeably. In the context of this API, an "event" is an occurrence of interest within the system, and a "log" or "log event" is the recorded fact.
+
+      The System Log API supports these primary use cases:
+
+        * Event data export into a security information and event management system (SIEM)
+        * System monitoring
+        * Development debugging
+        * Event introspection and audit
+
+      > **Note:** Some of the curl code examples on this page include SSWS API token authentication. However, Okta recommends using scoped OAuth 2.0 and OIDC access tokens to authenticate with Okta management APIs. OAuth 2.0 and OIDC access tokens provide fine-grain control over the bearer's actions on specific endpoints. See [Okta API authentication methods](https://developer.okta.com/docs/api/openapi/okta-oauth/guides/overview/).
+
+      For further details and examples, see [System Log query](https://developer.okta.com/docs/reference/system-log-query/).
+
+  - name: Template
+    x-displayName: SMS Templates
+    description: |-
+      The SMS Templates API provides operations to manage custom SMS templates for verification.
+
+      > **Note:** Only SMS custom Templates are available through the API.
+
+      SMS Templates customize the SMS message that is sent to users. One default SMS Template is provided. All custom Templates must have the variable `${code}` as part of the text. The `${code}` variable is replaced with the actual SMS code when the message is sent. Optionally, you can also use the variable `${org.name}`. If a Template contains `${org.name}`, it is replaced with the organization name before the SMS message is sent.
+
+      ### SMS Template macros
+
+      Only two macros are supported for SMS Templates:
+
+      | <div style="width:200px">Type</div> | Description   |
+      | -------------------- | ----------- |
+      | ${code}  | The one-time verification code that's required for a user to sign in. |
+      | ${org.name} | The Okta org name that the user is trying to authenticate into. |
+
+      >**Note:** The length of your SMS message can't exceed 160 characters. If the verification code portion of the message falls outside of the 160-character limit, your message isn't sent.
+
+  - name: Themes
+    x-displayName: Themes
+    description: |-
+      These endpoints allow you to customize the look and feel of pages and templates, including the following:
+      * The Okta-hosted sign-in page
+      * The sign-out page
+      * Error pages
+      * Email templates
+      * The Okta End-User Dashboard
+
+      Each new org contains Okta default branding. You can upload your own assets (colors, background image, logo, and favicon) to replace the default assets. Then you can publish these assets directly to your pages and templates.
+
+      > **Notes:**
+      > * Some of the curl code examples on this page include SSWS API token authentication. However, Okta recommends scoped OAuth 2.0 and OIDC access tokens to authenticate with Okta management APIs. OAuth 2.0 and OIDC access tokens provide fine-grain control over the bearer's actions on specific endpoints. See [Okta API authentication methods](https://developer.okta.com/docs/api/openapi/okta-oauth/guides/overview/).
+      > * Okta optimizes the `primaryColorContrastHex` and `secondaryColorContrastHex` properties for the highest contrast between the font color and the background or button color. To disable or override the contrast auto-detection, update either contrast value with an accepted contrast hex code. Any update disables future automatic optimizations for the contrast hex.
+      > * Contrast color is used by pages to optimize the opacity of text color when primary or secondary color is used as the background.
+  - name: ThreatInsight
+    x-displayName: ThreatInsight
+    description: |-
+      [Okta ThreatInsight](https://help.okta.com/okta_help.htm?id=ext_threatinsight) maintains a
+      constantly evolving list of IP addresses that consistently exhibit malicious activity.
+      Authentication requests that are associated with an IP in this list can be logged to the
+      [System Log](https://help.okta.com/okta_help.htm?id=ext_Reports_SysLog) and blocked.
+      ThreatInsight also covers non-authentication requests in limited capacity depending on the attack patterns of these malicious IPs.
+
+      The ThreatInsight API provides operations to manage your org ThreatInsight configuration.
+
+      > **Note:** To prevent abuse, Okta ThreatInsight works in a limited capacity for free trial edition orgs. Contact Okta Support if fully functional Okta ThreatInsight is required.
+  - name: TrustedOrigin
+    x-displayName: Trusted Origins
+    description: |-
+      The Trusted Origins API provides operations to manage Trusted Origins and sources.
+
+      When external URLs are requested during sign-in, sign-out, or recovery operations, Okta checks those URLs against the allowed list of Trusted Origins. Trusted Origins also enable browser-based applications to access Okta APIs from JavaScript (CORS). If the origins aren't specified, the related operation (redirect or Okta API access) isn't permitted.
+
+      You can also configure Trusted Origins to allow iFrame embedding of Okta resources, such as Okta sign-in pages and the Okta End-User Dashboard, within that origin.
+
+      > **Notes:**
+      > * This feature is supported for Okta domains only. It isn't currently supported for custom domains.
+      > * Some of the curl code examples on this page include SSWS API token authentication. However, Okta recommends using scoped OAuth 2.0 and OIDC access tokens to authenticate with Okta management APIs. OAuth 2.0 and OIDC access tokens provide fine-grain control over the bearer's actions on specific endpoints. See [Okta API authentication methods](https://developer.okta.com/docs/api/openapi/okta-oauth/guides/overview/).
+  - name: UISchema
+    x-displayName: UI Schema
+    description: |-
+      The Okta UI Schema API allows you to control how inputs appear on an enrollment form. The UI Schema API is only available as a part of Okta Identity Engine.
+
+      If you're not sure which solution you're using, check the footer on any page of the Admin Console. The version number is appended with E for Identity Engine orgs and C for Classic Engine orgs.
+  - name: User
+    x-displayName: Users
+    description: |-
+      The Users API provides operations to manage users in your org.
+      > **Note:** Some of the curl code examples on this page include SSWS API token authentication. However, Okta recommends using scoped OAuth 2.0 and OIDC access tokens to authenticate with Okta management APIs.
+      > OAuth 2.0 and OIDC access tokens provide fine-grain control over the bearer's actions on specific endpoints. See [Okta API authentication methods](https://developer.okta.com/docs/api/openapi/okta-oauth/guides/overview/).
+
+      ### User status
+      The following diagram shows the flow of user status:
+
+      <img alt="Example" src="https://developer.okta.com/docs/api/images/users/okta-user-status.png" width="1000"/>
+
+      ### User creation scenarios
+
+       The following table describes the user experience and expectation of user status and welcome screen, depending on which options (security question and answer, password, and activate query) are defined during user creation.
+
+        **User creation details and outcomes**
+
+        | Security Q & A   | Password   | Activate Query Parameter   | User Status                | Login Credential                | Welcome Screen   |
+        |     -----        |  --------  |  ------------------------  |  -------------             |  ----------------------         |  --------------  |
+        |                  |            | FALSE                      | `STAGED`                   |                                 |                  |
+        |                  |            | TRUE                       | `PROVISIONED` or `ACTIVE`  | One-Time Token (Email) or Email | X                |
+        | X                |            | FALSE                      | `STAGED`                   |                                 |                  |
+        | X                |            | TRUE                       | `PROVISIONED` or `ACTIVE`  | One-Time Token (Email) or Email | X                |
+        |                  | X          | FALSE                      | `STAGED`                   |                                 |                  |
+        |                  | X          | TRUE                       | `ACTIVE`                   | Password                        | X                |
+        | X                | X          | FALSE                      | `STAGED`                   |                                 |                  |
+        | X                | X          | TRUE                       | `ACTIVE`                   | Password                        |                  |
+
+      Creating users with a `FEDERATION` or `SOCIAL` provider sets the user status to either `ACTIVE` or `STAGED` based on the `activate` query parameter since these two providers don't support a `password` or `recovery_question` credential.
+
+      More information about the use cases are in the following sections and in the examples for [Create a user](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/User/#tag/User/operation/createUser).
+
+      #### Create user with optional password
+
+      When making the password optional, the user status following user creation can be affected by the enrollment policy. See [Create an authenticator enrollment policy](https://help.okta.com/okta_help.htm?type=oie&id=ext-create-mfa-policy).
+
+      Based on the group memberships that are specified when the user is created, a password may or may not be required to make the user's status `ACTIVE`. The groups assigned to the user determines the enrollment policy applied to the user. If the enrollment policy has the password authenticator set to `required`, then the user's status is determined by if the user is created with a password:
+
+      * Created with a password - the user status is set to `PROVISIONED` and a One-Time Token is sent to the user through email
+      * Created without a password - the user status is set to `ACTIVE` and they can immediately sign in using their password authenticator
+
+      If the user doesn't have an enrolled authenticator, Okta sets the user to `PROVISIONED` and sends an activation link. The user must click the activation link before they can sign in. The activation link provides a baseline assurance that can be used to enroll in other authenticators. If the user has one or more enrolled authenticators at activation time, they're set to `ACTIVE` and can sign in directly.
+
+      See [Passwordless authentication](https://help.okta.com/okta_help.htm?type=oie&id=ext-passwordless-auth) in the help documentation.
+
+      #### Create user without credentials
+
+      Creates a user without a `password` or a recovery `question` and `answer`.
+
+      If appropriate, when the user is activated, an email is sent to the user with an activation token that the user can use to complete the activation process.
+
+      This is the default flow for new user registration using the Admin Console.
+
+      #### Create user with recovery question
+
+      Creates a user without a `password`.
+
+      When the user is activated, an email is sent to the user with an activation token that can be used to complete the activation process.
+      This flow is useful if migrating users from an existing user store.
+
+      #### Create user with password
+
+      Creates a user without a recovery `question` and `answer`.
+
+      The new user is able to sign in after activation with the assigned password. This flow is common when developing a custom user registration experience.
+      > **Important:** Don't generate or send a one-time activation token when activating users with an assigned password. Users should sign in with their assigned password.
+
+      > **Note:** You can also use this scenario to create a user without sending an activation email. See this [Knowledge Base article](https://support.okta.com/help/s/article/How-to-Avoid-Sending-a-Welcome-Email?language=en_US#:~:text=For%20users%20imported%20from%20the,t%20send%20new%20user%20activation).
+
+      #### Create user with imported hashed password
+
+      Creates a user with a specified hashed password.
+
+      The new user is able to sign in after activation with the specified password.
+
+      This flow is common when migrating users from another data store in cases where we want to allow the users to retain their current passwords.
+      > **Important:** Do not generate or send a one-time activation token when activating users with an imported password. Users should login with their imported password.
+
+      #### Create user with password import inline hook
+
+      Creates a user with a `Password Hook` object specifying that a password inline hook should be used to handle password verification.
+
+      The password inline hook is triggered to handle verification of the end user's password the first time the user tries to sign in, with Okta calling the password inline hook to check that the password the user supplied is valid. If the password is valid, Okta stores the hash of the password that was provided and can authenticate the user independently from then on. See [Create a password import inline hook](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/inlinehook/#tag/InlineHook/operation/createPasswordImportInlineHook) for more details.
+
+      The new user is able to sign in after activation with the valid password. This flow supports migrating users from another data store in cases where we wish to allow the users to retain their current passwords.
+      > **Important:** Don't generate or send a one-time activation token when activating users with an password inline hook. Users should sign in with their existing password to be imported using the password import inline hook.
+
+      #### Create user with password and recovery question
+
+      Creates a new user with a password and recovery `question` and `answer`.
+
+      The new user is able to log in with the assigned password after activation. This flow is common when developing a custom user-registration experience.
+      > **Important:** Don't generate or send a one-time activation token when activating users with an assigned password. Users should login with their assigned password.
+
+      #### Create user with authentication provider
+
+      Creates a new passwordless user with a `SOCIAL` or `FEDERATION` authentication provider that must be authenticated through a trusted identity provider.
+
+      #### Create user in group
+
+      Creates a user that is added to the specified groups upon creation.
+
+      Use this in conjunction with other create operations for a group admin that's scoped to create users only in specified groups. The request can specify up to 20 group IDs. (This limit applies only when creating a user. You can add the user later to more groups.)
+
+      #### Create user with non-default user type
+
+      Creates a user with a specified user type. You can include the type specification with any of the above Create user operations. This example demonstrates creating a user without credentials.
+      The user type determines which [Schema](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Schema/) applies to that user. After you create a user, you can assign the user a different user type using the full replacement [PUT operation](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserType/#tag/UserType/operation/replaceUserType).
+
+      ### Links object
+
+      The links object specifies link relations. See [`_links`](https://developer.okta.com/docs/api/openapi/okta-management/management/user/listusers!c=200&path=_links&t=response).
+
+      > **Note:** This links object is different from [linked objects](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/LinkedObject/).
+
+      #### Individual users versus collection of users
+
+      For an individual user result, the links object contains a full set of link relations available for that user as determined by your policies. For a collection of users, the links object contains only the `self` link. Operations that return a collection of users include [List all users](https://developer.okta.com/docs/api/openapi/okta-management/management/user/listusers) and [List all member users](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Group/#tag/Group/operation/listGroupUsers).
+
+      The following table shows some links that may be available on a user, as determined by your policies:
+
+      |   Link Relation Type   |                                                  Description                                                                                                                        |
+      |------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+      |self	                   |  A self-referential link to this user                                                                                                                                               |
+      |activate	               |  Lifecycle action to [activate the user](https://developer.okta.com/docs/api/openapi/okta-management/management/userlifecycle/activateuser)                                           |
+      |deactivate              |	Lifecycle action to [deactivate the user](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserLifecycle/#tag/UserLifecycle/operation/deactivateUser)                                       |
+      |suspend                 |	Lifecycle action to [suspend the user](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserLifecycle/#tag/UserLifecycle/operation/suspendUser)                                             |
+      |unsuspend               |	Lifecycle action to [unsuspend the user](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserLifecycle/#tag/UserLifecycle/operation/unsuspendUser)                                         |
+      |resetPassword           |	Lifecycle action to [trigger a password reset](https://developer.okta.com/docs/api/openapi/okta-management/management/usercred/resetpassword)                                             |
+      |expirePassword          |	Lifecycle action to [expire the user's password](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserCred/#tag/UserCred/operation/expirePassword)                                          |
+      |resetFactors            |	Lifecycle action to [reset all MFA factors](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserLifecycle/#tag/UserLifecycle/operation/resetFactors)                                       |
+      |unlock                  |	Lifecycle action to [unlock a locked-out user](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserLifecycle/#tag/UserLifecycle/operation/unlockUser)                                      |
+      |forgotPassword          |	[Resets a user's password](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserCred/#tag/UserCred/operation/forgotPassword) by validating the user's recovery credential.                  |
+      |changePassword          |	[Changes a user's password](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserCred/#tag/UserCred/operation/changePassword) validating the user's current password                        |
+      |changeRecoveryQuestion  |	[Changes a user's recovery credential](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserCred/#tag/UserCred/operation/changeRecoveryQuestion) by validating the user's current password  |
+
+  - name: UserCred
+    x-displayName: User Credentials
+    description: The User Credentials API provides operations to manage user credentials in your org.
+  - name: UserGrant
+    x-displayName: User Grants
+    description: |-
+      The User Grants API provides operations to manage user consent grants in your org.
+
+      A consent represents a user's explicit permission to allow an app to access resources protected by scopes. Consent grants are different from tokens because a consent can outlast a token. Also, there can be multiple tokens with varying sets of scopes derived from a single consent. When an app comes back and needs to get a new access token, it may not need to prompt the user for consent. This happens if they've already consented to the specified scopes. Consent grants remain valid until the user manually revokes them, or until the user, app, authorization server, or scope is deactivated or deleted.
+
+      > **Hint:** For all grant operations, you can use `me` instead of the `userId` in an endpoint that contains `/users`, in an active session with no SSWS token (API token). For example: `https://${yourOktaDomain}/api/v1/users/me/grants` returns all the grants for the active session user.
+
+      > **Note:** Some browsers have begun blocking third-party cookies by default, disrupting Okta functionality in certain flows. For more information, see [FAQ: How Blocking Third Party Cookies Can Potentially Impact Your Okta Environment](https://support.okta.com/help/s/article/FAQ-How-Blocking-Third-Party-Cookies-Can-Potentially-Impact-Your-Okta-Environment).
+  - name: UserOAuth
+    x-displayName: User OAuth 2.0 Token Management
+    description: |-
+      The User OAuth 2.0 Token Management API provides operations to manage tokens issued by an authorization server for a particular user and client in your org. For example, you can revoke every active refresh token for a user in the context of a specific client. You can also [revoke specific tokens](https://developer.okta.com/docs/guides/revoke-tokens/main/) or [manage tokens at the authorization server level](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/AuthorizationServer/).
+
+      Read [Validate Access Tokens](https://developer.okta.com/docs/guides/validate-access-tokens/) to understand more about how OAuth 2.0 tokens work.
+  - name: UserResources
+    x-displayName: User Resources
+    description: |-
+      The User Resources API provides operations related to user resources.
+  - name: UserLifecycle
+    x-displayName: User Lifecycle
+    description: |-
+      The User Lifecycle API provides lifecycle operations, which are non-idempotent operations that initiate a state transition for a user's status. Some operations are asynchronous while others are synchronous.
+      The user's current status limits what operations are allowed.
+  - name: UserSessions
+    x-displayName: User Sessions
+    description: The User Sessions API provides operations to manage user sessions in your org.
+  - name: UserLinkedObject
+    x-displayName: User Linked Objects
+    description: |-
+      The User Linked Objects API provides operations to manage user linked objects in your org.
+      Use link value operations to assign users to a relationship, represented by a pair of `primary` and `associated` links. See also the [Linked Objects API](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/LinkedObject/).
+
+      For these operations, the examples use consistent IDs so that you can follow the operations more easily:
+      * `manager` is the `primary` relationship and is assigned `00u5t60iloOHN9pBi0h7`
+      * `subordinate` is the `associated` relationship and is assigned to IDs `00u5zex6ztMbOZhF50h7` and `00u1tsf0nQKavLDUh0g5`
+  - name: UserClassification
+    x-displayName: User Classification
+    description: The User Classification API provides operations to manage user classifications in your org.
+  - name: UserFactor
+    x-displayName: User Factors
+    description: |-
+      The Factors API provides operations to enroll, manage, and verify factors for multifactor authentication (MFA). Generally, authentication involves verifying a different one-time passcode (OTP). Manage both administration and end-user accounts, or verify an individual factor at any time.
+      Okta supports several different types of factors:
+
+      | Factor Type           | Description |
+      |-----------------------|-------------|
+      | `call`                | Software OTP sent using a voice call to a registered phone number |
+      | `sms`                 | Software OTP sent using SMS to a registered phone number |
+      | `email`               | Software OTP sent using email |
+      | `question`            | Additional knowledge-based security question |
+      | `push`                | Out-of-band verification using a push notification to a device and transaction verification with digital signature |
+      | `token`               | Software or hardware OTP sent to a device |
+      | `token:hardware`      | Hardware OTP sent to a device |
+      | `token:hotp`          | Custom [TOTP](https://www.ietf.org/rfc/rfc6238.txt) factor that uses an extension of the [HMAC (Hash-Based Message Authentication Codes)](https://www.okta.com/identity-101/hmac/)-based one-time passcode (HOTP) algorithm |
+      | `token:software:totp` | Software time-based one-time passcode (TOTP) |
+      | `u2f`                 | Hardware Universal 2nd Factor (U2F) device |
+      | `web`                 | HTML inline frame (iframe) for embedding verification from a third party |
+      | `webauthn`            | Hardware WebAuthn device |
+      | `signed_nonce`        | Okta Fastpass (device-bound authentication). This is available for OIE orgs if the org has users that have enrolled with Okta Verify after the org started using OIE. The `signed_nonce` factor type can only be retrieved using GET operations or deleted using the [DELETE](https://developer.okta.com/docs/api/openapi/okta-management/management/userfactor/unenrollfactor) operation. It cannot be enrolled, activated, or verified through other HTTP methods with the Factors API. |
+
+      > <x-lifecycle class="ea"></x-lifecycle>
+      > **Note:** When the **Passkeys Rebrand** self-service Early Access feature is enabled, the FIDO2 (WebAuthn) authenticator is called Passkeys (FIDO2 WebAuthn), and there are new settings and updates to the authenticator page layout.
+      >
+      > See [Configure the FIDO2 (WebAuthn) authenticator](https://help.okta.com/okta_help.htm?type=oie&id=csh-configure-webauthn) and [`settings`](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Authenticator/#tag/Authenticator/operation/replaceAuthenticatorMethod!path=8/settings&t=request). To enable the **Passkeys Rebrand** feature, see [Enable self-service features](https://help.okta.com/okta_help.htm?id=ext_Manage_Early_Access_features).
+
+  - name: UserType
+    x-displayName: User Types
+    description: The User Types API provides operations to manage user types. The user type determines which schema applies to that user. See the user object's [`type`](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/User/#tag/User/operation/createUser!path=type&t=request) property and the [Schemas](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Schema/) API.
+  - name: HookPassword
+    x-displayName: Password import inline hook
+    description: |-
+      This page provides reference documentation for the password import inline hook, one type of inline hook supported by Okta. It provides sample JSON objects that are contained in the outbound request from Okta to your external service,
+      and sample JSON objects that you can include in your response.
+
+      The password import inline hook allows you to migrate users from another data store where you want the users to retain their current passwords.
+      Use this hook with the [Create user with password import inline hook](https://developer.okta.com/docs/reference/api/users/#create-user-with-password-import-inline-hook) flow that's provided by the [Users API](/openapi/okta-management/management/tags/user).
+
+      The password import inline hook is triggered when the end user tries to sign in to Okta for the first time. Okta sends your external service the password that the user supplied. Your external service then needs to send a response to Okta indicating whether the password supplied by the end user is valid.
+
+      If your service returns a response that indicates that the password is valid, Okta sets the password for the user. The password import inline hook won't need to call your service again.
+      However, if the Okta service is in read-only mode, it might not be possible to set the password. Okta then needs to call your service again the next time the end user attempts to sign in.
+      See [Password inline hook and Okta read-only mode](#password-inline-hook-and-okta-read-only-mode) and [Removing password from existing user store](#password-removal-from -an-existing-user-store).
+
+      See also:
+        * [Inline hooks](https://developer.okta.com/docs/concepts/inline-hooks/) for a general introduction to Okta inline hooks
+        * [Inline Hooks Management API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/inlinehook/) for information on the API for registering external service endpoints with Okta
+        * [Add an inline hook](https://help.okta.com/okta_help.htm?type=oie&id=ext-add-inline-hook) for steps to enable this inline hook in the Admin Console
+        * [Password import inline hook](https://developer.okta.com/docs/guides/password-import-inline-hook/nodejs/main/) for an example implementation of this inline hook
+
+      >**Note:**
+      >
+      > * Password policies don't apply to the password import inline hook. That is, if your external service validates the password, the password is imported even if it doesn't meet the Okta password policy requirements.
+      > * You can create only one password import inline hook per org.
+
+      ### Enable a password import inline hook
+
+      To enable a password import inline hook, you first need to register your external service endpoint with Okta and configure it as an inline hook of type `com.okta.user.credential.password.import`.
+      See [Inline hook setup](https://developer.okta.com/docs/concepts/inline-hooks/#inline-hook-setup) or [Add an inline hook](https://help.okta.com/okta_help.htm?type=oie&id=ext-add-inline-hook).
+
+      When you create a user with the `/users` API, use the [Create user with password import inline hook](https://developer.okta.com/docs/reference/api/users/#create-user-with-password-import-inline-hook) use case.
+      This involves specifying a `credentials.password.hook` property in the request body.
+
+      When the end user that you have added attempts to sign in to Okta for the first time, the hook is triggered and Okta calls your external service. The call sends the credentials that the end user provided. Your service can check
+      the credentials and respond with a command to indicate whether the credentials are valid or not.
+
+      ### Password inline hook and Okta read-only mode
+
+      If your external service responds to Okta indicating that the credentials are valid, Okta saves the password
+      and can authenticate the user independently from then on. However, if your Okta org is in a special [read-only mode](https://support.okta.com/help/s/article/What-is-Oktas-Readonly-Mode)
+      at the time the end user signs in, then saving the password might not be possible. The
+      next time the end user attempts to sign in, the password import inline hook needs to be called again.
+
+      ### Password removal from an existing user store
+
+      Because of the possibility of your org being in a special service mode, you shouldn't attempt to permanently delete user passwords from your
+      existing user store until you can verify the success of the password import . An Okta System Log
+      Event, `user.import.password`, is available for this purpose. An event of this type is created every time a password
+      import inline hook is fired, with its `Event.Outcome` property providing a status of `FAILURE` or `SUCCESS` for the
+      password import operation. If the status is `SUCCESS`, Okta has successfully saved the end user's password, and
+      it's safe to delete it from your previous user store.
+
+      You can configure an [Event hook](https://developer.okta.com/docs/concepts/event-hooks/) to send this event type to you for use when triggering automated cleanup of end-user
+      passwords after successful migration.
+  - name: PrivilegedResource
+    x-displayName: Privileged Resources
+    description: The Privileged Resources API provides operations to fetch and manage privileged resources.
+  - name: ServiceAccount
+    x-displayName: Service Accounts
+    description: |-
+      The Service Accounts API provides operations to manage SaaS or On-Prem Provisioning (OPP) app accounts as service accounts.
+
+      > **Note:** This feature is available only if you're subscribed to Okta Privileged Access. Ensure that you've set up the Okta Privileged Access app before managing app accounts through this API.
+
+      See [Manage service accounts](https://help.okta.com/okta_help.htm?type=oie&id=ud-privileged-acnt).
+  - name: WebAuthnPreregistration
+    x-displayName: WebAuthn Preregistration
+    description: |-
+      The WebAuthn preregistration API provides a flow to initiate and set up WebAuthn preregistration authenticator enrollments through third-party fulfillment providers.
+
+      > **Note:** For information about using WebAuthn preregistration with YubiKeys, see [Require phishing-resistant authentication with pre-enrolled YubiKey](https://help.okta.com/okta_help.htm?type=oie&id=csh-preenrolled-yubikey-main).
+
+      Use the following sequence of endpoints to set up WebAuthn preregistration authenticator enrollments.
+
+        1. [Generate a fulfillment request](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/WebAuthnPreregistration/#tag/WebAuthnPreregistration/operation/generateFulfillmentRequest)
+        2. [Enroll a preregistered WebAuthn factor](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/WebAuthnPreregistration/#tag/WebAuthnPreregistration/operation/enrollPreregistrationEnrollment)
+        3. [Activate a preregistered WebAuthn factor](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/WebAuthnPreregistration/#tag/WebAuthnPreregistration/operation/activatePreregistrationEnrollment)
+
+      After you set up the preregistered WebAuthn factor, you can send the PIN to the user.
+
+      > <x-lifecycle class="ea"></x-lifecycle>
+      > **Note:** When the **Passkeys Rebrand** self-service Early Access feature is enabled, the FIDO2 (WebAuthn) authenticator is called Passkeys (FIDO2 WebAuthn), and there are new settings and updates to the authenticator page layout.
+      >
+      > See [Configure the FIDO2 (WebAuthn) authenticator](https://help.okta.com/okta_help.htm?type=oie&id=csh-configure-webauthn) and [`settings`](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Authenticator/#tag/Authenticator/operation/replaceAuthenticatorMethod!path=8/settings&t=request). To enable the **Passkeys Rebrand** feature, see [Enable self-service features](https://help.okta.com/okta_help.htm?id=ext_Manage_Early_Access_features).
+
+  - name: UserAuthenticatorEnrollments
+    x-displayName: User Authenticator Enrollments
+    description: |-
+      The Authenticator Enrollments API provides operations for admins to manage the authenticator enrollments of their users.
+
+      An authenticator enrollment is the specific instance of an authenticator that a user has enrolled. For example, if a user enrolls an `sms` method with a phone number, they can use both `sms` and `voice` methods. The Authenticator Enrollments API allows admins to manage both of those user enrollments.
+  - name: CustomTelephonyProvider
+    x-displayName: Custom Telephony Provider
+    description: |-
+      <x-lifecycle class="oie"></x-lifecycle>
+
+      The Custom Telephony Provider API provides operations to manage your custom telephony providers and their credentials. Creating a custom telephony provider enables you to use the Phone authenticator. See [Use your own telephony provider](https://help.okta.com/okta_help.htm?type=oie&id=configure-telephony-providers) to learn more about using your own telephony provider.
+      
+      To create a custom telephony provider, you must first create an account with a supported telephony provider. After you have an account, you can use this API to add and then manage your provider credentials. [Twilio](https://www.twilio.com/) and [Telesign](https://www.telesign.com/) are the only supported telephony providers at this time.
+
+paths: {} # This was added to satisfy the linter, any valid OAS file must have paths defined, even if it's empty.
+components:
+  securitySchemes:
+    apiToken:
+      description: 'Pass the API token as the Authorization header value prefixed with SSWS: `Authorization: SSWS {API Token}`'
+      name: Authorization
+      type: apiKey
+      in: header
+    oauth2:
+      type: oauth2
+      description: 'Pass the access_token as the value of the Authorization header: `Authorization: Bearer {access_token}`'
+      flows:
+        authorizationCode:
+          authorizationUrl: /oauth2/v1/authorize
+          tokenUrl: /oauth2/v1/token
+          scopes:
+            okta.agentPools.manage: Allows the app to create and manage agent pools in your Okta organization
+            okta.agentPools.read: Allows the app to read agent pools in your Okta organization
+            okta.apiTokens.manage: Allows the app to manage API Tokens in your Okta organization
+            okta.apiTokens.read: Allows the app to read API Tokens in your Okta organization
+            okta.appGrants.manage: Allows the app to create and manage grants in your Okta organization
+            okta.appGrants.read: Allows the app to read grants in your Okta organization
+            okta.apps.interclientTrust.manage: Allows the app to manage trusted relationship for native to web SSO
+            okta.apps.interclientTrust.read: Allows the app to read configured trusted relationship for native to web SSO
+            okta.apps.manage: Allows the app to create and manage Apps in your Okta organization
+            okta.apps.read: Allows the app to read information about Apps in your Okta organization
+            okta.authenticators.manage: Allows the app to manage all authenticators. For example, enrollments or resets.
+            okta.authenticators.manage.self: Allows the app to manage a user's own authenticators. For example, enrollments or resets.
+            okta.authenticators.read: Allows the app to read org authenticators information
+            okta.authorizationServers.manage: Allows the app to create and manage Authorization Servers in your Okta organization
+            okta.authorizationServers.read: Allows the app to read information about Authorization Servers in your Okta organization
+            okta.behaviors.manage: Allows the app to create and manage behavior detection rules in your Okta organization
+            okta.behaviors.read: Allows the app to read behavior detection rules in your Okta org
+            okta.botProtection.manage: Allows the app to manage bot protection configuration in your Okta org
+            okta.botProtection.read: Allows the app to read bot protection configuration in your Okta org
+            okta.brands.manage: Allows the app to create and manage Brands and Themes in your Okta organization
+            okta.brands.read: Allows the app to read information about Brands and Themes in your Okta organization
+            okta.captchas.manage: Allows the app to create and manage CAPTCHAs in your Okta organization
+            okta.captchas.read: Allows the app to read information about CAPTCHAs in your Okta organization
+            okta.deviceAssurance.manage: Allows the app to manage device assurances
+            okta.deviceAssurance.read: Allows the app to read device assurances
+            okta.devicePostureChecks.manage: Allows the app to manage device posture checks
+            okta.devicePostureChecks.read: Allows the app to read device posture checks
+            okta.deviceIntegrations.manage: Allows the app to manage device integrations
+            okta.deviceIntegrations.read: Allows the app to read device integrations
+            okta.devices.manage: Allows the app to manage device status transitions and delete a device
+            okta.devices.read: Allows the app to read the existing device's profile and search devices
+            okta.domains.manage: Allows the app to manage custom Domains for your Okta organization
+            okta.domains.read: Allows the app to read information about custom Domains for your Okta organization
+            okta.directories.groups.manage: Allows the app to manage AD/LDAP groups for your Okta organization
+            okta.directories.groups.read: Allows the app to read AD/LDAP groups for your Okta organization
+            okta.dr.manage: Allows the app to manage disaster recovery
+            okta.dr.read: Allows the app to read the disaster recovery status
+            okta.emailDomains.manage: Allows the app to manage Email Domains for your Okta organization
+            okta.emailDomains.read: Allows the app to read information about Email Domains for your Okta organization
+            okta.emailServers.manage: Allows the app to manage Email Servers for your Okta organization
+            okta.emailServers.read: Allows the app to read information about Email Servers for your Okta organization
+            okta.eventHooks.manage: Allows the app to create and manage Event Hooks in your Okta organization
+            okta.eventHooks.read: Allows the app to read information about Event Hooks in your Okta organization
+            okta.features.manage: Allows the app to create and manage Features in your Okta organization
+            okta.features.read: Allows the app to read information about Features in your Okta organization
+            okta.groups.manage: Allows the app to create and manage groups in your Okta organization
+            okta.groups.read: Allows the app to read information about groups and their members in your Okta organization
+            okta.identitySources.manage: Allows the custom identity sources to manage user entities in your Okta organization
+            okta.identitySources.read: Allows to read session information for custom identity sources in your Okta organization
+            okta.idps.manage: Allows the app to create and manage Identity Providers in your Okta organization
+            okta.idps.read: Allows the app to read information about Identity Providers in your Okta organization
+            okta.inlineHooks.manage: Allows the app to create and manage Inline Hooks in your Okta organization
+            okta.inlineHooks.read: Allows the app to read information about Inline Hooks in your Okta organization
+            okta.operations.read: Allows the app to read the status of asynchronous operations in your Okta organization
+            okta.linkedObjects.manage: Allows the app to manage linked object definitions in your Okta organization
+            okta.linkedObjects.read: Allows the app to read linked object definitions in your Okta organization
+            okta.logStreams.manage: Allows the app to create and manage log streams in your Okta organization
+            okta.logStreams.read: Allows the app to read information about log streams in your Okta organization
+            okta.logs.read: Allows the app to read information about System Log entries in your Okta organization
+            okta.manifests.manage: Allows the app to manage OIN submissions in your Okta organization
+            okta.manifests.read: Allows the app to read OIN submissions in your Okta organization
+            okta.networkZones.manage: Allows the app to create and manage Network Zones in your Okta organization
+            okta.networkZones.read: Allows the app to read Network Zones in your Okta organization
+            okta.oauthIntegrations.manage: Allows the app to create and manage API service Integration instances in your Okta organization
+            okta.oauthIntegrations.read: Allows the app to read API service Integration instances in your Okta organization
+            okta.orgs.manage: Allows the app to manage organization-specific details for your Okta organization
+            okta.orgs.read: Allows the app to read organization-specific details about your Okta organization
+            okta.personal.adminSettings.read: Allows the app to read the personal admin settings for the signed-in user
+            okta.personal.adminSettings.manage: Allows the app to manage the personal admin settings for the signed-in user
+            okta.policies.manage: Allows the app to manage policies in your Okta organization
+            okta.policies.read: Allows the app to read information about policies in your Okta organization
+            okta.principalRateLimits.manage: Allows the app to create and manage Principal Rate Limits in your Okta organization
+            okta.principalRateLimits.read: Allows the app to read information about Principal Rate Limits in your Okta organization
+            okta.privilegedResources.manage: Allows the app to create privileged resources and manage their details
+            okta.privilegedResources.read: Allows the app to read the details of existing privileged resources
+            okta.serviceAccounts.manage: Allows the app to manage service accounts in your Okta organization
+            okta.serviceAccounts.read: Allows the app to read service accounts in your Okta organization
+            okta.profileMappings.manage: Allows the app to manage user profile mappings in your Okta organization
+            okta.profileMappings.read: Allows the app to read user profile mappings in your Okta organization
+            okta.pushProviders.manage: Allows the app to create and manage push notification providers such as APNs and FCM
+            okta.pushProviders.read: Allows the app to read push notification providers such as APNs and FCM
+            okta.rateLimits.manage: Allows the app to create and manage rate limits in your Okta organization
+            okta.rateLimits.read: Allows the app to read information about rate limits in your Okta organization
+            okta.realms.manage: Allows the app to create new realms and to manage their details
+            okta.realms.read: Allows the app to read the existing realms and their details
+            okta.realmAssignments.manage: Allows a user to manage realm assignments
+            okta.realmAssignments.read: Allows a user to read realm assignments
+            okta.riskEvents.manage: (Deprecated) Allows the app to publish risk events to your Okta organization
+            okta.riskProviders.manage: (Deprecated) Allows the app to create and manage risk provider integrations in your Okta organization
+            okta.riskProviders.read: (Deprecated) Allows the app to read all risk provider integrations in your Okta organization
+            okta.roles.manage: Allows the app to manage administrative role assignments for users in your Okta organization. Delegated admins with this permission can only manage user credential fields and not the credential values themselves.
+            okta.roles.read: Allows the app to read administrative role assignments for users in your Okta organization. Delegated admins with this permission can only read user credential fields and not the credential values themselves.
+            okta.schemas.manage: Allows the app to create and manage Schemas in your Okta organization
+            okta.schemas.read: Allows the app to read information about Schemas in your Okta organization
+            okta.securityEventsProviders.manage: Allows the app to create and manage Security Events Providers in your Okta organization
+            okta.securityEventsProviders.read: Allows the app to read information about Security Events Providers in your Okta organization
+            okta.sessions.manage: Allows the app to manage all sessions in your Okta organization
+            okta.sessions.read: Allows the app to read all sessions in your Okta organization
+            okta.templates.manage: Allows the app to manage all custom templates in your Okta organization
+            okta.templates.read: Allows the app to read all custom templates in your Okta organization
+            okta.threatInsights.manage: Allows the app to manage all ThreatInsight configurations in your Okta organization
+            okta.threatInsights.read: Allows the app to read all ThreatInsight configurations in your Okta organization
+            okta.trustedOrigins.manage: Allows the app to manage all Trusted Origins in your Okta organization
+            okta.trustedOrigins.read: Allows the app to read all Trusted Origins in your Okta organization
+            okta.uischemas.read: Allows the app to read all the UI Schemas in your Okta organization
+            okta.uischemas.manage: Allows the app to manage all the UI Schemas in your Okta organization
+            okta.userRisk.read: Allows the app to read a user's risk in your Okta org
+            okta.userRisk.manage: Allows the app to manage a user's risk in your Okta org
+            okta.serviceAccounts.okta.manage: Allows the app to manage Okta managed user accounts in your Okta org
+            okta.serviceAccounts.okta.read: Allows the app to read Okta managed user accounts in your Okta org
+            okta.userTypes.manage: Allows the app to manage user types in your Okta org
+            okta.userTypes.read: Allows the app to read user types in your Okta org
+            okta.users.manage: Allows the app to create new users and to manage all users' profile and credentials information
+            okta.users.manage.self: Allows the app to manage the signed-in user's profile and credentials
+            okta.users.read: Allows the app to read the existing users' profiles and credentials
+            okta.users.read.self: Allows the app to read the signed-in user's profile and credentials
+            ssf.manage: Allows the app to create and manage Shared Signals Framework (SSF) in your Okta organization
+            ssf.read: Allows the app to read information about Shared Signals Framework (SSF) in your Okta organization
+            okta.customTelephonyProvider.manage: Allows the app to create and manage custom telephony provider credentials
+            okta.customTelephonyProvider.read: Allows the app to read custom telephony provider credentials

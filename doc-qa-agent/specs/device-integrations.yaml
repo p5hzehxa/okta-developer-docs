@@ -1,0 +1,386 @@
+openapi: 3.0.3
+info:
+  title: Device Integrations API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/device-integrations:
+    get:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_INTEGRATIONS_PUBLIC_API
+      summary: List all device integrations
+      description: Lists all device integrations for your org. Examples include Device Posture Provider, Windows Security Center, Chrome Device Trust, OSQuery, and Android Device Trust.
+      operationId: listDeviceIntegrations
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceIntegrations'
+        '401':
+          $ref: ./Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.deviceIntegrations.read
+      tags:
+        - DeviceIntegrations
+  /api/v1/device-integrations/{deviceIntegrationId}:
+    parameters:
+      - $ref: '#/components/parameters/pathDeviceIntegrationId'
+    get:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_INTEGRATIONS_PUBLIC_API
+      summary: Retrieve a device integration
+      description: Retrieves a device integration by `deviceIntegrationId`
+      operationId: getDeviceIntegration
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceIntegrations'
+              examples:
+                CrowdStrike:
+                  $ref: '#/components/examples/DeviceIntegrationCrowdStrikeResponse'
+                WindowsSecurityCenter:
+                  $ref: '#/components/examples/DeviceIntegrationWindowsSecurityCenterResponse'
+                ChromeDeviceTrustConnector:
+                  $ref: '#/components/examples/DeviceIntegrationChromeDeviceTrustConnectorResponse'
+                DevicePostureIdP:
+                  $ref: '#/components/examples/DeviceIntegrationDevicePostureIdPResponse'
+                DevicePostureCheck:
+                  $ref: '#/components/examples/DeviceIntegrationDevicePostureCheckResponse'
+                AndroidZeroTrust:
+                  $ref: '#/components/examples/DeviceIntegrationAndroidZeroTrustResponse'
+        '401':
+          $ref: ./Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.deviceIntegrations.read
+      tags:
+        - DeviceIntegrations
+  /api/v1/device-integrations/{deviceIntegrationId}/lifecycle/activate:
+    parameters:
+      - $ref: '#/components/parameters/pathDeviceIntegrationId'
+    post:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_INTEGRATIONS_PUBLIC_API
+      summary: Activate a device integration
+      description: Activates a device integration and populates the related configurations by `deviceIntegrationId`
+      operationId: activateDeviceIntegration
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceIntegrations'
+              examples:
+                ChromeDeviceTrustConnector:
+                  $ref: '#/components/examples/DeviceIntegrationChromeDeviceTrustConnectorResponse'
+                DevicePostureIdP:
+                  $ref: '#/components/examples/DeviceIntegrationDevicePostureIdPResponse'
+                DevicePostureCheck:
+                  $ref: '#/components/examples/DeviceIntegrationDevicePostureCheckResponse'
+                AndroidZeroTrust:
+                  $ref: '#/components/examples/DeviceIntegrationAndroidZeroTrustResponse'
+        '401':
+          $ref: ./Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.deviceIntegrations.manage
+      tags:
+        - DeviceIntegrations
+  /api/v1/device-integrations/{deviceIntegrationId}/lifecycle/deactivate:
+    parameters:
+      - $ref: '#/components/parameters/pathDeviceIntegrationId'
+    post:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_INTEGRATIONS_PUBLIC_API
+      summary: Deactivate a device integration
+      description: Deactivates a device integration by `deviceIntegrationId`
+      operationId: deactivateDeviceIntegration
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceIntegrations'
+              examples:
+                CrowdStrike:
+                  $ref: '#/components/examples/DeviceIntegrationCrowdStrikeResponse'
+                WindowsSecurityCenter:
+                  $ref: '#/components/examples/DeviceIntegrationWindowsSecurityCenterResponse'
+        '401':
+          $ref: ./Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.deviceIntegrations.manage
+      tags:
+        - DeviceIntegrations
+components:
+  examples:
+    DeviceIntegrationCrowdStrikeResponse:
+      summary: Response of a device integration for CrowdStrike
+      value:
+        id: dindyfy1f7Pv1eoVF0g4
+        name: com.okta.deviceidp
+        displayName: Device Posture Provider
+        status: DEACTIVATED
+        platform: IOS
+        metadata:
+          type: DEVICE_IDP
+          idpId: 0oa2owlGX5l74kjr60g4
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-integrations/dindyfy1f7Pv1eoVF0g4
+            hints:
+              allow:
+                - GET
+          activate:
+            href: https://your-subdomain.okta.com/api/v1/device-integrations/dindyfy1f7Pv1eoVF0g4/lifecycle/activate
+            hints:
+              allow:
+                - POST
+    DeviceIntegrationWindowsSecurityCenterResponse:
+      summary: Response of a device integration for Windows Security Center
+      value:
+        id: dinjihtR8qWZZF6qe0g4
+        name: com.okta.windowssecuritycenter
+        displayName: Windows Security Center
+        status: DEACTIVATED
+        platform: WINDOWS
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-integrations/dinjihtR8qWZZF6qe0g4
+            hints:
+              allow:
+                - GET
+          activate:
+            href: https://your-subdomain.okta.com/api/v1/device-integrations/dinjihtR8qWZZF6qe0g4/lifecycle/activate
+            hints:
+              allow:
+                - POST
+    DeviceIntegrationChromeDeviceTrustConnectorResponse:
+      summary: Response of a device integration for Chrome Device Trust
+      value:
+        id: din15gaNrC7BvlBgx0g4
+        name: com.google.dtc
+        displayName: Chrome Device Trust
+        status: ACTIVE
+        platform: CHROMEOS
+        metadata:
+          type: CHROME
+          serviceAccountName: okta-gci-00o158oxTmBNgrgyM0g4
+          serviceAccountEmail: okta-gci-00o158oxTmBNgrgyM0g4@vocal-invention-346218.iam.gserviceaccount.com
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-integrations/din15gaNrC7BvlBgx0g4
+            hints:
+              allow:
+                - GET
+          deactivate:
+            href: https://your-subdomain.okta.com/api/v1/device-integrations/din15gaNrC7BvlBgx0g4/lifecycle/deactivate
+            hints:
+              allow:
+                - POST
+    DeviceIntegrationDevicePostureIdPResponse:
+      summary: Response of a device integration for Device Posture Provider
+      value:
+        id: dindyfzlaerjWVdqt0g4
+        name: com.okta.deviceidp
+        displayName: Device Posture Provider
+        status: ACTIVE
+        platform: WINDOWS
+        metadata:
+          type: DEVICE_IDP
+          idpId: 0oa2owlGX5l74kjr60g4
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-integrations/dindyfzlaerjWVdqt0g4
+            hints:
+              allow:
+                - GET
+          deactivate:
+            href: https://your-subdomain.okta.com/api/v1/device-integrations/dindyfzlaerjWVdqt0g4/lifecycle/deactivate
+            hints:
+              allow:
+                - POST
+    DeviceIntegrationDevicePostureCheckResponse:
+      summary: Response of device integration for Device Posture Check
+      value:
+        id: din9lzd33mvS9vBwN1c5
+        name: com.okta.device.osquery
+        displayName: OSQuery
+        status: ACTIVE
+        platform: MACOS
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-integrations/din9lzd33mvS9vBwN1c5
+            hints:
+              allow:
+                - GET
+          deactivate:
+            href: https://your-subdomain.okta.com/api/v1/device-integrations/din9lzd33mvS9vBwN1c5/lifecycle/deactivate
+            hints:
+              allow:
+                - POST
+    DeviceIntegrationAndroidZeroTrustResponse:
+      summary: Response of device integration for Android Device Trust
+      value:
+        id: din9lzd33mvS9kjr60g4
+        name: com.android.zero.trust
+        displayName: Android Device Trust
+        status: ACTIVE
+        platform: ANDROID
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-integrations/din9lzd33mvS9kjr60g4
+            hints:
+              allow:
+                - GET
+          deactivate:
+            href: https://your-subdomain.okta.com/api/v1/device-integrations/din9lzd33mvS9kjr60g4/lifecycle/deactivate
+            hints:
+              allow:
+                - POST
+  parameters:
+    pathDeviceIntegrationId:
+      in: path
+      name: deviceIntegrationId
+      required: true
+      description: The ID of the device integration
+      schema:
+        type: string
+  schemas:
+    DeviceIntegrations:
+      title: DeviceIntegrations
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: The ID of the device integration
+        name:
+          $ref: '#/components/schemas/DeviceIntegrationsName'
+        displayName:
+          type: string
+          description: The display name of the device integration
+        status:
+          $ref: '#/components/schemas/DeviceIntegrationsStatus'
+        platform:
+          $ref: '#/components/schemas/DeviceIntegrationsPlatform'
+        metadata:
+          $ref: '#/components/schemas/DeviceIntegrationsMetadata'
+        _links:
+          $ref: ./Common.yaml#/components/schemas/LinksSelfAndLifecycle
+    DeviceIntegrationsName:
+      description: The namespace of the device integration
+      type: string
+      enum:
+        - com.crowdstrike.zta
+        - com.okta.windowssecuritycenter
+        - com.google.dtc
+        - com.okta.deviceidp
+        - com.okta.workspaceone
+        - com.okta.device.osquery
+        - com.android.zero.trust
+    DeviceIntegrationsStatus:
+      description: The status of the device integration
+      type: string
+      enum:
+        - ACTIVE
+        - DEACTIVATED
+    DeviceIntegrationsPlatform:
+      type: string
+      enum:
+        - MACOS
+        - WINDOWS
+        - CHROMEOS
+        - IOS
+        - ANDROID
+    DeviceIntegrationsMetadata:
+      description: The metadata of the device integration
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      oneOf:
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - CHROME
+            serviceAccountName:
+              type: string
+            serviceAccountEmail:
+              type: string
+          required:
+            - type
+            - serviceAccountName
+            - serviceAccountEmail
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - WORKSPACE_ONE
+            provider:
+              type: string
+            enrollmentUrl:
+              type: string
+            idpId:
+              type: string
+          required:
+            - type
+            - provider
+            - enrollmentUrl
+            - idpId
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - DEVICE_IDP
+            idpId:
+              type: string
+          required:
+            - type
+            - idpId
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

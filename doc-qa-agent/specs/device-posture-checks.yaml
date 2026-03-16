@@ -1,0 +1,418 @@
+openapi: 3.0.3
+info:
+  title: Device Posture Checks API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/device-posture-checks:
+    get:
+      summary: List all device posture checks
+      description: Lists all device posture checks
+      operationId: listDevicePostureChecks
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DevicePostureCheck'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.devicePostureChecks.read
+      tags:
+        - DevicePostureCheck
+    post:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_CUSTOM_ERROR_REMEDIATION_MESSAGES
+      summary: Create a device posture check
+      description: Creates a device posture check
+      operationId: createDevicePostureCheck
+      x-codegen-request-body-name: devicePostureCheck
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DevicePostureCheck'
+            examples:
+              MacOS:
+                $ref: '#/components/examples/DevicePostureChecksMacOSRequest'
+              Windows:
+                $ref: '#/components/examples/DevicePostureChecksWindowsRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DevicePostureCheck'
+              examples:
+                MacOS:
+                  $ref: '#/components/examples/DevicePostureChecksMacOSResponse'
+                Windows:
+                  $ref: '#/components/examples/DevicePostureChecksWindowsResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.devicePostureChecks.manage
+      tags:
+        - DevicePostureCheck
+  /api/v1/device-posture-checks/default:
+    get:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_CUSTOM_ERROR_REMEDIATION_MESSAGES
+      summary: List all default device posture checks
+      description: Lists all default device posture checks. Default device posture checks are defined by Okta. Their type will always be `BUILTIN`.
+      operationId: listDefaultDevicePostureChecks
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DevicePostureCheck'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.devicePostureChecks.read
+      tags:
+        - DevicePostureCheck
+  /api/v1/device-posture-checks/{postureCheckId}:
+    parameters:
+      - $ref: '#/components/parameters/pathPostureCheckId'
+    get:
+      summary: Retrieve a device posture check
+      description: Retrieves a device posture check by `postureCheckId`
+      operationId: getDevicePostureCheck
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DevicePostureCheck'
+              examples:
+                MacOS:
+                  $ref: '#/components/examples/DevicePostureChecksMacOSResponse'
+                Windows:
+                  $ref: '#/components/examples/DevicePostureChecksWindowsResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.devicePostureChecks.read
+      tags:
+        - DevicePostureCheck
+    put:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_CUSTOM_ERROR_REMEDIATION_MESSAGES
+      summary: Replace a device posture check
+      description: Replaces a device posture check by `postureCheckId`
+      operationId: replaceDevicePostureCheck
+      x-codegen-request-body-name: devicePostureCheck
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DevicePostureCheck'
+            examples:
+              MacOS:
+                $ref: '#/components/examples/DevicePostureChecksMacOSRequest'
+              Windows:
+                $ref: '#/components/examples/DevicePostureChecksWindowsRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DevicePostureCheck'
+              examples:
+                MacOS:
+                  $ref: '#/components/examples/DevicePostureChecksMacOSResponse'
+                Windows:
+                  $ref: '#/components/examples/DevicePostureChecksWindowsResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.devicePostureChecks.manage
+      tags:
+        - DevicePostureCheck
+    delete:
+      summary: Delete a device posture check
+      description: Deletes a device posture check by `postureCheckId`. You can't delete the device posture check if it's used in a device assurance policy.
+      operationId: deleteDevicePostureCheck
+      responses:
+        '204':
+          description: No Content
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '409':
+          description: Conflict
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+              examples:
+                ErrorDeviceCheckInUse:
+                  $ref: '#/components/examples/ErrorDevicePostureCheckInUse'
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.devicePostureChecks.manage
+      tags:
+        - DevicePostureCheck
+components:
+  examples:
+    DevicePostureChecksMacOSRequest:
+      summary: macOS request
+      value:
+        name: Device posture check macOS
+        description: Query macOS devices to check if firewall is enabled
+        variableName: macOSFirewall
+        platform: MACOS
+        type: CUSTOM
+        mappingType: CHECKBOX
+        query: SELECT CASE WHEN global_state = 0 THEN 0 ELSE 1 END AS firewall_enabled FROM alf;
+        remediationSettings:
+          message:
+            defaultI18nKey: null
+            customText: It is our company policy that all devices must have a firewall enabled.
+          link:
+            defaultUrl: null
+            customUrl: example.myremediationurl.com/docs
+    DevicePostureChecksWindowsRequest:
+      summary: Windows request
+      value:
+        name: Device posture check Windows
+        description: Query Windows devices to check if firewall is enabled
+        variableName: windowsFirewall
+        platform: WINDOWS
+        type: CUSTOM
+        mappingType: CHECKBOX
+        query: SELECT CASE WHEN enabled = 1 THEN 1 ELSE 0 END AS firewall_enabled FROM windows_firewall_profiles;
+        remediationSettings:
+          message:
+            defaultI18nKey: null
+            customText: It is our company policy that all devices must have a firewall enabled.
+          link:
+            defaultUrl: null
+            customUrl: example.myremediationurl.com/docs
+    DevicePostureChecksWindowsResponse:
+      summary: Windows response
+      value:
+        id: dch3m8o4rWhwReDeM1c5
+        name: Device posture check Windows
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        description: Query Windows devices to check if firewall is enabled
+        variableName: windowsFirewall
+        query: SELECT CASE WHEN enabled = 1 THEN 1 ELSE 0 END AS firewall_enabled FROM windows_firewall_profiles;
+        platform: WINDOWS
+        type: CUSTOM
+        mappingType: CHECKBOX
+        remediationSettings:
+          message:
+            defaultI18nKey: null
+            customText: It is our company policy that all devices must have a firewall enabled.
+          link:
+            defaultUrl: null
+            customUrl: example.myremediationurl.com/docs
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-posture-checks/dch3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DevicePostureChecksMacOSResponse:
+      summary: macOS response
+      value:
+        id: dch3m8o4rWhwReDeM1c5
+        name: Device posture check macOS
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        description: Query macOS devices to check if firewall is enabled
+        variableName: macOSFirewall
+        query: SELECT CASE WHEN global_state = 0 THEN 0 ELSE 1 END AS firewall_enabled FROM  alf;
+        platform: MACOS
+        type: CUSTOM
+        mappingType: CHECKBOX
+        remediationSettings:
+          message:
+            defaultI18nKey: null
+            customText: It is our company policy that all devices must have a firewall enabled.
+          link:
+            defaultUrl: null
+            customUrl: example.myremediationurl.com/docs
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-posture-checks/dch3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    ErrorDevicePostureCheckInUse:
+      summary: Can't delete device posture check in use by device assurance policies
+      value:
+        errorSummary: Device posture check is in use and can't be deleted.
+        errorId: oaenwA1ra80S9W-pvbh4m6haA
+        errorCauses: []
+  parameters:
+    pathPostureCheckId:
+      in: path
+      name: postureCheckId
+      required: true
+      description: ID of the device posture check
+      schema:
+        type: string
+  schemas:
+    DevicePostureCheck:
+      title: DevicePostureCheck
+      type: object
+      properties:
+        createdBy:
+          type: string
+          readOnly: true
+          description: User who created the device posture check
+          example: 00u217pyf72CdUrBt1c5
+        createdDate:
+          type: string
+          readOnly: true
+          description: Time the device posture check was created
+          example: 2019-10-02T18:03:07.000Z
+        lastUpdatedBy:
+          type: string
+          readOnly: true
+          description: User who updated the device posture check
+          example: 00u217pyf72CdUrBt1c5
+        lastUpdate:
+          type: string
+          readOnly: true
+          description: Time the device posture check was updated
+          example: 2019-10-02T18:03:07.000Z
+        id:
+          type: string
+          readOnly: true
+          description: The ID of the device posture check
+          example: dch3m8o4rWhwReDeM1c5
+        name:
+          type: string
+          description: Display name of the device posture check
+          example: Device posture check macOS
+        variableName:
+          type: string
+          description: Unique name of the device posture check
+          example: macOSFirewall
+        description:
+          type: string
+          description: Description of the device posture check
+          example: Query macOS devices to check if firewall is enabled
+        query:
+          type: string
+          description: OSQuery for the device posture check
+          example: SELECT CASE WHEN global_state = 0 THEN 0 ELSE 1 END AS firewall_enabled FROM  alf;
+        platform:
+          $ref: '#/components/schemas/DevicePostureChecksPlatform'
+        type:
+          $ref: '#/components/schemas/DevicePostureChecksType'
+        mappingType:
+          $ref: '#/components/schemas/DevicePostureChecksMappingType'
+        remediationSettings:
+          $ref: '#/components/schemas/DevicePostureChecksRemediationSettings'
+        _links:
+          $ref: ./Common.yaml#/components/schemas/LinksSelf
+    DevicePostureChecksPlatform:
+      type: string
+      enum:
+        - MACOS
+        - WINDOWS
+    DevicePostureChecksType:
+      type: string
+      enum:
+        - BUILTIN
+        - CUSTOM
+    DevicePostureChecksMappingType:
+      description: Represents how the device posture check is rendered in device assurance policies
+      type: string
+      enum:
+        - CHECKBOX
+        - TEXTBOX
+    DevicePostureChecksRemediationSettings:
+      description: Represents the remediation instructions shown to the end user when the device posture check fails
+      type: object
+      properties:
+        message:
+          type: object
+          properties:
+            defaultI18nKey:
+              type: string
+              description: Default i18n key for the message. This property is only relevant if type is set to `BUILTIN`. If type is set to `CUSTOM`, this field is ignored.
+              example: macos.firewall.enabled.remediation.message
+            customText:
+              type: string
+              description: Custom text for the message
+              example: It is our company policy that all devices must have a firewall enabled.
+        link:
+          type: object
+          properties:
+            defaultUrl:
+              type: string
+              description: Default URL for the link. This property is only relevant if type is set to `BUILTIN`. If type is set to `CUSTOM`, this field is ignored.
+              example: https://help.okta.com/eu/en-us/content/topics/end-user/ov-device-health-macos.htm
+            customUrl:
+              type: string
+              description: Custom URL for the link
+              example: example.myremediationurl.com/docs
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

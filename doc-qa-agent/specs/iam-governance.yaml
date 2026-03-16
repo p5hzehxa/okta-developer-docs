@@ -1,0 +1,682 @@
+openapi: 3.0.3
+info:
+  title: IAM Governance API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/iam/governance/optIn:
+    x-okta-lifecycle:
+      features:
+        - GOVERNANCE_FOR_ADMIN_ROLES_PHASE2
+    get:
+      summary: Retrieve the Admin Console opt-in status
+      description: Retrieves the entitlement management opt-in status for the Admin Console
+      operationId: getOptInStatus
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptInStatusResponse'
+              examples:
+                OptInStatusResponse:
+                  $ref: '#/components/examples/OptInStatusResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.read
+      tags:
+        - GovernanceBundle
+    post:
+      summary: Opt in the Admin Console to entitlement management
+      description: Opts in the Admin Console to entitlement management
+      operationId: optIn
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptInStatusResponse'
+              examples:
+                OptInStatusResponse:
+                  $ref: '#/components/examples/OptInStatusResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - GovernanceBundle
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /api/v1/iam/governance/optOut:
+    post:
+      summary: Opt out the Admin Console from entitlement management
+      description: Opts out the Admin Console from entitlement management
+      operationId: optOut
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptInStatusResponse'
+              examples:
+                OptOutStatusResponse:
+                  $ref: '#/components/examples/OptOutStatusResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - GovernanceBundle
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /api/v1/iam/governance/bundles:
+    x-okta-lifecycle:
+      features:
+        - GOVERNANCE_FOR_ADMIN_ROLES_PHASE2
+    get:
+      summary: List all governance bundles
+      description: Lists all governance bundles for the Admin Console in your org
+      operationId: listGovernanceBundles
+      parameters:
+        - $ref: ./Common.yaml#/components/parameters/queryAfter
+        - $ref: ./Common.yaml#/components/parameters/queryLimit
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GovernanceBundlesResponse'
+              examples:
+                GovernanceBundlesResponse:
+                  $ref: '#/components/examples/GovernanceBundlesResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.read
+      tags:
+        - GovernanceBundle
+    post:
+      summary: Create a governance bundle
+      description: Creates a governance bundle of entitlements for the Admin Console
+      operationId: createGovernanceBundle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GovernanceBundleCreateRequest'
+            examples:
+              GovernanceBundleCreateRequestStandardRole:
+                $ref: '#/components/examples/GovernanceBundleCreateRequestStandardRole'
+              GovernanceBundleCreateRequestScopedStandardRole:
+                $ref: '#/components/examples/GovernanceBundleCreateRequestScopedStandardRole'
+              GovernanceBundleCreateRequestCustomRole:
+                $ref: '#/components/examples/GovernanceBundleCreateRequestCustomRole'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GovernanceBundle'
+              examples:
+                GovernanceBundleCreateRequestStandardRole:
+                  $ref: '#/components/examples/GovernanceBundle'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - GovernanceBundle
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /api/v1/iam/governance/bundles/{bundleId}:
+    x-okta-lifecycle:
+      features:
+        - GOVERNANCE_FOR_ADMIN_ROLES_PHASE2
+    parameters:
+      - $ref: '#/components/parameters/pathBundleId'
+    get:
+      summary: Retrieve a governance bundle
+      description: Retrieves a governance bundle for the Admin Console
+      operationId: getGovernanceBundle
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GovernanceBundle'
+              examples:
+                GovernanceBundle:
+                  $ref: '#/components/examples/GovernanceBundle'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.read
+      tags:
+        - GovernanceBundle
+    delete:
+      summary: Delete a governance bundle
+      description: Deletes an Admin Console governance bundle
+      operationId: deleteGovernanceBundle
+      responses:
+        '204':
+          description: No Content
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - GovernanceBundle
+    put:
+      summary: Replace a governance bundle
+      description: Replaces the properties of a governance bundle for the Admin Console
+      operationId: replaceGovernanceBundle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GovernanceBundleUpdateRequest'
+            examples:
+              GovernanceBundleUpdateRequestStandardRole:
+                $ref: '#/components/examples/GovernanceBundleUpdateRequestStandardRole'
+              GovernanceBundleUpdateRequestScopedStandardRole:
+                $ref: '#/components/examples/GovernanceBundleUpdateRequestScopedStandardRole'
+              GovernanceBundleUpdateRequestCustomRole:
+                $ref: '#/components/examples/GovernanceBundleUpdateRequestCustomRole'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GovernanceBundle'
+              examples:
+                GovernanceBundle:
+                  $ref: '#/components/examples/GovernanceBundle'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - GovernanceBundle
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /api/v1/iam/governance/bundles/{bundleId}/entitlements:
+    x-okta-lifecycle:
+      features:
+        - GOVERNANCE_FOR_ADMIN_ROLES_PHASE2
+    parameters:
+      - $ref: '#/components/parameters/pathBundleId'
+    get:
+      summary: List all entitlements for a governance bundle
+      description: Lists all entitlements specific to a governance bundle
+      operationId: listBundleEntitlements
+      parameters:
+        - $ref: ./Common.yaml#/components/parameters/queryAfter
+        - $ref: ./Common.yaml#/components/parameters/queryLimit
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BundleEntitlementsResponse'
+              examples:
+                BundleEntitlementsResponse:
+                  $ref: '#/components/examples/BundleEntitlementsResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.read
+      tags:
+        - GovernanceBundle
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /api/v1/iam/governance/bundles/{bundleId}/entitlements/{entitlementId}/values:
+    x-okta-lifecycle:
+      features:
+        - GOVERNANCE_FOR_ADMIN_ROLES_PHASE2
+    parameters:
+      - $ref: '#/components/parameters/pathBundleId'
+      - $ref: '#/components/parameters/pathEntitlementId'
+    get:
+      summary: List all values for a governance bundle entitlement
+      description: Lists all entitlement values that are specific to a governance bundle entitlement
+      operationId: listBundleEntitlementValues
+      parameters:
+        - $ref: ./Common.yaml#/components/parameters/queryAfter
+        - $ref: ./Common.yaml#/components/parameters/queryLimit
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitlementValuesResponse'
+              examples:
+                EntitlementValuesResponse:
+                  $ref: '#/components/examples/EntitlementValuesResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.read
+      tags:
+        - GovernanceBundle
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+components:
+  parameters:
+    pathBundleId:
+      name: bundleId
+      in: path
+      schema:
+        type: string
+        example: enbllojq9J9J105DL1d6
+      required: true
+      description: The `id` of a bundle
+    pathEntitlementId:
+      name: entitlementId
+      in: path
+      schema:
+        type: string
+        example: ent4rg7fltWSgrlDT8g6
+      required: true
+      description: The `id` of a bundle entitlement
+  examples:
+    OptInStatusResponse:
+      summary: Opt in response
+      value:
+        optInStatus: OPTING_IN
+        _links:
+          optInStatus:
+            href: http://your-subdomain.okta.com/api/v1/iam/governance/optIn
+    OptOutStatusResponse:
+      summary: Opt out response
+      value:
+        optInStatus: OPTING_OUT
+        _links:
+          optInStatus:
+            href: http://your-subdomain.okta.com/api/v1/iam/governance/optIn
+    GovernanceBundleCreateRequestStandardRole:
+      summary: Create governance bundle with non-scoped standard role
+      value:
+        name: Group admin bundle
+        description: Group bundle for administrative access
+        entitlements:
+          role: GROUP_MEMBERSHIP_ADMIN
+    GovernanceBundleCreateRequestScopedStandardRole:
+      summary: Create governance bundle with scoped standard role
+      value:
+        name: Group admin bundle
+        description: Group bundle for administrative access
+        entitlements:
+          role: GROUP_MEMBERSHIP_ADMIN
+          targets:
+            - 00guaxWZ0AOa5NFAj0g3
+    GovernanceBundleCreateRequestCustomRole:
+      summary: Create governance bundle with custom role
+      value:
+        name: Custom admin bundle
+        description: Custom bundle for administrative access
+        entitlements:
+          role: cr0WxyzJxGIr0ouum0g4
+          resourceSets:
+            - iamoJDFKaJxGIr0oamd9g
+    GovernanceBundleUpdateRequestStandardRole:
+      summary: Update governance bundle with non-scoped standard role
+      value:
+        name: Group admin bundle
+        description: Group bundle for administrative access
+        entitlements:
+          role: GROUP_MEMBERSHIP_ADMIN
+    GovernanceBundleUpdateRequestScopedStandardRole:
+      summary: Update governance bundle with scoped standard role
+      value:
+        name: Group admin bundle
+        description: Group bundle for administrative access
+        entitlements:
+          role: GROUP_MEMBERSHIP_ADMIN
+          targets:
+            - 00guaxWZ0AOa5NFAj0g3
+    GovernanceBundleUpdateRequestCustomRole:
+      summary: Update governance bundle with custom role
+      value:
+        name: Custom admin bundle
+        description: Custom bundle for administrative access
+        entitlements:
+          role: cr0WxyzJxGIr0ouum0g4
+          resourceSets:
+            - iamoJDFKaJxGIr0oamd9g
+    GovernanceBundle:
+      summary: Governance bundle
+      value:
+        id: 0bbfxqCAJWWGELFTYAAA
+        name: Group admin bundle
+        description: Group bundle for administrative access
+        status: ACTIVE
+        orn: orn:okta:governance:00o5rb5mt2H3d1TJd0h7:bundles:0bbfxqCAJWWGELFTYAAA
+        _links:
+          self: http://your-subdomain.okta.com/api/v1/iam/governance/bundles/0bbfxqCAJWWGELFTYAAA
+          entitlements: http://your-subdomain.okta.com/api/v1/iam/governance/bundles/0bbfxqCAJWWGELFTYAAA/entitlements
+    GovernanceBundlesResponse:
+      summary: List of governance bundles
+      value:
+        bundles:
+          - id: 0bbfxqCAJWWGELFTYAAA
+            name: Group admin bundle
+            description: Group bundle for administrative access
+            status: ACTIVE
+            orn: orn:okta:governance:00o5rb5mt2H3d1TJd0h7:bundles:0bbfxqCAJWWGELFTYAAA
+            _links:
+              entitlements: http://your-subdomain.okta.com/api/v1/iam/governance/bundles/0bbfxqCAJWWGELFTYAAA/entitlements
+        _links:
+          self:
+            href: http://your-subdomain.okta.com/api/v1/iam/governance/bundles?limit=2&after=10
+          next:
+            href: http://your-subdomain.okta.com/api/v1/iam/governance/bundles?after=bundleId12
+    BundleEntitlementsResponse:
+      summary: List of governance bundle entitlements
+      value:
+        entitlements:
+          - id: espfxqCAJWWGELFTYASJ
+            role: GROUP_MEMBERSHIP_ADMIN
+            name: Group Membership Admin
+            description: Perform all admin activities for groups in the org
+            _links:
+              values: http://your-subdomain.okta.com/api/v1/iam/governance/bundles/0bbfxqCAJWWGELFTYAAA/entitlements/espfxqCAJWWGELFTYASJ/values
+        _links:
+          self:
+            href: http://your-subdomain.okta.com/api/v1/iam/governance/bundles?limit=2&after=10
+          next:
+            href: http://your-subdomain.okta.com/api/v1/iam/governance/bundles?after=bundleId12
+          bundle:
+            href: http://your-subdomain.okta.com/api/v1/iam/governance/bundles/0bbfxqCAJWWGELFTYAAA
+    EntitlementValuesResponse:
+      summary: List of bundle entitlement values
+      value:
+        entitlementValues:
+          - id: entfxqCAJWWGELFTYAAA
+            value: orn:okta:00o5rb5mt2H3d1TJd0h7:groups:00guaxWZ0AOa5NFAj0g3
+            name: Restricted users group
+            _links:
+              group: http://your-subdomain.okta.com/api/v1/groups/00guaxWZ0AOa5NFAj0g3
+        _links:
+          self:
+            href: http://your-subdomain.okta.com/api/v1/iam/governance/bundles?limit=2&after=10
+          bundle:
+            href: http://your-subdomain.okta.com/api/v1/iam/governance/bundles/0bbfxqCAJWWGELFTYAAA
+          entitlements:
+            href: http://your-subdomain.okta.com/api/v1/iam/governance/bundles/0bbfxqCAJWWGELFTYAAA/entitlements
+  schemas:
+    BundleLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: ./Common.yaml#/components/schemas/HrefObject
+        - description: Link to the bundle resource
+    EntitlementsLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: ./Common.yaml#/components/schemas/HrefObject
+        - description: Link to the entitlements resource
+    OptInStatusResponse:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        optInStatus:
+          type: string
+          description: The entitlement management opt-in status for the Admin Console
+          enum:
+            - OPTING_IN
+            - OPTED_IN
+            - OPTING_OUT
+            - OPTED_OUT
+          x-enumDescriptions:
+            OPTING_IN: Okta is enabling entitlement management for the Admin Console
+            OPTED_IN: Entitlement management is enabled for the Admin Console
+            OPTING_OUT: Okta is disabling entitlement management for the Admin Console
+            OPTED_OUT: Entitlement management is disabled for the Admin Console
+        _links:
+          type: object
+          description: Link relations available
+          properties:
+            optInStatus:
+              allOf:
+                - $ref: ./Common.yaml#/components/schemas/HrefObject
+                - description: Link to the opt-in status resource
+    IAMBundleEntitlement:
+      type: object
+      description: An entitlement in a governance bundle
+      properties:
+        role:
+          type: string
+          description: The role
+        targets:
+          type: array
+          description: List of target resource IDs to scope the entitlement with the role
+          items:
+            type: string
+            description: Target resource (app or group ID)
+        resourceSets:
+          type: array
+          description: List of resource set IDs for the custom role
+          items:
+            type: string
+            description: Resource set ID
+    GovernanceBundleCreateRequest:
+      type: object
+      description: Request to create a governance bundle
+      properties:
+        name:
+          type: string
+          description: Name of the governance bundle
+        description:
+          type: string
+          description: Description of the governance bundle
+        entitlements:
+          type: array
+          description: List of entitlements to include in the governance bundle
+          items:
+            $ref: '#/components/schemas/IAMBundleEntitlement'
+    GovernanceBundleUpdateRequest:
+      type: object
+      description: Request to update a governance bundle
+      properties:
+        name:
+          type: string
+          description: Name of the governance bundle
+        description:
+          type: string
+          description: Description of the governance bundle
+        entitlements:
+          type: array
+          description: List of entitlements to include in the governance bundle
+          items:
+            $ref: '#/components/schemas/IAMBundleEntitlement'
+    GovernanceBundle:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Governance bundle ID
+        name:
+          type: string
+          description: Name of the governance bundle
+        description:
+          type: string
+          description: Description of the governance bundle
+        status:
+          type: string
+          description: Status of the governance bundle
+        orn:
+          type: string
+          description: The governance bundle resource, in [ORN format](https://developer.okta.com/docs/api/openapi/okta-management/guides/roles/#okta-resource-name-orn)
+        _links:
+          type: object
+          description: Link relations available
+          properties:
+            entitlements:
+              $ref: '#/components/schemas/EntitlementsLink'
+            self:
+              $ref: ./Common.yaml#/components/schemas/HrefObjectSelfLink
+    GovernanceBundlesResponse:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        bundles:
+          type: array
+          description: List of governance bundles
+          items:
+            $ref: '#/components/schemas/GovernanceBundle'
+        _links:
+          allOf:
+            - $ref: ./Common.yaml#/components/schemas/LinksSelf
+            - readOnly: true
+            - type: object
+              properties:
+                next:
+                  $ref: ./Common.yaml#/components/schemas/HrefObjectNextLink
+    BundleEntitlement:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      description: An entitlement in a governance bundle
+      properties:
+        id:
+          type: string
+          description: Entitlement ID
+        role:
+          type: string
+          description: The role key
+        name:
+          type: string
+          description: The name of the role
+        description:
+          type: string
+          description: The description of the role
+        _links:
+          type: object
+          description: Link relations available
+          properties:
+            values:
+              allOf:
+                - $ref: ./Common.yaml#/components/schemas/HrefObject
+                - description: Link to the entitlement values resource
+    BundleEntitlementsResponse:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      description: Entitlement list for a governance bundle
+      properties:
+        entitlements:
+          type: array
+          description: List of bundle entitlements
+          items:
+            $ref: '#/components/schemas/BundleEntitlement'
+        _links:
+          allOf:
+            - $ref: ./Common.yaml#/components/schemas/LinksSelf
+            - readOnly: true
+            - properties:
+                next:
+                  $ref: ./Common.yaml#/components/schemas/HrefObjectNextLink
+                bundle:
+                  $ref: '#/components/schemas/BundleLink'
+    EntitlementValue:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Entitlement value ID
+        value:
+          type: string
+          description: The entitlement value resource [ORN](https://developer.okta.com/docs/api/openapi/okta-management/guides/roles/#okta-resource-name-orn)
+        name:
+          type: string
+          description: The entitlement value resource name
+        _links:
+          type: object
+          description: Specifies link relations (see [Web Linking](https://www.rfc-editor.org/rfc/rfc8288)) available using the [JSON Hypertext Application Language](https://datatracker.ietf.org/doc/html/draft-kelly-json-hal-06) specification
+          readOnly: true
+          properties:
+            group:
+              $ref: ./Common.yaml#/components/schemas/HrefObjectGroupLink
+            app:
+              $ref: ./Common.yaml#/components/schemas/HrefObjectAppLink
+            resource-set:
+              $ref: ./Common.yaml#/components/schemas/HrefObjectResourceSetLink
+    EntitlementValuesResponse:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        entitlementValues:
+          type: array
+          description: List of entitlement values for a bundle entitlement
+          items:
+            $ref: '#/components/schemas/EntitlementValue'
+        _links:
+          allOf:
+            - $ref: ./Common.yaml#/components/schemas/LinksSelf
+            - properties:
+                bundle:
+                  $ref: '#/components/schemas/BundleLink'
+                entitlements:
+                  $ref: '#/components/schemas/EntitlementsLink'
+                next:
+                  $ref: ./Common.yaml#/components/schemas/HrefObjectNextLink
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

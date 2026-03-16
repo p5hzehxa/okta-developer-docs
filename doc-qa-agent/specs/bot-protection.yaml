@@ -1,0 +1,246 @@
+openapi: 3.0.3
+info:
+  title: Bot Protection API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../../base.yaml#/tags
+paths:
+  /api/v1/bot-protection/configuration:
+    get:
+      summary: Retrieve the bot protection configuration
+      description: Retrieves the bot protection configuration for your org
+      operationId: getBotProtectionConfiguration
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BotProtectionConfiguration'
+              examples:
+                Default:
+                  $ref: '#/components/examples/BotProtectionConfigurationDefault'
+                Enforced:
+                  $ref: '#/components/examples/BotProtectionConfigurationEnforced'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.botProtection.read
+      tags:
+        - BotProtection
+    post:
+      summary: Update the bot protection configuration
+      description: Updates the bot protection configuration for your org
+      operationId: updateBotProtectionConfiguration
+      x-codegen-request-body-name: botProtectionConfiguration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BotProtectionConfiguration'
+            examples:
+              LogOnly:
+                $ref: '#/components/examples/BotProtectionConfigurationRequestLogOnly'
+              Enforced:
+                $ref: '#/components/examples/BotProtectionConfigurationRequestEnforced'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BotProtectionConfiguration'
+              examples:
+                LogOnly:
+                  $ref: '#/components/examples/BotProtectionConfigurationDefault'
+                Enforced:
+                  $ref: '#/components/examples/BotProtectionConfigurationEnforced'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ../Common.yaml#/components/schemas/Error
+              examples:
+                ApiValidationFailed:
+                  $ref: ../Common.yaml#/components/examples/ErrorApiValidationFailed
+                LevelRequired:
+                  $ref: '#/components/examples/ErrorBotProtectionLevelRequired'
+                ModeRequired:
+                  $ref: '#/components/examples/ErrorBotProtectionModeRequired'
+                EnforcementTypeRequired:
+                  $ref: '#/components/examples/ErrorBotProtectionEnforcementTypeRequired'
+                SupportedFlowsRequired:
+                  $ref: '#/components/examples/ErrorBotProtectionSupportedFlowsRequired'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.botProtection.manage
+      tags:
+        - BotProtection
+components:
+  examples:
+    BotProtectionConfigurationDefault:
+      summary: Default bot protection configuration (`LOG_ONLY` mode)
+      value:
+        level: LOW
+        mode: LOG_ONLY
+        supportedFlows:
+          - SIGN_IN
+          - SSR
+          - SSPR
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/bot-protection/configuration
+            hints:
+              allow:
+                - GET
+                - POST
+    BotProtectionConfigurationEnforced:
+      summary: Enforced bot protection configuration
+      value:
+        level: MEDIUM
+        mode: ENFORCED
+        enforcementType: OKTA_CHALLENGE
+        supportedFlows:
+          - SIGN_IN
+          - SSR
+          - SSPR
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/bot-protection/configuration
+            hints:
+              allow:
+                - GET
+                - POST
+    BotProtectionConfigurationRequestLogOnly:
+      summary: Update to `LOG_ONLY` mode
+      value:
+        level: LOW
+        mode: LOG_ONLY
+        supportedFlows:
+          - SIGN_IN
+          - SSR
+          - SSPR
+    BotProtectionConfigurationRequestEnforced:
+      summary: Update to `ENFORCED` mode
+      value:
+        level: MEDIUM
+        mode: ENFORCED
+        enforcementType: OKTA_CHALLENGE
+        supportedFlows:
+          - SSR
+          - SSPR
+    ErrorBotProtectionLevelRequired:
+      summary: Level is required
+      value:
+        errorCode: E0000001
+        errorSummary: 'Api validation failed: level'
+        errorLink: E0000001
+        errorId: sampleiCF-8D5rLW6myqiPItW
+        errorCauses:
+          - errorSummary: 'level: The field cannot be left blank'
+    ErrorBotProtectionModeRequired:
+      summary: Mode is required
+      value:
+        errorCode: E0000001
+        errorSummary: 'Api validation failed: mode'
+        errorLink: E0000001
+        errorId: sampleiCF-8D5rLW6myqiPItW
+        errorCauses:
+          - errorSummary: 'mode: The field cannot be left blank'
+    ErrorBotProtectionEnforcementTypeRequired:
+      summary: Enforcement type is required when mode is ENFORCED
+      value:
+        errorCode: E0000001
+        errorSummary: 'Api validation failed: enforcementType'
+        errorLink: E0000001
+        errorId: sampleiCF-8D5rLW6myqiPItW
+        errorCauses:
+          - errorSummary: 'enforcementType: Api validation failed: enforcementType must be provided when mode is ENFORCED'
+    ErrorBotProtectionSupportedFlowsRequired:
+      summary: Supported flows must have at least one flow
+      value:
+        errorCode: E0000001
+        errorSummary: 'Api validation failed: supportedFlows'
+        errorLink: E0000001
+        errorId: sampleiCF-8D5rLW6myqiPItW
+        errorCauses:
+          - errorSummary: 'supportedFlows: Api validation failed: supportedFlows must have at least one supported flow'
+  schemas:
+    BotProtectionConfiguration:
+      title: BotProtectionConfiguration
+      description: Bot protection configuration for the org
+      type: object
+      properties:
+        level:
+          $ref: '#/components/schemas/BotProtectionLevel'
+        mode:
+          $ref: '#/components/schemas/BotProtectionMode'
+        supportedFlows:
+          description: An array of authentication flows that have bot protection enabled
+          type: array
+          items:
+            $ref: '#/components/schemas/BotProtectionSupportedFlow'
+        enforcementType:
+          $ref: '#/components/schemas/BotProtectionEnforcementType'
+        _links:
+          $ref: ../Common.yaml#/components/schemas/LinksSelf
+      required:
+        - level
+        - mode
+    BotProtectionLevel:
+      description: The sensitivity level of bot detection
+      type: string
+      enum:
+        - LOW
+        - MEDIUM
+        - HIGH
+        - ANY
+      x-enumDescriptions:
+        HIGH: High - Flags only high-confidence bot requests. Prioritizes a frictionless user experience.
+        MEDIUM: Medium and above - Flags moderate and high-confidence bot requests. Provides a balanced experience and security.
+        LOW: Low and above - Flags low-confidence bot requests. Prioritizes a rigorous security.
+        ANY: Always flag all requests to trigger enforcement settings, regardless of bot likeliness confidence level.
+    BotProtectionMode:
+      description: The enforcement mode for bot protection
+      type: string
+      enum:
+        - DISABLED
+        - LOG_ONLY
+        - ENFORCED
+      x-enumDescriptions:
+        DISABLED: Bot protection is disabled
+        LOG_ONLY: Bot detection events are logged but not enforced
+        ENFORCED: Enforcement is applied to events where bots are detected
+    BotProtectionSupportedFlow:
+      description: Authentication flows that support bot protection
+      type: string
+      enum:
+        - SIGN_IN
+        - SSPR
+        - SSR
+      x-enumDescriptions:
+        SIGN_IN: User sign-in page
+        SSPR: Self-Service Password Recovery page
+        SSR: Self-Service Registration page
+    BotProtectionEnforcementType:
+      description: The type of enforcement to trigger when a bot is detected
+      type: string
+      enum:
+        - OKTA_CHALLENGE
+      x-enumDescriptions:
+        OKTA_CHALLENGE: The Okta built-in challenge mechanism
+  securitySchemes:
+    $ref: ../../base.yaml#/components/securitySchemes

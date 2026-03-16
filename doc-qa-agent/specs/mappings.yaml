@@ -1,0 +1,458 @@
+openapi: 3.0.3
+info:
+  title: Mappings API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/mappings:
+    get:
+      summary: List all profile mappings
+      description: |-
+        Lists all profile mappings in your org with [pagination](https://developer.okta.com/docs/api/#pagination). You can return a subset of profile mappings that match a supported `sourceId` and/or `targetId`.
+
+        The results are [paginated](/#pagination) according to the `limit` parameter. If there are multiple pages of results, the Link header contains a `next` link that you should treat as an opaque value (follow it, don't parse it). See [Link Header](https://developer.okta.com/docs/api/#link-header).
+
+        The response is a collection of profile mappings that include a subset of the profile mapping object's parameters. The profile mapping object describes
+        the properties mapping between an Okta user and an app user profile using [JSON Schema Draft 4](https://datatracker.ietf.org/doc/html/draft-zyp-json-schema-04).
+      operationId: listProfileMappings
+      parameters:
+        - name: after
+          in: query
+          description: Mapping `id` that specifies the pagination cursor for the next page of mappings
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Specifies the number of results per page
+          schema:
+            type: integer
+            format: int32
+            default: 20
+            maximum: 200
+        - name: sourceId
+          in: query
+          description: The user type or app instance ID that acts as the source of expressions in a mapping. If this parameter is included, all returned mappings have this as their `source.id`.
+          schema:
+            type: string
+        - name: targetId
+          in: query
+          description: The user type or app instance ID that acts as the target of expressions in a mapping. If this parameter is included, all returned mappings have this as their `target.id`.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ListProfileMappings'
+              examples:
+                MappingList:
+                  summary: List all profile mappings response
+                  $ref: '#/components/examples/ListMappingsResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.profileMappings.read
+      tags:
+        - ProfileMapping
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+  /api/v1/mappings/{mappingId}:
+    parameters:
+      - $ref: '#/components/parameters/pathMappingId'
+    get:
+      summary: Retrieve a profile mapping
+      description: Retrieves a single profile mapping referenced by its ID
+      operationId: getProfileMapping
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileMapping'
+              examples:
+                MappingRetrieve:
+                  summary: Retrieve a single profile mapping
+                  $ref: '#/components/examples/RetrieveMappingsResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.profileMappings.read
+      tags:
+        - ProfileMapping
+    post:
+      summary: Update a profile mapping
+      description: Updates an existing profile mapping by adding, updating, or removing one or many property mappings
+      operationId: updateProfileMapping
+      x-codegen-request-body-name: profileMapping
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileMappingRequest'
+            examples:
+              Addpropertymapping:
+                $ref: '#/components/examples/AddMappingBody'
+              Updatepropertymapping:
+                $ref: '#/components/examples/UpdateMappingBody'
+              Removepropertymapping:
+                $ref: '#/components/examples/RemoveMappingBody'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileMapping'
+              examples:
+                Addpropertymapping:
+                  summary: Update an existing profile mapping by adding one or more properties
+                  $ref: '#/components/examples/AddMappingResponse'
+                Updatepropertymapping:
+                  summary: Update an existing profile mapping by updating one or more properties
+                  $ref: '#/components/examples/UpdateMappingResponse'
+                Removepropertymapping:
+                  summary: Update an existing profile mapping by removing one or more properties
+                  $ref: '#/components/examples/RemoveMappingResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.profileMappings.manage
+      tags:
+        - ProfileMapping
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+components:
+  examples:
+    AddMappingBody:
+      summary: Update an existing profile mapping by adding one or more properties
+      value:
+        properties:
+          fullName:
+            expression: user.firstName + user.lastName
+            pushStatus: PUSH
+          nickName:
+            expression: user.nickName
+            pushStatus: PUSH
+    UpdateMappingBody:
+      summary: Update an existing profile mapping by updating one or more properties
+      value:
+        properties:
+          nickName:
+            expression: user.honorificPrefix + user.displayName
+            pushStatus: DONT_PUSH
+    RemoveMappingBody:
+      summary: Update an existing profile mapping by removing one or more properties
+      value:
+        properties:
+          nickName:
+            expression: null
+            pushStatus: null
+    AddMappingResponse:
+      summary: Update an existing profile mapping by adding one or more properties
+      value:
+        id: prm1k47ghydIQOTBW0g4
+        source:
+          id: otysbePhQ3yqt4cVv0g3
+          name: user
+          type: user
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/meta/types/user/otysbePhQ3yqt4cVv0g3
+            schema:
+              href: https://{yourOktaDomain}/api/v1/meta/schemas/user/oscsbePhQ3yqt4cVv0g3
+        target:
+          id: 0oa1qmn4LZQQEH0wZ0g4
+          name: okta_org2org
+          type: appuser
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/apps/0oa1qmn4LZQQEH0wZ0g4
+            schema:
+              href: https://{yourOktaDomain}/api/v1/meta/schemas/apps/0oa1qmn4LZQQEH0wZ0g4/default
+        properties:
+          fullName:
+            expression: user.firstName + user.lastName
+            pushStatus: PUSH
+          nickName:
+            expression: user.nickName
+            pushStatus: PUSH
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/mappings/prm1k48weFSOnEUnw0g4
+    UpdateMappingResponse:
+      summary: Update an existing profile mapping by updating one or more properties
+      value:
+        id: prm1k47ghydIQOTBW0g4
+        source:
+          id: otysbePhQ3yqt4cVv0g3
+          name: user
+          type: user
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/meta/types/user/otysbePhQ3yqt4cVv0g3
+            schema:
+              href: https://{yourOktaDomain}/api/v1/meta/schemas/user/oscsbePhQ3yqt4cVv0g3
+        target:
+          id: 0oa1qmn4LZQQEH0wZ0g4
+          name: okta_org2org
+          type: appuser
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/apps/0oa1qmn4LZQQEH0wZ0g4
+            schema:
+              href: https://{yourOktaDomain}/api/v1/meta/schemas/apps/0oa1qmn4LZQQEH0wZ0g4/default
+        properties:
+          fullName:
+            expression: user.firstName + user.lastName
+            pushStatus: PUSH
+          nickName:
+            expression: user.honorificPrefix + user.displayName
+            pushStatus: DONT_PUSH
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/mappings/prm1k48weFSOnEUnw0g4
+    RemoveMappingResponse:
+      summary: Update an existing profile mapping by removing one or more properties
+      value:
+        id: prm1k47ghydIQOTBW0g4
+        source:
+          id: otysbePhQ3yqt4cVv0g3
+          name: user
+          type: user
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/meta/types/user/otysbePhQ3yqt4cVv0g3
+            schema:
+              href: https://{yourOktaDomain}/api/v1/meta/schemas/user/oscsbePhQ3yqt4cVv0g3
+        target:
+          id: 0oa1qmn4LZQQEH0wZ0g4
+          name: okta_org2org
+          type: appuser
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/apps/0oa1qmn4LZQQEH0wZ0g4
+            schema:
+              href: https://{yourOktaDomain}/api/v1/meta/schemas/apps/0oa1qmn4LZQQEH0wZ0g4/default
+        properties:
+          fullName:
+            expression: user.firstName + user.lastName
+            pushStatus: PUSH
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/mappings/prm1k48weFSOnEUnw0g4
+    RetrieveMappingsResponse:
+      summary: Retrieve a single profile mapping
+      value:
+        id: prm1k47ghydIQOTBW0g4
+        source:
+          id: otysbePhQ3yqt4cVv0g3
+          name: user
+          type: user
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/meta/types/user/otysbePhQ3yqt4cVv0g3
+            schema:
+              href: https://{yourOktaDomain}/api/v1/meta/schemas/user/oscsbePhQ3yqt4cVv0g3
+        target:
+          id: 0oa1qmn4LZQQEH0wZ0g4
+          name: okta_org2org
+          type: appuser
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/apps/0oa1qmn4LZQQEH0wZ0g4
+            schema:
+              href: https://{yourOktaDomain}/api/v1/meta/schemas/apps/0oa1qmn4LZQQEH0wZ0g4/default
+        properties:
+          firstName:
+            expression: user.firstName
+            pushStatus: PUSH
+          lastName:
+            expression: user.lastName
+            pushStatus: PUSH
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/mappings/prm1k48weFSOnEUnw0g4
+    ListMappingsResponse:
+      summary: List all profile mappings response
+      value:
+        - id: prm1k47ghydIQOTBW0g4
+          source:
+            id: otysbePhQ3yqt4cVv0g3
+            name: user
+            type: user
+            _links:
+              self:
+                href: https://{yourOktaDomain}/api/v1/meta/types/user/otysbePhQ3yqt4cVv0g3
+              schema:
+                href: https://{yourOktaDomain}/api/v1/meta/schemas/user/oscsbePhQ3yqt4cVv0g3
+          target:
+            id: 0oa1qmn4LZQQEH0wZ0g4
+            name: okta_org2org
+            type: appuser
+            _links:
+              self:
+                href: https://{yourOktaDomain}/api/v1/apps/0oa1qmn4LZQQEH0wZ0g4
+              schema:
+                href: https://{yourOktaDomain}/api/v1/meta/schemas/apps/0oa1qmn4LZQQEH0wZ0g4/default
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/mappings/prm1k48weFSOnEUnw0g4
+  parameters:
+    pathMappingId:
+      name: mappingId
+      description: '`id` of the Mapping'
+      in: path
+      required: true
+      schema:
+        type: string
+        example: cB6u7X8mptebWkffatKA
+  schemas:
+    ListProfileMappings:
+      type: object
+      description: |-
+        A collection of the profile mappings that include a subset of the profile mapping object's properties. The profile mapping object describes a mapping between an Okta user's and an app user's properties using [JSON Schema Draft 4](https://datatracker.ietf.org/doc/html/draft-zyp-json-schema-04).
+
+        > **Note:** Same type source/target mappings aren't supported by this API. Profile mappings must either be Okta->App or App->Okta.
+      properties:
+        id:
+          type: string
+          description: Unique identifier for profile mapping
+          readOnly: true
+        source:
+          $ref: '#/components/schemas/ProfileMappingSource'
+        target:
+          $ref: '#/components/schemas/ProfileMappingTarget'
+        _links:
+          $ref: ./Common.yaml#/components/schemas/LinksSelf
+    ProfileMapping:
+      type: object
+      description: |-
+        The profile mapping object describes a mapping between an Okta user's and an app user's properties using [JSON Schema Draft 4](https://datatracker.ietf.org/doc/html/draft-zyp-json-schema-04).
+
+        > **Note:** Same type source/target mappings aren't supported by this API. Profile mappings must be between Okta and an app.
+      properties:
+        id:
+          type: string
+          description: Unique identifier for a profile mapping
+          readOnly: true
+        properties:
+          type: object
+          $ref: '#/components/schemas/ProfileMappingProperty'
+          readOnly: false
+        source:
+          $ref: '#/components/schemas/ProfileMappingSource'
+        target:
+          $ref: '#/components/schemas/ProfileMappingTarget'
+        _links:
+          $ref: ./Common.yaml#/components/schemas/LinksSelf
+    ProfileMappingProperty:
+      type: object
+      description: A target property, in string form, that maps to a valid [JSON Schema Draft](https://tools.ietf.org/html/draft-zyp-json-schema-04) document.
+      properties:
+        expression:
+          description: Combination or single source properties that are mapped to the target property. See [Okta Expression Language](https://developer.okta.com/docs/reference/okta-expression-language/).
+          type: string
+        pushStatus:
+          $ref: '#/components/schemas/ProfileMappingPropertyPushStatus'
+    ProfileMappingPropertyPushStatus:
+      type: string
+      description: |-
+        Indicates whether to update target properties for user create and update or just for user create.
+
+        - Having a pushStatus of `PUSH` causes properties in the target to be updated on create and update. 
+        - Having a pushStatus of `DONT_PUSH` causes properties in the target to be updated only on create.
+      enum:
+        - DONT_PUSH
+        - PUSH
+    ProfileMappingSource:
+      type: object
+      description: |-
+        The parameter is the source of a profile mapping and is a valid [JSON Schema Draft 4](https://datatracker.ietf.org/doc/html/draft-zyp-json-schema-04) document with the following properties. The data type can be an app instance or an Okta object.
+
+        > **Note:** If the source is Okta and the UserTypes feature isn't enabled, then the source `_links` only has a link to the schema.
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the application instance or userType
+          readOnly: true
+        name:
+          type: string
+          description: Variable name of the application instance or name of the referenced UserType
+          readOnly: true
+        type:
+          type: string
+          description: Type of user referenced in the mapping
+          readOnly: true
+        _links:
+          $ref: '#/components/schemas/SourceLinks'
+    ProfileMappingTarget:
+      type: object
+      description: |-
+        The parameter is the target of a profile mapping and is a valid [JSON Schema Draft 4](https://datatracker.ietf.org/doc/html/draft-zyp-json-schema-04) document with the following properties. The data type can be an app instance or an Okta object.
+
+         > **Note:** If the target is Okta and the UserTypes feature isn't enabled, then the target `_links` only has a link to the schema.
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the application instance or UserType
+          readOnly: true
+        name:
+          type: string
+          description: Variable name of the application instance or name of the referenced userType
+          readOnly: true
+        type:
+          type: string
+          description: Type of user referenced in the mapping
+          readOnly: true
+        _links:
+          $ref: '#/components/schemas/SourceLinks'
+    ProfileMappingRequest:
+      type: object
+      description: The updated request body properties
+      properties:
+        properties:
+          type: object
+          $ref: '#/components/schemas/ProfileMappingProperty'
+      required:
+        - properties
+        - expression
+        - pushStatus
+    SourceLinks:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: ./Common.yaml#/components/schemas/LinksSelf
+        - type: object
+          properties:
+            schema:
+              allOf:
+                - $ref: ./Common.yaml#/components/schemas/HrefObject
+                - description: The associated schema
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

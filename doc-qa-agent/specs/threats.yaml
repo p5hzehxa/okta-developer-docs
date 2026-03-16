@@ -1,0 +1,155 @@
+openapi: 3.0.3
+info:
+  title: ThreatInsight API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../../base.yaml#/tags
+paths:
+  /api/v1/threats/configuration:
+    get:
+      summary: Retrieve the ThreatInsight configuration
+      description: Retrieves the ThreatInsight configuration for the org
+      operationId: getCurrentConfiguration
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreatInsightConfiguration'
+              examples:
+                ThreatInsightResponseEx:
+                  $ref: '#/components/examples/ThreatInsightResponseExample'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.threatInsights.read
+      tags:
+        - ThreatInsight
+    post:
+      summary: Update the ThreatInsight configuration
+      description: Updates the ThreatInsight configuration for the org
+      operationId: updateConfiguration
+      x-codegen-request-body-name: threatInsightConfiguration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThreatInsightConfiguration'
+            examples:
+              ThreatInsightUpdateEx:
+                $ref: '#/components/examples/ThreatInsightUpdateRequestExample'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreatInsightConfiguration'
+              examples:
+                ThreatInsightUpdateEx:
+                  $ref: '#/components/examples/ThreatInsightUpdateResponseExample'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.threatInsights.manage
+      tags:
+        - ThreatInsight
+    x-okta-team-detail:
+      x-team-slack: eng-esec
+components:
+  parameters: {}
+  schemas:
+    ThreatInsightConfiguration:
+      type: object
+      properties:
+        action:
+          type: string
+          description: Specifies how Okta responds to authentication requests from suspicious IP addresses
+          enum:
+            - none
+            - audit
+            - block
+          x-enumDescriptions:
+            none: Indicates that ThreatInsight is disabled
+            audit: Indicates that Okta logs suspicious requests to the System Log
+            block: Indicates that Okta logs suspicious requests to the System Log and blocks the requests
+          example: none
+        created:
+          type: string
+          format: date-time
+          description: Timestamp when the ThreatInsight Configuration object was created
+          example: '2020-08-05T22:18:30.629Z'
+          readOnly: true
+        excludeZones:
+          type: array
+          description: |-
+            Accepts a list of [Network Zone](/openapi/okta-management/management/networkzone/) IDs.
+            IPs in the excluded network zones aren't logged or blocked.
+            This ensures that traffic from known, trusted IPs isn't accidentally logged or blocked.
+          items:
+            type: string
+          example: []
+        lastUpdated:
+          type: string
+          format: date-time
+          description: Timestamp when the ThreatInsight Configuration object was last updated
+          readOnly: true
+          example: '2020-09-08T20:53:20.882Z'
+        _links:
+          $ref: ../Common.yaml#/components/schemas/LinksSelf
+      required:
+        - action
+  examples:
+    ThreatInsightUpdateRequestExample:
+      summary: ThreatInsight update request
+      value:
+        action: audit
+        excludeZones:
+          - nzo1q7jEOsoCnoKcj0g4
+          - nzouagptWUz5DlLfM0g3
+    ThreatInsightUpdateResponseExample:
+      summary: ThreatInsight update response
+      value:
+        action: audit
+        excludeZones:
+          - nzo1q7jEOsoCnoKcj0g4
+          - nzouagptWUz5DlLfM0g3
+        created: '2020-08-05T22:18:30.629Z'
+        lastUpdated: '2020-10-13T21:23:10.178Z'
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/threats/configuration
+            hints:
+              allow:
+                - GET
+                - POST
+    ThreatInsightResponseExample:
+      summary: ThreatInsight response
+      value:
+        action: none
+        excludeZones: []
+        created: '2020-08-05T22:18:30.629Z'
+        lastUpdated: '2020-08-05T22:18:30.629Z'
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/threats/configuration
+            hints:
+              allow:
+                - GET
+                - POST
+  securitySchemes:
+    $ref: ../../base.yaml#/components/securitySchemes

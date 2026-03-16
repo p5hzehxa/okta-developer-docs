@@ -1,0 +1,2681 @@
+openapi: 3.0.3
+info:
+  title: Device assurance policies API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/device-assurances:
+    get:
+      summary: List all device assurance policies
+      description: Lists all device assurance policies
+      operationId: listDeviceAssurancePolicies
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceAssurance'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.deviceAssurance.read
+      tags:
+        - DeviceAssurance
+    post:
+      summary: Create a device assurance policy
+      description: Creates a new device assurance policy
+      operationId: createDeviceAssurancePolicy
+      x-codegen-request-body-name: deviceAssurance
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceAssurance'
+            examples:
+              Android:
+                $ref: '#/components/examples/DeviceAssuranceAndroidRequest'
+              iOS:
+                $ref: '#/components/examples/DeviceAssuranceIosRequest'
+              MacOS:
+                $ref: '#/components/examples/DeviceAssuranceMacOSRequest'
+              Windows:
+                $ref: '#/components/examples/DeviceAssuranceWindowsRequest'
+              ChromeOSWithDeviceTrustConnectorThirdPartySignalProviders:
+                $ref: '#/components/examples/DeviceAssuranceChromeOSWithDeviceTrustConnectorThirdPartySignalProvidersRequest'
+              ChromeOSWithDevicePostureIdPThirdPartySignalProviders:
+                $ref: '#/components/examples/DeviceAssuranceChromeOSWithDevicePostureIdPThirdPartySignalProvidersRequest'
+              MacOSWithDeviceTrustConnectorThirdPartySignalProviders:
+                $ref: '#/components/examples/DeviceAssuranceMacOSWithDeviceTrustConnectorThirdPartySignalProvidersRequest'
+              MacOSWithDevicePostureIdPThirdPartySignalProviders:
+                $ref: '#/components/examples/DeviceAssuranceMacOSWithDevicePostureIdPThirdPartySignalProvidersRequest'
+              WindowsWithDeviceTrustConnectorThirdPartySignalProviders:
+                $ref: '#/components/examples/DeviceAssuranceWindowsWithDeviceTrustConnectorThirdPartySignalProvidersRequest'
+              WindowsWithDeviceTrustConnectorThirdPartySignalProvidersAndAntivirusEnabled:
+                $ref: '#/components/examples/DeviceAssuranceWindowsWithDeviceTrustConnectorThirdPartySignalProvidersAndAntivirusEnabledRequest'
+              WindowsWithDevicePostureIdPThirdPartySignalProviders:
+                $ref: '#/components/examples/DeviceAssuranceWindowsWithDevicePostureIdPThirdPartySignalProvidersRequest'
+              AndroidWithAndroidDeviceTrustThirdPartySignalProviders:
+                $ref: '#/components/examples/DeviceAssuranceAndroidWithAndroidDeviceTrustThirdPartySignalProvidersRequest'
+              AndroidWithDevicePostureIdPThirdPartySignalProviders:
+                $ref: '#/components/examples/DeviceAssuranceAndroidWithDevicePostureIdPThirdPartySignalProvidersRequest'
+              iOSWithDevicePostureIdPThirdPartySignalProviders:
+                $ref: '#/components/examples/DeviceAssuranceIosWithDevicePostureIdPSignalProvidersRequest'
+              AndroidWithDynamicVersionRequirement:
+                $ref: '#/components/examples/DeviceAssuranceAndroidWithDynamicVersionRequirementRequest'
+              iOSWithDynamicVersionRequirement:
+                $ref: '#/components/examples/DeviceAssuranceIosWithDynamicVersionRequirementRequest'
+              MacOSWithDynamicVersionRequirement:
+                $ref: '#/components/examples/DeviceAssuranceMacOSWithDynamicVersionRequirementRequest'
+              WindowsWithDynamicVersionRequirements:
+                $ref: '#/components/examples/DeviceAssuranceWindowsWithDynamicVersionRequirementsRequest'
+              WindowsWithWin11DynamicVersionRequirementAndWin10MinimumVersionString:
+                $ref: '#/components/examples/DeviceAssuranceWindowsWithWin11DynamicVersionRequirementAndWin10MinimumVersionStringRequest'
+              WindowsWithWin11MinimumVersionStringAndWin10DynamicVersionRequirement:
+                $ref: '#/components/examples/DeviceAssuranceWindowsWithWin11MinimumVersionStringAndWin10DynamicVersionRequirementRequest'
+              AndroidWithGracePeriod:
+                $ref: '#/components/examples/DeviceAssuranceAndroidWithGracePeriodRequest'
+              iOSWithGracePeriod:
+                $ref: '#/components/examples/DeviceAssuranceIosWithGracePeriodRequest'
+              MacOSWithGracePeriod:
+                $ref: '#/components/examples/DeviceAssuranceMacOSWithGracePeriodRequest'
+              WindowsWithGracePeriod:
+                $ref: '#/components/examples/DeviceAssuranceWindowsWithGracePeriodRequest'
+              ChromeOSWithGracePeriod:
+                $ref: '#/components/examples/DeviceAssuranceChromeOSWithGracePeriodRequest'
+              MacOSWithDevicePostureChecks:
+                $ref: '#/components/examples/DeviceAssuranceMacOSWithDevicePostureChecksRequest'
+              WindowsWithDevicePostureChecks:
+                $ref: '#/components/examples/DeviceAssuranceWindowsWithDevicePostureChecksRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceAssurance'
+              examples:
+                Android:
+                  $ref: '#/components/examples/DeviceAssuranceAndroidResponse'
+                iOS:
+                  $ref: '#/components/examples/DeviceAssuranceIosResponse'
+                MacOS:
+                  $ref: '#/components/examples/DeviceAssuranceMacOSResponse'
+                Windows:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsResponse'
+                ChromeOSWithDeviceTrustConnectorThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceChromeOSWithDeviceTrustConnectorThirdPartySignalProvidersResponse'
+                ChromeOSWithDevicePostureIdPThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceChromeOSWithDevicePostureIdPThirdPartySignalProvidersResponse'
+                MacOSWithDeviceTrustConnectorThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceMacOSWithDeviceTrustConnectorThirdPartySignalProvidersResponse'
+                MacOSWithDevicePostureIdPThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceMacOSWithDevicePostureIdPThirdPartySignalProvidersResponse'
+                WindowsWithDeviceTrustConnectorThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithDeviceTrustConnectorThirdPartySignalProvidersResponse'
+                WindowsWithDeviceTrustConnectorThirdPartySignalProvidersAndAntivirusEnabled:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithDeviceTrustConnectorThirdPartySignalProvidersAndAntivirusEnabledResponse'
+                WindowsWithDevicePostureIdPThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithDevicePostureIdPThirdPartySignalProvidersResponse'
+                AndroidWithAndroidDeviceTrustThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceAndroidWithAndroidDeviceTrustThirdPartySignalProvidersResponse'
+                AndroidWithDevicePostureIdPThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceAndroidWithDevicePostureIdPThirdPartySignalProvidersResponse'
+                iOSWithDevicePostureIdPThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceIosWithDevicePostureIdPSignalProvidersResponse'
+                AndroidWithDynamicVersionRequirement:
+                  $ref: '#/components/examples/DeviceAssuranceAndroidWithDynamicVersionRequirementResponse'
+                iOSWithDynamicVersionRequirement:
+                  $ref: '#/components/examples/DeviceAssuranceIosWithDynamicVersionRequirementResponse'
+                MacOSWithDynamicVersionRequirement:
+                  $ref: '#/components/examples/DeviceAssuranceMacOSWithDynamicVersionRequirementResponse'
+                WindowsWithDynamicVersionRequirements:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithDynamicVersionRequirementsResponse'
+                WindowsWithWin11DynamicVersionRequirementAndWin10MinimumVersionString:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithWin11DynamicVersionRequirementAndWin10MinimumVersionStringResponse'
+                WindowsWithWin11MinimumVersionStringAndWin10DynamicVersionRequirement:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithWin11MinimumVersionStringAndWin10DynamicVersionRequirementResponse'
+                AndroidWithGracePeriod:
+                  $ref: '#/components/examples/DeviceAssuranceAndroidWithGracePeriodResponse'
+                iOSWithGracePeriod:
+                  $ref: '#/components/examples/DeviceAssuranceIosWithGracePeriodResponse'
+                MacOSWithGracePeriod:
+                  $ref: '#/components/examples/DeviceAssuranceMacOSWithGracePeriodResponse'
+                WindowsWithGracePeriod:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithGracePeriodResponse'
+                ChromeOSWithGracePeriod:
+                  $ref: '#/components/examples/DeviceAssuranceChromeOSWithGracePeriodResponse'
+                MacOSWithDevicePostureChecks:
+                  $ref: '#/components/examples/DeviceAssuranceMacOSWithDevicePostureChecksResponse'
+                WindowsWithDevicePostureChecks:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithDevicePostureChecksResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.deviceAssurance.manage
+      tags:
+        - DeviceAssurance
+  /api/v1/device-assurances/{deviceAssuranceId}:
+    parameters:
+      - $ref: '#/components/parameters/pathDeviceAssuranceId'
+    get:
+      summary: Retrieve a device assurance policy
+      description: Retrieves a device assurance policy by `deviceAssuranceId`
+      operationId: getDeviceAssurancePolicy
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceAssurance'
+              examples:
+                Android:
+                  $ref: '#/components/examples/DeviceAssuranceAndroidResponse'
+                iOS:
+                  $ref: '#/components/examples/DeviceAssuranceIosResponse'
+                MacOS:
+                  $ref: '#/components/examples/DeviceAssuranceMacOSResponse'
+                Windows:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsResponse'
+                ChromeOSWithDeviceTrustConnectorThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceChromeOSWithDeviceTrustConnectorThirdPartySignalProvidersResponse'
+                ChromeOSWithDevicePostureIdPThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceChromeOSWithDevicePostureIdPThirdPartySignalProvidersResponse'
+                MacOSWithDeviceTrustConnectorThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceMacOSWithDeviceTrustConnectorThirdPartySignalProvidersResponse'
+                MacOSWithDevicePostureIdPThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceMacOSWithDevicePostureIdPThirdPartySignalProvidersResponse'
+                WindowsWithDeviceTrustConnectorThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithDeviceTrustConnectorThirdPartySignalProvidersResponse'
+                WindowsWithDeviceTrustConnectorThirdPartySignalProvidersAndAntivirusEnabled:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithDeviceTrustConnectorThirdPartySignalProvidersAndAntivirusEnabledResponse'
+                WindowsWithDevicePostureIdPThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithDevicePostureIdPThirdPartySignalProvidersResponse'
+                AndroidWithAndroidDeviceTrustThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceAndroidWithAndroidDeviceTrustThirdPartySignalProvidersResponse'
+                AndroidWithDevicePostureIdPThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceAndroidWithDevicePostureIdPThirdPartySignalProvidersResponse'
+                iOSWithDevicePostureIdPThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceIosWithDevicePostureIdPSignalProvidersResponse'
+                AndroidWithDynamicVersionRequirement:
+                  $ref: '#/components/examples/DeviceAssuranceAndroidWithDynamicVersionRequirementResponse'
+                iOSWithDynamicVersionRequirement:
+                  $ref: '#/components/examples/DeviceAssuranceIosWithDynamicVersionRequirementResponse'
+                MacOSWithDynamicVersionRequirement:
+                  $ref: '#/components/examples/DeviceAssuranceMacOSWithDynamicVersionRequirementResponse'
+                WindowsWithDynamicVersionRequirements:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithDynamicVersionRequirementsResponse'
+                WindowsWithWin11DynamicVersionRequirementAndWin10MinimumVersionString:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithWin11DynamicVersionRequirementAndWin10MinimumVersionStringResponse'
+                WindowsWithWin11MinimumVersionStringAndWin10DynamicVersionRequirement:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithWin11MinimumVersionStringAndWin10DynamicVersionRequirementResponse'
+                AndroidWithGracePeriod:
+                  $ref: '#/components/examples/DeviceAssuranceAndroidWithGracePeriodResponse'
+                iOSWithGracePeriod:
+                  $ref: '#/components/examples/DeviceAssuranceIosWithGracePeriodResponse'
+                MacOSWithGracePeriod:
+                  $ref: '#/components/examples/DeviceAssuranceMacOSWithGracePeriodResponse'
+                WindowsWithGracePeriod:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithGracePeriodResponse'
+                ChromeOSWithGracePeriod:
+                  $ref: '#/components/examples/DeviceAssuranceChromeOSWithGracePeriodResponse'
+                MacOSWithDevicePostureChecks:
+                  $ref: '#/components/examples/DeviceAssuranceMacOSWithDevicePostureChecksResponse'
+                WindowsWithDevicePostureChecks:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithDevicePostureChecksResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.deviceAssurance.read
+      tags:
+        - DeviceAssurance
+    put:
+      summary: Replace a device assurance policy
+      description: Replaces a device assurance policy by `deviceAssuranceId`
+      operationId: replaceDeviceAssurancePolicy
+      x-codegen-request-body-name: deviceAssurance
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceAssurance'
+            examples:
+              Android:
+                $ref: '#/components/examples/DeviceAssuranceAndroidRequest'
+              iOS:
+                $ref: '#/components/examples/DeviceAssuranceIosRequest'
+              MacOS:
+                $ref: '#/components/examples/DeviceAssuranceMacOSRequest'
+              Windows:
+                $ref: '#/components/examples/DeviceAssuranceWindowsRequest'
+              ChromeOSWithDeviceTrustConnectorThirdPartySignalProviders:
+                $ref: '#/components/examples/DeviceAssuranceChromeOSWithDeviceTrustConnectorThirdPartySignalProvidersRequest'
+              ChromeOSWithDevicePostureIdPThirdPartySignalProviders:
+                $ref: '#/components/examples/DeviceAssuranceChromeOSWithDevicePostureIdPThirdPartySignalProvidersRequest'
+              MacOSWithDeviceTrustConnectorThirdPartySignalProviders:
+                $ref: '#/components/examples/DeviceAssuranceMacOSWithDeviceTrustConnectorThirdPartySignalProvidersRequest'
+              MacOSWithDevicePostureIdPThirdPartySignalProviders:
+                $ref: '#/components/examples/DeviceAssuranceMacOSWithDevicePostureIdPThirdPartySignalProvidersRequest'
+              WindowsWithDeviceTrustConnectorThirdPartySignalProviders:
+                $ref: '#/components/examples/DeviceAssuranceWindowsWithDeviceTrustConnectorThirdPartySignalProvidersRequest'
+              WindowsWithDeviceTrustConnectorThirdPartySignalProvidersAndAntivirusEnabled:
+                $ref: '#/components/examples/DeviceAssuranceWindowsWithDeviceTrustConnectorThirdPartySignalProvidersAndAntivirusEnabledRequest'
+              WindowsWithDevicePostureIdPThirdPartySignalProviders:
+                $ref: '#/components/examples/DeviceAssuranceWindowsWithDevicePostureIdPThirdPartySignalProvidersRequest'
+              AndroidWithAndroidDeviceTrustThirdPartySignalProviders:
+                $ref: '#/components/examples/DeviceAssuranceAndroidWithAndroidDeviceTrustThirdPartySignalProvidersRequest'
+              AndroidWithDevicePostureIdPThirdPartySignalProviders:
+                $ref: '#/components/examples/DeviceAssuranceAndroidWithDevicePostureIdPThirdPartySignalProvidersRequest'
+              iOSWithDevicePostureIdPThirdPartySignalProviders:
+                $ref: '#/components/examples/DeviceAssuranceIosWithDevicePostureIdPSignalProvidersRequest'
+              AndroidWithDynamicVersionRequirement:
+                $ref: '#/components/examples/DeviceAssuranceAndroidWithDynamicVersionRequirementRequest'
+              iOSWithDynamicVersionRequirement:
+                $ref: '#/components/examples/DeviceAssuranceIosWithDynamicVersionRequirementRequest'
+              MacOSWithDynamicVersionRequirement:
+                $ref: '#/components/examples/DeviceAssuranceMacOSWithDynamicVersionRequirementRequest'
+              WindowsWithDynamicVersionRequirements:
+                $ref: '#/components/examples/DeviceAssuranceWindowsWithDynamicVersionRequirementsRequest'
+              WindowsWithWin11DynamicVersionRequirementAndWin10MinimumVersionString:
+                $ref: '#/components/examples/DeviceAssuranceWindowsWithWin11DynamicVersionRequirementAndWin10MinimumVersionStringRequest'
+              WindowsWithWin11MinimumVersionStringAndWin10DynamicVersionRequirement:
+                $ref: '#/components/examples/DeviceAssuranceWindowsWithWin11MinimumVersionStringAndWin10DynamicVersionRequirementRequest'
+              AndroidWithGracePeriod:
+                $ref: '#/components/examples/DeviceAssuranceAndroidWithGracePeriodRequest'
+              iOSWithGracePeriod:
+                $ref: '#/components/examples/DeviceAssuranceIosWithGracePeriodRequest'
+              MacOSWithGracePeriod:
+                $ref: '#/components/examples/DeviceAssuranceMacOSWithGracePeriodRequest'
+              WindowsWithGracePeriod:
+                $ref: '#/components/examples/DeviceAssuranceWindowsWithGracePeriodRequest'
+              ChromeOSWithGracePeriod:
+                $ref: '#/components/examples/DeviceAssuranceChromeOSWithGracePeriodRequest'
+              MacOSWithDevicePostureChecks:
+                $ref: '#/components/examples/DeviceAssuranceMacOSWithDevicePostureChecksRequest'
+              WindowsWithDevicePostureChecks:
+                $ref: '#/components/examples/DeviceAssuranceWindowsWithDevicePostureChecksRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceAssurance'
+              examples:
+                Android:
+                  $ref: '#/components/examples/DeviceAssuranceAndroidResponse'
+                iOS:
+                  $ref: '#/components/examples/DeviceAssuranceIosResponse'
+                MacOS:
+                  $ref: '#/components/examples/DeviceAssuranceMacOSResponse'
+                Windows:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsResponse'
+                ChromeOSWithDeviceTrustConnectorThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceChromeOSWithDeviceTrustConnectorThirdPartySignalProvidersResponse'
+                ChromeOSWithDevicePostureIdPThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceChromeOSWithDevicePostureIdPThirdPartySignalProvidersResponse'
+                MacOSWithDeviceTrustConnectorThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceMacOSWithDeviceTrustConnectorThirdPartySignalProvidersResponse'
+                MacOSWithDevicePostureIdPThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceMacOSWithDevicePostureIdPThirdPartySignalProvidersResponse'
+                WindowsWithDeviceTrustConnectorThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithDeviceTrustConnectorThirdPartySignalProvidersResponse'
+                WindowsWithDeviceTrustConnectorThirdPartySignalProvidersAndAntivirusEnabled:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithDeviceTrustConnectorThirdPartySignalProvidersAndAntivirusEnabledResponse'
+                WindowsWithDevicePostureIdPThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithDevicePostureIdPThirdPartySignalProvidersResponse'
+                AndroidWithAndroidDeviceTrustThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceAndroidWithAndroidDeviceTrustThirdPartySignalProvidersResponse'
+                AndroidWithDevicePostureIdPThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceAndroidWithDevicePostureIdPThirdPartySignalProvidersResponse'
+                iOSWithDevicePostureIdPThirdPartySignalProviders:
+                  $ref: '#/components/examples/DeviceAssuranceIosWithDevicePostureIdPSignalProvidersResponse'
+                AndroidWithDynamicVersionRequirement:
+                  $ref: '#/components/examples/DeviceAssuranceAndroidWithDynamicVersionRequirementResponse'
+                iOSWithDynamicVersionRequirement:
+                  $ref: '#/components/examples/DeviceAssuranceIosWithDynamicVersionRequirementResponse'
+                MacOSWithDynamicVersionRequirement:
+                  $ref: '#/components/examples/DeviceAssuranceMacOSWithDynamicVersionRequirementResponse'
+                WindowsWithDynamicVersionRequirements:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithDynamicVersionRequirementsResponse'
+                WindowsWithWin11DynamicVersionRequirementAndWin10MinimumVersionString:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithWin11DynamicVersionRequirementAndWin10MinimumVersionStringResponse'
+                WindowsWithWin11MinimumVersionStringAndWin10DynamicVersionRequirement:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithWin11MinimumVersionStringAndWin10DynamicVersionRequirementResponse'
+                AndroidWithGracePeriod:
+                  $ref: '#/components/examples/DeviceAssuranceAndroidWithGracePeriodResponse'
+                iOSWithGracePeriod:
+                  $ref: '#/components/examples/DeviceAssuranceIosWithGracePeriodResponse'
+                MacOSWithGracePeriod:
+                  $ref: '#/components/examples/DeviceAssuranceMacOSWithGracePeriodResponse'
+                WindowsWithGracePeriod:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithGracePeriodResponse'
+                ChromeOSWithGracePeriod:
+                  $ref: '#/components/examples/DeviceAssuranceChromeOSWithGracePeriodResponse'
+                MacOSWithDevicePostureChecks:
+                  $ref: '#/components/examples/DeviceAssuranceMacOSWithDevicePostureChecksResponse'
+                WindowsWithDevicePostureChecks:
+                  $ref: '#/components/examples/DeviceAssuranceWindowsWithDevicePostureChecksResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.deviceAssurance.manage
+      tags:
+        - DeviceAssurance
+    delete:
+      summary: Delete a device assurance policy
+      description: Deletes a device assurance policy by `deviceAssuranceId`. If the device assurance policy is currently being used in the org Authentication Policies, the delete will not be allowed.
+      operationId: deleteDeviceAssurancePolicy
+      responses:
+        '204':
+          description: No Content
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '409':
+          description: Conflict
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+              examples:
+                ErrorDeviceAssuranceInUse:
+                  $ref: '#/components/examples/ErrorDeviceAssuranceInUse'
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.deviceAssurance.manage
+      tags:
+        - DeviceAssurance
+components:
+  examples:
+    DeviceAssuranceAndroidRequest:
+      summary: Android request
+      value:
+        name: Device assurance Android
+        osVersion:
+          minimum: 12
+        diskEncryptionType:
+          include:
+            - USER
+            - FULL
+        jailbreak: false
+        platform: ANDROID
+        screenLockType:
+          include:
+            - BIOMETRIC
+        secureHardwarePresent: true
+    DeviceAssuranceIosRequest:
+      summary: iOS request
+      value:
+        name: Device assurance iOS
+        osVersion:
+          minimum: 12.4.5
+        jailbreak: false
+        platform: IOS
+        screenLockType:
+          include:
+            - BIOMETRIC
+    DeviceAssuranceMacOSRequest:
+      summary: macOS request
+      value:
+        name: Device assurance macOS
+        osVersion:
+          minimum: 12.4.5
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: MACOS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+    DeviceAssuranceWindowsRequest:
+      summary: Windows request
+      value:
+        name: Device assurance Windows
+        osVersion:
+          minimum: 12.4.5.9
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: WINDOWS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+    DeviceAssuranceMacOSWithDeviceTrustConnectorThirdPartySignalProvidersRequest:
+      x-okta-lifecycle:
+        features:
+          - GOOGLE_DEVICE_CONTEXT_CONNECTOR
+      summary: macOS with Device Trust Connector as third-party signal provider request
+      value:
+        name: Device assurance macOS
+        osVersion:
+          minimum: 12.4.5
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: MACOS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        thirdPartySignalProviders:
+          dtc:
+            osVersion:
+              minimum: 10.0.19041.1110
+            diskEncrypted: true
+            osFirewall: true
+            screenLockSecured: true
+            browserVersion:
+              minimum: 15393.27.0
+            deviceEnrollmentDomain": testDomain
+            builtInDnsClientEnabled": true
+            chromeRemoteDesktopAppBlocked": true
+            safeBrowsingProtectionLevel": true
+            siteIsolationEnabled": true
+            passwordProtectionWarningTrigger": PASSWORD_PROTECTION_OFF
+            realtimeUrlCheckMode": true
+    DeviceAssuranceMacOSWithDevicePostureIdPThirdPartySignalProvidersRequest:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_CUSTOM_POSTURE_PROVIDER
+      summary: macOS with Device Posture IdP as third-party signal provider request
+      value:
+        name: Device assurance macOS
+        osVersion:
+          minimum: 12.4.5
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: MACOS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        thirdPartySignalProviders:
+          devicePostureIdP:
+            managed: true
+            compliant: true
+    DeviceAssuranceWindowsWithDeviceTrustConnectorThirdPartySignalProvidersRequest:
+      x-okta-lifecycle:
+        features:
+          - GOOGLE_DEVICE_CONTEXT_CONNECTOR
+      summary: Windows with Device Trust Connector as third-party signal provider request
+      value:
+        name: Device assurance Windows
+        osVersion:
+          minimum: 12.4.5.9
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: WINDOWS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        thirdPartySignalProviders:
+          dtc:
+            osVersion:
+              minimum: 10.0.19041.1110
+            diskEncrypted: true
+            osFirewall: true
+            screenLockSecured: true
+            browserVersion:
+              minimum: 15393.27.0
+            deviceEnrollmentDomain: testDomain
+            builtInDnsClientEnabled: true
+            chromeRemoteDesktopAppBlocked: true
+            safeBrowsingProtectionLevel: ENHANCED_PROTECTION
+            siteIsolationEnabled: true
+            passwordProtectionWarningTrigger: PASSWORD_PROTECTION_OFF
+            realtimeUrlCheckMode: true
+            secureBootEnabled: true
+            windowsMachineDomain: testMachineDomain
+            windowsUserDomain: testUserDomain
+            crowdStrikeCustomerId: testCustomerId
+            crowdStrikeAgentId": testAgentId
+            keyTrustLevel: CHROME_BROWSER_HW_KEY
+    DeviceAssuranceWindowsWithDeviceTrustConnectorThirdPartySignalProvidersAndAntivirusEnabledRequest:
+      x-okta-lifecycle:
+        features:
+          - CHROME_DTC_ANTIVIRUS_SUPPORT
+      summary: Windows with Device Trust Connector as third-party signal provider and antivirus enabled request
+      value:
+        name: Device assurance Windows
+        osVersion:
+          minimum: 12.4.5.9
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: WINDOWS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        thirdPartySignalProviders:
+          dtc:
+            osVersion:
+              minimum: 10.0.19041.1110
+            diskEncrypted: true
+            osFirewall: true
+            screenLockSecured: true
+            browserVersion:
+              minimum: 15393.27.0
+            deviceEnrollmentDomain: testDomain
+            builtInDnsClientEnabled: true
+            chromeRemoteDesktopAppBlocked: true
+            safeBrowsingProtectionLevel: ENHANCED_PROTECTION
+            siteIsolationEnabled: true
+            passwordProtectionWarningTrigger: PASSWORD_PROTECTION_OFF
+            realtimeUrlCheckMode: true
+            secureBootEnabled: true
+            windowsMachineDomain: testMachineDomain
+            windowsUserDomain: testUserDomain
+            crowdStrikeCustomerId: testCustomerId
+            crowdStrikeAgentId": testAgentId
+            keyTrustLevel: CHROME_BROWSER_HW_KEY
+            antivirusEnabled: true
+    DeviceAssuranceWindowsWithDevicePostureIdPThirdPartySignalProvidersRequest:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_CUSTOM_POSTURE_PROVIDER
+      summary: Windows with Device Posture IdP as third-party signal provider request
+      value:
+        name: Device assurance Windows
+        osVersion:
+          minimum: 12.4.5.9
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: WINDOWS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        thirdPartySignalProviders:
+          devicePostureIdP:
+            managed: true
+            compliant: true
+    DeviceAssuranceChromeOSWithDeviceTrustConnectorThirdPartySignalProvidersRequest:
+      x-okta-lifecycle:
+        features:
+          - GOOGLE_DEVICE_CONTEXT_CONNECTOR
+      summary: ChromeOS with Device Trust Connector as third-party signal provider request
+      value:
+        name: Device assurance ChromeOS
+        platform: CHROMEOS
+        thirdPartySignalProviders:
+          dtc:
+            osVersion:
+              minimum: 10.0.19041.1110
+            diskEncrypted: true
+            osFirewall: true
+            screenLockSecured: true
+            allowScreenLock: true
+            browserVersion:
+              minimum: 15393.27.0
+            deviceEnrollmentDomain: testDomain
+            builtInDnsClientEnabled: true
+            chromeRemoteDesktopAppBlocked: true
+            safeBrowsingProtectionLevel: ENHANCED_PROTECTION
+            siteIsolationEnabled: true
+            passwordProtectionWarningTrigger: PASSWORD_PROTECTION_OFF
+            realtimeUrlCheckMode: true
+            keyTrustLevel: CHROME_OS_VERIFIED_MODE
+    DeviceAssuranceChromeOSWithDevicePostureIdPThirdPartySignalProvidersRequest:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_CUSTOM_POSTURE_PROVIDER
+      summary: ChromeOS with Device Posture IdP as third-party signal provider request
+      value:
+        name: Device assurance ChromeOS
+        platform: CHROMEOS
+        thirdPartySignalProviders:
+          devicePostureIdP:
+            managed: true
+            compliant: true
+    DeviceAssuranceAndroidWithDynamicVersionRequirementRequest:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_DYNAMIC_OS_SUPPORT
+      summary: Android with dynamic version requirement request
+      value:
+        name: Device assurance Android
+        osVersion:
+          dynamicVersionRequirement:
+            type: MINIMUM
+            distanceFromLatestMajor: 0
+        diskEncryptionType:
+          include:
+            - USER
+            - FULL
+        jailbreak: false
+        platform: ANDROID
+        screenLockType:
+          include:
+            - BIOMETRIC
+        secureHardwarePresent: true
+    DeviceAssuranceIosWithDynamicVersionRequirementRequest:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_DYNAMIC_OS_SUPPORT
+      summary: iOS with dynamic version requirement request
+      value:
+        name: Device assurance iOS
+        osVersion:
+          dynamicVersionRequirement:
+            type: EXACT_ANY_SUPPORTED
+            latestSecurityPatch: true
+        jailbreak: false
+        platform: IOS
+        screenLockType:
+          include:
+            - BIOMETRIC
+    DeviceAssuranceMacOSWithDynamicVersionRequirementRequest:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_DYNAMIC_OS_SUPPORT
+      summary: macOS with dynamic version requirement request
+      value:
+        name: Device assurance macOS
+        osVersion:
+          dynamicVersionRequirement:
+            type: EXACT
+            distanceFromLatestMajor: 0
+            latestSecurityPatch: true
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: MACOS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+    DeviceAssuranceWindowsWithDynamicVersionRequirementsRequest:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_DYNAMIC_OS_SUPPORT
+      summary: Windows with Windows 11 and Windows 10 dynamic version requirements request
+      value:
+        name: Device assurance Windows
+        osVersionConstraints:
+          - majorVersionConstraint: WINDOWS_11
+            dynamicVersionRequirement:
+              type: MINIMUM
+              distanceFromLatestMajor: 1
+              latestSecurityPatch: true
+          - majorVersionConstraint: WINDOWS_10
+            dynamicVersionRequirement:
+              type: EXACT_ANY_SUPPORTED
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: WINDOWS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+    DeviceAssuranceWindowsWithWin11DynamicVersionRequirementAndWin10MinimumVersionStringRequest:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_DYNAMIC_OS_SUPPORT
+      summary: Windows with Windows 11 dynamic version requirement and Windows 10 minimum version request
+      value:
+        name: Device assurance Windows
+        osVersionConstraints:
+          - majorVersionConstraint: WINDOWS_11
+            dynamicVersionRequirement:
+              type: EXACT
+              distanceFromLatestMajor: 1
+          - majorVersionConstraint: WINDOWS_10
+            minimum: 10.0.19045.0
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: WINDOWS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+    DeviceAssuranceWindowsWithWin11MinimumVersionStringAndWin10DynamicVersionRequirementRequest:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_DYNAMIC_OS_SUPPORT
+      summary: Windows with Windows 11 minimum version and a Windows 10 dynamic version requirement request
+      value:
+        name: Device assurance Windows
+        osVersionConstraints:
+          - majorVersionConstraint: WINDOWS_11
+            minimum: 10.0.22000.0
+          - majorVersionConstraint: WINDOWS_10
+            dynamicVersionRequirement:
+              type: NOT_ALLOWED
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: WINDOWS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+    DeviceAssuranceAndroidWithGracePeriodRequest:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_GRACE_PERIOD
+      summary: Android with due by date grace period request
+      value:
+        name: Device assurance Android Grace Period
+        osVersion:
+          dynamicVersionRequirement:
+            type: MINIMUM
+            distanceFromLatestMajor: 0
+        diskEncryptionType:
+          include:
+            - USER
+            - FULL
+        jailbreak: false
+        platform: ANDROID
+        screenLockType:
+          include:
+            - BIOMETRIC
+        secureHardwarePresent: true
+        gracePeriod:
+          type: BY_DATE_TIME
+          expiry: '2024-12-01T00:00:00.00Z'
+        displayRemediationMode: SHOW
+    DeviceAssuranceIosWithGracePeriodRequest:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_GRACE_PERIOD
+      summary: iOS with 30 day grace period request
+      value:
+        name: Device assurance iOS Grace Period
+        osVersion:
+          minimum: 12.4.5
+        jailbreak: false
+        platform: IOS
+        screenLockType:
+          include:
+            - BIOMETRIC
+        gracePeriod:
+          type: BY_DURATION
+          expiry: P30D
+        displayRemediationMode: SHOW
+    DeviceAssuranceMacOSWithGracePeriodRequest:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_GRACE_PERIOD
+      summary: macOS request with due by date grace period request
+      value:
+        name: Device assurance macOS
+        osVersion:
+          minimum: 12.4.5
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: MACOS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        gracePeriod:
+          type: BY_DATE_TIME
+          expiry: '2024-12-01T00:00:00.00Z'
+        displayRemediationMode: SHOW
+    DeviceAssuranceWindowsWithGracePeriodRequest:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_GRACE_PERIOD
+      summary: Windows with 7 day grace period request
+      value:
+        name: Device assurance Windows
+        osVersion:
+          minimum: 12.4.5.9
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: WINDOWS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        gracePeriod:
+          type: BY_DURATION
+          expiry: P7D
+        displayRemediationMode: SHOW
+    DeviceAssuranceChromeOSWithGracePeriodRequest:
+      x-okta-lifecycle:
+        features:
+          - GOOGLE_DEVICE_CONTEXT_CONNECTOR
+          - DEVICE_ASSURANCE_GRACE_PERIOD
+      summary: ChromeOS with 7 day grace period request
+      value:
+        name: Device assurance ChromeOS
+        platform: CHROMEOS
+        gracePeriod:
+          type: BY_DURATION
+          expiry: P7D
+        displayRemediationMode: SHOW
+        thirdPartySignalProviders:
+          dtc:
+            osVersion:
+              minimum: 10.0.19041.1110
+            diskEncrypted: true
+            osFirewall: true
+            screenLockSecured: true
+            allowScreenLock: true
+            browserVersion:
+              minimum: 15393.27.0
+            deviceEnrollmentDomain: testDomain
+            builtInDnsClientEnabled: true
+            chromeRemoteDesktopAppBlocked: true
+            safeBrowsingProtectionLevel: ENHANCED_PROTECTION
+            siteIsolationEnabled: true
+            passwordProtectionWarningTrigger: PASSWORD_PROTECTION_OFF
+            realtimeUrlCheckMode: true
+            keyTrustLevel: CHROME_OS_VERIFIED_MODE
+    DeviceAssuranceAndroidWithAndroidDeviceTrustThirdPartySignalProvidersRequest:
+      x-okta-lifecycle:
+        features:
+          - ANDROID_ZERO_TRUST_SIGNALS
+      summary: Android with Android Device Trust as third-party signal provider request
+      value:
+        name: Device assurance Android with Android Device Trust third-party signals
+        osVersion:
+          dynamicVersionRequirement:
+            type: EXACT
+            distanceFromLatestMajor: 0
+            latestSecurityPatch: true
+        diskEncryptionType:
+          include:
+            - USER
+            - FULL
+        jailbreak: false
+        platform: ANDROID
+        screenLockType:
+          include:
+            - BIOMETRIC
+        secureHardwarePresent: true
+        thirdPartySignalProviders:
+          androidDeviceTrust:
+            playProtectVerdict: LOW
+            deviceIntegrityLevel: MEETS_STRONG_INTEGRITY
+            screenLockComplexity: HIGH
+            usbDebuggingDisabled: true
+            networkProxyDisabled: true
+            wifiSecured: true
+            requireMajorVersionUpdate: true
+    DeviceAssuranceAndroidWithDevicePostureIdPThirdPartySignalProvidersRequest:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_CUSTOM_POSTURE_PROVIDER
+      summary: Android with Device Posture IdP as third-party signal provider request
+      value:
+        name: Device assurance Android
+        osVersion:
+          dynamicVersionRequirement:
+            type: EXACT
+            distanceFromLatestMajor: 0
+            latestSecurityPatch: true
+        diskEncryptionType:
+          include:
+            - USER
+            - FULL
+        jailbreak: false
+        platform: ANDROID
+        screenLockType:
+          include:
+            - BIOMETRIC
+        secureHardwarePresent: true
+        thirdPartySignalProviders:
+          devicePostureIdP:
+            managed: true
+            compliant: true
+    DeviceAssuranceIosWithDevicePostureIdPSignalProvidersRequest:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_CUSTOM_POSTURE_PROVIDER
+      summary: iOS with Device Posture IdP as third-party signal provider request
+      value:
+        name: Device assurance iOS
+        osVersion:
+          minimum: 12.4.5
+        jailbreak: false
+        platform: IOS
+        screenLockType:
+          include:
+            - BIOMETRIC
+        thirdPartySignalProviders:
+          devicePostureIdP:
+            managed: true
+            compliant: true
+    DeviceAssuranceMacOSWithDevicePostureChecksRequest:
+      x-okta-lifecycle:
+        features:
+          - OSQUERY_CUSTOM_DEVICE_POSTURE_CHECKS
+      summary: macOS request with OSQuery device posture check
+      value:
+        name: Device assurance macOS
+        osVersion:
+          minimum: 12.4.5
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: MACOS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        devicePostureChecks:
+          include:
+            - variableName: macOSFirewall
+              value: '1'
+    DeviceAssuranceWindowsWithDevicePostureChecksRequest:
+      x-okta-lifecycle:
+        features:
+          - OSQUERY_CUSTOM_DEVICE_POSTURE_CHECKS
+      summary: Windows request with OSQuery device posture check
+      value:
+        name: Device assurance Windows
+        osVersion:
+          minimum: 12.4.5.9
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: WINDOWS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        devicePostureChecks:
+          include:
+            - variableName: windowsFirewall
+              value: '1'
+    DeviceAssuranceAndroidResponse:
+      summary: Android response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance Android
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          minimum: 12.4.5
+        diskEncryptionType:
+          include:
+            - USER
+            - FULL
+        jailbreak: false
+        platform: ANDROID
+        screenLockType:
+          include:
+            - BIOMETRIC
+        secureHardwarePresent: true
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceIosResponse:
+      summary: iOS response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance iOS
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          minimum: 12.4.5.9
+        jailbroken: false
+        platform: IOS
+        screenLockType:
+          include:
+            - BIOMETRIC
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceMacOSResponse:
+      summary: macOS response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance macOS
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          minimum: 12.4.5
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: MACOS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceWindowsResponse:
+      summary: Windows response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance Windows
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          minimum: 12.4.5.9
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: WINDOWS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceMacOSWithDeviceTrustConnectorThirdPartySignalProvidersResponse:
+      x-okta-lifecycle:
+        features:
+          - GOOGLE_DEVICE_CONTEXT_CONNECTOR
+      summary: macOS with Device Trust Connector as third-party signal provider response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance macOS
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          minimum: 12.4.5.9
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: MACOS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        thirdPartySignalProviders:
+          dtc:
+            osVersion:
+              minimum: 10.0.19041.1110
+            diskEncrypted: true
+            osFirewall: true
+            screenLockSecured: true
+            browserVersion:
+              minimum: 15393.27.0
+            deviceEnrollmentDomain: testDomain
+            builtInDnsClientEnabled: true
+            chromeRemoteDesktopAppBlocked: true
+            safeBrowsingProtectionLevel: ENHANCED_PROTECTION
+            siteIsolationEnabled: true
+            passwordProtectionWarningTrigger: PASSWORD_PROTECTION_OFF
+            realtimeUrlCheckMode: true
+            keyTrustLevel: CHROME_BROWSER_HW_KEY
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceMacOSWithDevicePostureIdPThirdPartySignalProvidersResponse:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_CUSTOM_POSTURE_PROVIDER
+      summary: macOS with Device Posture IdP as third-party signal provider response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance macOS
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          minimum: 12.4.5.9
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: MACOS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        thirdPartySignalProviders:
+          devicePostureIdP:
+            managed: true
+            compliant: true
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceWindowsWithDeviceTrustConnectorThirdPartySignalProvidersResponse:
+      x-okta-lifecycle:
+        features:
+          - GOOGLE_DEVICE_CONTEXT_CONNECTOR
+      summary: Windows with Device Trust Connector as third-party signal provider response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance Windows
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          minimum: 12.4.5.9
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: WINDOWS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        thirdPartySignalProviders:
+          dtc:
+            osVersion:
+              minimum: 10.0.19041.1110
+            diskEncrypted: true
+            osFirewall: true
+            screenLockSecured: true
+            browserVersion:
+              minimum: 15393.27.0
+            deviceEnrollmentDomain: testDomain
+            builtInDnsClientEnabled: true
+            chromeRemoteDesktopAppBlocked: true
+            safeBrowsingProtectionLevel: ENHANCED_PROTECTION
+            siteIsolationEnabled: true
+            passwordProtectionWarningTrigger: PASSWORD_PROTECTION_OFF
+            realtimeUrlCheckMode: true
+            secureBootEnabled: true
+            windowsMachineDomain: testMachineDomain
+            windowsUserDomain: testUserDomain
+            crowdStrikeCustomerId: testCustomerId
+            crowdStrikeAgentId": testAgentId
+            keyTrustLevel: CHROME_BROWSER_HW_KEY
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceWindowsWithDeviceTrustConnectorThirdPartySignalProvidersAndAntivirusEnabledResponse:
+      x-okta-lifecycle:
+        features:
+          - CHROME_DTC_ANTIVIRUS_SUPPORT
+      summary: Windows with Device Trust Connector as third-party signal provider and antivirus enabled response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance Windows
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          minimum: 12.4.5.9
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: WINDOWS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        thirdPartySignalProviders:
+          dtc:
+            osVersion:
+              minimum: 10.0.19041.1110
+            diskEncrypted: true
+            osFirewall: true
+            screenLockSecured: true
+            browserVersion:
+              minimum: 15393.27.0
+            deviceEnrollmentDomain: testDomain
+            builtInDnsClientEnabled: true
+            chromeRemoteDesktopAppBlocked: true
+            safeBrowsingProtectionLevel: ENHANCED_PROTECTION
+            siteIsolationEnabled: true
+            passwordProtectionWarningTrigger: PASSWORD_PROTECTION_OFF
+            realtimeUrlCheckMode: true
+            secureBootEnabled: true
+            windowsMachineDomain: testMachineDomain
+            windowsUserDomain: testUserDomain
+            crowdStrikeCustomerId: testCustomerId
+            crowdStrikeAgentId": testAgentId
+            keyTrustLevel: CHROME_BROWSER_HW_KEY
+            antivirusEnabled: true
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceWindowsWithDevicePostureIdPThirdPartySignalProvidersResponse:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_CUSTOM_POSTURE_PROVIDER
+      summary: Windows with Device Posture IdP as third-party signal provider response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance Windows
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          minimum: 12.4.5.9
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: WINDOWS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        thirdPartySignalProviders:
+          devicePostureIdP:
+            managed: true
+            compliant: true
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceChromeOSWithDeviceTrustConnectorThirdPartySignalProvidersResponse:
+      x-okta-lifecycle:
+        features:
+          - GOOGLE_DEVICE_CONTEXT_CONNECTOR
+      summary: ChromeOS with Device Trust Connector as third-party signal provider response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance ChromeOS
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        platform: CHROMEOS
+        thirdPartySignalProviders:
+          dtc:
+            osVersion:
+              minimum: 10.0.19041.1110
+            diskEncrypted: true
+            osFirewall: true
+            screenLockSecured: true
+            allowScreenLock: true
+            browserVersion:
+              minimum: 15393.27.0
+            deviceEnrollmentDomain: testDomain
+            builtInDnsClientEnabled: true
+            chromeRemoteDesktopAppBlocked: true
+            safeBrowsingProtectionLevel: ENHANCED_PROTECTION
+            siteIsolationEnabled: true
+            passwordProtectionWarningTrigger: PASSWORD_PROTECTION_OFF
+            realtimeUrlCheckMode: true
+            keyTrustLevel: CHROME_OS_VERIFIED_MODE
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceChromeOSWithDevicePostureIdPThirdPartySignalProvidersResponse:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_CUSTOM_POSTURE_PROVIDER
+      summary: ChromeOS with Device Posture IdP as third-party signal provider response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance ChromeOS
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        platform: CHROMEOS
+        thirdPartySignalProviders:
+          devicePostureIdP:
+            managed: true
+            compliant: true
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceAndroidWithDynamicVersionRequirementResponse:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_DYNAMIC_OS_SUPPORT
+      summary: Android with dynamic version requirement response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance Android
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          dynamicVersionRequirement:
+            type: MINIMUM
+            distanceFromLatestMajor: 0
+        diskEncryptionType:
+          include:
+            - USER
+            - FULL
+        jailbreak: false
+        platform: ANDROID
+        screenLockType:
+          include:
+            - BIOMETRIC
+        secureHardwarePresent: true
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceIosWithDynamicVersionRequirementResponse:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_DYNAMIC_OS_SUPPORT
+      summary: iOS with dynamic version requirement response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance iOS
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          dynamicVersionRequirement:
+            type: EXACT_ANY_SUPPORTED
+            latestSecurityPatch: true
+        jailbroken: false
+        platform: IOS
+        screenLockType:
+          include:
+            - BIOMETRIC
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceMacOSWithDynamicVersionRequirementResponse:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_DYNAMIC_OS_SUPPORT
+      summary: macOS with dynamic version requirement response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance macOS
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          dynamicVersionRequirement:
+            type: EXACT
+            distanceFromLatestMajor: 0
+            latestSecurityPatch: true
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: MACOS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceWindowsWithDynamicVersionRequirementsResponse:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_DYNAMIC_OS_SUPPORT
+      summary: Windows with Windows 11 and Windows 10 dynamic version requirements response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance Windows
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersionConstraints:
+          - majorVersionConstraint: WINDOWS_11
+            dynamicVersionRequirement:
+              type: MINIMUM
+              distanceFromLatestMajor: 1
+              latestSecurityPatch: true
+          - majorVersionConstraint: WINDOWS_10
+            dynamicVersionRequirement:
+              type: EXACT_ANY_SUPPORTED
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: WINDOWS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceWindowsWithWin11DynamicVersionRequirementAndWin10MinimumVersionStringResponse:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_DYNAMIC_OS_SUPPORT
+      summary: Windows with Windows 11 dynamic version requirement and Windows 10 minimum version response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance Windows
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersionConstraints:
+          - majorVersionConstraint: WINDOWS_11
+            dynamicVersionRequirement:
+              type: EXACT
+              distanceFromLatestMajor: 1
+          - majorVersionConstraint: WINDOWS_10
+            minimum: 10.0.19045.0
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: WINDOWS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceWindowsWithWin11MinimumVersionStringAndWin10DynamicVersionRequirementResponse:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_DYNAMIC_OS_SUPPORT
+      summary: Windows with Windows 11 minimum version and Windows 10 dynamic version requirement response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance Windows
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersionConstraints:
+          - majorVersionConstraint: WINDOWS_11
+            minimum: 10.0.22000.0
+          - majorVersionConstraint: WINDOWS_10
+            dynamicVersionRequirement:
+              type: NOT_ALLOWED
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: WINDOWS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceAndroidWithGracePeriodResponse:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_GRACE_PERIOD
+      summary: Android with due by date grace period response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance Android
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          minimum: 12.4.5
+        diskEncryptionType:
+          include:
+            - USER
+            - FULL
+        jailbreak: false
+        platform: ANDROID
+        screenLockType:
+          include:
+            - BIOMETRIC
+        secureHardwarePresent: true
+        gracePeriod:
+          type: BY_DATE_TIME
+          expiry: '2024-12-01T00:00:00.00Z'
+        displayRemediationMode: SHOW
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceIosWithGracePeriodResponse:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_GRACE_PERIOD
+      summary: iOS with due by days grace period response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance iOS
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          minimum: 12.4.5.9
+        jailbroken: false
+        platform: IOS
+        screenLockType:
+          include:
+            - BIOMETRIC
+        gracePeriod:
+          type: BY_DURATION
+          expiry: P30D
+        displayRemediationMode: SHOW
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceMacOSWithGracePeriodResponse:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_GRACE_PERIOD
+      summary: macOS with due by date grace period response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance macOS
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          minimum: 12.4.5
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: MACOS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        gracePeriod:
+          type: BY_DATE_TIME
+          expiry: '2024-12-01T00:00:00.00Z'
+        displayRemediationMode: SHOW
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceWindowsWithGracePeriodResponse:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_GRACE_PERIOD
+      summary: Windows with due by days grace period response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance Windows
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          minimum: 12.4.5.9
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: WINDOWS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        gracePeriod:
+          type: BY_DURATION
+          expiry: P7D
+        displayRemediationMode: SHOW
+        secureHardwarePresent: true
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceChromeOSWithGracePeriodResponse:
+      x-okta-lifecycle:
+        features:
+          - GOOGLE_DEVICE_CONTEXT_CONNECTOR
+          - DEVICE_ASSURANCE_GRACE_PERIOD
+      summary: ChromeOS with due by days grace period response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance ChromeOS
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        platform: CHROMEOS
+        gracePeriod:
+          type: BY_DURATION
+          expiry: P7D
+        displayRemediationMode: SHOW
+        thirdPartySignalProviders:
+          dtc:
+            osVersion:
+              minimum: 10.0.19041.1110
+            diskEncrypted: true
+            osFirewall: true
+            screenLockSecured: true
+            allowScreenLock: true
+            browserVersion:
+              minimum: 15393.27.0
+            deviceEnrollmentDomain: testDomain
+            builtInDnsClientEnabled: true
+            chromeRemoteDesktopAppBlocked: true
+            safeBrowsingProtectionLevel: ENHANCED_PROTECTION
+            siteIsolationEnabled: true
+            passwordProtectionWarningTrigger: PASSWORD_PROTECTION_OFF
+            realtimeUrlCheckMode: true
+            keyTrustLevel: CHROME_OS_VERIFIED_MODE
+    DeviceAssuranceMacOSWithDevicePostureChecksResponse:
+      x-okta-lifecycle:
+        features:
+          - OSQUERY_CUSTOM_DEVICE_POSTURE_CHECKS
+      summary: macOS request with OSQuery device posture check
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance macOS
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          minimum: 12.4.5
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: MACOS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        devicePostureChecks:
+          include:
+            - variableName: macOSFirewall
+              value: '1'
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceWindowsWithDevicePostureChecksResponse:
+      x-okta-lifecycle:
+        features:
+          - OSQUERY_CUSTOM_DEVICE_POSTURE_CHECKS
+      summary: Windows request with OSQuery device posture check
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance Windows
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          minimum: 12.4.5.9
+        diskEncryptionType:
+          include:
+            - ALL_INTERNAL_VOLUMES
+        platform: WINDOWS
+        screenLockType:
+          include:
+            - PASSCODE
+            - BIOMETRIC
+        secureHardwarePresent: true
+        devicePostureChecks:
+          include:
+            - variableName: windowsFirewall
+              value: '1'
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceAndroidWithAndroidDeviceTrustThirdPartySignalProvidersResponse:
+      x-okta-lifecycle:
+        features:
+          - ANDROID_ZERO_TRUST_SIGNALS
+      summary: Android with Android Device Trust as third-party signal provider response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance Android with Android Device Trust third-party signals
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          dynamicVersionRequirement:
+            type: EXACT
+            distanceFromLatestMajor: 0
+            latestSecurityPatch: true
+        diskEncryptionType:
+          include:
+            - USER
+            - FULL
+        jailbreak: false
+        platform: ANDROID
+        screenLockType:
+          include:
+            - BIOMETRIC
+        secureHardwarePresent: true
+        thirdPartySignalProviders:
+          androidDeviceTrust:
+            playProtectVerdict: LOW
+            deviceIntegrityLevel: MEETS_STRONG_INTEGRITY
+            screenLockComplexity: HIGH
+            usbDebuggingDisabled: true
+            networkProxyDisabled: true
+            wifiSecured: true
+            requireMajorVersionUpdate: true
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceAndroidWithDevicePostureIdPThirdPartySignalProvidersResponse:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_CUSTOM_POSTURE_PROVIDER
+      summary: Android with Device Posture IdP as third-party signal provider response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance Android
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          dynamicVersionRequirement:
+            type: EXACT
+            distanceFromLatestMajor: 0
+            latestSecurityPatch: true
+        diskEncryptionType:
+          include:
+            - USER
+            - FULL
+        jailbreak: false
+        platform: ANDROID
+        screenLockType:
+          include:
+            - BIOMETRIC
+        secureHardwarePresent: true
+        thirdPartySignalProviders:
+          devicePostureIdP:
+            managed: true
+            compliant: true
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    DeviceAssuranceIosWithDevicePostureIdPSignalProvidersResponse:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_CUSTOM_POSTURE_PROVIDER
+      summary: iOS with Device Posture IdP as third-party signal provider response
+      value:
+        id: dae3m8o4rWhwReDeM1c5
+        name: Device assurance iOS
+        lastUpdate: '2022-01-01T00:00:00.000Z'
+        createdUpdate: '2022-01-01T00:00:00.000Z'
+        lastUpdatedBy: 00u217pyf72CdUrBt1c5
+        createdBy: 00u217pyf72CdUrBt1c5
+        osVersion:
+          minimum: 12.4.5
+        jailbroken: false
+        platform: IOS
+        screenLockType:
+          include:
+            - BIOMETRIC
+        thirdPartySignalProviders:
+          devicePostureIdP:
+            managed: true
+            compliant: true
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/device-assurances/dae3m8o4rWhwReDeM1c5
+            hints:
+              allow:
+                - DELETE
+                - GET
+                - PUT
+    ErrorDeviceAssuranceInUse:
+      summary: Can't delete device assurance policy in use by app sign-in policies
+      value:
+        errorSummary: Device assurance is in use and cannot be deleted.
+        errorId: oaenwA1ra80S9W-pvbh4m6haA
+        errorCauses: []
+  parameters:
+    pathDeviceAssuranceId:
+      in: path
+      name: deviceAssuranceId
+      required: true
+      description: Id of the device assurance policy
+      schema:
+        type: string
+  schemas:
+    DeviceAssurance:
+      title: DeviceAssurance
+      type: object
+      properties:
+        createdBy:
+          type: string
+          readOnly: true
+        createdDate:
+          type: string
+          readOnly: true
+        id:
+          type: string
+          readOnly: true
+        lastUpdatedBy:
+          type: string
+          readOnly: true
+        lastUpdate:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          description: Display name of the device assurance policy
+        platform:
+          $ref: '#/components/schemas/Platform'
+        gracePeriod:
+          $ref: '#/components/schemas/GracePeriod'
+        devicePostureChecks:
+          $ref: '#/components/schemas/DevicePostureChecks'
+        displayRemediationMode:
+          x-okta-lifecycle:
+            features:
+              - DEVICE_ASSURANCE_GRACE_PERIOD
+          description: Represents the remediation mode of this device assurance policy when users are denied access due to device noncompliance
+          type: string
+          enum:
+            - HIDE
+            - SHOW
+          example: SHOW
+          x-enumDescriptions:
+            HIDE: Hide remediation instructions in the Sign-In Widget
+            SHOW: Display remediation instructions in the Sign-In Widget
+        _links:
+          $ref: ./Common.yaml#/components/schemas/LinksSelf
+      discriminator:
+        propertyName: platform
+        mapping:
+          WINDOWS: '#/components/schemas/DeviceAssuranceWindowsPlatform'
+          MACOS: '#/components/schemas/DeviceAssuranceMacOSPlatform'
+          CHROMEOS: '#/components/schemas/DeviceAssuranceChromeOSPlatform'
+          IOS: '#/components/schemas/DeviceAssuranceIOSPlatform'
+          ANDROID: '#/components/schemas/DeviceAssuranceAndroidPlatform'
+    DeviceAssuranceWindowsPlatform:
+      allOf:
+        - $ref: '#/components/schemas/DeviceAssurance'
+        - type: object
+          properties:
+            diskEncryptionType:
+              type: object
+              properties:
+                include:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/DiskEncryptionTypeDesktop'
+            osVersion:
+              $ref: '#/components/schemas/OSVersionFourComponents'
+            osVersionConstraints:
+              x-okta-lifecycle:
+                features:
+                  - DEVICE_ASSURANCE_DYNAMIC_OS_SUPPORT
+              type: array
+              description: |
+                Specifies the Windows version requirements for the assurance policy. Each requirement must correspond to a different major version (Windows 11 or Windows 10). If a requirement isn't specified for a major version, then devices on that major version satisfy the condition.
+
+                There are two types of OS requirements:
+                * **Static**: A specific Windows version requirement that doesn't change until you update the policy. A static OS Windows requirement is specified with `majorVersionConstraint` and `minimum`.
+                * **Dynamic**: A Windows version requirement that is relative to the latest major release and security patch. A dynamic OS Windows requirement is specified with `majorVersionConstraint` and `dynamicVersionRequirement`.
+
+                > **Note:** Dynamic OS requirements are available only if the **Dynamic OS version compliance** [self-service EA](/openapi/okta-management/guides/release-lifecycle/#early-access-ea) feature is enabled. The `osVersionConstraints` property is only supported for the Windows platform. You can't specify both `osVersion.minimum` and `osVersionConstraints` properties at the same time.
+              items:
+                $ref: '#/components/schemas/OSVersionConstraint'
+              minItems: 1
+              maxItems: 2
+            screenLockType:
+              type: object
+              properties:
+                include:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ScreenLockType'
+            secureHardwarePresent:
+              type: boolean
+            thirdPartySignalProviders:
+              type: object
+              description: Settings for third-party signal providers (based on the `WINDOWS` platform)
+              properties:
+                dtc:
+                  $ref: '#/components/schemas/DTCWindows'
+                devicePostureIdP:
+                  $ref: '#/components/schemas/DevicePostureIdP'
+    DeviceAssuranceMacOSPlatform:
+      allOf:
+        - $ref: '#/components/schemas/DeviceAssurance'
+        - type: object
+          properties:
+            diskEncryptionType:
+              type: object
+              properties:
+                include:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/DiskEncryptionTypeDesktop'
+            osVersion:
+              $ref: '#/components/schemas/OSVersion'
+            screenLockType:
+              type: object
+              properties:
+                include:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ScreenLockType'
+            secureHardwarePresent:
+              type: boolean
+            thirdPartySignalProviders:
+              type: object
+              description: Settings for third-party signal providers (based on the `MACOS` platform)
+              properties:
+                dtc:
+                  $ref: '#/components/schemas/DTCMacOS'
+                devicePostureIdP:
+                  $ref: '#/components/schemas/DevicePostureIdP'
+    DeviceAssuranceChromeOSPlatform:
+      allOf:
+        - $ref: '#/components/schemas/DeviceAssurance'
+        - type: object
+          properties:
+            thirdPartySignalProviders:
+              type: object
+              description: Settings for third-party signal providers (based on the `CHROMEOS` platform)
+              properties:
+                dtc:
+                  $ref: '#/components/schemas/DTCChromeOS'
+                devicePostureIdP:
+                  $ref: '#/components/schemas/DevicePostureIdP'
+    DeviceAssuranceIOSPlatform:
+      allOf:
+        - $ref: '#/components/schemas/DeviceAssurance'
+        - type: object
+          properties:
+            jailbreak:
+              type: boolean
+            osVersion:
+              $ref: '#/components/schemas/OSVersion'
+            screenLockType:
+              type: object
+              properties:
+                include:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ScreenLockType'
+            thirdPartySignalProviders:
+              type: object
+              description: Settings for third-party signal providers (based on the `IOS` platform)
+              properties:
+                devicePostureIdP:
+                  $ref: '#/components/schemas/DevicePostureIdP'
+    DeviceAssuranceAndroidPlatform:
+      allOf:
+        - $ref: '#/components/schemas/DeviceAssurance'
+        - type: object
+          properties:
+            diskEncryptionType:
+              type: object
+              properties:
+                include:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/DiskEncryptionTypeAndroid'
+            jailbreak:
+              type: boolean
+            osVersion:
+              $ref: '#/components/schemas/OSVersion'
+            screenLockType:
+              type: object
+              properties:
+                include:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ScreenLockType'
+            secureHardwarePresent:
+              type: boolean
+            thirdPartySignalProviders:
+              type: object
+              description: Settings for third-party signal providers (based on the `ANDROID` platform)
+              properties:
+                androidDeviceTrust:
+                  $ref: '#/components/schemas/AndroidDeviceTrust'
+                devicePostureIdP:
+                  $ref: '#/components/schemas/DevicePostureIdP'
+    DiskEncryptionTypeDesktop:
+      type: string
+      enum:
+        - ALL_INTERNAL_VOLUMES
+    DiskEncryptionTypeAndroid:
+      type: string
+      enum:
+        - FULL
+        - USER
+    KeyTrustLevelBrowserKey:
+      description: Represents the attestation strength used by the Chrome Verified Access API
+      type: string
+      enum:
+        - CHROME_BROWSER_HW_KEY
+        - CHROME_BROWSER_OS_KEY
+      example: CHROME_BROWSER_HW_KEY
+      x-enumDescriptions:
+        CHROME_BROWSER_HW_KEY: Identity of the device was attested using a key pair that is OS encapsulated by a hardware layer
+        CHROME_BROWSER_OS_KEY: Identity of the device was attested using a key pair that is simply stored on the device but not in any specific hardware layer
+    KeyTrustLevelOSMode:
+      description: Represents the attestation strength used by the Chrome Verified Access API
+      type: string
+      enum:
+        - CHROME_OS_VERIFIED_MODE
+        - CHROME_OS_DEVELOPER_MODE
+      example: CHROME_OS_VERIFIED_MODE
+      x-enumDescriptions:
+        CHROME_OS_VERIFIED_MODE: Identity of the device was attested using an enterprise-emitted certificate, and the device is in Verified mode
+        CHROME_OS_DEVELOPER_MODE: Identity of the device was attested using an enterprise-emitted certificate, and the device is in Developer mode
+    PasswordProtectionWarningTrigger:
+      description: Indicates whether the Password Protection Warning feature is enabled
+      type: string
+      enum:
+        - PASSWORD_PROTECTION_OFF
+        - PASSWORD_REUSE
+        - PHISHING_REUSE
+      example: PHISHING_REUSE
+      x-enumDescriptions:
+        PASSWORD_PROTECTION_OFF: Password protection warning is off
+        PASSWORD_REUSE: Password protection warning is triggered by password reuse
+        PHISHING_REUSE: Password protection warning is triggered by password reuse on a phishing page
+    Platform:
+      type: string
+      enum:
+        - ANDROID
+        - IOS
+        - MACOS
+        - WINDOWS
+        - CHROMEOS
+    GracePeriod:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_GRACE_PERIOD
+      description: Represents the Grace Period configuration for the device assurance policy
+      type: object
+      properties:
+        type:
+          description: Represents the type of Grace Period configured for the device assurance policy
+          type: string
+          enum:
+            - BY_DATE_TIME
+            - BY_DURATION
+          example: BY_DATE_TIME
+          x-enumDescriptions:
+            BY_DATE_TIME: The Grace Period configured for this device assurance policy expires at a specified date and time
+            BY_DURATION: The Grace Period configured for this device assurance policy expires after a specified duration
+        expiry:
+          oneOf:
+            - $ref: '#/components/schemas/ByDateTimeExpiry'
+            - $ref: '#/components/schemas/ByDurationExpiry'
+    DevicePostureChecks:
+      x-okta-lifecycle:
+        features:
+          - OSQUERY_CUSTOM_DEVICE_POSTURE_CHECKS
+      description: Represents the Device Posture Checks configuration for the device assurance policy
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        include:
+          type: array
+          items:
+            type: object
+            properties:
+              variableName:
+                description: The device posture check key
+                type: string
+              value:
+                description: The device posture check value
+                type: string
+          description: An array of key-value pairs that include the device posture check `variableName` key
+          example:
+            - variableName: macOSFirewall
+              value: '1'
+            - variableName: windowsFirewall
+              value: '1'
+    ByDateTimeExpiry:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: ./Common.yaml#/components/schemas/DateTime
+    ByDurationExpiry:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: ./Common.yaml#/components/schemas/TimeDuration
+      description: |-
+        A time duration specified as an [ISO 8601 duration](https://en.wikipedia.org/wiki/ISO_8601#Durations).
+        Must be between 1 and 180 days inclusive.
+    SafeBrowsingProtectionLevel:
+      description: Represents the current value of the Safe Browsing protection level
+      type: string
+      enum:
+        - ENHANCED_PROTECTION
+        - STANDARD_PROTECTION
+        - NO_SAFE_BROWSING
+      example: ENHANCED_PROTECTION
+      x-enumDescriptions:
+        NO_SAFE_BROWSING: Safe Browsing is never active
+        STANDARD_PROTECTION: Safe Browsing is active in the standard mode
+        ENHANCED_PROTECTION: Safe Browsing is active in the enhanced mode
+    ScreenLockType:
+      type: string
+      enum:
+        - BIOMETRIC
+        - PASSCODE
+        - NONE
+    OSVersionThreeComponents:
+      description: Current version of the operating system (maximum of three components in the versioning scheme)
+      type: object
+      properties:
+        minimum:
+          type: string
+          example: 12.4.5
+    OSVersionFourComponents:
+      description: Current version of the operating system (maximum of four components in the versioning scheme)
+      type: object
+      properties:
+        minimum:
+          type: string
+          example: 12.4.5.9
+    OSVersion:
+      description: |
+        Specifies the OS requirement for the policy.
+
+        There are two types of OS requirements:
+
+        * **Static**: A specific OS version requirement that doesn't change until you update the policy. A static OS requirement is specified with the `osVersion.minimum` property.
+        * **Dynamic**: An OS version requirement that is relative to the latest major OS release and security patch. A dynamic OS requirement is specified with the `osVersion.dynamicVersionRequirement` property.
+        > **Note:** Dynamic OS requirements are available only if the **Dynamic OS version compliance** [self-service EA](/openapi/okta-management/guides/release-lifecycle/#early-access-ea) feature is enabled. You can't specify both `osVersion.minimum` and `osVersion.dynamicVersionRequirement` properties at the same time.
+      type: object
+      properties:
+        minimum:
+          description: The device version must be equal to or newer than the specified version string (maximum of three components for iOS and macOS, and maximum of four components for Android)
+          type: string
+          example: 12.4.5
+        dynamicVersionRequirement:
+          x-okta-lifecycle:
+            features:
+              - DEVICE_ASSURANCE_DYNAMIC_OS_SUPPORT
+          description: Contains the necessary properties for a dynamic version requirement
+          type: object
+          properties:
+            type:
+              type: string
+              description: Indicates the type of the dynamic OS version requirement
+              enum:
+                - MINIMUM
+                - EXACT
+                - EXACT_ANY_SUPPORTED
+              x-enumDescriptions:
+                MINIMUM: The device version must be equal to or newer than the dynamically determined version. `distanceFromLatestMajor` must be specified for this type.
+                EXACT: The device version must be on the same major version as the dynamically determined version. `distanceFromLatestMajor` must be specified for this type.
+                EXACT_ANY_SUPPORTED: The device version must be on a major version which is supported. You can't specify `distanceFromLatestMajor` for this type.
+            distanceFromLatestMajor:
+              description: Indicates the distance from the latest major version
+              type: integer
+              minimum: 0
+              maximum: 1
+            latestSecurityPatch:
+              description: Indicates whether the device needs to be on the latest security patch
+              type: boolean
+    OSVersionConstraint:
+      type: object
+      properties:
+        majorVersionConstraint:
+          type: string
+          description: Indicates the Windows major version
+          enum:
+            - WINDOWS_11
+            - WINDOWS_10
+          x-enumDescriptions:
+            WINDOWS_11: The device is on Windows 11
+            WINDOWS_10: The device is on Windows 10 or an older Windows version
+        minimum:
+          description: The Windows device version must be equal to or newer than the specified version
+          type: string
+          example: 12.4.5.9
+        dynamicVersionRequirement:
+          type: object
+          description: Contains the necessary properties for a dynamic Windows version requirement
+          properties:
+            type:
+              type: string
+              description: Indicates the type of the dynamic Windows version requirement
+              enum:
+                - MINIMUM
+                - EXACT
+                - EXACT_ANY_SUPPORTED
+                - NOT_ALLOWED
+              x-enumDescriptions:
+                MINIMUM: The device version must be equal to or newer than the dynamically determined Windows version. `distanceFromLatestMajor` must be specified for this type.
+                EXACT: The device version must be on the same major version as the dynamically determined Windows version. `distanceFromLatestMajor` must be specified for this type.
+                EXACT_ANY_SUPPORTED: The device version must be on a Windows major version which is supported. You can't specify `distanceFromLatestMajor` for this type.
+                NOT_ALLOWED: The device version isn't allowed. You can't specify `distanceFromLatestMajor` or `latestSecurityPatch` for this type.
+            distanceFromLatestMajor:
+              description: Indicates the distance from the latest Windows major version
+              type: integer
+              minimum: 0
+              maximum: 1
+            latestSecurityPatch:
+              description: Indicates whether the policy requires Windows devices to be on the latest security patch
+              type: boolean
+      required:
+        - majorVersionConstraint
+    ChromeBrowserVersion:
+      description: Current version of the Chrome Browser
+      type: object
+      properties:
+        minimum:
+          type: string
+    PlayProtectVerdict:
+      description: Indicates if Google Play Protect is enabled on the device and whether it has found known malware
+      type: string
+      enum:
+        - LOW
+        - MEDIUM
+        - HIGH
+      x-enumDescriptions:
+        LOW: Play Protect is turned on and didn't find any app issues on the device
+        MEDIUM: Play Protect is turned on and either hasn't performed a scan yet or has found potentially harmful apps installed on the device
+        HIGH: Play Protect is turned on and has either found dangerous apps installed on the device or its verdict wasn't evaluated. That is, the device isn't trustworthy enough.
+    DeviceIntegrity:
+      description: Indicates how well a device can enforce app integrity
+      type: string
+      enum:
+        - MEETS_BASIC_INTEGRITY
+        - MEETS_DEVICE_INTEGRITY
+        - MEETS_STRONG_INTEGRITY
+      x-enumDescriptions:
+        MEETS_BASIC_INTEGRITY: The app is running on a device that passes basic system integrity checks. The device may not meet Android compatibility requirements and may not be approved to run Google Play services.
+        MEETS_DEVICE_INTEGRITY: The app is running on an Android-powered device with Google Play services. The device passes system integrity checks and meets Android compatibility requirements.
+        MEETS_STRONG_INTEGRITY: The app is running on an Android-powered device with Google Play services. It has a strong guarantee of system integrity such as a hardware-backed proof of boot integrity. The device passes system integrity checks and meets Android compatibility requirements.
+    ScreenLockComplexity:
+      description: |
+        Indicates whether a device has a screen lock set, and the type or complexity of the screen lock
+
+        **Note:** This option requires a `screenLockType.include` value.
+      type: string
+      enum:
+        - LOW
+        - MEDIUM
+        - HIGH
+      x-enumDescriptions:
+        LOW: A pattern or PIN is set
+        MEDIUM: A complex PIN, or alphabetic or alphanumeric screen lock with at least 4 digits is set
+        HIGH: A complex 8-digit PIN, or 6-character alphabetic or alphanumeric screen lock is set
+    DTCWindows:
+      x-okta-lifecycle:
+        features:
+          - GOOGLE_DEVICE_CONTEXT_CONNECTOR
+      description: Google Chrome Device Trust Connector provider
+      type: object
+      properties:
+        osVersion:
+          $ref: '#/components/schemas/OSVersionFourComponents'
+        diskEncrypted:
+          description: Indicates whether the main disk is encrypted
+          type: boolean
+        osFirewall:
+          description: Indicates whether a firewall is enabled at the OS-level on the device
+          type: boolean
+        screenLockSecured:
+          description: Indicates whether the device is password-protected
+          type: boolean
+        browserVersion:
+          $ref: '#/components/schemas/ChromeBrowserVersion'
+        deviceEnrollmentDomain:
+          description: Enrollment domain of the customer that is currently managing the device
+          type: string
+        builtInDnsClientEnabled:
+          description: Indicates if a software stack is used to communicate with the DNS server
+          type: boolean
+        chromeRemoteDesktopAppBlocked:
+          description: Indicates whether access to the Chrome Remote Desktop application is blocked through a policy
+          type: boolean
+        safeBrowsingProtectionLevel:
+          $ref: '#/components/schemas/SafeBrowsingProtectionLevel'
+        siteIsolationEnabled:
+          description: Indicates whether the Site Isolation (also known as **Site Per Process**) setting is enabled
+          type: boolean
+        passwordProtectionWarningTrigger:
+          $ref: '#/components/schemas/PasswordProtectionWarningTrigger'
+        realtimeUrlCheckMode:
+          description: Indicates whether enterprise-grade (custom) unsafe URL scanning is enabled
+          type: boolean
+        secureBootEnabled:
+          description: Indicates whether the device's startup software has its Secure Boot feature enabled
+          type: boolean
+        windowsMachineDomain:
+          description: Windows domain that the current machine has joined
+          type: string
+        windowsUserDomain:
+          description: Windows domain for the current OS user
+          type: string
+        thirdPartyBlockingEnabled:
+          deprecated: true
+          description: Indicates whether Chrome is blocking third-party software injection
+          type: boolean
+        crowdStrikeCustomerId:
+          description: Customer ID of an installed CrowdStrike agent
+          type: string
+        crowdStrikeAgentId:
+          description: Agent ID of an installed CrowdStrike agent
+          type: string
+        keyTrustLevel:
+          $ref: '#/components/schemas/KeyTrustLevelBrowserKey'
+        antivirusEnabled:
+          x-okta-lifecycle:
+            features:
+              - CHROME_DTC_ANTIVIRUS_SUPPORT
+          description: Indicates whether antivirus software is enabled
+          type: boolean
+    DTCMacOS:
+      x-okta-lifecycle:
+        features:
+          - GOOGLE_DEVICE_CONTEXT_CONNECTOR
+      description: Google Chrome Device Trust Connector provider
+      type: object
+      properties:
+        osVersion:
+          $ref: '#/components/schemas/OSVersionThreeComponents'
+        diskEncrypted:
+          description: Indicates whether the main disk is encrypted
+          type: boolean
+        osFirewall:
+          description: Indicates whether a firewall is enabled at the OS-level on the device
+          type: boolean
+        screenLockSecured:
+          description: Indicates whether the device is password-protected
+          type: boolean
+        browserVersion:
+          $ref: '#/components/schemas/ChromeBrowserVersion'
+        deviceEnrollmentDomain:
+          description: Enrollment domain of the customer that is currently managing the device
+          type: string
+        builtInDnsClientEnabled:
+          description: Indicates if a software stack is used to communicate with the DNS server
+          type: boolean
+        chromeRemoteDesktopAppBlocked:
+          description: Indicates whether access to the Chrome Remote Desktop application is blocked through a policy
+          type: boolean
+        safeBrowsingProtectionLevel:
+          $ref: '#/components/schemas/SafeBrowsingProtectionLevel'
+        siteIsolationEnabled:
+          description: Indicates whether the Site Isolation (also known as **Site Per Process**) setting is enabled
+          type: boolean
+        passwordProtectionWarningTrigger:
+          $ref: '#/components/schemas/PasswordProtectionWarningTrigger'
+        realtimeUrlCheckMode:
+          description: Indicates whether enterprise-grade (custom) unsafe URL scanning is enabled
+          type: boolean
+        keyTrustLevel:
+          $ref: '#/components/schemas/KeyTrustLevelBrowserKey'
+    DTCChromeOS:
+      x-okta-lifecycle:
+        features:
+          - GOOGLE_DEVICE_CONTEXT_CONNECTOR
+      description: Google Chrome Device Trust Connector provider
+      type: object
+      properties:
+        osVersion:
+          $ref: '#/components/schemas/OSVersionFourComponents'
+        diskEncrypted:
+          description: Indicates whether the main disk is encrypted
+          type: boolean
+        osFirewall:
+          description: Indicates whether a firewall is enabled at the OS-level on the device
+          type: boolean
+        allowScreenLock:
+          description: Indicates whether the AllowScreenLock enterprise policy is enabled
+          type: boolean
+        screenLockSecured:
+          description: Indicates whether the device is password-protected
+          type: boolean
+        browserVersion:
+          $ref: '#/components/schemas/ChromeBrowserVersion'
+        deviceEnrollmentDomain:
+          description: Enrollment domain of the customer that is currently managing the device
+          type: string
+        builtInDnsClientEnabled:
+          description: Indicates if a software stack is used to communicate with the DNS server
+          type: boolean
+        chromeRemoteDesktopAppBlocked:
+          description: Indicates whether access to the Chrome Remote Desktop application is blocked through a policy
+          type: boolean
+        safeBrowsingProtectionLevel:
+          $ref: '#/components/schemas/SafeBrowsingProtectionLevel'
+        siteIsolationEnabled:
+          description: Indicates whether the Site Isolation (also known as **Site Per Process**) setting is enabled
+          type: boolean
+        passwordProtectionWarningTrigger:
+          $ref: '#/components/schemas/PasswordProtectionWarningTrigger'
+        realtimeUrlCheckMode:
+          description: Indicates whether enterprise-grade (custom) unsafe URL scanning is enabled
+          type: boolean
+        keyTrustLevel:
+          $ref: '#/components/schemas/KeyTrustLevelOSMode'
+        managedDevice:
+          description: Indicates whether the device is enrolled in ChromeOS device management
+          type: boolean
+    AndroidDeviceTrust:
+      x-okta-lifecycle:
+        features:
+          - ANDROID_ZERO_TRUST_SIGNALS
+      description: Android Device Trust integration provider
+      type: object
+      properties:
+        playProtectVerdict:
+          $ref: '#/components/schemas/PlayProtectVerdict'
+        deviceIntegrityLevel:
+          $ref: '#/components/schemas/DeviceIntegrity'
+        screenLockComplexity:
+          $ref: '#/components/schemas/ScreenLockComplexity'
+        usbDebuggingDisabled:
+          description: Indicates whether Android Debug Bridge (adb) over USB is disabled
+          type: boolean
+        networkProxyDisabled:
+          description: Indicates whether a device has a network proxy disabled
+          type: boolean
+        wifiSecured:
+          description: Indicates whether a device is on a password-protected Wi-Fi network
+          type: boolean
+        requireMajorVersionUpdate:
+          description: |
+            Indicates whether the device needs to be on the latest major version available to the device
+
+            **Note:** This option requires an `osVersion.dynamicVersionRequirement` value to be supplied with the `osVersion.dynamicVersionRequirement.type` as either `MINIMUM` or `EXACT`.
+          type: boolean
+    DevicePostureIdP:
+      x-okta-lifecycle:
+        features:
+          - DEVICE_ASSURANCE_CUSTOM_POSTURE_PROVIDER
+      description: Device Posture IdP provider
+      type: object
+      properties:
+        managed:
+          description: Indicates whether the device is managed according to the custom IDP
+          type: boolean
+        compliant:
+          description: Indicates whether the device is compliant according to the custom IDP
+          type: boolean
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

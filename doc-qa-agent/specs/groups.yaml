@@ -1,0 +1,844 @@
+openapi: 3.0.3
+info:
+  title: Groups API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/groups:
+    get:
+      summary: List all groups
+      description: |-
+        Lists all groups with pagination support.
+
+        > **Note:** To list all groups belonging to a member, use the [List all groups endpoint in the User Resources API](/openapi/okta-management/management/userresources/listusergroups).
+
+        The number of groups returned depends on the specified [`limit`](/openapi/okta-management/management/group/listgroups#group/listgroups/t=request&in=query&path=limit), if you have a search, filter, and/or query parameter set, and if that parameter is not null. We recommend using a limit less than or equal to 200.
+
+        A subset of groups can be returned that match a supported filter expression, query, or search criteria.
+
+        > **Note:** The `search` parameter results are sourced from an eventually consistent datasource and may not reflect the latest information.
+
+      operationId: listGroups
+      parameters:
+        - name: search
+          in: query
+          description: |-
+            Searches for groups with a supported [filtering](https://developer.okta.com/docs/api/#filter) expression for all properties except for `_embedded`, `_links`, and `objectClass`. Okta recommends this query parameter because it provides the largest range of search options and optimal performance.
+            
+            This operation supports [pagination](https://developer.okta.com/docs/api/#pagination).
+
+            The `search` string requires [URL encoding](https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding). For example, `search=type eq "OKTA_GROUP"` is encoded as `search=type+eq+%22OKTA_GROUP%22`.
+
+            This operation searches many properties:
+
+            * Any group profile attribute, including imported app group profile attributes.
+            * The top-level properties: `id`, `created`, `lastMembershipUpdated`, `lastUpdated`, and `type`.
+            * The [source](/openapi/okta-management/management/group/listgroups#group/listgroups/t=response&c=200&path=_links/source) of groups with type of `APP_GROUP`, accessed as `source.id`.
+
+            You can also use the `sortBy` and `sortOrder` parameters.
+
+            Searches for groups can be filtered by the following operators: `sw`, `eq`, and `co`. You can only use `co` with these select profile attributes: `profile.name` and `profile.description`. See [Operators](https://developer.okta.com/docs/api/#operators).
+          schema:
+            type: string
+          examples:
+            searchByType:
+              value: type%20eq%20%22APP_GROUP%22
+              summary: Search by type
+              description: Search for groups that have a type of APP_GROUP
+            searchByLastMembershipUpdatedAfterDate:
+              value: lastMembershipUpdated%20gt%20%222014-01-01T00%3A00%3A00.000Z%22
+              summary: Search by last updated membership timestamp
+              description: Search for groups whose memberships were last updated after 01/01/2024
+            searchById:
+              value: id%20eq%20%2200gak46y5hydV6NdM0g4%22
+              summary: Search by ID
+              description: Search for groups with the specified ID (00gak46y5hydV6NdM0g4)
+            searchByProfileName:
+              value: profile.name%20eq%20%22West%20Coast%20users%22
+              summary: Search by name
+              description: Search for groups that have a group profile name of West Coast users
+            searchBySamAccountName:
+              value: profile.samAccountName%20sw%20%22West%20Coast%22
+              summary: Search using an operator
+              description: Search for groups whose samAccountName profile attribute starts with "West Coast"
+            searchBySourceId:
+              value: source.id%20eq%20%220oa2v0el0gP90aqjJ0g7%22
+              summary: Search by source ID
+              description: Search for groups that have the source app with the specified source ID (0oa2v0el0gP90aqjJ0g7)
+            searchByIdTypeAndCreationDate:
+              value: type%20eq%20%22APP_GROUP%22%20and%20%28created%20lt%20%222014-01-01T00%3A00%3A00.000Z%22%20and%20source.id%20eq%20%220oa2v0el0gP90aqjJ0g7%22%29
+              summary: Search with multiple criteria
+              description: List groups of type APP_GROUP that were created before 01/01/2014 and whose source app has the ID 0oa2v0el0gP90aqjJ0g7
+        - name: filter
+          in: query
+          description: |-
+            Filter expression for groups. See [Filter](https://developer.okta.com/docs/api/#filter).
+
+            Filtering supports the following limited number of properties: `id`, `type`, `lastUpdated`, and `lastMembershipUpdated`.
+
+            > **Note:** All filters must be [URL encoded](https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding). For example, `filter=lastUpdated gt "2013-06-01T00:00:00.000Z"` is encoded as `filter=lastUpdated%20gt%20%222013-06-01T00:00:00.000Z%22`.  See [Special characters](https://developer.okta.com/docs/api/#special-characters).
+          schema:
+            type: string
+          examples:
+            filterById:
+              value: id%20eq%20%2200g1emaKYZTWRYYRRTSK%22
+              summary: Filter by ID
+              description: Filter group with a specific ID (00g1emaKYZTWRYYRRTSK)
+            filterByType:
+              value: type%20eq%20%22OKTA_GROUP%22
+              summary: Filter by type
+              description: Filter groups that are of the type OKTA_GROUP
+            filterByTypeAndProfileLastUpdatedAfterDate:
+              value: type%20eq%20%22OKTA_GROUP%22%20and%20lastUpdated%20gt%20%222016-11-11T00%3A00%3A00.000Z%22
+              summary: Filter by type and last updated date
+              description: Filter groups that are OKTA_GROUP type with profile updated after 11/11/2016
+            filterByTypeAndProfileOrMembershipUpdatedBeforeDate:
+              value: type%20eq%20%22OKTA_GROUP%22%20and%20%28lastUpdated%20lt%20%222015-11-11T00%3A00%3A00.000Z%22%20or%20lastMembershipUpdated%20lt%20%222015-11-11T00%3A00%3A00.000Z%22%29
+              summary: Filter by multiple criteria
+              description: Filter groups that are OKTA_GROUP type, with profiles or memberships updated before 11/11/2015
+        - name: q
+          in: query
+          description: |-
+            Finds a group that matches the `name` property.
+            > **Note:** Paging and searching are currently mutually exclusive. You can't page a query. The default limit for a query is 300 results. Query is intended for an auto-complete picker use case where users refine their search string to constrain the results.
+          schema:
+            type: string
+            example: West&limit=10
+        - name: after
+          in: query
+          description: Specifies the pagination cursor for the next page of groups. The `after` cursor should be treated as an opaque value and obtained through the next link relation. See [Pagination](https://developer.okta.com/docs/api/#pagination).
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: |-
+            Specifies the number of group results in a page.
+
+            Okta recommends using a specific value other than the default or maximum. If your request times out, retry your request with a smaller `limit` and [page the results](https://developer.okta.com/docs/api/#pagination).
+            
+            The Okta default `Everyone` group isn't returned for users with a group admin role.
+          schema:
+            type: integer
+            format: int32
+            maximum: 10000
+        - name: expand
+          in: query
+          description: |-
+            If specified, additional metadata is included in the response. Possible values are `stats` and `app`. This additional metadata is listed in the [`_embedded`](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Group/#tag/Group/operation/addGroup!c=200&path=_embedded&t=response) property of the response.
+
+            > **Note:** You can use the `stats` value to return the number of users within a group. This is listed as the `_embedded.stats.usersCount` value in the response. See this [Knowledge Base article](https://support.okta.com/help/s/article/Is-there-an-API-that-returns-the-number-of-users-in-a-group?language=en_US) for more information and an example.
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: |-
+            Specifies the field to sort by (for search queries only). `sortBy` can be any single property, for example `sortBy=profile.name`. Groups with the same value for the `sortBy` property are ordered by `id`'. Use with `sortOrder` to control the order of results.
+          schema:
+            type: string
+            example: lastUpdated
+        - $ref: ./Common.yaml#/components/parameters/querySortOrder
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Group'
+              examples:
+                ListGroupsExample:
+                  $ref: '#/components/examples/list-groups-examples'
+                ListGroupsFilterExample:
+                  $ref: '#/components/examples/list-groups-filter'
+                ListGroupsSearchExample:
+                  $ref: '#/components/examples/list-groups-search'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.groups.read
+      tags:
+        - Group
+    post:
+      summary: Add a group
+      description: |-
+        Adds a new group with the `OKTA_GROUP` type to your org.
+        > **Note:** App import operations are responsible for syncing groups with `APP_GROUP` type such as Active Directory groups. See
+        [About groups](https://help.okta.com/okta_help.htm?id=Directory_Groups) in the help documentation.
+      operationId: addGroup
+      x-codegen-request-body-name: group
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                profile:
+                  $ref: '#/components/schemas/OktaUserGroupProfile'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+              examples:
+                GroupExample:
+                  $ref: '#/components/examples/group-example'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.groups.manage
+      tags:
+        - Group
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+  /api/v1/groups/{groupId}:
+    parameters:
+      - $ref: '#/components/parameters/pathGroupId'
+    get:
+      summary: Retrieve a group
+      description: Retrieves a specific group by `id` from your org
+      operationId: getGroup
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+              examples:
+                GroupExample:
+                  $ref: '#/components/examples/group-example'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.groups.read
+      tags:
+        - Group
+    put:
+      summary: Replace a group
+      description: |-
+        Replaces the profile for a group of `OKTA_GROUP` type from your org.
+        > **Note :** You only can modify profiles for groups of the `OKTA_GROUP` type.
+        >
+        > App imports are responsible for updating profiles for groups of the `APP_GROUP` type, such as Active Directory groups.
+      operationId: replaceGroup
+      x-codegen-request-body-name: group
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                profile:
+                  $ref: '#/components/schemas/OktaUserGroupProfile'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+              examples:
+                GroupExample:
+                  $ref: '#/components/examples/group-example'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.groups.manage
+      tags:
+        - Group
+    delete:
+      summary: Delete a group
+      description: |-
+        Deletes a group of the `OKTA_GROUP` or `APP_GROUP` type from your org.
+        > **Note:** You can't remove groups of type `APP_GROUP` if they are used in a group push mapping.
+      operationId: deleteGroup
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.groups.manage
+      tags:
+        - Group
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+  /api/v1/groups/{groupId}/apps:
+    parameters:
+      - $ref: '#/components/parameters/pathGroupId'
+    get:
+      summary: List all assigned apps
+      description: Lists all apps that are assigned to a group. See [Application Groups API](/openapi/okta-management/management/applicationgroups/).
+      operationId: listAssignedApplicationsForGroup
+      parameters:
+        - name: after
+          in: query
+          description: Specifies the pagination cursor for the next page of apps
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Specifies the number of app results for a page
+          schema:
+            type: integer
+            format: int32
+            default: 20
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ./apps.yaml#/components/schemas/Application
+              examples:
+                ListAppsExample:
+                  $ref: '#/components/examples/list-apps-example'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.groups.read
+      tags:
+        - Group
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+  /api/v1/groups/{groupId}/users:
+    parameters:
+      - $ref: '#/components/parameters/pathGroupId'
+    get:
+      summary: List all member users
+      description: |-
+        Lists all users that are a member of a group.
+        The default user limit is set to a very high number due to historical reasons that are no longer valid for most orgs. This will change in a future version of this API. The recommended page limit is now `limit=200`.
+      operationId: listGroupUsers
+      parameters:
+        - $ref: ./Common.yaml#/components/parameters/queryAfter
+        - name: limit
+          in: query
+          description: Specifies the number of user results in a page
+          schema:
+            type: integer
+            format: int32
+            default: 1000
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ./users.yaml#/components/schemas/User
+              examples:
+                ListMemberUserResponse:
+                  $ref: ./users-operations.yaml#/components/examples/ListUsersResponse
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.groups.read
+      tags:
+        - Group
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+  /api/v1/groups/{groupId}/users/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/pathGroupId'
+      - $ref: ./Common.yaml#/components/parameters/pathUserId
+    put:
+      summary: Assign a user to a group
+      description: |-
+        Assigns a user to a group with the `OKTA_GROUP` type.
+        > **Note:** You only can modify memberships for groups of the `OKTA_GROUP` type. App imports are responsible for managing group memberships for groups of the `APP_GROUP` type, such as Active Directory groups.
+      operationId: assignUserToGroup
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.groups.manage
+      tags:
+        - Group
+    delete:
+      summary: Unassign a user from a group
+      description: |-
+        Unassigns a user from a group with the `OKTA_GROUP` type.
+        > **Note:** You only can modify memberships for groups of the `OKTA_GROUP` type.
+        >
+        > App imports are responsible for managing group memberships for groups of the `APP_GROUP` type, such as Active Directory groups.
+      operationId: unassignUserFromGroup
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.groups.manage
+      tags:
+        - Group
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+components:
+  parameters:
+    pathGroupId:
+      name: groupId
+      description: The `id` of the group
+      in: path
+      required: true
+      schema:
+        type: string
+        example: 00g1emaKYZTWRYYRRTSK
+  schemas:
+    Group:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Timestamp when the group was created
+        id:
+          type: string
+          readOnly: true
+          example: 0gabcd1234
+          description: Unique ID for the group
+        lastMembershipUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Timestamp when the groups memberships were last updated
+        lastUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Timestamp when the group's profile was last updated
+        objectClass:
+          type: array
+          readOnly: true
+          description: Determines the group's `profile`
+          items:
+            type: string
+        profile:
+          $ref: '#/components/schemas/GroupProfile'
+        type:
+          $ref: '#/components/schemas/GroupType'
+        _embedded:
+          type: object
+          description: Embedded resources related to the group
+          readOnly: true
+          properties:
+            stats:
+              description: Statistics about the group
+              type: object
+              properties:
+                usersCount:
+                  type: integer
+                  format: int32
+                  description: Number of users in the group
+                appsCount:
+                  type: integer
+                  format: int32
+                  description: Number of apps associated with the group
+                groupPushMappingsCount:
+                  type: integer
+                  format: int32
+                  description: Number of group push mappings associated with the group
+                hasAdminPrivlege: 
+                  type: boolean
+                  description: Indicates if the group has admin privileges via a group-level role assignment
+            app:
+              description: If the group is sourced from an app, this object contains information about that app
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: The ID of the `AppInstance`
+                name:
+                  type: string
+                  description: The name of the `AppInstance`
+                label:
+                  type: string
+                  description: The user-facing display name of the `AppInstance`
+                signOnMode:
+                  type: string
+                  description: The configured sign-on mode for the `AppInstance`
+                  example: SAML_1_1
+        _links:
+          description: '[Discoverable resources](/openapi/okta-management/management/group/listgroups#group/listgroups/t=response&c=200&path=_links/source) related to the group'
+          allOf:
+            - $ref: ./Common.yaml#/components/schemas/LinksSelf
+            - properties:
+                apps:
+                  $ref: ./Common.yaml#/components/schemas/HrefObject
+                logo:
+                  type: array
+                  items:
+                    $ref: ./Common.yaml#/components/schemas/HrefObject
+                source:
+                  $ref: ./Common.yaml#/components/schemas/HrefObject
+                users:
+                  $ref: ./Common.yaml#/components/schemas/HrefObject
+    GroupProfile:
+      description: |-
+        Specifies required and optional properties for a group. The `objectClass` of a group determines which additional properties are available.
+
+        You can extend group profiles with custom properties, but you must first add the properties to the group profile schema before you can reference them. Use the Profile Editor in the Admin Console or the [Schemas API](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Schema/) to manage schema extensions.
+
+        Custom properties can contain HTML tags. It is the client's responsibility to escape or encode this data before displaying it. Use [best-practices](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html) to prevent cross-site scripting.
+      anyOf:
+        - $ref: '#/components/schemas/OktaUserGroupProfile'
+        - $ref: '#/components/schemas/OktaActiveDirectoryGroupProfile'
+    OktaUserGroupProfile:
+      type: object
+      description: |-
+        Profile for any group that is not imported from Active Directory. Specifies the standard
+        and custom profile properties for a group.
+
+        The `objectClass` for these groups is `okta:user_group`.
+      properties:
+        description:
+          type: string
+          example: All users West of The Rockies
+          description: Description of the group
+        name:
+          type: string
+          example: West Coast users
+          description: Name of the group
+      x-okta-extensible: true
+    OktaActiveDirectoryGroupProfile:
+      type: object
+      description: |-
+        Profile for a group that is imported from Active Directory.
+
+        The `objectClass` for such groups is `okta:windows_security_principal`.
+      properties:
+        description:
+          type: string
+          example: All users in the engineering department
+          description: Description of the Windows group
+        dn:
+          type: string
+          example: CN=West Coast users,OU=West Coast,DC=example,DC=com
+          description: The distinguished name of the Windows group
+        externalId:
+          type: string
+          example: VKzYZ1C+IkSZxIWlrW5ITg==
+          description: Base-64 encoded GUID (`objectGUID`) of the Windows group
+        name:
+          type: string
+          example: West Coast users
+          description: Name of the Windows group
+        samAccountName:
+          type: string
+          example: West Coast users
+          description: Pre-Windows 2000 name of the Windows group
+        windowsDomainQualifiedName:
+          type: string
+          example: EXAMPLE\\West Coast users
+          description: Fully qualified name of the Windows group
+    GroupType:
+      type: string
+      description: Determines how a group's profile and memberships are managed
+      enum:
+        - APP_GROUP
+        - BUILT_IN
+        - OKTA_GROUP
+      x-enumDescriptions:
+        APP_GROUP: Group profile and memberships are imported and must be managed within the app (such as Active Directory or LDAP) that imported the group
+        BUILT_IN: Group profile and memberships are managed by Okta and can't be modified
+        OKTA_GROUP: Group profile and memberships are directly managed in Okta via static assignments or indirectly through group rules
+  examples:
+    group-example:
+      summary: Group example
+      description: Example of a group
+      value:
+        id: 00g1emaKYZTWRYYRRTSK
+        created: '2015-02-06T10:11:28.000Z'
+        lastUpdated: '2015-10-05T19:16:43.000Z'
+        lastMembershipUpdated: '2015-11-28T19:15:32.000Z'
+        objectClass:
+          - okta:user_group
+        type: OKTA_GROUP
+        profile:
+          name: West Coast users
+          description: All users West of The Rockies
+        _links:
+          logo:
+            - name: medium
+              href: https://{yourOktaDomain}/img/logos/groups/okta-medium.png
+              type: image/png
+            - name: large
+              href: https://{yourOktaDomain}/img/logos/groups/okta-large.png
+              type: image/png
+          users:
+            href: https://{yourOktaDomain}/api/v1/groups/00g1emaKYZTWRYYRRTSK/users
+          apps:
+            href: https://{yourOktaDomain}/api/v1/groups/00g1emaKYZTWRYYRRTSK/apps
+    list-apps-example:
+      summary: List apps example
+      description: List all apps example
+      value:
+        - id: 0oafwvZDWJKVLDCUWUAC
+          name: template_basic_auth
+          label: Sample Basic Auth App
+          status: ACTIVE
+          lastUpdated: '2013-09-30T00:56:52.000Z'
+          created: '2013-09-30T00:56:52.000Z'
+          accessibility:
+            selfService: false
+            errorRedirectUrl: null
+          visibility:
+            autoSubmitToolbar: false
+            hide:
+              iOS: false
+              web: false
+            appLinks:
+              login: true
+          features: []
+          signOnMode: BASIC_AUTH
+          credentials:
+            scheme: EDIT_USERNAME_AND_PASSWORD
+            userNameTemplate:
+              template: '${source.login}'
+              type: BUILT_IN
+          settings:
+            app:
+              url: 'https://example.com/login.html'
+              authURL: 'https://example.com/auth.html'
+          _links:
+            appLinks:
+              - href: >-
+                  https://{yourOktaDomain}/home/template_basic_auth/0oafwvZDWJKVLDCUWUAC/1438
+                name: login
+                type: text/html
+            users:
+              href: 'https://{yourOktaDomain}/api/v1/apps/0oafwvZDWJKVLDCUWUAC/users'
+            deactivate:
+              href: >-
+                https://{yourOktaDomain}/api/v1/apps/0oafwvZDWJKVLDCUWUAC/lifecycle/deactivate
+            groups:
+              href: 'https://{yourOktaDomain}/api/v1/apps/0oafwvZDWJKVLDCUWUAC/groups'
+    list-groups-examples:
+      summary: List all groups example
+      description: Lists an example of an OKTA_GROUP and an APP_GROUP
+      value:
+        - id: 00g1emaKYZTWRYYRRTSK
+          created: '2015-02-06T10:11:28.000Z'
+          lastUpdated: '2015-10-05T19:16:43.000Z'
+          lastMembershipUpdated: '2015-11-28T19:15:32.000Z'
+          objectClass:
+            - 'okta:user_group'
+          type: OKTA_GROUP
+          profile:
+            name: West Coast users
+            description: All users West of The Rockies
+          _links:
+            logo:
+              - name: medium
+                href: 'https://{yourOktaDomain}/img/logos/groups/okta-medium.png'
+                type: image/png
+              - name: large
+                href: 'https://{yourOktaDomain}/img/logos/groups/okta-large.png'
+                type: image/png
+            users:
+              href: 'https://{yourOktaDomain}/api/v1/groups/00g1emaKYZTWRYYRRTSK/users'
+            apps:
+              href: 'https://{yourOktaDomain}/api/v1/groups/00g1emaKYZTWRYYRRTSK/apps'
+        - id: 00garwpuyxHaWOkdV0g4
+          created: '2015-08-15T19:15:17.000Z'
+          lastUpdated: '2015-11-18T04:02:19.000Z'
+          lastMembershipUpdated: '2015-08-15T19:15:17.000Z'
+          objectClass:
+            - 'okta:windows_security_principal'
+          type: APP_GROUP
+          profile:
+            name: Engineering users
+            description: All users in the engineering department
+            groupType: Security
+            samAccountName: Engineering users
+            objectSid: S-1-5-21-717838489-685202119-709183397-1177
+            groupScope: Global
+            dn: 'CN=Engineering users,OU=Engineering,DC=corp,DC=example,DC=com'
+            windowsDomainQualifiedName: CORP\Engineering users
+            externalId: OZJdWdONCU6h7WjQKp+LPA==
+          _links:
+            logo:
+              - name: medium
+                href: 'https://{yourOktaDomain}/img/logos/groups/active_directory-medium.png'
+                type: image/png
+              - name: large
+                href: 'https://{yourOktaDomain}/img/logos/groups/active_directory-large.png'
+                type: image/png
+            source:
+              href: 'https://{yourOktaDomain}/api/v1/apps/0oa2v0el0gP90aqjJ0g7'
+            users:
+              href: 'https://{yourOktaDomain}/api/v1/groups/00garwpuyxHaWOkdV0g4/users'
+            apps:
+              href: 'https://{yourOktaDomain}/api/v1/groups/00garwpuyxHaWOkdV0g4/apps'
+    list-groups-filter:
+      summary: List all groups with filter by type
+      description: Response with `filter=type+eq+%22OKTA_GROUP%22`
+      value:
+        - id: 00g1emaKYZTWRYYRRTSK
+          created: '2015-02-06T10:11:28.000Z'
+          lastUpdated: '2015-10-05T19:16:43.000Z'
+          lastMembershipUpdated: '2015-11-28T19:15:32.000Z'
+          objectClass:
+            - 'okta:user_group'
+          type: OKTA_GROUP
+          profile:
+            name: West Coast users
+            description: All users West of The Rockies
+          _links:
+            logo:
+              - name: medium
+                href: 'https://{yourOktaDomain}/img/logos/groups/okta-medium.png'
+                type: image/png
+              - name: large
+                href: 'https://{yourOktaDomain}/img/logos/groups/okta-large.png'
+                type: image/png
+            users:
+              href: 'https://{yourOktaDomain}/api/v1/groups/00g1emaKYZTWRYYRRTSK/users'
+            apps:
+              href: 'https://{yourOktaDomain}/api/v1/groups/00g1emaKYZTWRYYRRTSK/apps'
+        - id: 00gak46y5hydV6NdM0g4
+          created: '2015-07-22T08:45:03.000Z'
+          lastUpdated: '2015-07-22T08:45:03.000Z'
+          lastMembershipUpdated: '2015-10-22T08:45:03.000Z'
+          objectClass:
+            - 'okta:user_group'
+          type: OKTA_GROUP
+          profile:
+            name: Squabble of users
+            description: Keep Calm and Single Sign-On
+          _links:
+            logo:
+              - name: medium
+                href: 'https://{yourOktaDomain}/img/logos/groups/okta-medium.png'
+                type: image/png
+              - name: large
+                href: 'https://{yourOktaDomain}/img/logos/groups/okta-large.png'
+                type: image/png
+            users:
+              href: 'https://{yourOktaDomain}/api/v1/groups/00gak46y5hydV6NdM0g4/users'
+            apps:
+              href: 'https://{yourOktaDomain}/api/v1/groups/00gak46y5hydV6NdM0g4/apps'
+    list-groups-search:
+      summary: List all groups with search
+      description: Response with `search=lastUpdated+gt+%222015-10-01T00:00:00.000Z%22+or+lastMembershipUpdated+gt+%222015-10-01T00:00:00.000Z%22`
+      value:
+        - id: '00g1emaKYZTWRYYRRTSK'
+          created: '2015-02-06T10:11:28.000Z'
+          lastUpdated: '2015-10-05T19:16:43.000Z'
+          lastMembershipUpdated: '2015-11-28T19:15:32.000Z'
+          objectClass:
+            - 'okta:user_group'
+          type: OKTA_GROUP
+          profile:
+            name: 'West Coast users'
+            description: 'All users West of The Rockies'
+          _links:
+            logo:
+              - name: medium
+                href: 'https://{yourOktaDomain}/img/logos/groups/okta-medium.png'
+                type: image/png
+              - name: large
+                href: 'https://{yourOktaDomain}/img/logos/groups/okta-large.png'
+                type: image/png
+            users:
+              href: 'https://{yourOktaDomain}/api/v1/groups/00g1emaKYZTWRYYRRTSK/users'
+            apps:
+              href: 'https://{yourOktaDomain}/api/v1/groups/00g1emaKYZTWRYYRRTSK/apps'
+            source:
+              href: 'https://{yourOktaDomain}/api/v1/apps/0oa2v0el0gP90aqjJ0g7'
+        - id: 00gak46y5hydV6NdM0g4
+          created: '2015-07-22T08:45:03.000Z'
+          lastUpdated: '2015-07-22T08:45:03.000Z'
+          lastMembershipUpdated: '2015-10-22T08:45:03.000Z'
+          objectClass:
+            - 'okta:user_group'
+          type: OKTA_GROUP
+          profile:
+            name: 'Squabble of users'
+            description: 'Keep Calm and Single Sign-On'
+          _links:
+            logo:
+              - name: medium
+                href: 'https://{yourOktaDomain}/img/logos/groups/okta-medium.png'
+                type: image/png
+              - name: large
+                href: 'https://{yourOktaDomain}/img/logos/groups/okta-large.png'
+                type: image/png
+            users:
+              href: 'https://{yourOktaDomain}/api/v1/groups/00gak46y5hydV6NdM0g4/users'
+            apps:
+              href: 'https://{yourOktaDomain}/api/v1/groups/00gak46y5hydV6NdM0g4/apps'
+            source:
+              href: 'https://{yourOktaDomain}/api/v1/apps/0oa2v0el0gP90aqjJ0g7'
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

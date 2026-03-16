@@ -1,0 +1,691 @@
+openapi: 3.0.3
+info:
+  title: Realm Assignments API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/realm-assignments:
+    get:
+      x-okta-lifecycle:
+        lifecycle: GA
+      summary: List all realm assignments
+      description: Lists all realm assignments
+      operationId: listRealmAssignments
+      parameters:
+        - $ref: ./Common.yaml#/components/parameters/queryLimit
+        - name: after
+          in: query
+          description: The cursor used for pagination. It represents the priority of the last realm assignment returned in the previous fetch operation.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RealmAssignment'
+              examples:
+                AssignmentLists:
+                  $ref: '#/components/examples/ListRealmAssignmentsResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.realmAssignments.read
+      tags:
+        - RealmAssignment
+    post:
+      x-okta-lifecycle:
+        lifecycle: GA
+      summary: Create a realm assignment
+      description: Creates a new realm assignment
+      operationId: createRealmAssignment
+      x-codegen-request-body-name: body
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRealmAssignmentRequest'
+            examples:
+              Create Realm Assignments:
+                $ref: '#/components/examples/CreateRealmAssignmentRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RealmAssignment'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.realmAssignments.manage
+      tags:
+        - RealmAssignment
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+  /api/v1/realm-assignments/{assignmentId}:
+    parameters:
+      - $ref: '#/components/parameters/assignmentId'
+    get:
+      x-okta-lifecycle:
+        lifecycle: GA
+      summary: Retrieve a realm assignment
+      description: Retrieves a realm assignment
+      operationId: getRealmAssignment
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RealmAssignment'
+              examples:
+                RealmAssignment:
+                  $ref: '#/components/examples/GetRealmAssignmentResponse'
+                CatchAllRealmAssignment:
+                  $ref: '#/components/examples/DefaultRealmAssignment'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.realmAssignments.read
+      tags:
+        - RealmAssignment
+    put:
+      x-okta-lifecycle:
+        lifecycle: GA
+      summary: Replace a realm assignment
+      description: Replaces a realm assignment
+      operationId: replaceRealmAssignment
+      x-codegen-request-body-name: body
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRealmAssignmentRequest'
+            examples:
+              Replace Realm Assignment:
+                $ref: '#/components/examples/CreateRealmAssignmentRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RealmAssignment'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.realmAssignments.manage
+      tags:
+        - RealmAssignment
+    delete:
+      x-okta-lifecycle:
+        lifecycle: GA
+      summary: Delete a realm assignment
+      description: Deletes a realm assignment
+      operationId: deleteRealmAssignment
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.realmAssignments.manage
+      tags:
+        - RealmAssignment
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+  /api/v1/realm-assignments/{assignmentId}/lifecycle/activate:
+    parameters:
+      - $ref: '#/components/parameters/assignmentId'
+    post:
+      x-okta-lifecycle:
+        lifecycle: GA
+      summary: Activate a realm assignment
+      description: Activates a realm assignment
+      operationId: activateRealmAssignment
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.realmAssignments.manage
+      tags:
+        - RealmAssignment
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+  /api/v1/realm-assignments/{assignmentId}/lifecycle/deactivate:
+    parameters:
+      - $ref: '#/components/parameters/assignmentId'
+    post:
+      x-okta-lifecycle:
+        lifecycle: GA
+      summary: Deactivate a realm assignment
+      description: Deactivates a realm assignment
+      operationId: deactivateRealmAssignment
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.realmAssignments.manage
+      tags:
+        - RealmAssignment
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+  /api/v1/realm-assignments/operations:
+    get:
+      x-okta-lifecycle:
+        lifecycle: GA
+      summary: List all realm assignment operations
+      description: Lists all realm assignment operations. The upper limit is 200 and operations are sorted in descending order from most recent to oldest by ID.
+      operationId: listRealmAssignmentOperations
+      parameters:
+        - $ref: ./Common.yaml#/components/parameters/queryLimit
+        - $ref: ./Common.yaml#/components/parameters/queryAfter
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RealmAssignmentOperationResponse'
+              examples:
+                Executions:
+                  value:
+                    - id: rre4mje4ez6B2a7B60g7
+                      type: realm:assignment
+                      status: COMPLETED
+                      created: 2023-10-25T21:02:54.000Z
+                      started: 2023-10-25T21:02:54.000Z
+                      completed: 2023-10-25T21:02:54.000Z
+                      realmId: 00g1b7rvh0xPLKXFf0g5
+                      realmName: Realm Name
+                      assignmentOperation:
+                        configuration:
+                          id: 0pr1b7rxZj2ibQzfP0g5
+                          name: Realm Assignment 1
+                          conditions:
+                            profileSourceId: 0oa4enoRyjwSCy5hx0g4
+                            expression:
+                              value: string
+                          actions:
+                            assignUserToRealm:
+                              realmId: 00g1b7rvh0xPLKXFf0g5
+                      numUserMoved: 50
+                      _links:
+                        self:
+                          rel: self
+                          href: http://your-subdomain.okta.com/api/v1/operations/rre4mje4ez6B2a7B60g7
+                          method: GET
+                    - id: rre4mje4ez7B2a7B60g7
+                      type: realm:assignment
+                      status: COMPLETED
+                      created: 2023-10-25T21:02:54.000Z
+                      started: 2023-10-25T21:02:54.000Z
+                      completed: 2023-10-25T21:02:54.000Z
+                      assignmentOperation:
+                        configuration:
+                          id: ALL
+                          name: All Assignments
+                      numUserMoved: 50
+                      _links:
+                        self:
+                          rel: self
+                          href: http://your-subdomain.okta.com/api/v1/operations/rre4mje4ez7B2a7B60g7
+                          method: GET
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.realmAssignments.read
+      tags:
+        - RealmAssignment
+    post:
+      x-okta-lifecycle:
+        lifecycle: GA
+      summary: Execute a realm assignment
+      description: Executes a realm assignment
+      operationId: executeRealmAssignment
+      x-codegen-request-body-name: body
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OperationRequest'
+            examples:
+              ExecuteSpecificAssignment:
+                value:
+                  assignmentId: 0pr1b7rxZj2ibQzfP0g5
+              ExecuteAllAssignments:
+                value:
+                  assignmentId: ALL
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RealmAssignmentOperationResponse'
+              examples:
+                Execution:
+                  $ref: '#/components/examples/OperationResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.realmAssignments.manage
+      tags:
+        - RealmAssignment
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+components:
+  examples:
+    GetRealmAssignmentResponse:
+      value:
+        id: rul2jy7jLUlnO3ng00g4
+        status: ACTIVE
+        name: Realm Assignment 1
+        created: 2022-04-04T15:56:05.000Z
+        lastUpdated: 2022-05-05T18:15:44.000Z
+        isDefault: false
+        domains:
+          - atko.com
+          - user.com
+        conditions:
+          profileSourceId: 0oa4enoRyjwSCy5hx0g4
+          expression:
+            value: string
+        actions:
+          assignUserToRealm:
+            realmId: 00g1b7rvh0xPLKXFf0g5
+        priority: 0
+        _links:
+          self:
+            rel: self
+            href: http://your-subdomain.okta.com/api/v1/realm-assignments/rul2jy7jLUlnO3ng00g4
+            method: GET
+    DefaultRealmAssignment:
+      value:
+        id: rul2jy7jLUlnO5ng00g4
+        status: ACTIVE
+        name: Catch-all
+        created: 2022-04-04T15:56:05.000Z
+        lastUpdated: 2022-05-05T18:15:44.000Z
+        isDefault: true
+        conditions:
+          profileSourceId: 0oa4enoRyjwSCy6hx0g4,
+          expression:
+            value: string
+        actions:
+          assignUserToRealm:
+            realmId: 00g1b7rvh0xPLKXFf2g5
+        priority: 499
+        _links:
+          self:
+            rel: self
+            href: http://your-subdomain.okta.com/api/v1/realm-assignments/rul2jy7jLUlnO5ng00g4
+            method: GET
+    ListRealmAssignmentsResponse:
+      value:
+        - id: rul2jy7jLUlnO3ng00g4
+          status: ACTIVE
+          name: Realm Assignment 1
+          created: 2022-04-04T15:56:05.000Z
+          lastUpdated: 2022-05-05T18:15:44.000Z
+          isDefault: false
+          domains:
+            - atko.com
+            - user.com
+          conditions:
+            profileSourceId: 0oa4enoRyjwSCy5hx0g4
+            expression:
+              value: user.profile.role ==\"Manager\"
+          actions:
+            assignUserToRealm:
+              realmId: 00g1b7rvh0xPLKXFf0g5
+          priority: 0
+          _links:
+            self:
+              rel: self
+              href: http://your-subdomain.okta.com/api/v1/realm-assignments/rul2jy7jLUlnO3ng00g4
+              method: GET
+        - id: rul2jy7jLUlnO5ng00g4
+          status: ACTIVE
+          name: Catch-all
+          created: 2022-04-04T15:56:05.000Z
+          lastUpdated: 2022-05-05T18:15:44.000Z
+          isDefault: true
+          domains:
+            - atko.com
+            - user.com
+          conditions:
+            profileSourceId: 0oa4enoRyjwSCy6hx0g4,
+            expression:
+              value: string
+          actions:
+            assignUserToRealm:
+              realmId: 00g1b7rvh0xPLKXFf2g5
+          priority: 499
+          _links:
+            self:
+              rel: self
+              href: http://your-subdomain.okta.com/api/v1/realm-assignments/rul2jy7jLUlnO5ng00g4
+              method: GET
+    OperationResponse:
+      value:
+        id: rre4mje4ez6B2a7B60g7
+        type: realm:assignment
+        status: COMPLETED
+        created: 2023-10-25T21:02:54.000Z
+        started: 2023-10-25T21:02:54.000Z
+        completed: 2023-10-25T21:02:54.000Z
+        realmId: 00g1b7rvh0xPLKXFf0g5
+        realmName: Realm Name
+        assignmentOperation:
+          configuration:
+            id: 0pr1b7rxZj2ibQzfP0g5
+            name: Realm Assignment 1
+            conditions:
+              profileSourceId: 0oa4enoRyjwSCy5hx0g4
+              expression:
+                value: string
+            actions:
+              assignUserToRealm:
+                realmId: 00g1b7rvh0xPLKXFf0g5
+        numUserMoved: 50
+        _links:
+          self:
+            rel: self
+            href: http://your-subdomain.okta.com/api/v1/operations/rre4mje4ez6B2a7B60g7
+            method: GET
+    AllAssignmentsOperationResponse:
+      value:
+        id: rre4mje4ez7B2a7B60g7
+        type: realm:assignment
+        status: COMPLETED
+        created: 2023-10-25T21:02:54.000Z
+        started: 2023-10-25T21:02:54.000Z
+        completed: 2023-10-25T21:02:54.000Z
+        assignmentOperation:
+          configuration:
+            id: ALL
+            name: All Assignments
+        numUserMoved: 50
+        _links:
+          self:
+            rel: self
+            href: http://your-subdomain.okta.com/api/v1/operations/rre4mje4ez7B2a7B60g7
+            method: GET
+    CreateRealmAssignmentRequest:
+      value:
+        actions:
+          assignUserToRealm:
+            realmId: 00g1b7rvh0xPLKXFf0g5
+        conditions:
+          profileSourceId: 0oa4enoRyjwSCy5hx0g4
+          expression:
+            value: user.profile.role ==\"Manager\"
+        name: Realm Assignment 1
+        priority: 0
+  parameters:
+    assignmentId:
+      name: assignmentId
+      description: ID of the realm assignment
+      in: path
+      required: true
+      schema:
+        type: string
+        example: rul2jy7jLUlnO3ng00g4
+  schemas:
+    Actions:
+      type: object
+      description: Action to apply to a user
+      properties:
+        assignUserToRealm:
+          $ref: '#/components/schemas/AssignUserToRealm'
+    AssignUserToRealm:
+      description: Action that assigns a user to a realm
+      type: object
+      properties:
+        realmId:
+          description: ID of the realm
+          type: string
+    Conditions:
+      description: Conditions of applying realm assignment
+      type: object
+      properties:
+        expression:
+          $ref: '#/components/schemas/Expression'
+        profileSourceId:
+          description: ID of the profile source
+          type: string
+    CreateRealmAssignmentRequest:
+      type: object
+      properties:
+        actions:
+          $ref: '#/components/schemas/Actions'
+        conditions:
+          $ref: '#/components/schemas/Conditions'
+        name:
+          type: string
+          description: Name of the realm
+        priority:
+          type: integer
+          description: |-
+            The priority of the realm assignment. The lower the number, the higher the priority. This helps resolve conflicts between realm assignments.
+            > **Note:** When you create realm assignments in bulk, realm assignment priorities must be unique.
+    Expression:
+      description: Conditional expression
+      type: object
+      properties:
+        value:
+          description: Value of the condition expression
+          type: string
+    RealmAssignment:
+      type: object
+      properties:
+        actions:
+          $ref: '#/components/schemas/Actions'
+        conditions:
+          $ref: '#/components/schemas/Conditions'
+        created:
+          description: Timestamp when the realm assignment was created
+          type: string
+          format: date-time
+          readOnly: true
+        id:
+          description: Unique ID of the realm assignment
+          type: string
+          readOnly: true
+        isDefault:
+          description: Indicates the default realm. Existing users will start out in the default realm and can be moved individually to other realms.
+          type: boolean
+          readOnly: true
+        lastUpdated:
+          description: Timestamp of when the realm assignment was updated
+          type: string
+          format: date-time
+          readOnly: true
+        name:
+          description: Name of the realm
+          type: string
+        priority:
+          type: integer
+          description: |-
+            The priority of the realm assignment. The lower the number, the higher the priority. This helps resolve conflicts between realm assignments.
+            > **Note:** When you create realm assignments in bulk, realm assignment priorities must be unique.
+        domains:
+          type: array
+          items:
+            type: string
+          description: |-
+            Array of allowed domains. No user in this realm can be created or updated unless they have a username and email from one of these domains.
+
+            The following characters aren't allowed in the domain name: `!$%^&()=*+,:;<>'[]|/?\`
+        status:
+          $ref: ./Common.yaml#/components/schemas/LifecycleStatus
+        _links:
+          $ref: ./Common.yaml#/components/schemas/LinksSelf
+    UpdateRealmAssignmentRequest:
+      type: object
+      properties:
+        actions:
+          $ref: '#/components/schemas/Actions'
+        conditions:
+          $ref: '#/components/schemas/Conditions'
+        name:
+          type: string
+        priority:
+          type: integer
+          description: |-
+            The priority of the realm assignment. The lower the number, the higher the priority. This helps resolve conflicts between realm assignments.
+            > **Note:** When you create realm assignments in bulk, realm assignment priorities must be unique.
+    OperationRequest:
+      type: object
+      properties:
+        assignmentId:
+          type: string
+          description: ID of the realm
+    RealmAssignmentOperationResponse:
+      allOf:
+        - $ref: ../operations.yaml#/components/schemas/OperationResponse
+        - type: object
+          properties:
+            realmId:
+              description: ID of the realm
+              type: string
+              readOnly: true
+            realmName:
+              description: Name of the realm
+              type: string
+              readOnly: true
+            assignmentOperation:
+              type: object
+              description: Definition of the realm assignment operation
+              properties:
+                configuration:
+                  description: Configuration defintion of the realm
+                  type: object
+                  properties:
+                    actions:
+                      type: object
+                      description: Realm assignment action
+                      properties:
+                        assignUserToRealm:
+                          type: object
+                          description: Action that assigns a user to a realm
+                          properties:
+                            realmId:
+                              description: ID of the realm
+                              type: string
+                    conditions:
+                      $ref: '#/components/schemas/Conditions'
+                    id:
+                      type: string
+                      description: ID of the realm assignment operation
+                    name:
+                      type: string
+                      description: Name of the realm assignment operation
+            numUserMoved:
+              description: Number of users moved
+              type: number
+              readOnly: true
+            _links:
+              $ref: ./Common.yaml#/components/schemas/LinksSelf
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

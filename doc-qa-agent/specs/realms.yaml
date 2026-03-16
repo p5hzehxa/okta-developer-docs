@@ -1,0 +1,346 @@
+openapi: 3.0.3
+info:
+  title: Realms API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/realms:
+    get:
+      x-okta-lifecycle:
+        lifecycle: GA
+      summary: List all realms
+      description: |-
+        Lists all realms.
+
+        > **Note:** The `search` parameter results are sourced from an eventually consistent datasource and may not reflect the latest information.
+      operationId: listRealms
+      parameters:
+        - name: limit
+          in: query
+          description: Specifies the number of results returned. Defaults to 10 if `search` is provided.
+          schema:
+            type: integer
+            format: int32
+            default: 200
+        - $ref: ./Common.yaml#/components/parameters/queryAfter
+        - name: search
+          in: query
+          description: |-
+            Searches for realms with a supported filtering expression for most properties.
+
+            Searches for realms can be filtered by the contains (`co`) operator. You can only use `co` with the `profile.name` property. See [Operators](https://developer.okta.com/docs/api/#operators).
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: Specifies the field to sort by and can be any single property (for search queries only)
+          schema:
+            type: string
+            example: profile.name
+        - $ref: ./Common.yaml#/components/parameters/querySortOrder
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Realm'
+              examples:
+                Realm Lists:
+                  $ref: '#/components/examples/ListRealmsResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.realms.read
+      tags:
+        - Realm
+    post:
+      x-okta-lifecycle:
+        lifecycle: GA
+      summary: Create a realm
+      description: Creates a new realm
+      operationId: createRealm
+      x-codegen-request-body-name: body
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRealmRequest'
+            examples:
+              Create a realm:
+                $ref: '#/components/examples/CreateRealmRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Realm'
+              examples:
+                Realm Lists:
+                  $ref: '#/components/examples/ListRealmsResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.realms.manage
+      tags:
+        - Realm
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+  /api/v1/realms/{realmId}:
+    parameters:
+      - $ref: '#/components/parameters/pathRealmId'
+    get:
+      x-okta-lifecycle:
+        lifecycle: GA
+      summary: Retrieve a realm
+      description: Retrieves a realm
+      operationId: getRealm
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Realm'
+              examples:
+                DefaultRealm:
+                  $ref: '#/components/examples/DefaultRealmResponse'
+                NonDefaultRealm:
+                  $ref: '#/components/examples/RealmResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.realms.read
+      tags:
+        - Realm
+    put:
+      x-okta-lifecycle:
+        lifecycle: GA
+      summary: Replace the realm profile
+      description: Replaces the realm profile
+      operationId: replaceRealm
+      x-codegen-request-body-name: body
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRealmRequest'
+            examples:
+              Replace a realm:
+                $ref: '#/components/examples/CreateRealmRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Realm'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.realms.manage
+      tags:
+        - Realm
+    delete:
+      x-okta-lifecycle:
+        lifecycle: GA
+      summary: Delete a realm
+      description: Deletes a realm permanently. This operation can only be performed after disassociating other entities like users and identity providers from a realm.
+      operationId: deleteRealm
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.realms.manage
+      tags:
+        - Realm
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+components:
+  examples:
+    DefaultRealmResponse:
+      value:
+        id: guox9jQ16k9V8IQWL0g3
+        created: 2022-04-04T15:56:05.000Z
+        lastUpdated: 2022-05-05T18:15:44.000Z
+        isDefault: true
+        profile:
+          name: Default realm
+        _links:
+          self:
+            rel: self
+            href: http://your-subdomain.okta.com/api/v1/realms/guox9jQ16k9V8IQWL0g3
+            method: GET
+    ListRealmsResponse:
+      value:
+        - id: guox9jQ16k9V8IFEL0g3
+          created: 2022-04-04T15:56:05.000Z
+          lastUpdated: 2022-05-05T18:15:44.000Z
+          isDefault: false
+          profile:
+            name: Car Co
+            realmType: PARTNER
+            domains:
+              - atko.com
+              - user.com
+          _links:
+            self:
+              rel: self
+              href: http://your-subdomain.okta.com/api/v1/realms/guox9jQ16k9V8IFEL0g3
+              method: GET
+    RealmResponse:
+      value:
+        id: guox9jQ16k9V8IFEL0g3
+        created: 2022-04-04T15:56:05.000Z
+        lastUpdated: 2022-05-05T18:15:44.000Z
+        isDefault: false
+        profile:
+          name: Car Co
+          domains:
+            - atko.com
+            - user.com
+        _links:
+          self:
+            rel: self
+            href: http://your-subdomain.okta.com/api/v1/realms/guox9jQ16k9V8IFEL0g3
+            method: GET
+    CreateRealmRequest:
+      value:
+        profile:
+          name: Car Co
+          realmType: PARTNER
+          domains:
+            - atko.com
+            - user.com
+  parameters:
+    pathRealmId:
+      name: realmId
+      description: ID of the realm
+      in: path
+      required: true
+      schema:
+        type: string
+        example: vvrcFogtKCrK9aYq3fgV
+  schemas:
+    Realm:
+      type: object
+      properties:
+        created:
+          type: string
+          format: date-time
+          description: Timestamp when the realm was created
+          readOnly: true
+        id:
+          type: string
+          description: Unique ID for the realm
+          readOnly: true
+        isDefault:
+          type: boolean
+          description: Indicates the default realm. Existing users will start out in the default realm and can be moved to other realms individually or through realm assignments. See [Realms Assignments API](/openapi/okta-management/management/realmassignment/).
+          readOnly: true
+        lastUpdated:
+          type: string
+          format: date-time
+          description: Timestamp when the realm was updated
+          readOnly: true
+        profile:
+          $ref: '#/components/schemas/RealmProfile'
+        _links:
+          $ref: ./Common.yaml#/components/schemas/LinksSelf
+    CreateRealmRequest:
+      type: object
+      properties:
+        profile:
+          $ref: '#/components/schemas/RealmProfile'
+    UpdateRealmRequest:
+      type: object
+      properties:
+        profile:
+          $ref: '#/components/schemas/RealmProfile'
+    RealmProfile:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        name:
+          type: string
+          description: Name of a realm
+        realmType:
+          type: string
+          description: Used to store partner users. This property must be set to `PARTNER` to access Okta's external partner portal.
+          enum:
+            - PARTNER
+            - DEFAULT
+          x-enumDescriptions:
+            PARTNER: Realm with external partner portal
+            DEFAULT: Default
+        domains:
+          type: array
+          description: |-
+            Array of allowed domains. No user in this realm can be created or updated unless they have a username and email from one of these domains.
+
+            The following characters aren't allowed in the domain name: `!$%^&()=*+,:;<>'[]|/?\`
+      required:
+        - name
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

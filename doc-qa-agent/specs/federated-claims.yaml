@@ -1,0 +1,278 @@
+openapi: 3.0.3
+info:
+  title: Federated Claims
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/apps/{appId}/federated-claims:
+    parameters:
+      - $ref: ./Common.yaml#/components/parameters/pathAppId
+    get:
+      summary: List all configured federated claims
+      description: Lists all federated claims for your app
+      operationId: listFederatedClaims
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FederatedClaim'
+              examples:
+                listFederatedClaimResponse:
+                  $ref: '#/components/examples/listFederatedClaimResponse'
+        '401':
+          $ref: ./Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.apps.read
+      tags:
+        - ApplicationSSOFederatedClaims
+    post:
+      summary: Create a federated claim
+      description: 'Creates a claim that will be included in tokens produced by federation protocols (for example: OIDC `id_tokens` or SAML Assertions)'
+      operationId: createFederatedClaim
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FederatedClaimRequestBody'
+            examples:
+              createFederatedClaimRequestBody:
+                $ref: '#/components/examples/createFederatedClaimRequestBody'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FederatedClaim'
+              examples:
+                federatedClaimResponse:
+                  $ref: '#/components/examples/federatedClaimResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+        '401':
+          $ref: ./Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.apps.manage
+      tags:
+        - ApplicationSSOFederatedClaims
+    x-okta-team-detail:
+      x-team-slack: amp-eng-outbound-fed
+  /api/v1/apps/{appId}/federated-claims/{claimId}:
+    parameters:
+      - $ref: ./Common.yaml#/components/parameters/pathAppId
+      - $ref: '#/components/parameters/claimId'
+    get:
+      summary: Retrieve a federated claim
+      description: Retrieves a federated claim by `claimId`
+      operationId: getFederatedClaim
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/FederatedClaimRequestBody'
+              examples:
+                federatedClaimResponse:
+                  $ref: '#/components/examples/federatedClaimResponse'
+        '401':
+          $ref: ./Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.apps.read
+      tags:
+        - ApplicationSSOFederatedClaims
+    put:
+      summary: Replace a federated claim
+      description: 'Replaces a claim that will be included in tokens produced by federation protocols (for example: OIDC `id_tokens` or SAML Assertions)'
+      operationId: replaceFederatedClaim
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FederatedClaim'
+            examples:
+              replaceFederatedClaim:
+                $ref: '#/components/examples/replaceFederatedClaimRequestBody'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FederatedClaim'
+              examples:
+                replaceFederatedClaimResponse:
+                  $ref: '#/components/examples/replaceFederatedClaimResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+        '401':
+          $ref: ./Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.apps.manage
+      tags:
+        - ApplicationSSOFederatedClaims
+    delete:
+      summary: Delete a federated claim
+      description: Deletes a federated claim by `claimId`
+      operationId: deleteFederatedClaim
+      responses:
+        '204':
+          description: No Content
+        '401':
+          $ref: ./Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.apps.manage
+      tags:
+        - ApplicationSSOFederatedClaims
+    x-okta-team-detail:
+      x-team-slack: amp-eng-outbound-fed
+components:
+  examples:
+    createFederatedClaimRequestBody:
+      summary: Create federated claim example
+      value:
+        name: role
+        expression: appuser.entitlements.role
+    replaceFederatedClaimRequestBody:
+      summary: Replace federated claim example
+      value:
+        name: readOnly
+        expression: appuser.entitlements.readOnly
+    federatedClaimResponse:
+      summary: An example federated claim
+      value:
+        id: ofc893fbjaBaqdtoX0g7
+        name: role
+        expression: appuser.entitlements.role
+        created: '2024-12-25T03:00:00.000Z'
+        lastUpdated: '2024-12-25T03:00:00.000Z'
+    replaceFederatedClaimResponse:
+      summary: An updated federated claim
+      value:
+        id: ofc893fbjaTxynmo5v93
+        name: readOnly
+        expression: appuser.entitlements.readOnly
+        created: '2024-12-25T04:00:00.000Z'
+        lastUpdated: '2024-12-25T05:00:00.000Z'
+    listFederatedClaimResponse:
+      summary: List federated claim response example
+      value:
+        - id: ofc893fbjaBaqdtoX0g7
+          name: role
+          expression: appuser.entitlements.role
+          created: '2024-12-25T03:00:00.000Z'
+          lastUpdated: '2024-12-25T03:00:00.000Z'
+        - id: ofc893fbjaTxynmo5v93
+          name: readOnly
+          expression: appuser.entitlements.readOnly
+          created: '2024-12-25T05:00:00.000Z'
+          lastUpdated: '2024-12-25T05:00:00.000Z'
+  parameters:
+    claimId:
+      name: claimId
+      in: path
+      schema:
+        type: string
+      required: true
+      description: The unique `id` of the federated claim
+      example: ofc2f4zrZbs8nUa7p0g4
+  schemas:
+    FederatedClaimRequestBody:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the claim to be used in the produced token
+          example: role
+        expression:
+          type: string
+          description: The Okta Expression Language expression to be evaluated at runtime
+          example: appuser.entitlements.role
+    FederatedClaim:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique ID of the federated claim
+          example: ofc2f4zrZbs8nUa7p0g4
+          readOnly: true
+          nullable: false
+        name:
+          type: string
+          description: The name of the claim to be used in the produced token
+          example: roleg
+          readOnly: false
+          nullable: false
+        expression:
+          type: string
+          description: The Okta Expression Language expression to be evaluated at runtime
+          example: appuser.entitlements.role
+          readOnly: false
+          nullable: false
+        created:
+          type: string
+          description: Timestamp when the federated claim was created
+          example: '2024-02-29T20:08:24.000Z'
+          readOnly: true
+          nullable: false
+        lastUpdated:
+          type: string
+          description: Timestamp when the federated claim was updated
+          example: '2023-02-21T20:08:24.000Z'
+          readOnly: true
+          nullable: false
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

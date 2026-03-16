@@ -1,0 +1,3931 @@
+openapi: 3.0.3
+info:
+  title: Inlinehooks API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/inlineHooks:
+    get:
+      summary: List all inline hooks
+      description: |-
+        Lists all inline hooks or all inline hooks of a specific type.
+
+        When listing a specific inline hook, you need to specify its type. The following types are currently supported:
+          | Type Value                         | Name                                                           |
+          |------------------------------------|----------------------------------------------------------------|
+          | `com.okta.import.transform`        | [User import inline hook](/openapi/okta-management/management/management/inlinehook/createuserimportinlinehook)       |
+          | `com.okta.oauth2.tokens.transform` | [Token inline hook](/openapi/okta-management/management/management/inlinehook/createtokeninlinehook)               |
+          | `com.okta.saml.tokens.transform`   | [SAML assertion inline hook](/openapi/okta-management/management/management/inlinehook/createsamlassertioninlinehook)       |
+          | `com.okta.telephony.provider`      | [Telephony inline hook](/openapi/okta-management/management/management/inlinehook/createtelephonyinlinehook) |
+          | `com.okta.user.credential.password.import` | [Password import inline hook](openapi/okta-management/management/management/inlinehook/createpasswordimportinlinehook)|
+          | `com.okta.user.pre-registration`   | [Registration inline hook](/openapi/okta-management/management/management/inlinehook/create-registration-hook) |
+      operationId: listInlineHooks
+      parameters:
+        - $ref: '#/components/parameters/inlineHookType'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InlineHook'
+              examples:
+                InlineHooktMgmtListAllexample:
+                  $ref: '#/components/examples/InlineHooktMgmtListAllexample'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.inlineHooks.read
+      tags:
+        - InlineHook
+    post:
+      summary: Create an inline hook
+      description: |-
+        Creates an inline hook
+
+        This endpoint creates an inline hook for your org in an `ACTIVE` status. You need to pass an inline hooks object in the JSON payload of your request. 
+        That object represents the set of required information about the inline hook that you're registering, including:
+
+        * The URI of your external service endpoint
+        * The type of inline hook you're registering
+        * The type of authentication you're registering
+
+        There are two authentication options that you can configure for your inline hook: HTTP headers and OAuth 2.0 tokens.
+
+        HTTP headers let you specify a secret API key that you want Okta to pass to your external service endpoint (so that your external service can check for its presence as a security measure).
+
+        >**Note:** The API key that you set here is unrelated to the Okta API token you must supply when making calls to Okta APIs.
+
+        You can also optionally specify extra headers that you want Okta to pass to your external service with each call.
+
+        To configure HTTP header authentication, see parameters for the `config` object.
+
+        OAuth 2.0 tokens provide enhanced security between Okta and your external service. You can configure these tokens for the following types&mdash;client secret and private key.
+
+        >**Note:** Your external service's endpoint needs to be a valid HTTPS endpoint. The URI you specify should always begin with `https://`.
+
+        The total number of inline hooks that you can create in an Okta org is limited to 50, which is a combined total for any combination of inline hook types.
+      operationId: createInlineHook
+      x-codegen-request-body-name: inlineHookCreate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InlineHookCreate'
+            examples:
+              CreateInlineHookHTTP:
+                $ref: '#/components/examples/InlineHookMgmtCreateHTTPRequest'
+              CreateInlineHookOAuthClientSecret:
+                $ref: '#/components/examples/InlineHookMgmtCreateOAuthClientSecretRequest'
+              CreateInlineHookOAuthPrivateKey:
+                $ref: '#/components/examples/InlineHookMgmtCreateOAuthPrivateKeyRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InlineHookCreateResponse'
+              examples:
+                CreateInlineHookHTTP:
+                  $ref: '#/components/examples/InlineHookMgmtCreateHTTPResponse'
+                CreateInlineHookOAuthClientSecret:
+                  $ref: '#/components/examples/InlineHookMgmtCreateOAuthClientSecretResponse'
+                CreateInlineHookOAuthPrivateKey:
+                  $ref: '#/components/examples/InlineHookMgmtCreateOAuthPrivateKeyResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.inlineHooks.manage
+      tags:
+        - InlineHook
+    x-okta-team-detail:
+      x-team-slack: eng-data-platform
+  /api/v1/inlineHooks/{inlineHookId}:
+    parameters:
+      - $ref: '#/components/parameters/pathInlineHookId'
+    get:
+      summary: Retrieve an inline hook
+      description: Retrieves an inline hook by `inlineHookId`
+      operationId: getInlineHook
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InlineHook'
+              examples:
+                InlineHookHTTP:
+                  $ref: '#/components/examples/InlineHookMgmtHTTPexample'
+                InlineHookOAuthClientSecret:
+                  $ref: '#/components/examples/InlineHookMgmtOAuthCSPexample'
+                InlineHookOAuthPrivateKey:
+                  $ref: '#/components/examples/InlineHookMgmtOauthPKJexample'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.inlineHooks.read
+      tags:
+        - InlineHook
+    put:
+      summary: Replace an inline hook
+      description: |-
+        Replaces an inline hook by `inlineHookId`. The submitted inline hook properties replace the existing properties after passing validation.
+
+        >**Note:** Some properties are immutable and can't be updated.
+      x-codegen-request-body-name: inlineHook
+      operationId: replaceInlineHook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InlineHookReplace'
+            examples:
+              UpdateInlineHookHTTP:
+                $ref: '#/components/examples/InlineHookMgmtPutHTTPRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InlineHook'
+              examples:
+                UpdateInlineHookHTTP:
+                  $ref: '#/components/examples/InlineHookMgmtPutResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.inlineHooks.manage
+      tags:
+        - InlineHook
+    post:
+      summary: Update an inline hook
+      description: Updates an inline hook by `inlineHookId`
+      operationId: updateInlineHook
+      x-codegen-request-body-name: inlineHook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InlineHookReplace'
+            examples:
+              UpdateInlineHookHTTP:
+                $ref: '#/components/examples/InlineHookMgmtPutHTTPRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InlineHook'
+              examples:
+                UpdateInlineHookHTTP:
+                  $ref: '#/components/examples/InlineHookMgmtPutResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.inlineHooks.manage
+      tags:
+        - InlineHook
+    delete:
+      summary: Delete an inline hook
+      description: Deletes an inline hook by `inlineHookId`. After it's deleted, the inline hook is unrecoverable. As a safety precaution, only inline hooks with a status of `INACTIVE` are eligible for deletion.
+      operationId: deleteInlineHook
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.inlineHooks.manage
+      tags:
+        - InlineHook
+    x-okta-team-detail:
+      x-team-slack: eng-data-platform
+  /api/v1/inlineHooks/{inlineHookId}/execute:
+    parameters:
+      - $ref: '#/components/parameters/pathInlineHookId'
+    post:
+      summary: Execute an inline hook
+      description: |-
+        Executes the inline hook that matches the provided `inlineHookId` by using the request body as the input. This inline hook sends the provided 
+        data through the `channel` object and returns a response if it matches the correct data contract. Otherwise it returns an error. You need to 
+        construct a JSON payload that matches the payloads that Okta would send to your external service for this inline hook type.
+
+        A timeout of three seconds is enforced on all outbound requests, with one retry in the event of a timeout or an error response from the remote system. 
+        If a successful response isn't received after the request, a 400 error is returned with more information about what failed.
+
+        >**Note:** This execution endpoint isn't tied to any other functionality in Okta, and you should only use it for testing purposes.
+      operationId: executeInlineHook
+      x-codegen-request-body-name: payloadData
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/PasswordImportRequestExecute'
+                - $ref: '#/components/schemas/TelephonyRequestExecute'
+                - $ref: '#/components/schemas/RegistrationInlineHookRequest'
+                - $ref: '#/components/schemas/TokenRequest'
+                - $ref: '#/components/schemas/SAMLPayloadExecute'
+                - $ref: '#/components/schemas/UserImportRequestExecute'
+            examples:
+              PasswordImportPayloadExample:
+                $ref: '#/components/examples/PasswordImportPayloadExample'
+              TelephonyPayloadExample:
+                $ref: '#/components/examples/TelephonyPayloadExample'
+              ProfileEnrollmentRequest:
+                $ref: '#/components/examples/ProfileEnrollmentRequest'
+              TokenPayLoadExample:
+                $ref: '#/components/examples/TokenPayLoadExample'
+              SAMLPayloadExample:
+                $ref: '#/components/examples/SAMLPayLoadExample'
+              UserImportPayloadExample:
+                $ref: '#/components/examples/UserImportPayloadExample'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                x-okta-ignore-redocly-rules-for-sdk: true
+                oneOf:
+                  - $ref: '#/components/schemas/PasswordImportResponse'
+                  - $ref: '#/components/schemas/TelephonyResponse'
+                  - $ref: '#/components/schemas/RegistrationInlineHookResponse'
+                  - $ref: '#/components/schemas/TokenHookResponse'
+                  - $ref: '#/components/schemas/SAMLHookResponse'
+                  - $ref: '#/components/schemas/UserImportResponse'
+              examples:
+                PasswordImportPayloadExample:
+                  $ref: '#/components/examples/PasswordImportVerifiedResponse'
+                TelephonyPayloadExample:
+                  $ref: '#/components/examples/TelephonySuccessResponse'
+                ProfileEnrollmentRequest:
+                  $ref: '#/components/examples/ProfileEnrollmentResponse'
+                TokenPayLoadExample:
+                  $ref: '#/components/examples/TokenHookResponse'
+                SAMLPayloadExample:
+                  $ref: '#/components/examples/SAMLHookResponseExample'
+                UserImportPayloadExample:
+                  $ref: '#/components/examples/UserImportChangeAppUserProfileExample'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.inlineHooks.manage
+      tags:
+        - InlineHook
+    x-okta-team-detail:
+      x-team-slack: eng-data-platform
+  /api/v1/inlineHooks/{inlineHookId}/lifecycle/activate:
+    parameters:
+      - $ref: '#/components/parameters/pathInlineHookId'
+    post:
+      summary: Activate an inline hook
+      description: Activates the inline hook by `inlineHookId`
+      operationId: activateInlineHook
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InlineHook'
+              examples:
+                ActivateAnInlineHook:
+                  $ref: '#/components/examples/InlineHookMgmtOAuthCSPexample'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.inlineHooks.manage
+      tags:
+        - InlineHook
+    x-okta-team-detail:
+      x-team-slack: eng-data-platform
+  /api/v1/inlineHooks/{inlineHookId}/lifecycle/deactivate:
+    parameters:
+      - $ref: '#/components/parameters/pathInlineHookId'
+    post:
+      summary: Deactivate an inline hook
+      description: Deactivates the inline hook by `inlineHookId`
+      operationId: deactivateInlineHook
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InlineHook'
+              examples:
+                DeactivateAnInlineHook:
+                  $ref: '#/components/examples/InlineHookMgmtHTTPexampleDeactivate'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.inlineHooks.manage
+      tags:
+        - InlineHook
+    x-okta-team-detail:
+      x-team-slack: eng-data-platform
+x-webhooks:
+  CreateTelephonyInlineHook:
+    post:
+      summary: Create a telephony inline hook
+      description: |-
+        Creates an Okta telephony inline hook request. This is an automated request from Okta to your third-party service endpoint.
+
+        The objects that you return in the JSON payload of your response to this Okta request are an array of one or more objects,
+        which specify the Okta commands to execute.
+
+        >**Note:** The size of your response payload must be less than 256 KB.
+
+        See also:
+        * For a general introduction to Okta inline hooks, see [Inline hooks](https://developer.okta.com/docs/concepts/inline-hooks/)
+        * For information on the API for registering external service endpoints with Okta, see [Inline Hooks Management API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/inlinehook/)
+        * For an example implementation of a telephony inline hook, see [Telephony inline hook ](https://developer.okta.com/docs/guides/telephony-inline-hook)
+
+        ### About
+
+        The Okta telephony inline hook allows you to integrate your own custom code into Okta flows that send SMS or voice call messages. You can integrate this hook with enrollment, authentication, and recovery flows that involve the phone authenticator. Okta uses your external provider to deliver the one-time passcode (OTP) to the Requester. The provider can respond with commands that indicate if the delivery was successful or not.
+
+        You can have only one active telephony inline hook per org.
+
+        When you create a telephony inline hook, you must include the `authScheme` parameter. See [Create inline hook](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/inlinehook/#tag/InlineHook/operation/createInlineHook) and the [authScheme object](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/inlinehook/#tag/InlineHook/operation/createInlineHook!path=channel/0/config/authScheme&t=request).
+
+        ### Time-out behavior
+
+        If the provider response times out, Okta attempts to send the OTP using the Okta telephony providers. See [Troubleshoot](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/inlinehook/#tag/InlineHook/operation/createTelephonyInlineHook/#troubleshoot).
+
+        >**Note:** The failover mechanism that uses the Okta telephony providers is heavily rate-limited.
+
+        ### Troubleshoot
+
+        This section explains several common causes of failure for telephony inline hooks.
+
+        Note: Administrators can use the [Okta System Log](https://developer.okta.com/docs/reference/api/system-log/) to view errors. See the Troubleshooting section in the inline hooks topic for details on events captured by the Okta System Log.
+
+        | Issue                                                                               | Impact                                                                                          | Error Visibility                          | 
+        |-------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|-------------------------------------------|
+        |External service fails to communicate or times out                                   | Inline hook operation is skipped, OTP is sent to the Requester using an Okta telephony provider | Administrators only                       |
+        |External service responds with any HTTP status code besides `200`                    | Inline hook operation is skipped, OTP is sent to the Requester using an Okta telephony provider | Administrators only                       | 
+        |External service returns an error object                                             | Inline hook operation fails, OTP is sent to the Requester using an Okta telephony provider      | Administrators, developers, and end users |
+        |Hook response is malformed or can't be mapped to the expected API response           | Inline hook operation is skipped                                                                | Administrators only                       |
+        |Request header doesn't include an `authScheme`                                       | Inline hook operation is skipped                                                                | Administrators only                       |
+        |Response uses an invalid status                                                      | Inline hook operation is skipped                                                                | Administrators only                       |
+        |Operation adds an active telephony inline hook when a hook exists                    | Inline hook operation is skipped                                                                | Administrators only                       |
+      operationId: createTelephonyInlineHook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/InlineHookBasePayload'
+                - $ref: '#/components/schemas/TelephonyRequest'
+            examples:
+              TelephonyPayloadExample:
+                $ref: '#/components/examples/TelephonyPayloadExample'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelephonyResponse'
+              examples:
+                TelephonySuccessResponse:
+                  $ref: '#/components/examples/TelephonySuccessResponse'
+                TelephonyFailureResponse:
+                  $ref: '#/components/examples/TelephonyFailureResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+      security:
+        - apiToken: []
+        - oauth2: []
+      tags:
+        - InlineHook
+  CreatePasswordImportInlineHook:
+    post:
+      summary: Create a password import inline hook
+      description: |-
+        Creates a password import inline hook request, one type of inline hook supported by Okta. This is an automated request from Okta to your third-party service endpoint. This reference provides sample JSON objects that are contained in the outbound request from Okta to your external service,
+        and sample JSON objects that you can include in your response. The objects that you return in the JSON payload of your response to this Okta request are an array of one or more objects,
+        which specify the Okta commands to execute.
+
+        >**Note:** The size of your response payload must be less than 256 KB.
+
+        The password import inline hook allows you to migrate users from another data store where you want the users to retain their current passwords.
+        Use this hook with the [Create user with password import inline hook flow](/openapi/okta-management/management/user/create-user-with-imported-hashed-password#user/Create-user-with-password-import-inline-hook) that's described in the [Users API](/openapi/okta-management/management/tags/user).
+
+        The password import inline hook is triggered when the user tries to sign in to Okta for the first time. Okta sends your external service the password that the user supplied. Your external service then needs to send a response to Okta indicating whether the password supplied by the end user is valid.
+
+        If your service returns a response that indicates that the password is valid, Okta sets the password for the user. The password import inline hook won't need to call your service again.
+        However, if the Okta service is in read-only mode, it might not be possible to set the password. Okta then needs to call your service again the next time the user attempts to sign in.
+        See [Password inline hook and Okta read-only mode](#password-inline-hook-and-okta-read-only-mode) and [Removing password from existing user store](#password-removal-from-an-existing-user-store).
+
+        >**Notes:**
+        > * Password policies don't apply to the password import inline hook. That is, if your external service validates the password, the password is imported even if it doesn't meet the Okta password policy requirements.
+        > * You can create only one password import inline hook per org.
+
+        See also:
+
+          * [Inline hooks](https://developer.okta.com/docs/concepts/inline-hooks/) for a general introduction to Okta inline hooks
+          * [Inline Hooks Management API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/inlinehook/) for information on the API for registering external service endpoints with Okta
+          * [Add an inline hook](https://help.okta.com/okta_help.htm?type=oie&id=ext-add-inline-hook) for steps to enable this inline hook in the Admin Console
+          * [Password import inline hook](https://developer.okta.com/docs/guides/password-import-inline-hook/nodejs/main/) for an example implementation of this inline hook
+
+        ### Enable a password import inline hook
+
+        To enable a password import inline hook, you first need to register your external service endpoint with Okta and configure it as an inline hook of type `com.okta.user.credential.password.import`.
+        You can enable the hook using the Admin Console, see [Add an inline hook](https://help.okta.com/okta_help.htm?type=oie&id=ext-add-inline-hook) or through the [Inline Hooks Management API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/inlinehook/).
+        When creating a user with the Users API, you need to use the [Create User with password import inline hook](/openapi/okta-management/management/user/create-user-with-imported-hashed-password#user/Create-user-with-password-import-inline-hook) use case.
+        This involves specifying a `credentials.password.hook` property in the request body.
+
+        When the user that you have added attempts to sign in to Okta for the first time, the hook is triggered and Okta calls your external service. The call sends the credentials that the end user provided. Your service can check
+        the credentials and respond with a command to indicate whether the credentials are valid or not.
+
+        ### Password inline hook and Okta read-only mode
+
+        If your external service responds to Okta indicating that the credentials are valid, Okta saves the password and can authenticate the user independently from then on. However, if your Okta org is in a special [read-only mode](https://support.okta.com/help/s/article/What-is-Oktas-Readonly-Mode)
+        at the time the user signs in, then saving the password might not be possible. The next time the end user attempts to sign in, the password import inline hook needs to be called again.
+
+        ### Password removal from an existing user store
+
+        Because of the possibility of your org being in a special service mode, you shouldn't attempt to permanently delete user passwords from your existing user store until you can verify the success of the password import . An Okta System Log Event, `user.import.password`, is available for this purpose. An event of this type is created every time a password import inline hook is fired, with its `Event.Outcome` property providing a status of `FAILURE` or `SUCCESS` for the password import operation. 
+        If the status is `SUCCESS`, Okta has successfully saved the end user's password, and it's safe to delete it from your previous user store.
+
+        You can configure an [Event hook](https://developer.okta.com/docs/concepts/event-hooks/) to send this event type to you for use when triggering automated cleanup of end-user
+        passwords after successful migration.
+      operationId: createPasswordImportInlineHook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/InlineHookBasePayload'
+                - $ref: '#/components/schemas/PasswordImportRequest'
+            examples:
+              PasswordImportPayloadExample:
+                $ref: '#/components/examples/PasswordImportPayloadExample'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordImportResponse'
+              examples:
+                PasswordImportVerifiedResponse:
+                  $ref: '#/components/examples/PasswordImportVerifiedResponse'
+                PasswordImportUnVerifiedResponse:
+                  $ref: '#/components/examples/PasswordImportUnVerifiedResponse'
+        '204':
+          description: No content - Unverified user response
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+      security:
+        - apiToken: []
+        - oauth2: []
+      tags:
+        - InlineHook
+  create-registration-hook:
+    post:
+      summary: Create a registration inline hook
+      description: |-
+        Creates a registration inline hook request, one type of inline hook supported by Okta. This is an automated request from Okta to your third-party service endpoint. This reference provides sample JSON objects that are contained in the outbound request from Okta to your external service,
+        and sample JSON objects that you can include in your response. The objects that you return in the JSON payload of your response to this Okta request are an array of one or more objects,
+        which specify the Okta commands to execute.
+
+        The Okta registration inline hook allows you to integrate your own custom code into Okta's [Profile Enrollment](https://help.okta.com/okta_help.htm?type=oie&id=ext-create-profile-enrollment) flow. The hook is triggered after Okta receives the registration or profile update request. Your custom code can:
+        - Allow or deny the registration attempt, based on your own validation of the information the user has submitted
+        - Set or override the values that are populated in attributes of the user's Okta profile
+        > **Note:** Profile Enrollment and self-service registration (SSR) inline hooks only work with the [Okta Sign-In Widget](https://developer.okta.com/code/javascript/okta_sign-in_widget/) version 4.5 or later.
+
+        See also:
+        * [Inline hooks](https://developer.okta.com/docs/concepts/inline-hooks/) for a general introduction to Okta inline hooks
+        * [Inline Hooks Management API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/inlinehook/) for information on the API for registering external service endpoints with Okta
+        * [Add an inline hook](https://help.okta.com/okta_help.htm?type=oie&id=ext-add-inline-hook) for steps to enable this inline hook in the Admin Console
+        * [Registration inline hook](https://developer.okta.com/docs/guides/registration-inline-hook) for an example implementation of this inline hook
+      operationId: create-registration-hook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              x-okta-ignore-redocly-rules-for-sdk: true
+              allOf:
+                - $ref: '#/components/schemas/RegistrationInlineHookRequest'
+            examples:
+              ProfileEnrollmentRequest:
+                $ref: '#/components/examples/ProfileEnrollmentRequest'
+              ProgressiveProfileRequest:
+                $ref: '#/components/examples/ProgressiveProfileRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+              examples:
+                ProfileEnrollmentResponse:
+                  $ref: '#/components/examples/ProfileEnrollmentResponse'
+                ProgressiveProfileResponse:
+                  $ref: '#/components/examples/ProgressiveProfileResponse'
+                ProfileEnrollmentResponseDeny:
+                  $ref: '#/components/examples/ProfileEnrollmentResponseDeny'
+                ProgressiveProfileResponseDeny:
+                  $ref: '#/components/examples/ProgressiveProfileResponseDeny'
+        '204':
+          description: No content - Allow registration to proceed without any update.
+      tags:
+        - InlineHook
+      security:
+        - apiToken: []
+        - oauth2: []
+      x-okta-no-scope-required: true
+  CreateUserImportInlineHook:
+    post:
+      summary: Create a user import inline hook
+      description: |-
+        Creates a user import inline hook request, one type of inline hook supported by Okta. This is an automated request from Okta to your third-party service endpoint. 
+        This reference provides sample JSON objects that are contained in the outbound request from Okta to your external service, and sample JSON objects that you can include 
+        in your response. The objects that you return in the JSON payload of your response to this Okta request are an array of one or more objects, which specify the Okta commands to execute.
+
+        The user import inline hook enables you to add custom logic to the process of importing new users into Okta from an app. You can resolve conflicts in user name or other profile attributes, 
+        modify values of profile attributes, and control whether the imported user is treated as a match for an existing user or not. The hook is invoked for each user being imported, 
+        at the point immediately after any applicable profile attribute mappings have been applied, and any potential matches with existing users have been found, but before the Okta user profile is created.
+
+        >**Note:** If the external service times out after receiving an Okta request, the Okta process flow continues and the user is created.
+
+        See also:
+        * [Inline hooks](https://developer.okta.com/docs/concepts/inline-hooks/) for a general introduction to Okta inline hooks
+        * [Inline Hooks Management API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/inlinehook/) for information on the API for registering external service endpoints with Okta
+        * [Add an inline hook](https://help.okta.com/okta_help.htm?type=oie&id=ext-add-inline-hook) for steps to enable this inline hook in the Admin Console
+
+        >**Note:** The procedure for associating a user import inline hook with an app using the Admin Console can't be used with AD or LDAP.
+      operationId: createUserImportInlineHook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/InlineHookBasePayload'
+                - $ref: '#/components/schemas/UserImportRequest'
+            examples:
+              UserImportPayloadExample:
+                $ref: '#/components/examples/UserImportPayloadExample'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserImportResponse'
+              examples:
+                UserImportChangeAppUserProfileExample:
+                  $ref: '#/components/examples/UserImportChangeAppUserProfileExample'
+                UserImportChangeUserProfileExample:
+                  $ref: '#/components/examples/UserImportChangeUserProfileExample'
+                UserImportCreateANewUserExample:
+                  $ref: '#/components/examples/UserImportCreateANewUserExample'
+                UserImportMatchExample:
+                  $ref: '#/components/examples/UserImportMatchExample'
+                UserImportErrorExample:
+                  $ref: '#/components/examples/UserImportErrorExample'
+        '204':
+          description: No content - Use the default action
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+      security:
+        - apiToken: []
+        - oauth2: []
+      tags:
+        - InlineHook
+  create-saml-hook:
+    post:
+      summary: Create a SAML assertion inline hook
+      description: |-
+        Creates a SAML assertion inline hook request, one type of inline hook supported by Okta. This is an automated request from Okta to your third-party service endpoint. This reference provides sample JSON objects that are contained in the outbound request from Okta to your external service, and sample JSON objects that you can include in your response. The objects that you return in the JSON payload of your response to this Okta request are an array of one or more objects, which specify the Okta commands to execute.
+
+        This type of inline hook is triggered when Okta generates a SAML assertion in response to an authentication request. Before sending the SAML assertion to the app that will consume it, Okta calls out to your external service. Your external service can respond with commands to add attributes to the assertion or to modify its existing attributes.
+
+        You can use this functionality to add data to assertions, which might be data that is sensitive, calculated at runtime, or complexly-structured and not appropriate for storing in Okta user profiles. Data added this way is never logged or stored by Okta. As an example, SAML assertions generated for a medical app could be augmented with confidential patient data provided by your external service and not stored in Okta.
+
+        This inline hook works only when using custom SAML apps, not apps from the OIN.
+
+        See also:
+          * [Inline hooks](https://developer.okta.com/docs/concepts/inline-hooks/) for a general introduction to Okta inline hooks
+          * [Inline Hooks Management API](/openapi/okta-management/management/tags/inlinehook/) for information on the API for registering external service endpoints with Okta
+          * For a use case example of how to implement a SAML assertion inline hook, see [SAML assertion inline hook](https://developer.okta.com/docs/guides/saml-inline-hook)
+          * For steps to enable this inline hook, see [Add an inline hook](https://help.okta.com/okta_help.htm?type=oie&id=ext-add-inline-hook).
+
+        ### Specify location within the assertion
+
+        Specify the location within the assertion where you want to apply your operation using a slash-delimited path, which follows JSON Patch conventions.
+
+        When you perform an `add` op to add a new attribute statement, begin with `/claims/` and follow that with the name of the new attribute that you're adding.
+
+        When you modify an existing assertions statement, begin the path with `/subject/`, `/authentication/`, `/conditions/`, or `/claims/`, depending on which part of the assertion you want to modify. You then look deeper within the child elements using slash-delimited element names, for example, `/claims/array/attributeValues/1/value`. (The `/1/` in the path indicates the index of the array, using zero-based indexing.)
+
+        ### URI claims
+
+        Okta supports URI claims with SAML assertion hooks. When you need to replace or add a URI claim, encode the claim name within the command per the [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901) specification. Specifically, this replaces `~` with `~0` and `/` with `~1`.
+
+        ### SessionNotOnOrAfter support
+
+        In some scenarios, your service provider may require the `SessionNotOnOrAfter` attribute for the `<saml:AuthnStatement>` in the SAML assertion, which sets the provider session time correctly. Use `add` op with the path `/authentication/sessionLifetime` and a value for session lifetime in seconds to add this attribute. Okta calculates `SessionNotOnOrAfter` by adding the `/authentication/sessionLifetime` value to the `issueInstant` attribute and returns it in the SAML `data.assertion.
+      operationId: createSAMLAssertionInlineHook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/InlineHookBasePayload'
+                - $ref: '#/components/schemas/SAMLPayLoad'
+            examples:
+              SAMLPayloadExample:
+                $ref: '#/components/examples/SAMLPayLoadExample'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SAMLHookResponse'
+              examples:
+                SAMLHookResponseExample:
+                  $ref: '#/components/examples/SAMLHookResponseExample'
+                SAMLHookResponseWithURIFormat:
+                  $ref: '#/components/examples/SAMLHookResponseWithURIFormat'
+        '204':
+          description: No content - Use the default action
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+      security:
+        - apiToken: []
+        - oauth2: []
+      tags:
+        - InlineHook
+  create-token-hook:
+    post:
+      summary: Create a token inline hook
+      description: |-
+        Creates a token inline hook request, one type of inline hook supported by Okta. This is an automated request from Okta to your third-party service endpoint. This reference provides sample JSON objects that are contained in the outbound request from Okta to your external service, and sample JSON objects that you can include in your response.
+
+        This type of inline hook is triggered when OAuth 2.0 and OpenID Connect (OIDC) tokens are minted by your Okta custom authorization server. Before sending the token to the requester, Okta calls out to your external service. Your service can then respond with commands to add custom claims to the token or to modify existing claims.
+
+        Use this functionality to add data that is sensitive, calculated at runtime, or complexly structured and not appropriate for storing in Okta user profiles. Okta never logs nor stores data that is added this way. As an example, tokens minted for a medical app could be augmented with confidential patient data provided by your external service and not stored in Okta.
+
+        In addition to adding custom claims, you can modify or remove an existing custom claim or an OIDC standard profile claim. You can also update how long an access token or an ID token is valid.
+
+        This inline hook works only when using an [Okta custom authorization server](https://developer.okta.com/docs/guides/customize-authz-server/main/#create-an-authorization-server), not the built-in Okta org authorization server.
+
+        See also:
+          * [Inline hooks](https://developer.okta.com/docs/concepts/inline-hooks/) for a general introduction to Okta inline hooks
+          * [Inline Hooks Management API](/openapi/okta-management/management/tags/inlinehook) for information on the API for registering external service endpoints with Okta
+          * For an example implementation of this inline hook, see [Token inline hook](https://developer.okta.com/docs/guides/token-inline-hook)
+
+        ### Timeout behavior
+        After receiving the Okta request, if there's a response timeout, the Okta process flow proceeds with the original token returned.
+
+        ### Enabling a token inline hook
+        To activate the inline hook, you first need to register your external service endpoint with Okta using the [Inline Hooks Management API](/openapi/okta-management/management/tags/inlinehook).
+        You then need to associate the registered inline hook with a custom authorization server policy rule by completing the following steps:
+        1. Go to **Security** > **API** > **Authorization Servers.**
+        2. Select a custom authorization server from the list.
+        3. Select **Access Policies** and select a policy to use with the hook. In most cases, pick the Default Policy.
+        4. One of the policy's rules needs to trigger the inline hook. Click the pencil icon for a rule to edit it. If you only have one rule, edit the Default Policy Rule.
+        5. Click the **Use this Inline Hook** dropdown menu. Any inline hooks that you have registered are listed. Select the hook that you would like to use.
+        6. Click **Update Rule**.
+
+        > **Note:** You can associate only one inline hook with each rule.
+
+        ### Troubleshoot
+        This section covers what happens when a token inline hook flow fails either due to the external inline hook service returning an error object or not returning a successful response, or the inline hook patch fails.
+        > **Note:** Administrators can use the [Okta System Log](https://developer.okta.com/docs/reference/api/system-log/) to view errors. See the [Troubleshooting](https://developer.okta.com/docs/concepts/inline-hooks/#troubleshooting) section in the inline hooks concept piece for more information on the events related to inline hooks that the Okta System Log captures.
+        - When there's a communication failure with the external service, a timeout for example, the inline hook operation is skipped. The token is generated without any modification from the inline hook.
+
+          **Who can see this error?** Administrators
+
+        - When the external service returns a response with any other HTTP status code besides `200`, the inline hook operation is skipped. The token is generated without any modification from the inline hook.
+
+          **Who can see this error?** Administrators
+
+        - When the external service returns an error object in the response, the entire token inline hook flow fails with no token generated.
+
+          **Who can see this error?** Administrators, developers, and end users. When the OAuth 2.0 client receives the error, the client developer can see that error if the client has the debug information. What the end user sees depends on how errors are handled within the client.
+          > **Note:** See the [error](https://developer.okta.com/docs/reference/token-hook/#error) section on this page for more information on what to include in the error object of your response and what the OAuth 2.0 error includes that Okta returns to the requestor of the token.
+
+        - When a hook command (for example, updating, adding, and deleting claims) can't be performed, the inline hook operation is skipped. The token is generated without any modification from the inline hook.
+
+          **Who can see this error?** Administrators
+
+          The following actions result in an error:
+            - Using an invalid command. For example, if only an ID token is requested, the `commands` array shouldn't contain commands of the type `com.okta.access.patch`.
+            - Using an invalid operation
+            - Attempting to remove a system-specific claim
+            - Attempting to update a claim that doesn't exist
+            - Attempting to update an element within an array that doesn't exist or specifying an invalid index
+            - Attempting to remove a claim that doesn't exist
+      operationId: createTokenInlineHook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRequest'
+            examples:
+              TokenPayLoadExample:
+                $ref: '#/components/examples/TokenPayLoadExample'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenHookResponse'
+              examples:
+                TokenHookResponse:
+                  $ref: '#/components/examples/TokenHookResponse'
+                TokenHookResponseWithURIFormat:
+                  $ref: '#/components/examples/TokenHookResponseWithURIFormat'
+                TokenHookResponseAppendArray:
+                  $ref: '#/components/examples/TokenHookResponseAppendArray'
+                TokenHookReplaceExisting:
+                  $ref: '#/components/examples/TokenHookReplaceExisting'
+                TokenHookReplaceInPath:
+                  $ref: '#/components/examples/TokenHookReplaceInPath'
+                TokenHookModifyLifetime:
+                  $ref: '#/components/examples/TokenHookModifyLifetime'
+                TokenHookRemoveClaim:
+                  $ref: '#/components/examples/TokenHookRemoveClaim'
+                TokenHookRemoveFromArray:
+                  $ref: '#/components/examples/TokenHookRemoveFromArray'
+                TokenHookRemoveFromObject:
+                  $ref: '#/components/examples/TokenHookRemoveFromObject'
+                TokenHookErrorExample:
+                  $ref: '#/components/examples/TokenHookErrorExample'
+        '204':
+          description: No content - Unverified user response
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+      security:
+        - apiToken: []
+        - oauth2: []
+      tags:
+        - InlineHook
+components:
+  parameters:
+    pathInlineHookId:
+      name: inlineHookId
+      description: '`id` of the inline hook'
+      in: path
+      required: true
+      schema:
+        type: string
+        example: Y7Rzrd4g4xj6WdKzrBHH
+    inlineHookType:
+      name: type
+      description: One of the supported inline hook types
+      in: query
+      schema:
+        type: string
+        enum:
+          - com.okta.import.transform
+          - com.okta.oauth2.tokens.transform
+          - com.okta.saml.tokens.transform
+          - com.okta.user.credential.password.import
+          - com.okta.user.pre-registration
+          - com.okta.telephony.provider
+  schemas:
+    InlineHook:
+      type: object
+      description: An inline hook object that specifies the details of the inline hook
+      properties:
+        channel:
+          $ref: '#/components/schemas/InlineHookChannel'
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Date of the inline hook creation
+        id:
+          type: string
+          readOnly: true
+          description: The unique identifier for the inline hook
+        type:
+          $ref: '#/components/schemas/InlineHookType'
+        lastUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Date of the last inline hook update
+        name:
+          type: string
+          description: The display name of the inline hook
+          maximum: 255
+          minimum: 1
+        status:
+          $ref: '#/components/schemas/InlineHookStatus'
+        version:
+          type: string
+          description: Version of the inline hook type. The currently supported version is `1.0.0`.
+          readOnly: true
+        _links:
+          $ref: '#/components/schemas/InlineHookLinks'
+    InlineHookCreateResponse:
+      type: object
+      description: An inline hook object that specifies the details of the inline hook
+      properties:
+        channel:
+          $ref: '#/components/schemas/InlineHookChannel'
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Date of the inline hook creation
+        id:
+          type: string
+          readOnly: true
+          description: The unique identifier for the inline hook
+        lastUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Date of the last inline hook update
+        name:
+          type: string
+          description: The display name of the inline hook
+          maximum: 255
+          minimum: 1
+        status:
+          $ref: '#/components/schemas/InlineHookStatus'
+        type:
+          $ref: '#/components/schemas/InlineHookType'
+        version:
+          type: string
+          description: Version of the inline hook type. The currently supported version is `1.0.0`.
+          readOnly: true
+        _links:
+          $ref: '#/components/schemas/InlineHookLinksCreate'
+    InlineHookLinks:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: ./Common.yaml#/components/schemas/LinksSelf
+        - type: object
+          properties:
+            execute:
+              description: URL to test the inline hook
+              allOf:
+                - $ref: ./Common.yaml#/components/schemas/HrefObject
+            deactivate:
+              description: URL to deactivate the inline hook
+              allOf:
+                - $ref: ./Common.yaml#/components/schemas/HrefObject
+            activate:
+              description: URL to activate the inline hook
+              allOf:
+                - $ref: ./Common.yaml#/components/schemas/HrefObject
+            delete:
+              description: URL to delete the inline hook
+              allOf:
+                - $ref: ./Common.yaml#/components/schemas/HrefObject
+    InlineHookLinksCreate:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: ./Common.yaml#/components/schemas/LinksSelf
+        - type: object
+          properties:
+            execute:
+              description: URL to test the inline hook
+              allOf:
+                - $ref: ./Common.yaml#/components/schemas/HrefObject
+            deactivate:
+              description: URL to deactivate the inline hook
+              allOf:
+                - $ref: ./Common.yaml#/components/schemas/HrefObject
+    InlineHookCreate:
+      type: object
+      description: An inline hook object that specifies the details of the inline hook
+      properties:
+        channel:
+          $ref: '#/components/schemas/InlineHookChannelCreate'
+        name:
+          type: string
+          description: The display name of the inline hook
+          maximum: 255
+          minimum: 1
+        type:
+          $ref: '#/components/schemas/InlineHookType'
+        version:
+          type: string
+          description: Version of the inline hook type. The currently supported version is `1.0.0`.
+    InlineHookReplace:
+      type: object
+      description: An inline hook object that specifies the details of the inline hook
+      properties:
+        channel:
+          $ref: '#/components/schemas/InlineHookChannelCreate'
+        name:
+          type: string
+          description: The display name of the inline hook
+          maximum: 255
+          minimum: 1
+        version:
+          type: string
+          description: Version of the inline hook type. The currently supported version is `1.0.0`.
+    InlineHookBasePayload:
+      type: object
+      properties:
+        eventId:
+          type: string
+          description: The individual inline hook request ID
+          example: 3o9jBzq1SmOGmmsDsqyyeQ
+        eventTime:
+          type: string
+          description: The time the inline hook request was sent
+          example: 2020-01-17T21:23:56.000Z
+        eventTypeVersion:
+          description: The inline hook version
+          example: 1
+          type: string
+        cloudEventVersion:
+          description: The inline hook cloud version
+          example: 0.1
+          type: string
+        contentType:
+          description: The inline hook request header content
+          example: application/JSON
+          type: string
+    InlineHookChannel:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/InlineHookChannelType'
+        version:
+          type: string
+          description: Version of the inline hook type. The currently supported version is `1.0.0`.
+      discriminator:
+        propertyName: type
+        mapping:
+          HTTP: '#/components/schemas/InlineHookChannelHttp'
+          OAUTH: '#/components/schemas/InlineHookChannelOAuth'
+    InlineHookChannelCreate:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/InlineHookChannelType'
+        version:
+          type: string
+          description: Version of the inline hook type. The currently supported version is `1.0.0`.
+      discriminator:
+        propertyName: type
+        mapping:
+          HTTP: '#/components/schemas/InlineHookChannelHttpCreate'
+          OAUTH: '#/components/schemas/InlineHookChannelOAuthCreate'
+    InlineHookChannelConfig:
+      type: object
+      description: Properties of the communications channel that are used to contact your external service
+      properties:
+        headers:
+          type: array
+          description: An optional list of key/value pairs for headers that you can send with the request to the external service
+          items:
+            $ref: '#/components/schemas/InlineHookChannelConfigHeaders'
+        method:
+          type: string
+          description: The method of the Okta inline hook request
+        uri:
+          type: string
+          description: The external service endpoint that executes the inline hook handler. It must begin with `https://` and be reachable by Okta. No white space is allowed in the URI.
+          maximum: 1024
+    InlineHookChannelConfigCreate:
+      type: object
+      description: Properties of the communications channel that are used to contact your external service
+      properties:
+        headers:
+          type: array
+          description: An optional list of key/value pairs for headers that you can send with the request to the external service.
+          items:
+            $ref: '#/components/schemas/InlineHookChannelConfigHeaders'
+        method:
+          type: string
+          description: The method of the Okta inline hook request
+        uri:
+          type: string
+          description: The external service endpoint that executes the inline hook handler. It must begin with `https://` and be reachable by Okta. No white space is allowed in the URI.
+          maximum: 1024
+    InlineHookChannelConfigAuthSchemeBody:
+      type: object
+      description: The authentication scheme to use for this request
+      nullable: true
+      properties:
+        key:
+          type: string
+          description: The header name for the authorization server
+        type:
+          type: string
+          description: The authentication scheme type. Supported type&mdash;`HEADER`.
+        value:
+          type: string
+          description: The header value. This secret value is passed to your external service endpoint. Your external service can check it as a security measure.
+    InlineHookChannelConfigAuthSchemeResponse:
+      type: object
+      description: The authentication scheme to use for this request
+      nullable: true
+      properties:
+        key:
+          type: string
+          description: The header name for the authorization server
+        type:
+          type: string
+          description: The authentication scheme type. Supported type&mdash;`HEADER`
+    InlineHookChannelConfigHeaders:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The optional field or header name
+        value:
+          type: string
+          description: The value for the key
+    InlineHookChannelHttp:
+      allOf:
+        - $ref: '#/components/schemas/InlineHookChannel'
+        - type: object
+          properties:
+            config:
+              $ref: '#/components/schemas/InlineHookHttpConfig'
+    InlineHookChannelHttpCreate:
+      allOf:
+        - $ref: '#/components/schemas/InlineHookChannelCreate'
+        - type: object
+          properties:
+            config:
+              $ref: '#/components/schemas/InlineHookHttpConfigCreate'
+    InlineHookChannelOAuth:
+      allOf:
+        - $ref: '#/components/schemas/InlineHookChannel'
+        - type: object
+          properties:
+            config:
+              $ref: '#/components/schemas/InlineHookOAuthChannelConfig'
+    InlineHookChannelOAuthCreate:
+      allOf:
+        - $ref: '#/components/schemas/InlineHookChannelCreate'
+        - type: object
+          properties:
+            config:
+              $ref: '#/components/schemas/InlineHookOAuthChannelConfigCreate'
+    InlineHookChannelType:
+      type: string
+      enum:
+        - HTTP
+        - OAUTH
+    InlineHookOAuthBasicConfig:
+      allOf:
+        - $ref: '#/components/schemas/InlineHookChannelConfig'
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        authType:
+          type: string
+        clientId:
+          type: string
+          description: A publicly exposed string provided by the service that's used to identify the OAuth app and build authorization URLs
+        scope:
+          type: string
+          description: Include the scopes that allow you to perform the actions on the hook endpoint that you want to access
+        tokenUrl:
+          type: string
+          description: The URI where inline hooks can exchange an authorization code for access and refresh tokens
+    InlineHookOAuthChannelConfig:
+      type: object
+      properties:
+        authType:
+          type: string
+          description: The authentication method for the token endpoint
+      discriminator:
+        propertyName: authType
+        mapping:
+          client_secret_post: '#/components/schemas/InlineHookOAuthClientSecretConfig'
+          private_key_jwt: '#/components/schemas/InlineHookOAuthPrivateKeyJwtConfig'
+    InlineHookOAuthChannelConfigCreate:
+      type: object
+      properties:
+        authType:
+          type: string
+          description: The authentication method for the token endpoint
+      discriminator:
+        propertyName: authType
+        mapping:
+          client_secret_post: '#/components/schemas/InlineHookOAuthClientSecretConfigCreate'
+          private_key_jwt: '#/components/schemas/InlineHookOAuthPrivateKeyJwtConfig'
+    InlineHookOAuthClientSecretConfig:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/InlineHookOAuthBasicConfig'
+      type: object
+      properties:
+        authScheme:
+          type: string
+          description: Not applicable. Must be `null`.
+          nullable: true
+    InlineHookOAuthClientSecretConfigCreate:
+      allOf:
+        - $ref: '#/components/schemas/InlineHookOAuthBasicConfig'
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        clientSecret:
+          type: string
+          description: A private value provided by the service used to authenticate the identity of the app to the service
+        method:
+          type: string
+          description: The method of the Okta inline hook request. Only accepts `POST`.
+    InlineHookOAuthPrivateKeyJwtConfig:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/InlineHookOAuthBasicConfig'
+      type: object
+      properties:
+        hookKeyId:
+          type: string
+          description: An ID value of the hook key pair generated from the [Hook Keys API](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/HookKey/#tag/HookKey)
+        method:
+          type: string
+          description: The method of the Okta inline hook request. Only accepts `POST`.
+        authScheme:
+          type: string
+          description: Not applicable. Must be `null`.
+          nullable: true
+    InlineHookHttpConfig:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/InlineHookChannelConfig'
+      type: object
+      properties:
+        authScheme:
+          $ref: '#/components/schemas/InlineHookChannelConfigAuthSchemeResponse'
+    InlineHookHttpConfigCreate:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/InlineHookChannelConfigCreate'
+      type: object
+      properties:
+        authScheme:
+          $ref: '#/components/schemas/InlineHookChannelConfigAuthSchemeBody'
+    InlineHookPayload:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      x-okta-extensible: true
+    InlineHookRequestObject:
+      type: object
+      description: The API request that triggered the inline hook
+      properties:
+        id:
+          type: string
+          description: The unique identifier that Okta assigned to the API request
+        method:
+          type: string
+          description: The HTTP request method of the API request
+        url:
+          type: object
+          description: The URL of the API endpoint
+          properties:
+            value:
+              type: string
+              description: The URL value of the API endpoint
+        ipAddress:
+          type: string
+          description: The IP address of the client that made the API request
+    InlineHookResponse:
+      type: object
+      properties:
+        commands:
+          type: array
+          items:
+            $ref: '#/components/schemas/InlineHookResponseCommands'
+    InlineHookResponseCommandValue:
+      type: object
+      properties:
+        op:
+          type: string
+        path:
+          type: string
+        value:
+          type: string
+    InlineHookResponseCommands:
+      type: object
+      properties:
+        type:
+          type: string
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/InlineHookResponseCommandValue'
+    InlineHookStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+    InlineHookType:
+      type: string
+      description: One of the inline hook types
+      enum:
+        - com.okta.import.transform
+        - com.okta.oauth2.tokens.transform
+        - com.okta.saml.tokens.transform
+        - com.okta.user.credential.password.import
+        - com.okta.user.pre-registration
+        - com.okta.telephony.provider
+    PasswordImportRequestData:
+      type: object
+      properties:
+        context:
+          type: object
+          properties:
+            request:
+              $ref: '#/components/schemas/InlineHookRequestObject'
+            credential:
+              type: object
+              properties:
+                username:
+                  description: The `username` that the user supplied when attempting to sign in to Okta.
+                  type: string
+                password:
+                  description: The `password` that the user supplied when attempting to sign in to Okta.
+                  type: string
+        action:
+          type: object
+          description: This object specifies the default action Okta is set to take. Okta takes this action if your external service sends an empty HTTP 204 response. You can override the default action by returning a commands object in your response specifying the action to take.
+          properties:
+            credential:
+              description: The status of the user credential, either `UNVERIFIED` or `VERIFIED`
+              default: UNVERIFIED
+              type: string
+    PasswordImportRequest:
+      type: object
+      properties:
+        source:
+          description: The ID and URL of the password import inline hook
+          type: string
+        eventType:
+          type: string
+          description: The type of inline hook. The password import inline hook type is `com.okta.user.credential.password.import`.
+        data:
+          $ref: '#/components/schemas/PasswordImportRequestData'
+    PasswordImportRequestExecute:
+      description: Password import inline hook request
+      allOf:
+        - $ref: '#/components/schemas/InlineHookBasePayload'
+        - $ref: '#/components/schemas/PasswordImportRequest'
+    PasswordImportResponse:
+      description: Password import inline hook response
+      type: object
+      properties:
+        commands:
+          description: The `commands` object specifies whether Okta accepts the end user's sign-in credentials as valid or not. For the password import inline hook, you typically only return one `commands` object with one array element in it.
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                description: The location where you specify the command. For the password import inline hook, there's only one command, `com.okta.action.update`.
+              value:
+                description: |-
+                  The parameter value of the command.
+                  * To indicate that the supplied credentials are valid, supply a type property set to `com.okta.action.update` together with a value property set to `{"credential": "VERIFIED"}`.
+                  * To indicate that the supplied credentials are invalid, supply a type property set to `com.okta.action.update` together with a value property set to `{"credential": "UNVERIFIED"}`.
+                  Alternatively, you can send an empty response (`204`). By default, the `data.action.credential` is always set to `UNVERIFIED`.
+                type: object
+                properties:
+                  credential:
+                    type: string
+                    enum:
+                      - UNVERIFIED
+                      - VERIFIED
+    TelephonyRequest:
+      type: object
+      properties:
+        source:
+          description: The ID and URL of the telephony inline hook
+          type: string
+        eventType:
+          type: string
+          description: The type of inline hook. The telephony inline hook type is `com.okta.telephony.provider`.
+        requestType:
+          type: string
+          description: The type of inline hook request. For example, `com.okta.user.telephony.pre-enrollment`.
+        data:
+          $ref: '#/components/schemas/TelephonyRequestData'
+    TelephonyRequestExecute:
+      description: Telephony inline hook request body
+      allOf:
+        - $ref: '#/components/schemas/InlineHookBasePayload'
+        - $ref: '#/components/schemas/TelephonyRequest'
+    TelephonyRequestData:
+      type: object
+      properties:
+        context:
+          type: object
+          properties:
+            request:
+              $ref: '#/components/schemas/InlineHookRequestObject'
+        userProfile:
+          type: object
+          description: User profile specifies information about the Okta user
+          properties:
+            firstName:
+              description: The user's first name
+              type: string
+            lastName:
+              description: The user's last name
+              type: string
+            login:
+              description: The user's Okta login
+              type: string
+            userId:
+              description: The user's Okta user ID
+              type: string
+        messageProfile:
+          type: object
+          description: Message profile specifies information about the telephony (sms/voice) message to be sent to the Okta user
+          properties:
+            msgTemplate:
+              description: Default or Okta org configured sms or voice message template
+              type: string
+            phoneNumber:
+              description: The Okta's user's phone number
+              type: string
+            otpExpires:
+              description: The time when OTP expires
+              type: string
+            deliveryChannel:
+              description: The channel for OTP delivery - SMS or voice
+              type: string
+            otpCode:
+              description: The OTP code requested by the Okta user
+              type: string
+            locale:
+              description: The locale associated with the Okta user
+              type: string
+    TelephonyResponse:
+      description: Telephony inline hook response
+      type: object
+      properties:
+        commands:
+          description: The `commands` object specifies whether Okta accepts the end user's sign-in credentials as valid or not. For the telephony inline hook, you typically only return one `commands` object with one array element in it.
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                description: The location where you specify the command. For the telephony inline hook, there's only one command, `com.okta.telephony.action`.
+                type: string
+              value:
+                description: The status of the telephony operation along with optional additional information about the provider, transaction ID and any other transaction metadata.
+                type: array
+                items:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      description: Status of telephony callout
+                      enum:
+                        - SUCCESSFUL
+                        - PENDING
+                        - FAILED
+                      x-enumDescriptions:
+                        SUCCESSFUL: External web service was able to deliver the OTP to the Requester.
+                        PENDING: External web service wasn't able to confirm delivery of the OTP to the Requester.
+                        FAILED: External web service was unable to deliver the OTP to the Requester.
+                    provider:
+                      type: string
+                      description: Telephony provider for sms/voice
+                    transactionId:
+                      type: string
+                      description: Transaction ID for sms/voice
+                    transactionMetadata:
+                      type: string
+                      description: Any relevant metadata for the telephony transaction
+    RegistrationInlineHook:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/InlineHook'
+        - type: object
+    RegistrationInlineHookRequest:
+      description: Registration inline hook request
+      type: object
+      discriminator:
+        propertyName: requestType
+        mapping:
+          self.service.registration: '#/components/schemas/RegistrationInlineHookSSRData'
+          progressive.profile: '#/components/schemas/RegistrationInlineHookPPData'
+      properties:
+        eventType:
+          type: string
+          description: The type of inline hook. The registration inline hook type is `com.okta.user.pre-registration`.
+        source:
+          type: string
+          description: The ID of the registration inline hook
+        requestType:
+          $ref: '#/components/schemas/RegistrationInlineHookRequestType'
+    RegistrationInlineHookSSRData:
+      allOf:
+        - $ref: '#/components/schemas/InlineHookBasePayload'
+        - $ref: '#/components/schemas/RegistrationInlineHookRequest'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                context:
+                  type: object
+                  properties:
+                    request:
+                      $ref: '#/components/schemas/InlineHookRequestObject'
+                action:
+                  description: The default action the system will take. Will be `ALLOW`. `DENY` will never be sent to your external service.
+                  type: string
+                userProfile:
+                  additionalProperties: true
+                  type: object
+                  description: The name-value pairs for each registration-related attribute supplied by the user in the Profile Enrollment form.
+    RegistrationInlineHookPPData:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/InlineHookBasePayload'
+        - $ref: '#/components/schemas/RegistrationInlineHookRequest'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                context:
+                  type: object
+                  properties:
+                    request:
+                      $ref: '#/components/schemas/InlineHookRequestObject'
+                    user:
+                      type: object
+                      properties:
+                        passwordChanged:
+                          type: string
+                          format: date-time
+                          description: The last time the user's password was updated
+                        _links:
+                          description: Specifies link relations (see [Web Linking](https://www.rfc-editor.org/rfc/rfc8288)) available for the current status of the user. These links are used to discover what groups the user is a part of and what factors they have enrolled.
+                          type: object
+                          properties:
+                            groups:
+                              description: URL to retrieve the individual user's group memberships
+                              allOf:
+                                - $ref: ./Common.yaml#/components/schemas/HrefObject
+                            factors:
+                              description: URL to retrieve individual user's factor enrollments
+                              allOf:
+                                - $ref: ./Common.yaml#/components/schemas/HrefObject
+                        profile:
+                          additionalProperties: true
+                          type: object
+                          description: The user to update's current attributes
+                        id:
+                          type: string
+                action:
+                  description: The default action the system takes. Set to `ALLOW`. `DENY` is never sent to your external service
+                  type: string
+                userProfileUpdate:
+                  additionalProperties: true
+                  type: object
+                  description: Name-value pairs for each new attribute supplied by the user in the Progressive Profile form
+    RegistrationInlineHookRequestType:
+      type: string
+      description: The type of registration hook. Use either `self.service.registration` or `progressive.profile`.
+      enum:
+        - self.service.registration
+        - progressive.profile
+    RegistrationResponse:
+      type: object
+      properties:
+        commands:
+          description: |-
+            The `commands` object lets you invoke commands to modify or add values to the attributes in the Okta user profile that are created for this user. The object also lets you control whether or not the registration attempt is allowed to proceed.
+
+            This object is an array, allowing you to send multiple commands in your response. Each array element requires a `type` property and a `value` property. The `type` property is where you specify which of the supported commands you wish to execute, and `value` is where you supply parameters for that command.
+
+            The registration inline hook supports these three commands:
+            * `com.okta.user.profile.update`: Change attribute values in the user's Okta user profile. For SSR only. Invalid if used with a Progressive Profile response.
+            * `com.okta.action.update`: Allow or deny the user's registration.
+            * `com.okta.user.progressive.profile.update`: Change attribute values in the user's Okta Progressive Profile.
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                description: |-
+                  The location where you specify the command. To set attributes in the user's Okta profile, supply a `type` property set to `com.okta.user.profile.update`, together with a `value` property set to a list of key-value pairs corresponding to the Okta user profile attributes you want to set. The attributes must already exist in your user profile schema.
+
+                  To explicitly allow or deny registration to the user, supply a type property set to `com.okta.action.update`, together with a value property set to `{"registration": "ALLOW"}` or `{"registration": "DENY"}`. The default is to allow registration.
+
+                  In Okta Identity Engine, to set attributes in the user's profile, supply a `type` property set to `com.okta.user.progressive.profile.update`, together with a `value` property set to a list of key-value pairs corresponding to the Progressive Enrollment attributes that you want to set. See [Registration inline hook - Send response](https://developer.okta.com/docs/guides/registration-inline-hook/nodejs/main/#send-response).
+
+                  Commands are applied in the order that they appear in the array. Within a single `com.okta.user.profile.update` or `com.okta.user.progressive.profile.update command`, attributes are updated in the order that they appear in the `value` object.
+
+                  You can never use a command to update the user's password, but you are allowed to set the values of attributes other than password that are designated sensitive in your Okta user schema. However, the values of those sensitive attributes, if included as fields in the Profile Enrollment form, aren't included in the `data.userProfile` object sent to your external service by Okta. See [data.userProfile](/openapi/okta-management/management/tags/inlinehook/#tag/InlineHook/operation/create-registration-hook!path=0/data/userProfile&t=request).
+                type: string
+              value:
+                additionalProperties: true
+                description: |-
+                  The `value` object is the parameter to pass to the command.
+
+                  For `com.okta.user.profile.update` commands, `value` should be an object containing one or more name-value pairs for the attributes you wish to update.
+
+                  For `com.okta.action.update` commands, the value should be an object containing the attribute `action` set to a value of either `ALLOW` or `DENY`, indicating whether the registration should be permitted or not.
+
+                  Registrations are allowed by default, so setting a value of `ALLOW` for the action field is valid but superfluous.
+                type: object
+        Error:
+          description: |-
+            For the registration inline hook, the `error` object provides a way of displaying an error message to the end user who is trying to register or update their profile.
+
+            * If you're using the Okta Sign-In Widget for Profile Enrollment, only the `errorSummary` messages of the `errorCauses` objects that your external service returns appear as inline errors, given the following:
+              * You don't customize the error handling behavior of the widget.
+              * The `location` of `errorSummary` in the `errorCauses` object specifies the request object's user profile attribute.
+            * If you don't return a value for the `errorCauses` object, and deny the user's registration attempt through the `commands` object in your response to Okta, one of the following generic messages appears to the end user:
+              * "Registration cannot be completed at this time." (SSR)
+              * "We found some errors. Please review the form and make corrections." (Progressive Enrollment)
+            * If you don't return an `error` object at all and the registration is denied, the following generic message appears to the end user:
+              * "Registration denied." (SSR)
+              * "Profile update denied." (Progressive Enrollment)
+
+            >**Note:** If you include an error object in your response, no commands are executed and the registration fails. This holds true even if the top-level `errorSummary` and the `errorCauses` objects are omitted.
+          type: object
+          properties:
+            errorSummary:
+              type: string
+              description: Human-readable summary of one or more errors
+            errorCauses:
+              type: array
+              items:
+                type: object
+                properties:
+                  errorSummary:
+                    type: string
+                    description: Human-readable summary of the error.
+                  reason:
+                    type: string
+                    description: A brief, enum-like string that indicates the nature of the error. For example, `UNIQUE_CONSTRAINT` for a property uniqueness violation.
+                  locationType:
+                    type: string
+                    description: Where in the request the error was found (`body`, `header`, `url`, or `query`).
+                  location:
+                    description: The valid JSON path to the location of the error. For example, if there was an error in the user's `login` field, the `location` might be `data.userProfile.login`.
+                    type: string
+                  domain:
+                    type: string
+                    description: Indicates the source of the error. If the error was in the user's profile, for example, you might use `end-user`. If the error occurred in the external service, you might use `external-service`.
+    RegistrationInlineHookResponse:
+      description: Registration inline hook response
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        commands:
+          type: array
+    RegistrationInlineHookCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - com.okta.user.profile.update
+            - com.okta.action.update
+            - com.okta.user.progressive.profile.update
+    SAMLPayLoad:
+      type: object
+      properties:
+        source:
+          description: The ID and URL of the SAML assertion inline hook
+          type: string
+        eventType:
+          type: string
+          description: The type of inline hook. The SAML assertion inline hook type is `com.okta.saml.tokens.transform`.
+        data:
+          type: object
+          properties:
+            context:
+              allOf:
+                - $ref: '#/components/schemas/BaseContext'
+                - type: object
+                  properties:
+                    protocol:
+                      description: Details of the assertion protocol being used
+                      type: object
+                      properties:
+                        type:
+                          description: The type of authentication protocol being used for the assertion
+                          type: string
+                          example: SAML2.0
+                        issuer:
+                          type: object
+                          properties:
+                            id:
+                              description: The unique identifier of the issuer that provided the SAML assertion
+                              type: string
+                              example: 0oath92zlO60urQOP0g3
+                            name:
+                              description: The name of the issuer that provided the SAML assertion
+                              type: string
+                              example: SAML 2.0 App
+                            uri:
+                              description: The base URI of the SAML endpoint that's used to assert the authorization
+                              type: string
+                              example: http://www.okta.com/exkth8lMzFm0HZOTU0g3
+            assertion:
+              description: Details of the SAML assertion that was generated
+              type: object
+              properties:
+                subject:
+                  description: Provides a JSON representation of the `<saml:Subject>` element of the SAML assertion
+                  type: object
+                  properties:
+                    nameId:
+                      description: The unique identifier of the user
+                      type: string
+                      example: user@example.com
+                    nameFormat:
+                      description: Indicates how to interpret the attribute name
+                      type: string
+                      example: urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+                    confirmation:
+                      type: object
+                      properties:
+                        method:
+                          description: Used to indicate how the authorization server confirmed the SAML assertion
+                          type: string
+                          example: urn:oasis:names:tc:SAML:2.0:cm:bearer
+                        data:
+                          type: object
+                          properties:
+                            recipient:
+                              description: The token endpoint URL of the authorization server
+                              type: string
+                              example: http://www.example.com:7070/saml/sso
+                authentication:
+                  description: Provides a JSON representation of the `<saml:AuthnStatement>` element of the SAML assertion
+                  type: object
+                  properties:
+                    sessionIndex:
+                      description: The unique identifier describing the assertion statement
+                      type: string
+                      example: id1553800523546.312669168
+                    authnContext:
+                      description: Details of the authentication methods used for the SAML assertion
+                      type: object
+                      properties:
+                        authnContextClassRef:
+                          description: Describes the identity provider's supported authentication context classes
+                          type: string
+                          example: urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport
+                conditions:
+                  description: Provides a JSON representation of the `<saml:Conditions>` element of the SAML assertion
+                  type: object
+                  properties:
+                    audienceRestriction:
+                      description: Describes which service providers the assertion is valid for
+                      type: array
+                      items:
+                        type: string
+                        example:
+                          - urn:example:sp
+                claims:
+                  description: Provides a JSON representation of the `<saml:AttributeStatement>` element contained in the generated SAML assertion. Contains any optional SAML attribute statements that you have defined for the app using the Admin Console's **SAML Settings**.
+                  type: object
+                  additionalProperties:
+                    type: object
+                    properties:
+                      attributes:
+                        type: object
+                        properties:
+                          NameFormat:
+                            type: string
+                            description: Indicates how to interpret the attribute name
+                      attributeValues:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            attributes:
+                              type: object
+                              properties:
+                                xsi:type:
+                                  type: string
+                                  description: Used to derive the type of the attribute
+                            value:
+                              type: string
+                              description: The actual value of the attribute
+                lifetime:
+                  description: Specifies the expiration time, in seconds, of the SAML assertion
+                  type: object
+                  properties:
+                    expiration:
+                      description: The expiration time in seconds
+                      type: integer
+                      example: 300
+    SAMLHookResponse:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        commands:
+          description: |-
+            The `commands` object is where you tell Okta to add additional claims to the assertion or to modify the existing assertion statements.
+
+            `commands` is an array, allowing you to send multiple commands. In each array element, include a `type` property and a `value` property. The `type` property is where you specify which of the supported commands you want to execute, and `value` is where you supply an operand for that command.
+            In the case of the SAML assertion inline hook, the `value` property is itself a nested object, in which you specify a particular operation, a path to act on, and a value.
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: One of the supported commands `com.okta.assertion.patch`
+              value:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    op:
+                      type: string
+                      description: |-
+                        The name of one of the supported ops:
+                        `add`:  Add a new claim to the assertion
+                        `replace`: Modify any element of the assertion
+                         > **Note:** If a response to the SAML assertion inline hook request isn't received from your external service within three seconds, a timeout occurs. In this scenario, the Okta process flow continues with the original SAML assertion returned.
+                    path:
+                      type: string
+                      description: Location, within the assertion, to apply the operation
+                    value:
+                      oneOf:
+                        - type: string
+                        - type: integer
+                        - type: object
+                      description: |-
+                        The value of the claim that you add or replace, and can also include other attributes. If adding to a claim, add another `value` attribute residing within an array called `attributeValues`.
+
+                        See the following examples:
+
+                        #### Simple value (integer or string)
+
+                        `"value": 300` or `"value": "replacementString"`
+
+                        #### Attribute value (object)
+
+                        ` "value": {
+                            "authContextClassRef": "replacementValue"
+                          }`
+
+                        #### AttributeValues array value (object)
+
+                        ` "value": {
+                            "attributes": {
+                              "NameFormat": "urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
+                            },
+                            "attributeValues": [
+                              {"attributes": {
+                                "xsi:type": "xs:string"
+                              },
+                              "value": "4321"}
+                              ]
+                            }`
+        error:
+          description: |-
+            An object to return an error. Returning an error causes Okta to record a failure event in the Okta System Log.
+            The string supplied in the `errorSummary` property is recorded in the System Log event.
+            > **Note:** If the error object doesn't include the defined `errorSummary` property, the following common default message
+            is returned to the end user: `The callback service returned an error`.
+
+            > **Note:** If a response to a SAML inline hook request isn't received from your external service within three seconds, a timeout occurs. In this scenario, the Okta SAML inline hook process continues, and the user is created.
+          type: object
+          properties:
+            errorSummary:
+              description: A human-readable summary of the error
+              type: string
+    BaseContext:
+      description: This object contains a number of sub-objects, each of which provide some type of contextual information.
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        request:
+          $ref: '#/components/schemas/InlineHookRequestObject'
+        session:
+          description: Details of the user session
+          type: object
+          properties:
+            id:
+              description: The unique identifier for the user's session
+              type: string
+              example: 102LN9Bnuc4S_ewfc9BYwageA
+            userId:
+              description: The unique identifier for the user
+              type: string
+              example: 00uq8tMo3zV0OfJON0g3
+            login:
+              description: The username used to identify the user. This is often the user's email address.
+              type: string
+              example: user@example.com
+            createdAt:
+              description: Timestamp of when the session was created
+              type: string
+              format: date-time
+              example: '2019-03-28T16:45:55.000Z'
+            expiresAt:
+              description: Timestamp of when the session expires
+              type: string
+              format: date-time
+              example: '2019-03-28T21:15:23.000Z'
+            status:
+              description: Represents the current status of the user's session
+              type: string
+              example: ACTIVE
+            lastPasswordVerification:
+              description: Timestamp of when the user was last authenticated
+              type: string
+              format: date-time
+              example: '2019-03-28T16:45:55.000Z'
+            amr:
+              description: The authentication method reference
+              type: array
+              items:
+                type: string
+                example:
+                  - PASSWORD
+            idp:
+              $ref: ./sessions.yaml#/components/schemas/SessionIdentityProvider
+            mfaActive:
+              description: Describes whether multifactor authentication was enabled
+              type: boolean
+              example: false
+        user:
+          description: Identifies the Okta user that the token was generated to authenticate and provides details of their Okta user profile
+          type: object
+          properties:
+            id:
+              description: The unique identifier for the user
+              type: string
+              example: 00uq8tMo3zV0OfJON0g3
+            passwordChanged:
+              description: The timestamp when the user's password was last updated
+              type: string
+              format: date-time
+              example: '2018-09-11T23:19:12.000Z'
+            profile:
+              type: object
+              properties:
+                login:
+                  description: The username used to identify the user. This is often the user's email address.
+                  type: string
+                  example: user@example.com
+                firstName:
+                  description: The first name of the user
+                  type: string
+                  example: John
+                lastName:
+                  description: The last name of the user
+                  type: string
+                  example: Smith
+                locale:
+                  description: |-
+                    The user's default location for purposes of localizing items such as currency, date time format, numerical representations, and so on.
+                    A locale value is a concatenation of the [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) two-letter language code, an underscore, and the [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) two-letter country code. For example, `en_US` specifies the language English and country US. This value is `en_US` by default.
+                  type: string
+                  example: en_US
+                timeZone:
+                  description: The user's timezone
+                  type: string
+                  example: America/Los_Angeles
+            _links:
+              description: Specifies link relations (see [Web Linking](https://www.rfc-editor.org/rfc/rfc8288)) available for the current status of the user. These links are used to discover what groups the user is a part of and what factors they have enrolled.
+              type: object
+              properties:
+                groups:
+                  description: URL to retrieve the individual user's group memberships
+                  allOf:
+                    - $ref: ./Common.yaml#/components/schemas/HrefObject
+                factors:
+                  description: URL to retrieve individual user's factor enrollments
+                  allOf:
+                    - $ref: ./Common.yaml#/components/schemas/HrefObject
+    SAMLPayloadExecute:
+      description: SAML assertion inline hook request
+      allOf:
+        - $ref: '#/components/schemas/InlineHookBasePayload'
+        - $ref: '#/components/schemas/SAMLPayLoad'
+    TokenProtocolRequest:
+      description: Details of the token request
+      type: object
+      properties:
+        redirect_uri:
+          description: Specifies the callback location where the authorization was sent
+          type: string
+          format: uri
+        scope:
+          description: The scopes requested
+          type: string
+        response_mode:
+          description: The authorization response mode
+          type: string
+          enum:
+            - form_post
+            - fragment
+            - okta_post_message
+            - query
+        response_type:
+          description: The authorization response type
+          type: string
+          enum:
+            - code
+            - id_token
+            - token
+            - none
+        grant_type:
+          $ref: ./oauth.yaml#/components/schemas/GrantType
+        client_id:
+          description: The ID of the client associated with the token
+          type: string
+        state:
+          type: string
+    BaseToken:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        claims:
+          description: Claims included in the token. Consists of name-value pairs for each included claim. For descriptions of the claims that you can include, see the Okta [OpenID Connect and OAuth 2.0 API reference](/openapi/okta-oauth/guides/overview/#claims).
+          type: object
+        token:
+          description: The token
+          type: object
+          properties:
+            lifetime:
+              description: Lifetime of the token
+              type: object
+              properties:
+                expiration:
+                  description: Time in seconds until the token expires
+                  type: integer
+    RefreshToken:
+      description: The refresh token
+      type: object
+      properties:
+        jti:
+          description: The refresh token ID
+          type: string
+    TokenRequest:
+      description: Token inline hook request
+      allOf:
+        - $ref: '#/components/schemas/InlineHookBasePayload'
+        - $ref: '#/components/schemas/TokenPayLoad'
+    TokenPayLoad:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        source:
+          description: The URL of the token inline hook
+          type: string
+        eventType:
+          type: string
+          description: The type of inline hook. The token inline hook type is `com.okta.oauth2.tokens.transform`.
+        data:
+          type: object
+          properties:
+            context:
+              allOf:
+                - $ref: '#/components/schemas/BaseContext'
+                - type: object
+                  properties:
+                    protocol:
+                      description: Details of the authentication protocol
+                      type: object
+                      properties:
+                        type:
+                          description: The type of authentication protocol used
+                          type: string
+                          example: OAUTH2.0
+                        request:
+                          $ref: '#/components/schemas/TokenProtocolRequest'
+                        OriginalGrant:
+                          description: Information about the original token request used to get the refresh token being used, when in a refresh token request
+                          type: object
+                          properties:
+                            authorization:
+                              $ref: '#/components/schemas/TokenProtocolRequest'
+                            refresh_token:
+                              $ref: '#/components/schemas/RefreshToken'
+                        issuer:
+                          description: The authorization server's issuer identifier
+                          type: object
+                          properties:
+                            uri:
+                              description: The authorization server's issuer identifier
+                              type: string
+                              format: uri
+                        client:
+                          description: The client making the token request
+                          type: object
+                          properties:
+                            id:
+                              description: The unique identifier of the client
+                              type: string
+                            name:
+                              description: The name of the client
+                              type: string
+                            type:
+                              description: The type of client
+                              type: string
+                              example: PUBLIC
+                    policy:
+                      description: The authorization server policy used to mint the token
+                      type: object
+                      properties:
+                        id:
+                          description: The unique identifier for the policy
+                          type: string
+                          example: 00p4ktaq2ryOYtsHC0g7
+                        rule:
+                          description: The authorization server policy rule used to mint the token
+                          type: object
+                          properties:
+                            id:
+                              description: The unique identifier for the policy rule
+                              type: string
+                              example: 0pr4ktb7elD3ZvrMy0g7
+            identity:
+              allOf:
+                - description: Provides information on the properties of the ID token that Okta has generated, including the existing claims that it contains
+                - $ref: '#/components/schemas/BaseToken'
+            access:
+              allOf:
+                - description: Provides information on the properties of the access token that Okta has generated, including the existing claims that it contains
+                - $ref: '#/components/schemas/BaseToken'
+                - type: object
+                  properties:
+                    scopes:
+                      description: The scopes contained in the token. For descriptions of the scopes that you can include, see the Okta [OpenID Connect and OAuth 2.0 API reference](/openapi/okta-oauth/guides/overview/#scopes).
+                      type: object
+            refresh_token:
+              $ref: '#/components/schemas/RefreshToken'
+    TokenHookResponse:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      description: |-
+        For the token inline hook, the `commands` and `error` objects that you can return in the JSON payload of your response are defined in the following sections.
+        > **Note:** The size of your response payload must be less than 256 KB.
+      properties:
+        commands:
+          description: |-
+            You can use the `commands` object to provide commands to Okta. It's where you can tell Okta to add more claims to the token.
+            The `commands` object is an array, allowing you to send multiple commands. In each array element, there needs to be a `type` property and `value` property. The `type` property is where you specify which of the supported commands you want to execute, and `value` is where you supply an operand for that command.
+            In the case of the token hook type, the `value` property is itself a nested object in which you specify a particular operation, a path to act on, and a value.
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                description: |-
+                  One of the supported commands:
+                    `com.okta.identity.patch`: Modify an ID token
+                    `com.okta.access.patch`: Modify an access token
+                  > **Note:** The `commands` array should only contain commands that can be applied to the requested tokens. For example, if only an ID token is requested, the `commands` array shouldn't contain commands of the type `com.okta.access.patch`.
+                type: string
+              value:
+                description: The `value` object is where you specify the operation to perform. It's an array, which allows you to request more than one operation.
+                type: array
+                items:
+                  type: object
+                  properties:
+                    op:
+                      description: |-
+                        The name of one of the supported ops: `add`: Add a claim. `replace`: Modify an existing claim and update the token lifetime. `remove`: Remove an existing claim.
+                        #### `op: add` notes
+
+                        <details>
+                        <summary>Add a claim</summary>
+
+                          Add a claim
+
+                          **Existing JSON**
+
+                          ```
+                          {
+                            "employeeId": "00u12345678"
+                          }
+                          ```
+
+                          **Operation**
+
+                          ```
+                          {
+                            "commands": [
+                              {
+                                "type": "com.okta.assertion.patch",
+                                "value": [
+                                  {
+                                    "op": "add",
+                                    "path": "/claims/extPatientId",
+                                    "value": "1234"
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "com.okta.assertion.patch",
+                                "value": [
+                                  {
+                                    "op": "add",
+                                    "path": "/claims/external_guid",
+                                    "value": "F0384685-F87D-474B-848D-2058AC5655A7"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                          ```
+
+                          **Updated JSON**
+
+                          ```
+                          {
+                            "employeeId": "00u12345678",
+                            "extPatientId": 1234,
+                            "external_guid": "F0384685-F87D-474B-848D-2058AC5655A7"
+                          }
+                          ```
+
+                          > **Note:** If you use the `add` operation and include an existing claim in your response with a different value, that value is replaced. Use the `replace` operation instead. If you attempt to remove a system-specific claim or use an invalid operation, the entire PATCH fails and errors are logged in the token hooks events. See `op: replace` notes.
+                        </details>
+
+                        <details>
+                        <summary>Add new members to existing JSON objects</summary>
+
+                          If you have a JSON object in a claim called `employee_profile`, and you want to add the `department_id` member to the claim, the existing JSON is updated by specifying the claim in the path, followed by the name of the object member.
+
+                          **Existing JSON**
+
+                          ```
+                          {
+                            "employee_profile": {
+                              "employee_id": "1234",
+                              "name": "Anna"
+                            }
+                          }
+                          ```
+
+                          **Operation**
+
+                          ```
+                          {
+                            "commands": [
+                              {
+                                "type": "com.okta.identity.patch",
+                                "value": [
+                                  {
+                                    "op": "add",
+                                    "path": "/claims/employee_profile/department_id",
+                                    "value": "4947"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                          ```
+
+                          **Updated JSON**
+
+                          ```
+                          {
+                            "employee_profile": {
+                              "employee_id": "1234",
+                              "name": "Anna",
+                              "department_id": "4947"
+                            }
+                          }
+                          ```
+
+                          > **Note:** If you attempt to add a member within a JSON object that doesn't exist or using an invalid operation, the entire PATCH fails and errors are logged in the token hooks events.
+                        </details>
+
+                        <details>
+                        <summary>Add new elements to existing arrays</summary>
+
+                          Append an element to an array by specifying the name of the array, followed by the index where you want to insert the element in the path. Alternatively, you can specify the array name followed by a hyphen (-) in the path to append an element at the end of the array. For example, you have an array that contains the user's preferred airports, and you want to add a new airport to the array. The existing target JSON object is updated by specifying the claim in the path, followed by the index of where to insert the claim.
+
+                          **Existing JSON**
+
+                          ```
+                          {
+                            "preferred_airports":[
+                              "sjc",
+                              "sfo",
+                              "oak"
+                            ]
+                          }
+                          ```
+
+                          **Operation**
+
+                          ```
+                          {
+                            "commands": [
+                              {
+                                "type": "com.okta.identity.patch",
+                                "value": [
+                                  {
+                                    "op": "add",
+                                    "path": "/claims/preferred_airports/3",
+                                    "value": "lax"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                          ```
+
+                          **Updated JSON**
+
+                          ```
+                          {
+                            "preferred_airports":[
+                              "sjc",
+                              "sfo",
+                              "oak",
+                              "lax"
+                            ]
+                          }
+                          ```
+
+                          > **Note:** If you attempt to add an element within an array that doesn't exist or specify an invalid index, the entire PATCH fails and errors are logged in the token hooks events.
+                        </details>
+
+                        #### `op: replace` notes
+
+                        <details>
+                        <summary>Modify an existing claim</summary>
+
+                          You can modify (`replace`) existing custom claims or OIDC standard profile claims, such as `birthdate` and `locale`. You can't, however, modify any system-specific claims, such as `iss` or `ver`. Also, you can't modify a claim that isn't currently part of the token in the request payload. Attempting to modify a system-specific claim or using an invalid operation results in the entire PATCH failing and errors logged in the token hooks events.
+
+                          See [Access Tokens Scopes and Claims](/openapi/okta-oauth/guides/overview/#access-token-scopes-and-claims) for the list of access token-reserved claims that you can't modify.
+
+                          > **Note:** Although the `aud` and `sub` claims are listed as reserved claims, you can modify those claims in access tokens. You can't modify these claims in ID tokens.
+
+                          See [ID Token Claims](/openapi/okta-oauth/guides/overview/#id-token-claims) for a list of ID token-reserved claims that you can't modify.
+
+                          **Existing target JSON object**
+
+                          ```
+                          {
+                            "employeeId": "00u12345678",
+                            "extPatientId": 1234,
+                            "external_guid": "F0384685-F87D-474B-848D-2058AC5655A7"
+                          }
+                          ```
+
+                          **Operation**
+
+                          ```
+                          {
+                            "commands": [
+                              {
+                                "type": "com.okta.identity.patch",
+                                "value": [
+                                  {
+                                    "op": "replace",
+                                    "path": "/claims/extPatientId",
+                                    "value": "12345"
+                                  },
+                                  {
+                                    "op": "replace",
+                                    "path": "/claims/external_guid",
+                                    "value": "D1495796-G98E-585C-959E-1269CD6766B8"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                          ```
+
+                          **Updated JSON***
+
+                          ```
+                          {
+                            "employeeId": "00u12345678",
+                            "extPatientId": 12345,
+                            "external_guid": "D1495796-G98E-585C-959E-1269CD6766B8"
+                          }
+                          ```
+
+                        </details>
+
+                        <details>
+                        <summary>Modify members within existing JSON objects and arrays</summary>
+
+                          Use the `replace` operation to modify members within JSON objects and elements within arrays. For example, you have a JSON object in a claim called `employee_profile`, and you want to update the email address of the employee. The existing target JSON object is updated by specifying the claim in the path, followed by the name of the object member that you want to modify.
+
+                          **Existing target JSON object**
+
+                          ```
+                          {
+                            "employee_profile": {
+                              "employee_id":"1234",
+                              "name":"Anna",
+                              "email":"anna.v@company.com"
+                              }
+                          }
+                          ```
+
+                          **Operation**
+
+                          ```
+                          {
+                            "commands": [
+                              {
+                                "type": "com.okta.identity.patch",
+                                "value": [
+                                  {
+                                    "op": "replace",
+                                    "path": "/claims/employee_profile/email",
+                                    "value": "anna@company.com"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                          ```
+
+                          **Updated JSON**
+
+                          ```
+                          {
+                            "employee_profile": {
+                              "employee_id":"1234",
+                              "name":"Anna",
+                              "email":"anna@company.com"
+                              }
+                          }
+                          ```
+
+                          > **Note:** If you attempt to modify a member within a JSON object that doesn't exist or use an invalid operation, the entire PATCH fails and errors are logged in the token hooks events.
+
+                          Similarly, you can replace elements in an array by specifying the array name and the valid index of the element that you want to replace in the path.
+                        </details>
+
+                        <details>
+                        <summary>Modify token lifetimes</summary>
+                          You can modify how long the access and ID tokens are valid by specifying the `lifetime` in seconds. The `lifetime` value must be a minimum of five minutes (300 seconds) and a maximum of 24 hours (86,400 seconds).
+
+                          **Operation**
+
+                          ```
+                          {
+                            "commands": [
+                              {
+                                "type": "com.okta.identity.patch",
+                                "value": [
+                                  {
+                                    "op": "replace",
+                                    "path": "/token/lifetime/expiration",
+                                    "value": 36000
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "com.okta.access.patch",
+                                "value": [
+                                  {
+                                    "op": "replace",
+                                    "path": "/token/lifetime/expiration",
+                                    "value": 36000
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                          ```
+
+                        </details>
+
+                        #### `op: remove` notes
+
+                        <details>
+                        <summary>Remove a claim</summary>
+
+                          You can remove existing custom claims or OIDC standard profile claims, such as `birthdate` or `locale`. You can't, however, remove any system-specific claims, such as `iss` or `ver`. You also can't remove a claim that isn't currently part of the token in the request payload. If you attempt to remove a system-specific claim or use an invalid operation, the entire PATCH fails and errors are logged in the token hooks events.
+
+                          See [Access Tokens Scopes and Claims](/openapi/okta-oauth/guides/overview/#access-token-scopes-and-claims) for the list of access token-reserved claims that you can't modify.
+
+                          See [ID Token Claims](/openapi/okta-oauth/guides/overview/#id-token-claims) for a list of ID token-reserved claims that you can't modify.
+
+                          **Operation**
+
+                          ```
+                          {
+                            "commands": [
+                              {
+                                "type": "com.okta.identity.patch",
+                                "value": [
+                                  {
+                                    "op": "remove",
+                                    "path": "/claims/birthdate",
+                                    "value": null
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "com.okta.access.patch",
+                                "value": [
+                                  {
+                                    "op": "remove",
+                                    "path": "/claims/external_guid"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                          ```
+
+                          > **Note:** The `value` property for the `remove` operation isn't required. If you provide it in the response, it should be set to `null`. Providing any other value fails the entire PATCH response.
+
+                        </details>
+
+                        <details>
+                        <summary>Remove members from existing arrays</summary>
+
+                          Use the `remove` operation to remove members from existing arrays. For example, you have an array that contains the user's preferred airports, and you want to remove an airport from the array. The existing target JSON object is updated by specifying the array name followed by the index of the element that you want to remove. You don't need to specify a value for the remove operation, but you can specify `null` as the value if you want.
+
+                          **Existing target JSON object**
+
+                          ```
+                          {
+                            "preferred_airports": [
+                                "sjc",
+                                "lax",
+                                "sfo",
+                                "oak"
+                              ]
+                          }
+                          ```
+
+                          **Operation**
+
+                          ```
+                          {
+                            "commands": [
+                              {
+                                "type": "com.okta.identity.patch",
+                                "value": [
+                                  {
+                                    "op": "remove",
+                                    "path": "/claims/preferred_airports/1"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                          ```
+
+                          **Updated JSON**
+
+                          ```
+                          {
+                            "preferred_airports": [
+                                "sjc",
+                                "sfo",
+                                "oak"
+                              ]
+                          }
+                          ```
+
+                        </details>
+
+                        <details>
+                        <summary>Remove members from existing JSON objects</summary>
+
+                         Use the `remove` operation to remove members from existing JSON objects. Do this by specifying the JSON object in the path, followed by the claim member that you would like to remove. For example, you have an `employee_profile` claim, and you want to remove `email` from it.
+
+                        **Existing target JSON object**
+
+                        ```
+                        {
+                          "employee_profile": {
+                            "employee_id":"1234",
+                            "name":"Anna",
+                            "email":"anna.v@company.com"
+                            }
+                        }
+                        ```
+
+                        **Operation**
+
+                        ```
+                        {
+                          "commands": [
+                            {
+                              "type": "com.okta.identity.patch",
+                              "value": [
+                                {
+                                  "op": "remove",
+                                  "path": "/claims/employee_profile/email"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                        ```
+
+                        **Updated JSON**
+                        ```
+                        {
+                          "employee_profile": {
+                            "employee_id":"1234",
+                            "name":"Anna",
+                            }
+                        }
+                        ```
+
+                        </details>
+                      type: string
+                    path:
+                      description: Location within the token to apply the operation, specified as a slash-delimited path. When you add, replace, or remove a claim, this path always begins with `/claims/` and is followed by the name of the new claim that you're adding. When you replace a token lifetime, the path should always be `/token/lifetime/expiration`.
+                      type: string
+                    value:
+                      description: Value to set the claim to.
+                      oneOf:
+                        - type: string
+                        - type: integer
+                        - type: object
+        error:
+          description: When an error object is returned, it causes Okta to return an OAuth 2.0 error to the requester of the token. In the error response, the value of `error` is `server_error`, and the value of `error_description` is the string that you supplied in the `errorSummary` property of the `error` object that you returned.
+          type: object
+          properties:
+            errorSummary:
+              description: 'Human-readable summary of the error. If the error object doesn''t include the `errorSummary` property defined, the following common default message is returned to the end user: `The callback service returned an error`.'
+              type: string
+    UserImportRequest:
+      type: object
+      properties:
+        source:
+          description: The ID of the user import inline hook
+          type: string
+        eventType:
+          type: string
+          description: The type of inline hook. The user import inline hook type is `com.okta.import.transform`.
+        data:
+          $ref: '#/components/schemas/UserImportRequestData'
+    UserImportRequestExecute:
+      description: User import inline hook request
+      allOf:
+        - $ref: '#/components/schemas/InlineHookBasePayload'
+        - $ref: '#/components/schemas/UserImportRequest'
+    UserImportRequestData:
+      type: object
+      properties:
+        context:
+          type: object
+          properties:
+            conflicts:
+              description: An array of user profile attributes that are in conflict
+              type: array
+              items:
+                additionalProperties: true
+                type: string
+            application:
+              type: object
+              description: Details of the app from which the user is being imported
+              properties:
+                name:
+                  type: string
+                  description: The app name
+                id:
+                  type: string
+                  description: The app ID
+                label:
+                  type: string
+                  description: The user-defined display name for the app
+                status:
+                  type: string
+                  description: The status of the app
+                  enum:
+                    - ACTIVE
+                    - INACTIVE
+            job:
+              type: object
+              description: The details of the running import job
+              properties:
+                id:
+                  type: string
+                  description: The ID number of the import job
+                type:
+                  type: string
+                  description: The type of import job
+            matches:
+              type: array
+              description: The list of Okta users currently matched to the app user based on import matching. There can be more than one match.
+              items:
+                additionalProperties: true
+                type: string
+            policy:
+              type: array
+              description: The list of any policies that apply to the import matching
+              items:
+                additionalProperties: true
+                type: string
+        action:
+          type: object
+          description: The object that specifies the default action Okta is set to take
+          properties:
+            result:
+              description: |-
+                The current default action that results when Okta imports a user. The two possible values are `CREATE_USER` and `LINK_USER`. You 
+                can change the action that is taken by means of the commands object you return.
+              type: string
+              enum:
+                - CREATE_USER
+                - LINK_USER
+              x-enumDescriptions:
+                CREATE_USER: A new Okta user profile is created for the user
+                LINK_USER: The user is treated as a match for the existing Okta user identified by the value of `data.user.id`
+        appUser:
+          type: object
+          description: The app user profile being imported
+          properties:
+            profile:
+              type: object
+              description: |-
+                Provides the name-value pairs of the attributes contained in the app user profile of the user who is being imported. You can change 
+                the values of attributes in the user's app profile by means of the `commands` object you return. If you change attributes in the app 
+                profile, they then flow through to the Okta user profile, based on matching and mapping rules.
+              additionalProperties:
+                type: string
+        user:
+          type: object
+          description: |-
+            Provides information on the Okta user profile currently set to be used for the user who is being imported, based on the matching 
+            rules and attribute mappings that were applied.
+          properties:
+            profile:
+              description: |-
+                The `data.user.profile` contains the name-value pairs of the attributes in the user profile. If the user has been matched to an existing
+                Okta user, a `data.user.id` object is included, containing the unique identifier of the Okta user profile.
+
+                You can change the values of the attributes by means of the `commands` object you return.
+              type: object
+              additionalProperties:
+                type: string
+    UserImportResponse:
+      type: object
+      properties:
+        commands:
+          description: |-
+            The `commands` object is where you can provide commands to Okta. It is an array that allows you to send multiple commands.
+            Each array element needs to consist of a type-value pair.
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                description: |-
+                  The command types supported for the import inline hook.
+                  When using the `com.okta.action.update` command to specify that the user should be treated as a match, you need to also provide a `com.okta.user.update` command that sets the ID of the Okta user.
+                type: string
+                enum:
+                  - com.okta.appUser.profile.update
+                  - com.okta.user.profile.update
+                  - com.okta.action.update
+                  - com.okta.user.update
+                x-enumDescriptions:
+                  com.okta.appUser.profile.update: Change values of attributes in the user's app user profile
+                  com.okta.user.profile.update: Change values of attributes in the user's Okta user profile
+                  com.okta.action.update: Specify whether to create a new Okta user for the user being imported or treat them as a match of an existing Okta user
+                  com.okta.user.update: Specify the existing Okta user that the imported user should be treated as a match of.
+              value:
+                description: |-
+                  The `value` object is the parameter to pass to the command. In the case of the `com.okta.appUser.profile.update` and `com.okta.user.profile.update` commands, 
+                  the parameter should be a list of one or more profile attributes and the values you wish to set them to. In the case of the `com.okta.action.update` command,
+                  the parameter should be a `result` property set to either `CREATE_USER` or `LINK_USER`.
+                type: object
+                additionalProperties:
+                  type: string
+        error:
+          description: |-
+            An object to return an error. Returning an error causes Okta to record a failure event in the Okta System Log. 
+            The string supplied in the `errorSummary` property is recorded in the System Log event.
+
+            >**Note:** If a response to an import inline hook request is not received from your external service within three seconds, a timeout occurs. In this scenario, the Okta import process continues and the user is created.
+          type: object
+          properties:
+            errorSummary:
+              description: A human-readable summary of the error
+              type: string
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes
+  examples:
+    InlineHookMgmtHTTPexample:
+      summary: An inline hook with HTTP authentication
+      value:
+        id: calb7gacafgwgE7hc5e4
+        status: ACTIVE
+        name: Token hook with HTTP authentication
+        type: com.okta.oauth2.tokens.transform
+        version: 1.0.0
+        channel:
+          type: HTTP
+          version: 1.0.0
+          config:
+            uri: https://example.com/tokenHook
+            headers: []
+            method: POST
+            authScheme:
+              type: header
+              key: authorization
+        created: 2024-08-22T21:01:09.000Z
+        lastUpdated: 2024-09-05T16:06:09.000Z
+        _links:
+          activate:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calb7gacafgwgE7hc5e4/lifecycle/activate
+            hints:
+              allow:
+                - POST
+          self:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calb7gacafgwgE7hc5e4
+          delete:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calb7gacafgwgE7hc5e4
+            hints:
+              allow:
+                - DELETE
+    InlineHookMgmtHTTPexampleDeactivate:
+      value:
+        id: calb7gacafgwgE7hc5e4
+        status: INACTIVE
+        name: Token hook with HTTP authentication
+        type: com.okta.oauth2.tokens.transform
+        version: 1.0.0
+        channel:
+          type: HTTP
+          version: 1.0.0
+          config:
+            uri: https://example.com/tokenHook
+            headers: []
+            method: POST
+            authScheme:
+              type: header
+              key: authorization
+        created: 2024-08-22T21:01:09.000Z
+        lastUpdated: 2024-09-05T16:06:09.000Z
+        _links:
+          activate:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calb7gacafgwgE7hc5e4/lifecycle/activate
+            hints:
+              allow:
+                - POST
+          self:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calb7gacafgwgE7hc5e4
+          delete:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calb7gacafgwgE7hc5e4
+            hints:
+              allow:
+                - DELETE
+    InlineHookMgmtOAuthCSPexample:
+      summary: An inline hook example with OAuth 2.0 Client Secret Post
+      value:
+        id: calj4fythrqj5Bxol5e5
+        status: ACTIVE
+        name: Registration hook with OAuth 2.0 Client Secret Post
+        type: com.okta.user.pre-registration
+        version: 1.0.0
+        channel:
+          type: OAUTH
+          version: 1.0.0
+          config:
+            uri: https://example.com/registrationHook
+            headers: []
+            method: POST
+            authScheme: null
+            clientId: 0oaj43vkrq7wKxZSI5e6
+            tokenUrl: https:/subdomain.okta.com/oauth2/default/v1/token"
+            authType: client_secret_post
+            scope: null
+        created: 2024-08-22T21:01:09.000Z
+        lastUpdated: 2024-09-05T16:06:09.000Z
+        _links:
+          self:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calj4fythrqj5Bxol5e5
+          execute:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calj4fythrqj5Bxol5e5/execute
+            hints:
+              allow:
+                - POST
+          deactivate:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calj4fythrqj5Bxol5e5/lifecycle/activate
+            hints:
+              allow:
+                - POST
+    InlineHookMgmtOauthPKJexample:
+      summary: An inline hook example with OAuth 2.0 Private Key JWT
+      value:
+        id: calj4fythrqj5Bxol4ai6
+        status: ACTIVE
+        name: Token Hook with OAuth 2.0 Private Key JWT
+        type: com.okta.oauth2.tokens.transform
+        version: 1.0.0
+        channel:
+          type: OAUTH
+          version: 1.0.0
+          config:
+            uri: https://example.com/tokenHook
+            headers: []
+            method: POST
+            authScheme: null
+            clientId: 0oaj43vkrq7wKxZSI5d7
+            tokenUrl: https:/subdomain.okta.com/oauth2/default/v1/token"
+            authType: private_key_jwt
+            scope: null
+            hookKeyId: HKYj4ft1a3fjmwZg05d6
+          created: 2024-08-22T21:01:09.000Z
+        lastUpdated: 2024-09-05T16:06:09.000Z
+        _links:
+          self:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calj4fythrqj5Bxol4ai6
+          execute:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calj4fythrqj5Bxol4ai6/execute
+            hints:
+              allow:
+                - POST
+          deactivate:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calj4fythrqj5Bxol4ai6/lifecycle/activate
+            hints:
+              allow:
+                - POST
+    InlineHooktMgmtListAllexample:
+      summary: List all inline hooks response
+      value:
+        - id: calb7gacafgwgE7hc5e4
+          status: ACTIVE
+          name: Token hook with HTTP authentication
+          type: com.okta.oauth2.tokens.transform
+          version: 1.0.0
+          channel:
+            type: HTTP
+            version: 1.0.0
+            config:
+              uri: https://example.com/tokenHook
+              headers: []
+              method: POST
+              authScheme:
+                type: header
+                key: authorization
+          created: 2024-08-22T21:01:09.000Z
+          lastUpdated: 2024-09-05T16:06:09.000Z
+          _links:
+            activate:
+              href: https://subdomain.okta.com/api/v1/inlineHooks/calb7gacafgwgE7hc5e4/lifecycle/activate
+              hints:
+                allow:
+                  - POST
+            self:
+              href: https://subdomain.okta.com/api/v1/inlineHooks/calb7gacafgwgE7hc5e4
+            delete:
+              href: https://subdomain.okta.com/api/v1/inlineHooks/calb7gacafgwgE7hc5e4
+              hints:
+                allow:
+                  - DELETE
+        - id: calj4fythrqj5Bxol5e5
+          status: ACTIVE
+          name: Registration hook with OAuth 2.0 Client Secret Post
+          type: com.okta.user.pre-registration
+          version: 1.0.0
+          channel:
+            type: OAUTH
+            version: 1.0.0
+            config:
+              uri: https://example.com/registrationHook
+              headers: []
+              method: POST
+              authScheme: null
+              clientId: 0oaj43vkrq7wKxZSI5e6
+              tokenUrl: https:/subdomain.okta.com/oauth2/default/v1/token"
+              authType: client_secret_post
+              scope: null
+          created: 2024-08-22T21:01:09.000Z
+          lastUpdated: 2024-09-05T16:06:09.000Z
+          _links:
+            self:
+              href: https://subdomain.okta.com/api/v1/inlineHooks/calj4fythrqj5Bxol5e5
+            execute:
+              href: https://subdomain.okta.com/api/v1/inlineHooks/calj4fythrqj5Bxol5e5/execute
+              hints:
+                allow:
+                  - POST
+            deactivate:
+              href: https://subdomain.okta.com/api/v1/inlineHooks/calj4fythrqj5Bxol5e5/lifecycle/activate
+              hints:
+                allow:
+                  - POST
+        - id: calj4fythrqj5Bxol4ai6
+          status: ACTIVE
+          name: Token Hook with OAuth 2.0 Private Key JWT
+          type: com.okta.oauth2.tokens.transform
+          version: 1.0.0
+          channel:
+            type: OAUTH
+            version: 1.0.0
+            config:
+              uri: https://example.com/tokenHook
+              headers: []
+              method: POST
+              authScheme: null
+              clientId: 0oaj43vkrq7wKxZSI5d7
+              tokenUrl: https:/subdomain.okta.com/oauth2/default/v1/token"
+              authType: private_key_jwt
+              scope: null
+              hookKeyId: HKYj4ft1a3fjmwZg05d6
+            created: 2024-08-22T21:01:09.000Z
+          lastUpdated: 2024-09-05T16:06:09.000Z
+          _links:
+            self:
+              href: https://subdomain.okta.com/api/v1/inlineHooks/calj4fythrqj5Bxol4ai6
+            execute:
+              href: https://subdomain.okta.com/api/v1/inlineHooks/calj4fythrqj5Bxol4ai6/execute
+              hints:
+                allow:
+                  - POST
+            deactivate:
+              href: https://subdomain.okta.com/api/v1/inlineHooks/calj4fythrqj5Bxol4ai6/lifecycle/activate
+              hints:
+                allow:
+                  - POST
+    InlineHookMgmtCreateHTTPRequest:
+      summary: Create an inline hook with HTTP authentication
+      value:
+        name: Token hook with HTTP authentication
+        type: com.okta.oauth2.tokens.transform
+        version: 1.0.0
+        channel:
+          type: HTTP
+          version: 1.0.0
+          config:
+            uri: https://example.com/tokenHook
+            headers:
+              - key: x-any-key
+                value: my-header-value
+            method: POST
+            authScheme:
+              type: HEADER
+              key: Authorization
+              value: my-shared-secret
+    InlineHookMgmtPutHTTPRequest:
+      summary: Update an inline hook name
+      value:
+        name: New name token hook with HTTP authentication
+        version: 1.0.0
+        channel:
+          type: HTTP
+          version: 1.0.0
+          config:
+            uri: https://example.com/tokenHook
+            headers:
+              - key: x-any-key
+                value: my-header-value
+            method: POST
+            authScheme:
+              type: HEADER
+              key: Authorization
+              value: my-shared-secret
+    InlineHookMgmtPutResponse:
+      value:
+        id: calb7gacafgwgE7hc5e4
+        status: ACTIVE
+        name: New name token hook with HTTP authentication
+        type: com.okta.oauth2.tokens.transform
+        version: 1.0.0
+        channel:
+          type: HTTP
+          version: 1.0.0
+          config:
+            uri: https://example.com/tokenHook
+            headers: []
+            method: POST
+            authScheme:
+              type: header
+              key: authorization
+        created: 2024-08-22T21:01:09.000Z
+        lastUpdated: 2024-09-05T16:06:09.000Z
+        _links:
+          activate:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calb7gacafgwgE7hc5e4/lifecycle/activate
+            hints:
+              allow:
+                - POST
+          self:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calb7gacafgwgE7hc5e4
+          delete:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calb7gacafgwgE7hc5e4
+            hints:
+              allow:
+                - DELETE
+        description: Inline hook response with a new name
+    InlineHookMgmtCreateOAuthClientSecretRequest:
+      summary: Create an inline hook with OAuth 2.0 Client Secret
+      value:
+        name: Registration hook with OAuth 2.0 Client Secret Post
+        type: com.okta.oauth2.tokens.transform
+        version: 1.0.0
+        channel:
+          type: OAUTH
+          version: 1.0.0
+          config:
+            authType: client_secret_post
+            clientId: 0oaj43vkrq7wKxZSI5e6
+            clientSecret: b-iATvTu7sIocvhWx95S9kF.....vfZhM6q6khSaojLBejF21cUn5bPm9abi
+            uri: https://example.com/tokenHook
+            headers: []
+            method: POST
+            tokenUrl: https://example.okta.com/oauth2/default/v1/token
+    InlineHookMgmtCreateOAuthPrivateKeyRequest:
+      summary: Create an inline hook with OAuth 2.0 Private Key
+      value:
+        name: Token hook with OAuth 2.0 Private Key authentication
+        type: com.okta.oauth2.tokens.transform
+        version: 1.0.0
+        channel:
+          type: OAUTH
+          version: 1.0.0
+          config:
+            authType: private_key_jwt
+            clientId: 0oaj43vkrq7wKxZSI5e6
+            hookKeyId: HKYj4ft1a3fjmwZg05e6
+            uri: https://example.com/tokenHook
+            headers:
+              - key: x-any-key
+                value: my-header-value
+            method: POST
+            tokenUrl: https://example.okta.com/oauth2/default/v1/token
+    InlineHookMgmtCreateHTTPResponse:
+      summary: Inline hook with HTTP authentication response
+      value:
+        id: calb7gacafgwgE7hc5e4
+        status: ACTIVE
+        name: Token hook with HTTP authentication
+        type: com.okta.oauth2.tokens.transform
+        version: 1.0.0
+        channel:
+          type: HTTP
+          version: 1.0.0
+          config:
+            uri: https://example.com/tokenHook
+            headers: []
+            method: POST
+            authScheme:
+              type: header
+              key: authorization
+        created: 2024-08-22T21:01:09.000Z
+        lastUpdated: 2024-09-05T16:06:09.000Z
+        _links:
+          activate:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calb7gacafgwgE7hc5e4/lifecycle/activate
+            hints:
+              allow:
+                - POST
+          self:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calb7gacafgwgE7hc5e4
+          delete:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calb7gacafgwgE7hc5e4
+            hints:
+              allow:
+                - DELETE
+    InlineHookMgmtCreateOAuthClientSecretResponse:
+      summary: Inline hook with OAuth 2.0 Client Secret response
+      value:
+        id: calj4fythrqj5Bxol5e5
+        status: ACTIVE
+        name: Registration hook with OAuth 2.0 Client Secret Post
+        type: com.okta.user.pre-registration
+        version: 1.0.0
+        channel:
+          type: OAUTH
+          version: 1.0.0
+          config:
+            uri: https://example.com/registrationHook
+            headers: []
+            method: POST
+            authScheme: null
+            clientId: 0oaj43vkrq7wKxZSI5e6
+            tokenUrl: https:/subdomain.okta.com/oauth2/default/v1/token"
+            authType: client_secret_post
+            scope: null
+        created: 2024-08-22T21:01:09.000Z
+        lastUpdated: 2024-09-05T16:06:09.000Z
+        _links:
+          self:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calj4fythrqj5Bxol5e5
+          execute:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calj4fythrqj5Bxol5e5/execute
+            hints:
+              allow:
+                - POST
+          deactivate:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calj4fythrqj5Bxol5e5/lifecycle/activate
+            hints:
+              allow:
+                - POST
+    InlineHookMgmtCreateOAuthPrivateKeyResponse:
+      summary: Inline hook with OAuth 2.0 Private Key response
+      value:
+        id: calj4fythrqj5Bxol4ai6
+        status: ACTIVE
+        name: Token Hook with OAuth 2.0 Private Key JWT
+        type: com.okta.oauth2.tokens.transform
+        version: 1.0.0
+        channel:
+          type: OAUTH
+          version: 1.0.0
+          config:
+            uri: https://example.com/tokenHook
+            headers: []
+            method: POST
+            authScheme: null
+            clientId: 0oaj43vkrq7wKxZSI5d7
+            tokenUrl: https:/subdomain.okta.com/oauth2/default/v1/token"
+            authType: private_key_jwt
+            scope: null
+            hookKeyId: HKYj4ft1a3fjmwZg05d6
+          created: 2024-08-22T21:01:09.000Z
+        lastUpdated: 2024-09-05T16:06:09.000Z
+        _links:
+          self:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calj4fythrqj5Bxol4ai6
+          execute:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calj4fythrqj5Bxol4ai6/execute
+            hints:
+              allow:
+                - POST
+          deactivate:
+            href: https://subdomain.okta.com/api/v1/inlineHooks/calj4fythrqj5Bxol4ai6/lifecycle/activate
+            hints:
+              allow:
+                - POST
+    PasswordImportPayloadExample:
+      summary: An example password import inline hook request body
+      value:
+        eventId: 3o9jBzq1SmOGmmsDsqyyeQ
+        eventTime: '2020-01-17T21:23:56.000Z'
+        eventType: com.okta.user.credential.password.import
+        eventTypeVersion: '1.0'
+        contentType: application/json
+        cloudEventVersion: '0.1'
+        source: https://${yourOktaDomain}/api/v1/inlineHooks/cbl2ad6phv9fsPLcF0g7
+        data:
+          context:
+            request:
+              id: XiIl6wn7005Rr@fjYqeC7CCDBxw
+              method: POST
+              url:
+                value: /idp/idx/challenge/answer
+              ipAddress: 66.124.153.138
+            credential:
+              username: isaac.brock@example.com
+              password: Okta
+          action:
+            credential: UNVERIFIED
+    PasswordImportVerifiedResponse:
+      summary: An example password hook response for a verified user password
+      value:
+        commands:
+          - type: com.okta.action.update
+            value:
+              credential: VERIFIED
+    PasswordImportUnVerifiedResponse:
+      summary: An example password hook response for an unverified user password
+      value:
+        commands:
+          - type: com.okta.action.update
+            value:
+              credential: UNVERIFIED
+    ProfileEnrollmentRequest:
+      summary: An example registration hook profile enrollment (SSR) inline hook request body
+      value:
+        eventId: 04Dmt8BcT_aEgM
+        eventTime: '2022-04-25T17:35:27.000Z'
+        eventType: com.okta.user.pre-registration
+        eventTypeVersion: 1
+        contentType: application/json
+        cloudEventVersion: 0.1
+        source: regt4qeBKU29vSoPz0g3
+        requestType: self.service.registration
+        data:
+          context:
+            request:
+              method: POST
+              ipAddress: 127.0.0.1
+              id: 123testId456
+              url:
+                value: /idp/idx/enroll/new
+          userProfile:
+            firstName: Rosario
+            lastName: Jones
+            login: rosario.jones@example.com
+            email: rosario.jones@example.com
+          action: ALLOW
+    ProgressiveProfileRequest:
+      summary: An example progressive profile inline hook request
+      value:
+        eventId: vzYp_zMwQu2htIWRbNJdfw
+        eventTime: '2022-04-25T04:04:41.000Z'
+        eventType: com.okta.user.pre-registration
+        eventTypeVersion: 1
+        contentType: application/json
+        cloudEventVersion: 0.1
+        source: regt4qeBKU29vS
+        requestType: progressive.profile
+        data:
+          context:
+            request:
+              method: POST
+              ipAddress: 127.0.0.1
+              id: 123dummyId456
+              url:
+                value: /idp/idx/enroll/update
+            user:
+              passwordChanged: 2022-01-01T00:00:00.000Z
+              _links:
+                groups:
+                  href: /api/v1/users/00u48gwcu01WxvNol0g7/groups
+                factors:
+                  href: /api/v1/users/00u48gwcu01WxvNol0g7/factors
+              profile:
+                firstName: Rosario
+                lastName: Jones"
+                timeZone: America/Los_Angeles
+                login: rosario.jones@example.com
+                locale: en_US
+              id: 00u48gwcu01WxvNo
+          action: ALLOW
+          userProfileUpdate:
+            employeeNumber: 1234
+    ProfileEnrollmentResponse:
+      summary: An example registration hook profile enrollment (SSR) inline hook response
+      value:
+        commands:
+          - type: com.action.update
+            value:
+              registration: ALLOW
+    ProgressiveProfileResponse:
+      summary: An example progressive profile inline hook response
+      value:
+        commands:
+          - type: com.okta.user.progressive.profile.update'
+            value: request.body.data.userProfileUpdate['employeeNumber']
+    ProfileEnrollmentResponseDeny:
+      summary: An example profile enrollment (SSR) inline hook deny response
+      value:
+        commands:
+          - type: com.action.update
+            value:
+              registration: DENY
+        error:
+          errorSummary: Incorrect email address. Please contact your admin.
+          errorCauses:
+            - errorSummary: Only example.com emails can register.
+              reason: INVALID_EMAIL_DOMAIN
+              locationType: body
+              location: data.userProfile.email
+              domain: end-user
+    ProgressiveProfileResponseDeny:
+      summary: An example progressive profile inline hook deny response
+      value:
+        commands:
+          - type: com.action.update
+            value:
+              registration: DENY
+        error:
+          errorSummary: Incorrect employee number. Enter an employee number with 4 digits.
+          errorCauses:
+            - errorSummary: Only employee numbers with 4 digits can register.
+              reason: INVALID_EMPLOYEE_NUMBER
+              locationType: body
+              location: data.userProfile.employeeNumber
+              domain: end-user
+    SAMLPayLoadExample:
+      summary: An example SAML assertion inline hook request body
+      value:
+        source: https://${yourOktaDomain}/app/saml20app_1/exkth8lMzFm0HZOTU0g3/sso/saml
+        eventId: XMFoHCM1S4Wi_SGWzL8T9A
+        eventTime: '2019-03-28T19:15:23.000Z'
+        data:
+          context:
+            request:
+              id: reqqXypjzYJRSu2j1G1imUovA
+              method: GET
+              url:
+                value: https://${yourOktaDomain}/app/saml20app_1/exkth8lMzFm0HZOTU0g3/sso/saml
+              ipAddress: 127.0.0.1
+            protocol:
+              type: SAML2.0
+              issuer:
+                id: 0oath92zlO60urQOP0g3
+                name: SAML 2.0 App
+                uri: http://www.okta.com/exkth8lMzFm0HZOTU0g3
+            session:
+              id: 102LN9Bnuc4S_ewfc9BYwageA
+              userId: 00uq8tMo3zV0OfJON0g3
+              login: user@example.com
+              createdAt: '2019-03-28T16:45:55.000Z'
+              expiresAt: '2019-03-28T21:15:23.000Z'
+              status: ACTIVE
+              lastPasswordVerification: '2019-03-28T16:45:55.000Z'
+              amr:
+                - PASSWORD
+              idp:
+                id: 00oq6kcVwvrDY2YsS0g3
+                type: OKTA
+              mfaActive: false
+            user:
+              id: 00uq8tMo3zV0OfJON0g3
+              passwordChanged: '2018-09-11T23:19:12.000Z'
+              profile:
+                login: user@example.com
+                firstName: Admin
+                lastName: Last
+                locale: en
+                timeZone: America/Los_Angeles
+              _links:
+                groups:
+                  href: https://${yourOktaDomain}/00uq8tMo3zV0OfJON0g3/groups
+                factors:
+                  href: https://${yourOktaDomain}/api/v1/users/00uq8tMo3zV0OfJON0g3/factors
+          assertion:
+            subject:
+              nameId: user@example.com
+              nameFormat: urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+              confirmation:
+                method: urn:oasis:names:tc:SAML:2.0:cm:bearer
+                data:
+                  recipient: http://www.example.com:7070/saml/sso
+            authentication:
+              sessionIndex: id1553800523546.312669168
+              authnContext:
+                authnContextClassRef: urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport
+            conditions:
+              audienceRestriction:
+                - urn:example:sp
+            claims:
+              extPatientId:
+                attributes:
+                  NameFormat: urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified
+                attributeValues:
+                  - attributes:
+                      xsi:type: xs:integer
+                    value: '4321'
+              array:
+                attributes:
+                  NameFormat: urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified
+                attributeValues:
+                  - attributes:
+                      xsi:type: xs:string
+                    value: Array 1
+                  - attributes:
+                      xsi:type: xs:string
+                    value: Array2
+                  - attributes:
+                      xsi:type: xs:string
+                    value: Array3
+              middle:
+                attributes:
+                  NameFormat: urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified
+                attributeValues:
+                  - attributes:
+                      xsi:type: xs:string
+                    value: admin
+              firstAndLast:
+                attributes:
+                  NameFormat: urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified
+                attributeValues:
+                  - attributes:
+                      xsi:type: xs:string
+                    value: 7d6a50c8-4d7e-4058-9c5b-2cc98cecd294
+            lifetime:
+              expiration: 300
+        eventTypeVersion: '1.0'
+        cloudEventVersion: '0.1'
+        eventType: com.okta.saml.tokens.transform
+        contentType: application/json
+    SAMLHookResponseExample:
+      summary: An example SAML assertion inline hook response
+      value:
+        commands:
+          - type: com.okta.assertion.patch
+            value:
+              - op: replace
+                path: /claims/array/attributeValues/1/value
+                value: replacementValue
+              - op: replace
+                path: /authentication/authnContext
+                value:
+                  authnContextClassRef: replacementValue
+              - op: add
+                path: /claims/extPatientId
+                value:
+                  attributes:
+                    NameFormat: urn:oasis:names:tc:SAML:2.0:attrname-format:basic
+                  attributeValues:
+                    - attributes:
+                        xsi:type: xs:string
+                      value: '4321'
+              - op: add
+                path: /authentication/sessionLifetime
+                value: 300
+          - type: com.okta.assertion.patch
+            value:
+              - op: replace
+                path: /authentication/sessionIndex
+                value: exampleSession
+    SAMLHookResponseWithURIFormat:
+      summary: An example with `replace` and `add` operations with the URI formatted claim encoded
+      value:
+        commands:
+          - type: com.okta.assertion.patch
+            value:
+              - op: replace
+                path: /claims/http:~1~1schemas.xmlsoap.org~1ws~12005~105~1identity~1claims~1foo/attributeValues/0/value
+                value: replacementValue
+              - op: replace
+                path: /claims/http:~1~1schemas.xmlsoap.org~1ws~12005~105~1identity~1claims~1foo/attributes
+                value:
+                  attributes:
+                    NameFormat: urn:oasis:names:tc:SAML:2.0:attrname-format:basic
+              - op: add
+                path: /claims/http:~1~1schemas.xmlsoap.org~1ws~12005~105~1identity~1claims~1bar
+                value:
+                  attributes:
+                    NameFormat: urn:oasis:names:tc:SAML:2.0:attrname-format:basic
+                  attributeValues:
+                    - attributes:
+                        xsi:type: xs:string
+                      value: bearer
+    TokenPayLoadExample:
+      summary: An example token inline hook request body
+      description: An example token inline hook request body
+      value:
+        source: https://{yourOktaDomain}/oauth2/default/v1/authorize
+        eventId: 3OWo4oo-QQ-rBWfRyTmQYw
+        eventTime: '2019-01-15T23:20:47.000Z'
+        eventTypeVersion: '1.0'
+        cloudEventVersion: '0.1'
+        contentType: application/json
+        eventType: com.okta.oauth2.tokens.transform
+        data:
+          context:
+            request:
+              id: reqv66CbCaCStGEFc8AdfS0ng
+              method: GET
+              url:
+                value: https://{yourOktaDomain}/oauth2/default/v1/authorize?scope=openid+profile+email&response_type=token+id_token&redirect_uri=https%3A%2F%2Fhttpbin.org%2Fget&state=state&nonce=asf&client_id=customClientIdNative
+              ipAddress: 127.0.0.1
+            protocol:
+              type: OAUTH2.0
+              request:
+                scope: openid profile email
+                state: state
+                redirect_uri: https://httpbin.org/get
+                response_mode: fragment
+                response_type: token id_token
+                client_id: customClientIdNative
+              issuer:
+                uri: https://{yourOktaDomain}/oauth2/default
+              client:
+                id: customClientIdNative
+                name: Native client
+                type: PUBLIC
+            session:
+              id: 102Qoe7t5PcRnSxr8j3I8I6pA
+              userId: 00uq8tMo3zV0OfJON0g3
+              login: administrator1@clouditude.net
+              createdAt: '2019-01-15T23:17:09.000Z'
+              expiresAt: '2019-01-16T01:20:46.000Z'
+              status: ACTIVE
+              lastPasswordVerification: '2019-01-15T23:17:09.000Z'
+              amr:
+                - PASSWORD
+              idp:
+                id: 00oq6kcVwvrDY2YsS0g3
+                type: OKTA
+              mfaActive: false
+            user:
+              id: 00uq8tMo3zV0OfJON0g3
+              passwordChanged: '2018-09-11T23:19:12.000Z'
+              profile:
+                login: administrator1@clouditude.net
+                firstName: Add-Min
+                lastName: O'Cloudy Tud
+                locale: en
+                timeZone: America/Los_Angeles
+              _links:
+                groups:
+                  href: https://{yourOktaDomain}/00uq8tMo3zV0OfJON0g3/groups
+                factors:
+                  href: https://{yourOktaDomain}/api/v1/users/00uq8tMo3zV0OfJON0g3/factors
+            policy:
+              id: 00pq8lGaLlI8APuqY0g3
+              rule:
+                id: 0prq8mLKuKAmavOvq0g3
+          identity:
+            claims:
+              sub: 00uq8tMo3zV0OfJON0g3
+              name: Add-Min O'Cloudy Tud
+              email: administrator1@clouditude.net
+              ver: 1
+              iss: https://{yourOktaDomain}/oauth2/default
+              aud: customClientIdNative
+              jti: ID.YxF2whJfB3Eu4ktG_7aClqtCgjDq6ab_hgpiV7-ZZn0
+              amr:
+                - pwd
+              idp: 00oq6kcVwvrDY2YsS0g3
+              nonce: asf
+              preferred_username: administrator1@clouditude.net
+              auth_time: 1547594229
+            token:
+              lifetime:
+                expiration: 3600
+          access:
+            claims:
+              ver: 1
+              jti: AT.W-rrB-z-kkZQmHW0e6VS3Or...QfEN_YvoWJa46A7HAA
+              iss: https://{yourOktaDomain}/oauth2/default
+              aud: api://default
+              cid: customClientIdNative
+              uid: 00uq8tMo3zV0OfJON0g3
+              sub: administrator1@clouditude.net
+              firstName: Add-Min
+              preferred_username: administrator1@clouditude.net
+            token:
+              lifetime:
+                expiration: 3600
+            scopes:
+              openid:
+                id: scpq7bW1cp6dcvrz80g3
+                action: GRANT
+              profile:
+                id: scpq7cWJ81CIP5Qkr0g3
+                action: GRANT
+              email:
+                id: scpq7dxsoz6LQlRj00g3
+                action: GRANT
+          refresh_token:
+            jti: oarob4a0tckCkGcyo1d6
+    TokenHookResponse:
+      summary: An example token inline hook response that adds a claim
+      value:
+        commands:
+          - type: com.okta.identity.patch
+            value:
+              - op: add
+                path: /claims/extPatientId
+                value: '1234'
+          - type: com.okta.access.patch
+            value:
+              - op: add
+                path: /claims/external_guid
+                value: F0384685-F87D-474B-848D-2058AC5655A7
+    TokenHookResponseWithURIFormat:
+      summary: Add new members to existing JSON objects
+      value:
+        commands:
+          - type: com.okta.identity.patch
+            value:
+              - op: add
+                path: /claims/employee_profile/department_id
+                value: '4947'
+    TokenHookResponseAppendArray:
+      summary: Append to array
+      value:
+        commands:
+          - type: com.okta.identity.patch
+            value:
+              - op: add
+                path: /claims/preferred_airports/3
+                value: lax
+    TokenHookReplaceExisting:
+      summary: Replace an existing claim
+      value:
+        commands:
+          - type: com.okta.identity.patch
+            value:
+              - op: replace
+                path: /claims/extPatientId
+                value: '1234'
+              - op: replace
+                path: /claims/external_guid
+                value: F0384685-F87D-474B-848D-2058AC5655A7
+    TokenHookReplaceInPath:
+      summary: Replace within JSON object
+      value:
+        commands:
+          - type: com.okta.identity.patch
+            value:
+              - op: replace
+                path: /claims/employee_profile/email
+                value: anna@company.com
+    TokenHookModifyLifetime:
+      summary: Modify token lifetime
+      value:
+        commands:
+          - type: com.okta.identity.patch
+            value:
+              - op: replace
+                path: /token/lifetime/expiration
+                value: 36000
+          - type: com.okta.access.patch
+            value:
+              - op: replace
+                path: /token/lifetime/expiration
+                value: 36000
+    TokenHookRemoveClaim:
+      summary: Remove claim
+      value:
+        commands:
+          - type: com.okta.identity.patch
+            value:
+              - op: remove
+                path: /claims/birthdate
+                value: null
+          - type: com.okta.access.patch
+            value:
+              - op: remove
+                path: /claims/external_guid
+    TokenHookRemoveFromArray:
+      summary: Remove from array
+      value:
+        commands:
+          - type: com.okta.identity.patch
+            value:
+              - op: remove
+                path: /claims/preferred_airports/1
+    TokenHookRemoveFromObject:
+      summary: Remove from JSON object
+      value:
+        commands:
+          - type: com.okta.identity.patch
+            value:
+              - op: remove
+                path: /claims/employee_profile/email
+    TokenHookErrorExample:
+      summary: Error response
+      value:
+        error:
+          errorSummary: Human-readable summary of the error
+    TelephonyPayloadExample:
+      summary: An example telephony inline hook request body
+      value:
+        eventId: uS5871kJThSsU8qlA1LTcg
+        eventTime: '2020-01-17T21:23:56.000Z'
+        eventType: com.okta.telephony.provider
+        eventTypeVersion: '1.0'
+        contentType: application/json
+        cloudEventVersion: '0.1'
+        source: https://${yourOktaDomain}/api/v1/inlineHooks/cbl2ad6phv9fsPLcF0g7
+        data:
+          context:
+            request:
+              id: reqRgSk8IBBRhuo0YdlEDTmUw
+              method: POST
+              url:
+                value: /api/internal/v1/inlineHooks/com.okta.telephony.provider/generatePreview
+              ipAddress: 127.0.0.1
+          userProfile:
+            firstName: test
+            lastName: user
+            login: test.user@okta.com
+            userId: 00uyxxSknGtK8022w0g3
+          messageProfile:
+            msgTemplate: (HOOK)Your code is 11111
+            phoneNumber: 9876543210
+            otpExpires: 2022-01-28T21:48:34.321Z
+            deliveryChannel: SMS
+            otpCode: 11111
+            locale: EN-US
+    TelephonySuccessResponse:
+      summary: An example telephony hook response for an external web service returning success
+      value:
+        commands:
+          - type: com.okta.telephony.action
+            value:
+              - status: SUCCESSFUL
+                provider: VONAGE
+                transactionId: SM49a8ece2822d44e4adaccd7ed268f954
+                transactionMetadata: Duration=300ms
+    TelephonyFailureResponse:
+      summary: An example telephony hook response for an external web service returning failure
+      value:
+        error:
+          - errorSummary: Failed to deliver SMS OTP to test.user@okta.com
+          - errorCauses:
+              errorSummary: Provider could not deliver OTP
+              reason: The content of the message is not supported
+              location: South Africa
+    InlineHookTelephony:
+      value:
+        channel:
+          type: HTTP
+          version: 1.0.0
+          config:
+            uri: https://your-external-webservice/sendOtp
+            headers: []
+            method: POST
+            authScheme:
+              type: HEADER
+              key: x-telephony-key
+        created: 2024-03-28T17:30:25.000Z
+        id: caldpyulr3nbET2du1d7
+        lastUpdated: 2024-05-07T16:35:18.000Z
+        name: testTelephonyHook
+        status: ACTIVE
+        type: com.okta.telephony.provider
+        version: null
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/inlineHooks/caldpyulr3nbET2du1d7
+          execute:
+            href: https://{yourOktaDomain}/api/v1/inlineHooks/caldpyulr3nbET2du1d7/execute
+            hints:
+              allow":
+                - POST
+          deactivate:
+            href: https://{yourOktaDomain}/api/v1/inlineHooks/caldpyulr3nbET2du1d7/lifecycle/deactivate
+            hints:
+              allow":
+                - POST
+    UserImportPayloadExample:
+      summary: An example user import request body
+      value:
+        source: cal7eyxOsnb20oWbZ0g4
+        eventId: JUGOUiYZTaKPmH6db0nDag
+        eventTime: '2019-02-27T20:59:04.000Z'
+        eventTypeVersion: '1.0'
+        cloudEventVersion: '0.1'
+        eventType: com.okta.import.transform
+        contentType: application/json
+        data:
+          context:
+            conflicts:
+              - login
+            application:
+              name: test_app
+              id: 0oa7ey7aLRuBvcYUD0g4
+              label: Test App
+              status: ACTIVE
+            job:
+              id: ij17ez2AWtMZRfCZ60g4
+              type: import:users
+            matches: []
+            policy:
+              - EMAIL
+              - FIRST_AND_LAST_NAME
+          action:
+            result: CREATE_USER
+          appUser:
+            profile:
+              firstName: Sally2
+              lastName: Admin2
+              mobilePhone: null
+              accountType: PRO
+              secondEmail: null
+              failProvisioning: null
+              failDeprovisioning: null
+              externalId: user221
+              groups:
+                - everyone@examplee.net
+                - tech@example.net
+              userName: administrator2
+              email: sally.admin@example.net
+          user:
+            profile:
+              lastName: Admin2
+              zipCode: null
+              city: null
+              secondEmail: null
+              postAddress: null
+              login: sally.admin@example.net
+              firstName: Sally2
+              primaryPhone: null
+              mobilePhone: null
+              streetAddress: null
+              countryCode: null
+              typeId: null
+              state: null
+              email: sally.admin@example.net
+    UserImportChangeAppUserProfileExample:
+      summary: An example user import inline hook response that updates an app user's profile
+      value:
+        commands:
+          - type: com.okta.appUser.profile.update
+            value:
+              firstName: Stan
+    UserImportChangeUserProfileExample:
+      summary: Update an Okta user's profile response
+      value:
+        commands:
+          - type: com.okta.user.profile.update
+            value:
+              firstName: Stan
+    UserImportCreateANewUserExample:
+      summary: Create a new Okta user profile response
+      value:
+        commands:
+          - type: com.okta.action.update
+            value:
+              result: CREATE_USER
+    UserImportMatchExample:
+      summary: Match an existing Okta user response
+      value:
+        commands:
+          - type: com.okta.action.update
+            value:
+              result: LINK_USER
+          - type: com.okta.user.update
+            value:
+              id: 00garwpuyxHaWOkdV0g3
+    UserImportErrorExample:
+      summary: Return an error object
+      value:
+        error:
+          errorSummary: Error at third-party service. Please contact your admin.

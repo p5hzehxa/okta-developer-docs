@@ -1,0 +1,1026 @@
+openapi: 3.0.3
+info:
+  title: OAuth Clients API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /oauth2/v1/clients/{clientId}/roles:
+    parameters:
+      - $ref: ./oauth.yaml#/components/parameters/pathClientId
+    post:
+      summary: Assign a client role
+      description: |-
+        Assigns a [standard role](/openapi/okta-management/guides/roles/#standard-roles) to a client app.
+
+        You can also assign a custom role to a client app, but the preferred method to assign a custom role to a client is to create a binding between the custom role, the resource set, and the client app. See [Create a role resource set binding](/openapi/okta-management/management/roledresourcesetbinding/createresourcesetbinding).
+
+        > **Notes:**
+        > * The request payload is different for standard and custom role assignments.
+        > * For IAM-based standard role assignments, use the request payload for standard roles. However, the response payload for IAM-based role assignments is similar to the custom role's assignment response.
+      operationId: assignRoleToClient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                - $ref: ./roles.yaml#/components/schemas/CustomRoleAssignmentSchema
+              discriminator:
+                propertyName: type
+                mapping:
+                  API_ACCESS_MANAGEMENT_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  APP_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  GROUP_MEMBERSHIP_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  HELP_DESK_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  ORG_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  READ_ONLY_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  REPORT_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  SUPER_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  USER_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  ACCESS_CERTIFICATIONS_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  ACCESS_REQUESTS_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  WORKFLOWS_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  CUSTOM: ./roles.yaml#/components/schemas/CustomRoleAssignmentSchema
+            examples:
+              Standard role:
+                $ref: '#/components/examples/StandardRoleAssignmentRequest'
+              Custom role assignment:
+                $ref: '#/components/examples/CustomRoleAssignmentRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: ./roles.yaml#/components/schemas/StandardRole
+                  - $ref: ./roles.yaml#/components/schemas/CustomRole
+                discriminator:
+                  propertyName: type
+                  mapping:
+                    API_ACCESS_MANAGEMENT_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    APP_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    GROUP_MEMBERSHIP_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    HELP_DESK_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    ORG_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    READ_ONLY_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    REPORT_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    SUPER_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    USER_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    ACCESS_CERTIFICATIONS_ADMIN: ./roles.yaml#/components/schemas/CustomRole
+                    ACCESS_REQUESTS_ADMIN: ./roles.yaml#/components/schemas/CustomRole
+                    WORKFLOWS_ADMIN: ./roles.yaml#/components/schemas/CustomRole
+                    CUSTOM: ./roles.yaml#/components/schemas/CustomRole
+              examples:
+                Standard role:
+                  $ref: '#/components/examples/StandardRoleResponseClient'
+                Custom role assignment:
+                  $ref: '#/components/examples/CustomRoleResponseClient'
+                IAM-based role assignment:
+                  $ref: '#/components/examples/IAMStandardRolesListResponseClient'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - RoleAssignmentClient
+    get:
+      summary: List all client role assignments
+      description: Lists all roles assigned to a client app identified by `clientId`
+      operationId: listRolesForClient
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: ./roles.yaml#/components/schemas/StandardRole
+                    - $ref: ./roles.yaml#/components/schemas/CustomRole
+                  discriminator:
+                    propertyName: type
+                    mapping:
+                      API_ACCESS_MANAGEMENT_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                      APP_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                      GROUP_MEMBERSHIP_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                      HELP_DESK_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                      ORG_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                      READ_ONLY_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                      REPORT_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                      SUPER_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                      USER_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                      ACCESS_CERTIFICATIONS_ADMIN: ./roles.yaml#/components/schemas/CustomRole
+                      ACCESS_REQUESTS_ADMIN: ./roles.yaml#/components/schemas/CustomRole
+                      WORKFLOWS_ADMIN: ./roles.yaml#/components/schemas/CustomRole
+                      CUSTOM: ./roles.yaml#/components/schemas/CustomRole
+              examples:
+                Standard roles:
+                  $ref: '#/components/examples/StandardRolesListResponseClient'
+                Custom roles:
+                  $ref: '#/components/examples/CustomRolesListResponseClient'
+                IAM-based standard roles:
+                  $ref: '#/components/examples/IAMStandardRolesListResponseClient'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.read
+      tags:
+        - RoleAssignmentClient
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /oauth2/v1/clients/{clientId}/roles/{roleAssignmentId}:
+    parameters:
+      - $ref: ./oauth.yaml#/components/parameters/pathClientId
+      - $ref: ./users.yaml#/components/parameters/pathRoleAssignmentId
+    get:
+      summary: Retrieve a client role
+      description: Retrieves a role assignment (identified by `roleAssignmentId`) for a client app (identified by `clientId`)
+      operationId: retrieveClientRole
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: ./roles.yaml#/components/schemas/StandardRole
+                  - $ref: ./roles.yaml#/components/schemas/CustomRole
+                discriminator:
+                  propertyName: type
+                  mapping:
+                    API_ACCESS_MANAGEMENT_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    APP_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    GROUP_MEMBERSHIP_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    HELP_DESK_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    ORG_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    READ_ONLY_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    REPORT_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    SUPER_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    USER_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    ACCESS_CERTIFICATIONS_ADMIN: ./roles.yaml#/components/schemas/CustomRole
+                    ACCESS_REQUESTS_ADMIN: ./roles.yaml#/components/schemas/CustomRole
+                    WORKFLOWS_ADMIN: ./roles.yaml#/components/schemas/CustomRole
+                    CUSTOM: ./roles.yaml#/components/schemas/CustomRole
+              examples:
+                Standard role:
+                  $ref: '#/components/examples/StandardRoleResponseClient'
+                Custom role assignment:
+                  $ref: '#/components/examples/CustomRoleResponseClient'
+                IAM-based standard role assignment:
+                  $ref: '#/components/examples/IAMStandardRoleResponseClient'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.read
+      tags:
+        - RoleAssignmentClient
+    delete:
+      summary: Unassign a client role
+      description: Unassigns a role assignment (identified by `roleAssignmentId`) from a client app (identified by `clientId`)
+      operationId: deleteRoleFromClient
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - RoleAssignmentClient
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /oauth2/v1/clients/{clientId}/roles/{roleAssignmentId}/targets/catalog/apps:
+    parameters:
+      - $ref: ./oauth.yaml#/components/parameters/pathClientId
+      - $ref: ./users.yaml#/components/parameters/pathRoleAssignmentId
+    get:
+      summary: List all client role app targets
+      description: Lists all OIN app targets for an `APP_ADMIN` role that's assigned to a client (by `clientId`).
+      operationId: listAppTargetRoleToClient
+      parameters:
+        - $ref: ./Common.yaml#/components/parameters/queryAfter
+        - $ref: ./Common.yaml#/components/parameters/queryLimit
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ./roles.yaml#/components/schemas/CatalogApplication
+              examples:
+                ClientRoleTargetExample:
+                  $ref: '#/components/examples/ClientRoleTargetResponseFacebookEx'
+                ClientRoleTargetNonOINExample:
+                  $ref: '#/components/examples/ClientRoleTargetResponseInstanceEx'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.read
+      tags:
+        - RoleBTargetClient
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /oauth2/v1/clients/{clientId}/roles/{roleAssignmentId}/targets/catalog/apps/{appName}:
+    parameters:
+      - $ref: ./oauth.yaml#/components/parameters/pathClientId
+      - $ref: ./users.yaml#/components/parameters/pathRoleAssignmentId
+      - $ref: ./oauth.yaml#/components/parameters/pathAppName
+    put:
+      summary: Assign a client role app target
+      description: |-
+        Assigns an OIN app target for an `APP_ADMIN` role assignment to a client. When you assign an app target from the OIN catalog, you reduce the scope of the role assignment.
+        The role assignment applies to only app instances that are included in the specified OIN app target.
+
+        An assigned OIN app target overrides any existing app instance targets.
+        For example, if a user is assigned to administer a specific Facebook instance, a successful request to add an OIN app target with `facebook` for `appName` makes that user the administrator for all Facebook instances.
+      operationId: assignAppTargetRoleToClient
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - RoleBTargetClient
+    delete:
+      summary: Unassign a client role app target
+      description: |-
+        Unassigns an OIN app target for a role assignment to a client app
+
+        > **Note:** You can't remove the last OIN app target from a role assignment.
+        > If you need a role assignment that applies to all apps, delete the role assignment with the target and create another one. See [Unassign a client role](/openapi/okta-management/management/tags/roleassignmentclient/other/deleterolefromclient).
+      operationId: removeAppTargetRoleFromClient
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - RoleBTargetClient
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /oauth2/v1/clients/{clientId}/roles/{roleAssignmentId}/targets/catalog/apps/{appName}/{appId}:
+    parameters:
+      - $ref: ./oauth.yaml#/components/parameters/pathClientId
+      - $ref: ./users.yaml#/components/parameters/pathRoleAssignmentId
+      - $ref: ./oauth.yaml#/components/parameters/pathAppName
+      - $ref: ./Common.yaml#/components/parameters/pathAppId
+    put:
+      summary: Assign a client role app instance target
+      description: |-
+        Assigns an app instance target to an `APP_ADMIN` role assignment to a client. When you assign the first OIN app or app instance target, you reduce the scope of the role assignment.
+        The role no longer applies to all app targets, but applies only to the specified target.
+
+        > **Note:** You can target a mixture of both OIN app and app instance targets, but you can't assign permissions to manage all instances of an OIN app and then assign a subset of permissions to the same app.
+        For example, you can't specify that an admin has access to manage all instances of the Salesforce app and then also manage only specific configurations of the Salesforce app.
+      operationId: assignAppTargetInstanceRoleForClient
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - RoleBTargetClient
+    delete:
+      summary: Unassign a client role app instance target
+      description: |-
+        Unassigns an app instance target from a role assignment to a client app
+
+        > **Note:** You can't remove the last app instance target from a role assignment.
+        > If you need a role assignment that applies to all the apps, delete the role assignment with the instance target and create another one.  See [Unassign a client role](/openapi/okta-management/management/tags/roleassignmentclient/other/deleterolefromclient).
+      operationId: removeAppTargetInstanceRoleForClient
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - RoleBTargetClient
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /oauth2/v1/clients/{clientId}/roles/{roleAssignmentId}/targets/groups:
+    parameters:
+      - $ref: ./oauth.yaml#/components/parameters/pathClientId
+      - $ref: ./users.yaml#/components/parameters/pathRoleAssignmentId
+    get:
+      summary: List all client role group targets
+      description: Lists all group targets for a [`USER_ADMIN`](/openapi/okta-management/guides/roles/#standard-roles), `HELP_DESK_ADMIN`, or `GROUP_MEMBERSHIP_ADMIN` role assignment to a client. If the role isn't scoped to specific group targets, Okta returns an empty array `[]`.
+      operationId: listGroupTargetRoleForClient
+      parameters:
+        - $ref: ./Common.yaml#/components/parameters/queryAfter
+        - $ref: ./Common.yaml#/components/parameters/queryLimit
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ./groups.yaml#/components/schemas/Group
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.read
+      tags:
+        - RoleBTargetClient
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /oauth2/v1/clients/{clientId}/roles/{roleAssignmentId}/targets/groups/{groupId}:
+    parameters:
+      - $ref: ./oauth.yaml#/components/parameters/pathClientId
+      - $ref: ./users.yaml#/components/parameters/pathRoleAssignmentId
+      - $ref: ./groups.yaml#/components/parameters/pathGroupId
+    put:
+      summary: Assign a client role group target
+      description: Assigns a group target to a [`USER_ADMIN`](/openapi/okta-management/guides/roles/#standard-roles), `HELP_DESK_ADMIN`, or `GROUP_MEMBERSHIP_ADMIN` role assignment to a client app. When you assign the first group target, you reduce the scope of the role assignment. The role no longer applies to all targets, but applies only to the specified target.
+      operationId: assignGroupTargetRoleForClient
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - RoleBTargetClient
+    delete:
+      summary: Unassign a client role group target
+      description: |-
+        Unassigns a Group target from a `USER_ADMIN`, `HELP_DESK_ADMIN`, or `GROUP_MEMBERSHIP_ADMIN` role assignment to a client app.
+
+        > **Note:** You can't remove the last group target from a role assignment. If you need a role assignment that applies to all groups, delete the role assignment with the target and create another one. See [Unassign a client role](/openapi/okta-management/management/tags/roleassignmentclient/other/deleterolefromclient).
+      operationId: removeGroupTargetRoleFromClient
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - RoleBTargetClient
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+components:
+  securitySchemes:
+    apiToken:
+      description: 'Pass the API token as the Authorization header value prefixed with SSWS: `Authorization: SSWS {API Token}`'
+      name: Authorization
+      type: apiKey
+      in: header
+    oauth2:
+      type: oauth2
+      description: 'Pass the access_token as the value of the Authorization header: `Authorization: Bearer {access_token}`'
+      flows:
+        authorizationCode:
+          x-usePkce:
+            disableManualConfiguration: false
+            hideClientSecretInput: true
+          authorizationUrl: /oauth2/v1/authorize
+          tokenUrl: /oauth2/v1/token
+          scopes:
+            okta.roles.read: Allows the app to read administrative role assignments for clients in your Okta org. Delegated admins with this permission can only manage user credential fields and not the credential values themselves.
+            okta.roles.manage: Allows the app to manage administrative role assignments for clients in your Okta org. Delegated admins with this permission can only manage user credential fields and not the credential values themselves.
+  schemas:
+    ApplicationType:
+      description: 'The type of client application. Default value: `web`.'
+      type: string
+      enum:
+        - browser
+        - native
+        - service
+        - web
+    Claim:
+      type: string
+    Client:
+      type: object
+      properties:
+        application_type:
+          $ref: '#/components/schemas/ApplicationType'
+        client_id:
+          type: string
+          description: Unique key for the client application. The `client_id` is immutable. When you create a client Application, you can't specify the `client_id` because Okta uses the application ID for the `client_id`.
+          readOnly: true
+        client_id_issued_at:
+          type: integer
+          readOnly: true
+          description: Time at which the `client_id` was issued (measured in unix seconds)
+        client_name:
+          type: string
+          description: Human-readable string name of the client application
+        client_secret:
+          type: string
+          readOnly: true
+          description: OAuth 2.0 client secret string (used for confidential clients). The `client_secret` is shown only on the response of the creation or update of a client Application (and only if the `token_endpoint_auth_method` is one that requires a client secret). You can't specify the `client_secret`. If the `token_endpoint_auth_method` requires one, Okta generates a random `client_secret` for the client Application.
+          nullable: true
+        client_secret_expires_at:
+          type: integer
+          readOnly: true
+          description: Time at which the `client_secret` expires or 0 if it doesn't expire (measured in unix seconds)
+          minimum: 0
+          nullable: true
+        grant_types:
+          type: array
+          description: 'Array of OAuth 2.0 grant type strings. Default value: `[authorization_code]`'
+          items:
+            $ref: '#/components/schemas/GrantType'
+        initiate_login_uri:
+          type: string
+          description: URL that a third party can use to initiate a login by the client
+        jwks_uri:
+          type: string
+          description: URL string that references a [JSON Web Key Set](https://tools.ietf.org/html/rfc7517#section-5) for validating JWTs presented to Okta
+        logo_uri:
+          type: string
+          description: URL string that references a logo for the client consent dialog (not the sign-in dialog)
+          nullable: true
+        policy_uri:
+          type: string
+          description: URL string of a web page providing the client's policy document
+          nullable: true
+        post_logout_redirect_uris:
+          type: string
+          description: Array of redirection URI strings for use for relying party initiated logouts
+          items:
+            type: string
+        redirect_uris:
+          type: array
+          description: 'Array of redirection URI strings for use in redirect-based flows. All redirect URIs must be absolute URIs and must not include a fragment component. At least one redirect URI and response type is required for all client types, with the following exceptions: If the client uses the Resource Owner Password flow (if `grant_type` contains the value password) or the Client Credentials flow (if `grant_type` contains the value `client_credentials`), then no redirect URI or response type is necessary. In these cases, you can pass either null or an empty array for these attributes.'
+          items:
+            type: string
+        request_object_signing_alg:
+          type: array
+          description: The type of [JSON Web Key Set](https://tools.ietf.org/html/rfc7517#section-5) algorithm that must be used for signing request objects
+          items:
+            $ref: '#/components/schemas/SigningAlgorithm'
+        response_types:
+          type: array
+          description: 'Array of OAuth 2.0 response type strings. Default value: `[code]`'
+          items:
+            $ref: '#/components/schemas/ResponseType'
+        token_endpoint_auth_method:
+          $ref: '#/components/schemas/EndpointAuthMethod'
+        tos_uri:
+          type: string
+          description: URL string of a web page providing the client's terms of service document
+          nullable: true
+        frontchannel_logout_uri:
+          type: string
+          description: URL where Okta sends the logout request
+          nullable: true
+        frontchannel_logout_session_required:
+          type: boolean
+          description: Include user session details
+    CodeChallengeMethod:
+      type: string
+      enum:
+        - S256
+    EndpointAuthMethod:
+      description: Requested authentication method for OAuth 2.0 endpoints.
+      type: string
+      enum:
+        - client_secret_basic
+        - client_secret_jwt
+        - client_secret_post
+        - none
+        - private_key_jwt
+    GrantType:
+      description: Determines the mechanism Okta uses to authorize the creation of the tokens.
+      type: string
+      enum:
+        - authorization_code
+        - client_credentials
+        - implicit
+        - interaction_code
+        - password
+        - refresh_token
+        - urn:ietf:params:oauth:grant-type:device_code
+        - urn:ietf:params:oauth:grant-type:jwt-bearer
+        - urn:ietf:params:oauth:grant-type:saml2-bearer
+        - urn:ietf:params:oauth:grant-type:token-exchange
+        - urn:openid:params:grant-type:ciba
+      x-okta-feature-flag-amends:
+        DIRECT_AUTH:
+          enum:
+            - urn:okta:params:oauth:grant-type:otp
+            - urn:okta:params:oauth:grant-type:oob
+            - http://auth0.com/oauth/grant-type/mfa-otp
+            - http://auth0.com/oauth/grant-type/mfa-oob
+    ChallengeType:
+      type: string
+      enum:
+        - http://auth0.com/oauth/grant-type/mfa-otp
+        - http://auth0.com/oauth/grant-type/mfa-oob
+    Channel:
+      type: string
+      description: The out-of-band channel for use with authentication. Required for all `/oob-authenticate` requests and any `/challenge` request with an out-of-band authenticator.
+      enum:
+        - push
+        - sms
+        - voice
+    BindingMethod:
+      type: string
+      description: The method used to bind the out-of-band channel with the primary channel.
+      enum:
+        - none
+        - transfer
+        - prompt
+    OAuthMetadata:
+      type: object
+      properties:
+        authorization_endpoint:
+          type: string
+          description: URL of the authorization server's authorization endpoint.
+        backchannel_authentication_request_signing_alg_values_supported:
+          description: A list of signing algorithms that this authorization server supports for signed requests.
+          type: array
+          items:
+            $ref: '#/components/schemas/SigningAlgorithm'
+          x-okta-lifecycle:
+            features:
+              - OAUTH2_CIBA
+              - IDENTITY_ENGINE
+        backchannel_token_delivery_modes_supported:
+          description: The delivery modes that this authorization server supports for Client-Initiated Backchannel Authentication.
+          type: array
+          items:
+            $ref: '#/components/schemas/TokenDeliveryMode'
+          x-okta-lifecycle:
+            features:
+              - OAUTH2_CIBA
+              - IDENTITY_ENGINE
+        claims_supported:
+          description: A list of the claims supported by this authorization server.
+          type: array
+          items:
+            $ref: '#/components/schemas/Claim'
+        code_challenge_methods_supported:
+          description: A list of PKCE code challenge methods supported by this authorization server.
+          type: array
+          items:
+            $ref: '#/components/schemas/CodeChallengeMethod'
+        device_authorization_endpoint:
+          type: string
+        dpop_signing_alg_values_supported:
+          description: A list of signing algorithms supported by this authorization server for Demonstrating Proof-of-Possession (DPoP) JWTs.
+          type: array
+          items:
+            type: string
+            enum:
+              - ES256
+              - ES384
+              - ES512
+              - RS256
+              - RS384
+              - RS512
+          x-okta-lifecycle:
+            features:
+              - OAUTH2_DPOP
+        end_session_endpoint:
+          description: URL of the authorization server's logout endpoint.
+          type: string
+        grant_types_supported:
+          description: A list of the grant type values that this authorization server supports.
+          type: array
+          items:
+            $ref: '#/components/schemas/GrantType'
+        introspection_endpoint:
+          description: URL of the authorization server's introspection endpoint.
+          type: string
+        introspection_endpoint_auth_methods_supported:
+          description: A list of client authentication methods supported by this introspection endpoint.
+          type: array
+          items:
+            $ref: '#/components/schemas/EndpointAuthMethod'
+        issuer:
+          type: string
+          description: The authorization server's issuer identifier. In the context of this document, this is your authorization server's base URL. This becomes the `iss` claim in an access token.
+        jwks_uri:
+          description: URL of the authorization server's JSON Web Key Set document.
+          type: string
+        pushed_authorization_request_endpoint:
+          type: string
+        registration_endpoint:
+          description: URL of the authorization server's JSON Web Key Set document.
+          type: string
+        request_object_signing_alg_values_supported:
+          description: A list of signing algorithms that this authorization server supports for signed requests.
+          type: array
+          items:
+            $ref: '#/components/schemas/SigningAlgorithm'
+        request_parameter_supported:
+          description: Indicates if Request Parameters are supported by this authorization server.
+          type: boolean
+        response_modes_supported:
+          description: A list of the `response_mode` values that this authorization server supports. More information here.
+          type: array
+          items:
+            $ref: '#/components/schemas/ResponseMode'
+        response_types_supported:
+          description: A list of the `response_type` values that this authorization server supports. Can be a combination of `code`, `token`, and `id_token`.
+          type: array
+          items:
+            $ref: '#/components/schemas/ResponseTypesSupported'
+        revocation_endpoint:
+          description: URL of the authorization server's revocation endpoint.
+          type: string
+        revocation_endpoint_auth_methods_supported:
+          description: A list of client authentication methods supported by this revocation endpoint.
+          type: array
+          items:
+            $ref: '#/components/schemas/EndpointAuthMethod'
+        scopes_supported:
+          description: A list of the scope values that this authorization server supports.
+          type: array
+          items:
+            $ref: '#/components/schemas/Scope'
+        subject_types_supported:
+          description: A list of the Subject Identifier types that this authorization server supports. Valid types include `pairwise` and `public`, but only `public` is currently supported. See the [Subject Identifier Types](https://openid.net/specs/openid-connect-core-1_0.html#SubjectIDTypes) section in the OpenID Connect specification.
+          type: array
+          items:
+            $ref: '#/components/schemas/SubjectType'
+        token_endpoint:
+          description: URL of the authorization server's token endpoint.
+          type: string
+        token_endpoint_auth_methods_supported:
+          description: A list of client authentication methods supported by this token endpoint.
+          type: array
+          items:
+            $ref: '#/components/schemas/EndpointAuthMethod'
+    ResponseMode:
+      type: string
+      enum:
+        - form_post
+        - fragment
+        - okta_post_message
+        - query
+      x-enumDescriptions:
+        fragment: Parameters are encoded in the URL fragment added to the `redirect_uri` when redirecting back to the client.
+        query: Parameters are encoded in the query string added to the `redirect_uri` when redirecting back to the client.
+        form_post: Parameters are encoded as HTML form values (`application/x-www-form-urlencoded` format) and are transmitted through the HTTP POST method to the client.
+        okta_post_message: |-
+          Uses [HTML5 Web Messaging](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) (for example, `window.postMessage()`) instead of the redirect for the authorization response from the `/authorize` endpoint.
+
+          `okta_post_message` is an adaptation of the [Web Message Response Mode](https://tools.ietf.org/html/draft-sakimura-oauth-wmrm-00#section-4.1).
+          This value provides a secure way for a single-page application to perform a sign-in flow in a pop-up window or an iFrame and receive the ID token, access token, and/or authorization code back in the parent page without leaving the context of that page. The data object for the `postMessage` call is in the next section.
+    ResponseType:
+      type: string
+      enum:
+        - code
+        - id_token
+        - token
+        - none
+    ResponseTypesSupported:
+      type: string
+      enum:
+        - code
+        - code id_token
+        - code id_token token
+        - code token
+        - id_token
+        - id_token token
+        - token
+    Scope:
+      type: string
+    SigningAlgorithm:
+      type: string
+      enum:
+        - ES256
+        - ES384
+        - ES512
+        - HS256
+        - HS384
+        - HS512
+        - RS256
+        - RS384
+        - RS512
+    subject:
+      type: object
+      nullable: false
+      properties:
+        format:
+          type: string
+          description: The user identifier
+          nullable: false
+          writeOnly: true
+          enum:
+            - opaque
+        id:
+          type: string
+          description: ID of the user
+          writeOnly: true
+          nullable: false
+    SubjectType:
+      type: string
+      enum:
+        - pairwise
+        - public
+    TokenDeliveryMode:
+      type: string
+      enum:
+        - poll
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: An access token.
+        device_secret:
+          type: string
+          description: An opaque device secret. This is returned if the `device_sso` scope is granted.
+        expires_in:
+          type: integer
+          description: The expiration time of the access token in seconds.
+        id_token:
+          type: string
+          description: An ID token. This is returned if the `openid` scope is granted.
+        issued_token_type:
+          $ref: '#/components/schemas/TokenType'
+        refresh_token:
+          type: string
+          description: An opaque refresh token. This is returned if the `offline_access` scope is granted.
+        scope:
+          type: string
+          description: The scopes contained in the access token.
+        token_type:
+          $ref: '#/components/schemas/TokenResponseTokenType'
+    TokenResponseTokenType:
+      description: The token type in a `/token` response. The value is generally `Bearer` except for a few instances of token exchange.
+      type: string
+      enum:
+        - Bearer
+        - N_A
+    TokenType:
+      description: The type of token for token exchange. `urn:okta:params:oauth:token-type:interclient_token` is EA.
+      type: string
+      enum:
+        - urn:ietf:params:oauth:token-type:access_token
+        - urn:ietf:params:oauth:token-type:id_token
+        - urn:ietf:params:oauth:token-type:jwt
+        - urn:ietf:params:oauth:token-type:refresh_token
+        - urn:ietf:params:oauth:token-type:saml1
+        - urn:ietf:params:oauth:token-type:saml2
+        - urn:okta:oauth:token-type:web_sso_token
+        - urn:okta:params:oauth:token-type:interclient_token
+        - urn:x-oath:params:oauth:token-type:device-secret
+  parameters:
+    pathClientId:
+      name: clientId
+      description: '`client_id` of the app'
+      in: path
+      required: true
+      schema:
+        type: string
+        example: 52Uy4BUWVBOjFItcg2jWsmnd83Ad8dD
+    pathAppName:
+      name: appName
+      description: Name of the app definition (the OIN catalog app key name)
+      in: path
+      required: true
+      schema:
+        type: string
+        example: google
+  examples:
+    StandardRoleAssignmentRequest:
+      value:
+        type: HELP_DESK_ADMIN
+    CustomRoleAssignmentRequest:
+      value:
+        type: CUSTOM
+        role: cr04cxy6yzSCtNciD0g7
+        resource-set: iam4cxy6z7hhaZCSk0g7
+    StandardRoleResponseClient:
+      value:
+        id: JBCUYUC7IRCVGS27IFCE2SKO
+        label: Help Desk Administrator
+        type: HELP_DESK_ADMIN
+        status: ACTIVE
+        created: 2023-05-01T14:24:54.000Z
+        lastUpdated: 2023-05-01T14:24:54.000Z
+        assignmentType: CLIENT
+        _links:
+          assignee:
+            href: https://{yourOktaDomain}/oauth2/v1/clients/0jrabyQWm4B9zVJPbotY/roles
+    IAMStandardRoleResponseClient:
+      value:
+        id: irb4jlodtdN4yJ88b0g7
+        role: ACCESS_REQUESTS_ADMIN
+        label: Access Requests Administrator
+        type: ACCESS_REQUESTS_ADMIN
+        status: ACTIVE
+        created: 2023-07-06T21:52:48.000Z
+        lastUpdated: 2023-07-06T21:52:48.000Z
+        assignmentType: CLIENT
+        resource-set: ACCESS_CERTIFICATIONS_IAM_POLICY
+        _links:
+          assignee:
+            href: https://{yourOktaDomain}/api/v1/client/0oa5vymVNCe2cPEeZ0g4
+          resource-set:
+            href: https://{yourOktaDomain}/api/v1/iam/resource-sets/ACCESS_CERTIFICATIONS_IAM_POLICY
+          role:
+            href: https://{yourOktaDomain}/api/v1/iam/roles/ACCESS_REQUESTS_ADMIN
+          permissions:
+            href: https://{yourOktaDomain}/api/v1/iam/roles/ACCESS_REQUESTS_ADMIN/permissions
+          member:
+            href: https://{yourOktaDomain}/api/v1/iam/resource-sets/ACCESS_CERTIFICATIONS_IAM_POLICY/bindings/ACCESS_REQUESTS_ADMIN/members/irb4jlomnnDBuBDyJ0g7
+    CustomRoleResponseClient:
+      value:
+        id: irb4ey26fpFI3vQ8y0g7
+        label: view_minimal
+        type: CUSTOM
+        status: ACTIVE
+        created: 2023-05-01T15:16:47.000Z
+        lastUpdated: 2023-05-01T15:16:47.000Z
+        assignmentType: CLIENT
+        resource-set: iam4cxy6z7hhaZCSk0g7
+        role: cr04cxy6yzSCtNciD0g7
+        _links:
+          role:
+            href: https://{yourOktaDomain}/api/v1/iam/roles/cr04cxy6yzSCtNciD0g7
+          resource-set:
+            href: https://{yourOktaDomain}/api/v1/iam/resource-sets/iam4cxy6z7hhaZCSk0g7
+          permissions:
+            href: https://{yourOktaDomain}/api/v1/iam/roles/cr04cxy6yzSCtNciD0g7/permissions
+          member:
+            href: https://{yourOktaDomain}/api/v1/iam/resource-sets/iam4cxy6z7hhaZCSk0g7/bindings/cr04cxy6yzSCtNciD0g7/members/irb4ey26fpFI3vQ8y0g7
+          assignee:
+            href: https://{yourOktaDomain}/oauth2/v1/clients/0oa4ee9vgbIuqTUvd0g7
+    CustomRolesListResponseClient:
+      value:
+        - id: irb4ey26fpFI3vQ8y0g7
+          label: view_minimal
+          type: CUSTOM
+          status: ACTIVE
+          created: 2023-05-01T15:16:47.000Z
+          lastUpdated: 2023-05-01T15:16:47.000Z
+          assignmentType: CLIENT
+          resource-set: iam4cxy6z7hhaZCSk0g7
+          role: cr04cxy6yzSCtNciD0g7
+          _links:
+            role:
+              href: https://{yourOktaDomain}/api/v1/iam/roles/cr04cxy6yzSCtNciD0g7
+            resource-set:
+              href: https://{yourOktaDomain}/api/v1/iam/resource-sets/iam4cxy6z7hhaZCSk0g7
+            permissions:
+              href: https://{yourOktaDomain}/api/v1/iam/roles/cr04cxy6yzSCtNciD0g7/permissions
+            member:
+              href: https://{yourOktaDomain}/api/v1/iam/resource-sets/iam4cxy6z7hhaZCSk0g7/bindings/cr04cxy6yzSCtNciD0g7/members/irb4ey26fpFI3vQ8y0g7
+            assignee:
+              href: https://{yourOktaDomain}/oauth2/v1/clients/0oa4ee9vgbIuqTUvd0g7
+    StandardRolesListResponseClient:
+      value:
+        - id: JBCUYUC7IRCVGS27IFCE2SKO
+          label: Help Desk Administrator
+          type: HELP_DESK_ADMIN
+          status: ACTIVE
+          created: 2023-05-01T14:24:54.000Z
+          lastUpdated: 2023-05-01T14:24:54.000Z
+          assignmentType: CLIENT
+          _links:
+            assignee:
+              href: https://{yourOktaDomain}/oauth2/v1/clients/0jrabyQWm4B9zVJPbotY/roles
+    IAMStandardRolesListResponseClient:
+      value:
+        - id: irb5e92YgBazyyQ3x1q5
+          role: ACCESS_CERTIFICATIONS_ADMIN
+          label: Access Certifications Administrator
+          type: ACCESS_CERTIFICATIONS_ADMIN
+          status: ACTIVE
+          created: 2019-02-06T16:20:57.000Z
+          lastUpdated: 2019-02-06T16:20:57.000Z
+          assignmentType: CLIENT
+          resource-set: ACCESS_CERTIFICATIONS_IAM_POLICY
+          _links:
+            assignee:
+              href: https://{yourOktaDomain}/api/v1/clients/0oa4ee9vgbIuqTUvd0g7
+            resource-set:
+              href: https://{yourOktaDomain}/api/v1/iam/resource-sets/ACCESS_CERTIFICATIONS_IAM_POLICY
+            member:
+              href: https://{yourOktaDomain}/api/v1/iam/resource-sets/ACCESS_CERTIFICATIONS_IAM_POLICY/bindings/ACCESS_CERTIFICATIONS_ADMIN/members/irb1qe6PGuMc7Oh8N0g4
+            role:
+              href: https://{yourOktaDomain}/api/v1/iam/roles/ACCESS_CERTIFICATIONS_ADMIN
+            permissions:
+              href: https://{yourOktaDomain}/api/v1/iam/permission-sets/OKTA_IAM_TEST_DELIVERED_ROLE/permissionsZ
+    ClientRoleTargetResponseFacebookEx:
+      summary: Facebook target app example
+      value:
+        - name: facebook
+          displayName: Facebook
+          description: Giving people the power to share and make the world more open and connected.
+          status: ACTIVE
+          lastUpdated: '2021-03-18T17:37:56.000Z'
+          category: SOCIAL
+          verificationStatus: OKTA_VERIFIED
+          website: https://www.facebook.com/
+          signOnModes:
+            - BROWSER_PLUGIN
+          _links:
+            logo:
+              - name: medium
+                href: https://{oktaCDNDomain}/fs/bcg/4/abcdefghijABCC4V1234
+            self:
+              href: https://{yourOktaDomain}/api/v1/catalog/apps/facebook
+    ClientRoleTargetResponseInstanceEx:
+      summary: Non-catalog target app example
+      value:
+        - name: My_access_app
+          status: ACTIVE
+          id: 0oasrudLtMlzAsTxk0g3
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/apps/0oasrudLtMlzAsTxk0g3

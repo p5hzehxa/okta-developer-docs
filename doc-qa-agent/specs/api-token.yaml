@@ -1,0 +1,314 @@
+openapi: 3.0.3
+info:
+  title: API Tokens API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../../base.yaml#/tags
+paths:
+  /api/v1/api-tokens:
+    get:
+      summary: List all API token metadata
+      description: Lists all the metadata of the active API tokens
+      operationId: listApiTokens
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApiToken'
+              examples:
+                List Tokens:
+                  $ref: '#/components/examples/ApiTokenListMetadataResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.apiTokens.read
+      tags:
+        - ApiToken
+    x-okta-team-detail:
+      x-team-slack: amp-eng-outbound-fed
+  /api/v1/api-tokens/current:
+    delete:
+      summary: Revoke the current API token
+      description: Revokes the API token provided in the Authorization header
+      operationId: revokeCurrentApiToken
+      responses:
+        '204':
+          description: No Content
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+      tags:
+        - ApiToken
+  /api/v1/api-tokens/{apiTokenId}:
+    parameters:
+      - $ref: '#/components/parameters/pathApiTokenId'
+    get:
+      summary: Retrieve an API token's metadata
+      description: Retrieves the metadata for an active API token by `apiTokenId`
+      operationId: getApiToken
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiToken'
+              examples:
+                HCaptcha:
+                  $ref: '#/components/examples/ApiTokenMetadataResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.apiTokens.read
+      tags:
+        - ApiToken
+    put:
+      summary: Upsert an API token network condition
+      description: Upserts an API Token Network Condition by `apiTokenId`
+      operationId: upsertApiToken
+      requestBody:
+        content:
+          application/json:
+            example:
+              name: api_token_name
+              clientName: client_name
+              userId: 00uabcdefg1234567890
+              network:
+                connection: ANYWHERE
+              created: 2021-11-09T20:38:10.000Z
+            schema:
+              $ref: '#/components/schemas/ApiTokenUpdate'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiToken'
+              examples:
+                HCaptcha:
+                  $ref: '#/components/examples/ApiTokenMetadataResponse'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.apiTokens.manage
+      tags:
+        - ApiToken
+    delete:
+      summary: Revoke an API token
+      description: Revokes an API token by `apiTokenId`
+      operationId: revokeApiToken
+      responses:
+        '204':
+          description: No Content
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.apiTokens.manage
+      tags:
+        - ApiToken
+    x-okta-team-detail:
+      x-team-slack: amp-eng-outbound-fed
+components:
+  examples:
+    ApiTokenListMetadataResponse:
+      value:
+        - name: My API Token
+          userId: 00uabcdefg1234567890
+          tokenWindow: P30D
+          network:
+            connection: ANYWHERE
+          id: 00Tabcdefg1234567890
+          clientName: Okta API
+          expiresAt: 2021-12-11T20:38:10.000Z
+          created: 2021-11-09T20:38:10.000Z
+          lastUpdated: 2021-11-11T20:38:10.000Z
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/api-tokens/00Tabcdefg1234567890
+              hints:
+                allow:
+                  - GET
+                  - DELETE
+            user:
+              href: https://{yourOktaDomain}/api/v1/users/00uabcdefg1234567890
+              hints:
+                allow:
+                  - GET
+        - name: Another API Token
+          userId: 00uabcdefg1234567890
+          tokenWindow: PT5M
+          id: 00T1234567890abcdefg
+          clientName: Okta API
+          expiresAt: 2021-11-11T20:43:10.000Z
+          created: 2021-11-09T20:38:10.000Z
+          lastUpdated: 2021-11-11T20:38:10.000Z
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/api-tokens/00T1234567890abcdefg
+              hints:
+                allow:
+                  - GET
+                  - DELETE
+            user:
+              href: https://{yourOktaDomain}/api/v1/users/00uabcdefg1234567890
+              hints:
+                allow:
+                  - GET
+    ApiTokenMetadataResponse:
+      value:
+        name: My API Token
+        userId: 00uXXXXXXXXXXXXXXXXX
+        tokenWindow: P30D
+        network:
+          connection: ANYWHERE
+        id: 00Tabcdefg1234567890
+        clientName: Okta API
+        expiresAt: 2021-12-11T20:38:10.000Z
+        created: 2021-11-09T20:38:10.000Z
+        lastUpdated: 2021-11-11T20:38:10.000Z
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/api-tokens/00Tabcdefg1234567890
+            hints:
+              allow:
+                - GET
+                - DELETE
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00uXXXXXXXXXXXXXXXXX
+            hints:
+              allow:
+                - GET
+  parameters:
+    pathApiTokenId:
+      name: apiTokenId
+      in: path
+      schema:
+        type: string
+        example: 00Tabcdefg1234567890
+      required: true
+      description: id of the API Token
+  schemas:
+    ApiToken:
+      title: API Token
+      description: An API token for an Okta User. This token is NOT scoped any further and can be used for any API the user has permissions to call.
+      type: object
+      properties:
+        clientName:
+          type: string
+          readOnly: true
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        expiresAt:
+          type: string
+          format: date-time
+          readOnly: true
+        id:
+          type: string
+          readOnly: true
+        lastUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+        network:
+          type: object
+          description: The Network Condition of the API Token
+          properties:
+            connection:
+              type: string
+              description: The connection type of the Network Condition
+            include:
+              type: array
+              description: List of included IP network zones
+              items:
+                type: string
+            exclude:
+              type: array
+              description: List of excluded IP network zones
+              items:
+                type: string
+        name:
+          type: string
+        tokenWindow:
+          $ref: ../Common.yaml#/components/schemas/TimeDuration
+        userId:
+          type: string
+        _link:
+          $ref: ../Common.yaml#/components/schemas/LinksSelf
+      required:
+        - name
+    ApiTokenUpdate:
+      title: API Token Update
+      description: An API Token Update Object for an Okta user. This token is NOT scoped any further and can be used for any API that the user has permissions to call.
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name associated with the API Token
+        clientName:
+          type: string
+          description: The client name associated with the API Token
+          readOnly: true
+        userId:
+          type: string
+          description: The userId of the user who created the API Token
+        network:
+          type: object
+          description: The Network Condition of the API Token
+          properties:
+            connection:
+              type: string
+              description: The connection type of the Network Condition
+            include:
+              type: array
+              description: List of included IP network zones
+              items:
+                type: string
+            exclude:
+              type: array
+              description: List of excluded IP network zones
+              items:
+                type: string
+        created:
+          type: string
+          description: The creation date of the API Token
+          format: date-time
+          readOnly: true
+  securitySchemes:
+    $ref: ../../base.yaml#/components/securitySchemes

@@ -1,0 +1,760 @@
+openapi: 3.0.3
+info:
+  title: Directory Agent Pools API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/agentPools:
+    get:
+      summary: List all agent pools
+      description: Lists all agent pools with pagination support
+      operationId: listAgentPools
+      parameters:
+        - $ref: '#/components/parameters/queryLimitPerPoolType'
+        - $ref: '#/components/parameters/queryPoolType'
+        - $ref: ./Common.yaml#/components/parameters/queryAfter
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AgentPool'
+              examples:
+                ListAllAgentPoolsResponse:
+                  $ref: '#/components/examples/ListAllAgentPoolsResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.agentPools.read
+      tags:
+        - AgentPools
+    x-okta-team-detail:
+      x-team-slack: eng-ace
+  /api/v1/agentPools/{poolId}/updates:
+    parameters:
+      - $ref: '#/components/parameters/pathPoolId'
+    get:
+      summary: List all agent pool updates
+      description: Lists all agent pool updates
+      operationId: listAgentPoolsUpdates
+      parameters:
+        - $ref: '#/components/parameters/queryScheduled'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AgentPoolUpdate'
+              examples:
+                ListAllAgentPoolUpdatesResponse:
+                  $ref: '#/components/examples/ListAllAgentPoolUpdatesResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.agentPools.read
+      tags:
+        - AgentPools
+    post:
+      summary: Create an agent pool update
+      description: Creates an agent pool update
+      operationId: createAgentPoolsUpdate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentPoolUpdate'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentPoolUpdate'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.agentPools.manage
+      tags:
+        - AgentPools
+    x-okta-team-detail:
+      x-team-slack: eng-auto-update
+  /api/v1/agentPools/{poolId}/updates/settings:
+    parameters:
+      - $ref: '#/components/parameters/pathPoolId'
+    get:
+      summary: Retrieve an agent pool update's settings
+      description: Retrieves the current state of the agent pool update instance settings
+      operationId: getAgentPoolsUpdateSettings
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentPoolUpdateSettingResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.agentPools.read
+      tags:
+        - AgentPools
+    post:
+      summary: Update an agent pool update settings
+      description: Updates an agent pool update instance settings
+      operationId: updateAgentPoolsUpdateSettings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentPoolUpdateSettingRequest'
+        required: true
+      responses:
+        '201':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentPoolUpdateSettingResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.agentPools.manage
+      tags:
+        - AgentPools
+    x-okta-team-detail:
+      x-team-slack: eng-auto-update
+  /api/v1/agentPools/{poolId}/updates/{updateId}:
+    parameters:
+      - $ref: '#/components/parameters/pathPoolId'
+      - $ref: '#/components/parameters/pathUpdateId'
+    get:
+      summary: Retrieve an agent pool update by ID
+      description: Retrieves an agent pool update by its `updateId`
+      operationId: getAgentPoolsUpdateInstance
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentPoolUpdate'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.agentPools.read
+      tags:
+        - AgentPools
+    post:
+      summary: Update an agent pool update by ID
+      description: Updates an agent pool update instance and returns the latest agent pool update
+      operationId: updateAgentPoolsUpdate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentPoolUpdate'
+        required: true
+      responses:
+        '201':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentPoolUpdate'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.agentPools.manage
+      tags:
+        - AgentPools
+    delete:
+      summary: Delete an agent pool update
+      description: Deletes agent pool update
+      operationId: deleteAgentPoolsUpdate
+      responses:
+        '204':
+          description: Deleted
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.agentPools.manage
+      tags:
+        - AgentPools
+    x-okta-team-detail:
+      x-team-slack: eng-auto-update
+  /api/v1/agentPools/{poolId}/updates/{updateId}/activate:
+    parameters:
+      - $ref: '#/components/parameters/pathPoolId'
+      - $ref: '#/components/parameters/pathUpdateId'
+    post:
+      summary: Activate an agent pool update
+      description: Activates a scheduled agent pool update
+      operationId: activateAgentPoolsUpdate
+      responses:
+        '201':
+          description: Activated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentPoolUpdate'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.agentPools.manage
+      tags:
+        - AgentPools
+    x-okta-team-detail:
+      x-team-slack: eng-auto-update
+  /api/v1/agentPools/{poolId}/updates/{updateId}/deactivate:
+    parameters:
+      - $ref: '#/components/parameters/pathPoolId'
+      - $ref: '#/components/parameters/pathUpdateId'
+    post:
+      summary: Deactivate an agent pool update
+      description: Deactivates scheduled agent pool update
+      operationId: deactivateAgentPoolsUpdate
+      responses:
+        '201':
+          description: Deactivated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentPoolUpdate'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.agentPools.manage
+      tags:
+        - AgentPools
+    x-okta-team-detail:
+      x-team-slack: eng-auto-update
+  /api/v1/agentPools/{poolId}/updates/{updateId}/pause:
+    parameters:
+      - $ref: '#/components/parameters/pathPoolId'
+      - $ref: '#/components/parameters/pathUpdateId'
+    post:
+      summary: Pause an agent pool update
+      description: Pauses a running or queued agent pool update
+      operationId: pauseAgentPoolsUpdate
+      responses:
+        '201':
+          description: Paused
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentPoolUpdate'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.agentPools.manage
+      tags:
+        - AgentPools
+    x-okta-team-detail:
+      x-team-slack: eng-auto-update
+  /api/v1/agentPools/{poolId}/updates/{updateId}/resume:
+    parameters:
+      - $ref: '#/components/parameters/pathPoolId'
+      - $ref: '#/components/parameters/pathUpdateId'
+    post:
+      summary: Resume an agent pool update
+      description: Resumes a running or queued agent pool update
+      operationId: resumeAgentPoolsUpdate
+      responses:
+        '201':
+          description: Resumed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentPoolUpdate'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.agentPools.manage
+      tags:
+        - AgentPools
+    x-okta-team-detail:
+      x-team-slack: eng-auto-update
+  /api/v1/agentPools/{poolId}/updates/{updateId}/retry:
+    parameters:
+      - $ref: '#/components/parameters/pathPoolId'
+      - $ref: '#/components/parameters/pathUpdateId'
+    post:
+      summary: Retry an agent pool update
+      description: Retries an agent pool update if the update is unsuccessful or communication with Okta was interrupted during an agent auto-update
+      operationId: retryAgentPoolsUpdate
+      responses:
+        '201':
+          description: Retried
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentPoolUpdate'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.agentPools.manage
+      tags:
+        - AgentPools
+    x-okta-team-detail:
+      x-team-slack: eng-auto-update
+  /api/v1/agentPools/{poolId}/updates/{updateId}/stop:
+    parameters:
+      - $ref: '#/components/parameters/pathPoolId'
+      - $ref: '#/components/parameters/pathUpdateId'
+    post:
+      summary: Stop an agent pool update
+      description: Stops an agent pool update
+      operationId: stopAgentPoolsUpdate
+      responses:
+        '201':
+          description: Stopped
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentPoolUpdate'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.agentPools.manage
+      tags:
+        - AgentPools
+    x-okta-team-detail:
+      x-team-slack: eng-auto-update
+components:
+  examples:
+    ListAllAgentPoolsResponse:
+      summary: List all agent pools
+      value:
+        - disruptedAgents: 0
+          inactiveAgents: 1
+          operationalStatus: OPERATIONAL
+          id: poolId1
+          name: region1A.dc
+          type: AD
+          agents:
+            id: agentId1
+            state: ACTIVE
+            message: Agent connection is live
+            indicator: green
+            name: WIN-region1A-dc
+            version: 3.18.0
+            upgradeRequired: false
+            active: true
+            supportAutoUpdate: true
+            errorState: true
+            isHidden: false
+            isLatestGAedVersion: false
+            lastConnection: 1628263766000
+            operationalStatus: OPERATIONAL
+            poolId: poolId1
+            updateMessage: Queued for update.
+          _links:
+            self:
+              href: /api/v1/agentPools/poolId1
+    ListAllAgentPoolUpdatesResponse:
+      summary: List all agent pool updates
+      value:
+        - id: poolId1
+          name: testSchedule
+          agentType: AD
+          agents:
+            latestGAedVersion: true
+            id: a533eu8npxdZ60Mvf5s6
+            type: AD
+            operationalStatus: OPERATIONAL
+            updateStatus: Scheduled
+            updateMessage: Queued for update.
+            version: 3.20.0
+            lastConnection: 1750462090000
+            isLatestGAedVersion: true
+            poolId: 0oa3eu7ekG8tjbD9J5s6
+            name: N079-H069
+            isHidden: false
+          enabled: true
+          schedule:
+            cron: 0 1 * * THU
+            timezone: America/Los_Angeles
+            duration: 420
+          notifyAdmin: true
+          status: Scheduled
+          targetVersion: 3.20.0
+          _links:
+            self:
+              href: /api/v1/agentPools/poolId1/updates
+  parameters:
+    pathPoolId:
+      name: poolId
+      in: path
+      description: ID of the agent pool for which the settings apply to
+      schema:
+        type: string
+      required: true
+    pathUpdateId:
+      name: updateId
+      in: path
+      description: ID of the update
+      schema:
+        type: string
+      required: true
+    queryLimitPerPoolType:
+      name: limitPerPoolType
+      in: query
+      schema:
+        type: integer
+        default: 5
+      required: false
+      description: Maximum number of agent pools returned
+    queryPoolType:
+      name: poolType
+      in: query
+      schema:
+        $ref: '#/components/schemas/AgentType'
+      required: false
+      description: Agent type to search for
+    queryScheduled:
+      name: scheduled
+      in: query
+      description: Return only scheduled or ad-hoc updates. If this parameter isn't provided, Okta returns the entire list of updates.
+      schema:
+        type: boolean
+      required: false
+  schemas:
+    Agent:
+      description: Agent details
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: Unique identifier for the agent that's generated during installation
+          example: ajd3fxzltQKQ2VeLu5s6
+        isHidden:
+          type: boolean
+          description: Determines if an agent is hidden from the Admin Console
+        isLatestGAedVersion:
+          type: boolean
+          description: Determines if the agent is on the latest generally available version
+        lastConnection:
+          type: integer
+          format: int64
+          description: Unix timestamp in milliseconds when the agent last connected to Okta
+        name:
+          type: string
+          description: Agent name
+          example: WIN-region1A-dc
+        operationalStatus:
+          $ref: '#/components/schemas/OperationalStatus'
+        poolId:
+          type: string
+          description: Pool ID
+          example: 0oa3eu7ekG8tjbD9J5s6
+        type:
+          $ref: '#/components/schemas/AgentType'
+        updateMessage:
+          type: string
+          description: Status message of the agent
+          example: Queued for update.
+        updateStatus:
+          $ref: '#/components/schemas/AgentUpdateInstanceStatus'
+        version:
+          type: string
+          description: Agent version number
+          example: 3.19.0
+        _links:
+          $ref: ./Common.yaml#/components/schemas/LinksSelf
+    AgentPool:
+      description: An agent pool is a collection of agents that serve a common purpose. An agent pool has a unique ID within an org, and contains a collection of agents disjoint to every other agent pool, meaning that no two agent pools share an agent.
+      type: object
+      properties:
+        agents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Agent'
+        id:
+          type: string
+          readOnly: true
+          description: Agent pool ID
+        name:
+          type: string
+          description: Agent pool name
+        operationalStatus:
+          $ref: '#/components/schemas/OperationalStatus'
+        type:
+          $ref: '#/components/schemas/AgentType'
+        disruptedAgents:
+          description: Number of agents in the pool that are in a disrupted state
+          type: integer
+        inactiveAgents:
+          description: Number of agents in the pool that are in an inactive state
+          type: integer
+        _links:
+          $ref: ./Common.yaml#/components/schemas/LinksSelf
+    AgentPoolUpdate:
+      description: Various information about agent auto-update configuration
+      type: object
+      properties:
+        agents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Agent'
+        agentType:
+          $ref: '#/components/schemas/AgentType'
+        enabled:
+          type: boolean
+          description: Indicates if auto-update is enabled for the agent pool
+        id:
+          type: string
+          readOnly: true
+          description: ID of the agent pool update
+        name:
+          type: string
+          description: Name of the agent pool update
+          example: region1A.dc
+        notifyAdmin:
+          type: boolean
+          description: Indicates if the admin is notified about the update
+        reason:
+          description: Reason for the update
+          type: string
+          example: Update failed.
+        schedule:
+          $ref: '#/components/schemas/AutoUpdateSchedule'
+        sortOrder:
+          description: Specifies the sort order
+          type: integer
+        status:
+          $ref: '#/components/schemas/AgentUpdateJobStatus'
+        targetVersion:
+          type: string
+          description: The agent version to update to
+          example: 3.20.0
+        _links:
+          $ref: ./Common.yaml#/components/schemas/LinksSelf
+    AgentPoolUpdateSettingRequest:
+      description: Settings for auto-update
+      type: object
+      required:
+        - agentType
+      properties:
+        agentType:
+          $ref: '#/components/schemas/AgentType'
+        continueOnError:
+          type: boolean
+          description: Continues the update even if some agents fail to update
+        latestVersion:
+          type: string
+          description: Latest version of the agent
+          example: 3.20.0
+        minimalSupportedVersion:
+          type: string
+          description: Minimal version of the agent
+          example: 3.19.0
+        poolId:
+          type: string
+          readOnly: true
+          description: ID of the agent pool that the settings apply to
+          example: 0oa3eu7ekG8tjbD9J5s6
+        poolName:
+          type: string
+          description: Pool name
+          example: iwa.dc
+        releaseChannel:
+          $ref: '#/components/schemas/ReleaseChannel'
+    AgentPoolUpdateSettingResponse:
+      description: Settings for auto-update
+      type: object
+      properties:
+        agentType:
+          $ref: '#/components/schemas/AgentType'
+        continueOnError:
+          type: boolean
+          description: Continues the update even if some agents fail to update
+        latestVersion:
+          type: string
+          description: Latest version of the agent
+          example: 3.20.0
+        minimalSupportedVersion:
+          type: string
+          description: Minimal version of the agent
+          example: 3.19.0
+        poolId:
+          type: string
+          readOnly: true
+          description: ID of the agent pool that the settings apply to
+          example: 0oa3eu7ekG8tjbD9J5s6
+        poolName:
+          type: string
+          description: Pool name
+          example: iwa.dc
+        releaseChannel:
+          $ref: '#/components/schemas/ReleaseChannel'
+    AgentType:
+      description: Agent types that are being monitored
+      type: string
+      enum:
+        - AD
+        - IWA
+        - LDAP
+        - MFA
+        - OPP
+        - RUM
+        - Radius
+    AgentUpdateInstanceStatus:
+      description: Status for one agent regarding the status to auto-update that agent
+      type: string
+      enum:
+        - Cancelled
+        - Failed
+        - InProgress
+        - PendingCompletion
+        - Scheduled
+        - Success
+    AgentUpdateJobStatus:
+      description: Overall state for the auto-update job from the admin perspective
+      type: string
+      enum:
+        - Cancelled
+        - Failed
+        - InProgress
+        - Paused
+        - Scheduled
+        - Success
+    AutoUpdateSchedule:
+      description: The schedule of auto-update configured by the admin
+      type: object
+      properties:
+        cron:
+          type: string
+          description: The schedule of the update in cron format. The cron settings are limited to only the day of the month or the nth-day-of-the-week configurations. For example, `0 8 ? * 6#3` indicates every third Saturday at 8:00 AM.
+          example: 0 8 ? * 6#3
+        delay:
+          description: Delay in days
+          type: integer
+        duration:
+          description: Duration in minutes
+          type: integer
+          example: 120
+        lastUpdated:
+          description: Timestamp when the update finished (only for a successful or failed update, not for a cancelled update). Null is returned if the job hasn't finished once yet.
+          type: string
+          format: date-time
+        timezone:
+          type: string
+          description: Timezone of where the scheduled job takes place
+          example: America/New_York
+    OperationalStatus:
+      description: Operational status of a given agent
+      type: string
+      enum:
+        - DEGRADED
+        - DISRUPTED
+        - INACTIVE
+        - OPERATIONAL
+    ReleaseChannel:
+      description: Release channel for auto-update
+      type: string
+      enum:
+        - BETA
+        - EA
+        - GA
+        - TEST
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

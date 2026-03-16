@@ -1,0 +1,320 @@
+openapi: 3.0.3
+info:
+  title: User Resources APIs
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: '../base.yaml#/tags'
+paths:
+  /api/v1/users/{id}/groups:
+    parameters:
+      - $ref: ./users.yaml#/components/parameters/pathId
+    get:
+      summary: List all groups
+      description: |-
+        Lists all groups of which the user is a member
+        > **Note:** To list all groups in your org, use the [List all groups endpoints in the Groups API](/openapi/okta-management/management/group/listgroups).
+      operationId: listUserGroups
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ./groups.yaml#/components/schemas/Group
+              examples:
+                List user groups:
+                  $ref: '#/components/examples/ListUserGroups'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.read
+      tags:
+        - UserResources
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+  /api/v1/users/{userId}/clients:
+    parameters:
+      - $ref: ./Common.yaml#/components/parameters/pathUserId
+    get:
+      summary: List all clients
+      description: |-
+        Lists all client resources for which the specified user has grants or tokens
+
+        > **Note:** To list all client resources for which a specified authorization server has tokens, use the [List all client resources for an authorization server in the Authorization Servers API](/openapi/okta-management/management/authorizationserverclients/listoauth2clientsforauthorizationserver).
+      operationId: listUserClients
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: './apps.yaml#/components/schemas/OAuth2Client'
+              examples:
+                List user clients:
+                  $ref: '#/components/examples/ListUserClients'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.read
+      tags:
+        - UserResources
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+  /api/v1/users/{id}/appLinks:
+    parameters:
+      - $ref: ./users.yaml#/components/parameters/pathId
+    get:
+      summary: List all assigned app links
+      description: |- 
+        Lists all app links for all direct or indirect (through group membership) assigned apps
+        
+        > **Note:** To list all apps in an org, use the [List all applications endpoint in the Applications API](/openapi/okta-management/management/application/listapplications).
+      operationId: listAppLinks
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AssignedAppLink'
+              examples:
+                List App Links:
+                  $ref: '#/components/examples/ListAppLinks'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.read
+      tags:
+        - UserResources
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+  /api/v1/users/{userId}/devices:
+    parameters:
+      - $ref: ./Common.yaml#/components/parameters/pathUserId
+    get:
+      summary: List all devices for an enrolled user
+      description: |-
+        Lists all devices enrolled by a user
+
+        > **Note:** To list all devices registered to an org, use the [List all devices endpoint in the Devices API](/openapi/okta-management/management/tags/device/other/listdevices).
+      operationId: listUserDevices
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDevice'
+              examples:
+                APIUsersListDevicesResponseExample:
+                  summary: List all devices for a specific user
+                  $ref: '#/components/examples/APIUserListDevicesResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.read
+      tags:
+        - UserResources
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+components:
+  schemas:
+    AssignedAppLink:
+      type: object
+      properties:
+        appAssignmentId:
+          type: string
+          readOnly: true
+        appInstanceId:
+          type: string
+          readOnly: true
+        appName:
+          type: string
+          readOnly: true
+        credentialsSetup:
+          type: boolean
+          readOnly: true
+        hidden:
+          type: boolean
+          readOnly: true
+        id:
+          type: string
+          readOnly: true
+        label:
+          type: string
+          readOnly: true
+        linkUrl:
+          type: string
+          readOnly: true
+        logoUrl:
+          type: string
+          readOnly: true
+        sortOrder:
+          type: integer
+          readOnly: true
+    UserDevice:
+      type: object
+      properties:
+         created:
+           type: string
+           format: date-time
+           description: Timestamp when the device was created
+           readOnly: true
+         deviceUserId:
+           type: string
+           description: Unique key for the user device link
+         device:
+           type: object
+           $ref: "./devices.yaml#/components/schemas/Device"
+  examples:
+    ListAppLinks:
+      value:
+        - id: 00ub0oNGTSWTBKOLGLNR
+          label: Google Apps Mail
+          linkUrl: 'https://{yourOktaDomain}/home/google/0oa3omz2i9XRNSRIHBZO/50'
+          logoUrl: 'https://{yourOktaDomain}/img/logos/google-mail.png'
+          appName: google
+          appInstanceId: 0oa3omz2i9XRNSRIHBZO
+          appAssignmentId: 0ua3omz7weMMMQJERBKY
+          credentialsSetup: false
+          hidden: false
+          sortOrder: 0
+        - id: 00ub0oNGTSWTBKOLGLNR
+          label: Google Apps Calendar
+          linkUrl: 'https://{yourOktaDomain}/home/google/0oa3omz2i9XRNSRIHBZO/54'
+          logoUrl: 'https://{yourOktaDomain}/img/logos/google-calendar.png'
+          appName: google
+          appInstanceId: 0oa3omz2i9XRNSRIHBZO
+          appAssignmentId: 0ua3omz7weMMMQJERBKY
+          credentialsSetup: false
+          hidden: false
+          sortOrder: 1
+        - id: 00ub0oNGTSWTBKOLGLNR
+          label: Box
+          linkUrl: 'https://{yourOktaDomain}/home/boxnet/0oa3ompioiQCSTOYXVBK/72'
+          logoUrl: 'https://{yourOktaDomain}/img/logos/box.png'
+          appName: boxnet
+          appInstanceId: 0oa3ompioiQCSTOYXVBK
+          appAssignmentId: 0ua3omx46lYEZLPPRWBO
+          credentialsSetup: false
+          hidden: false
+          sortOrder: 3
+        - id: 00ub0oNGTSWTBKOLGLNR
+          label: Salesforce.com
+          linkUrl: 'https://{yourOktaDomain}/home/salesforce/0oa12ecnxtBQMKOXJSMF/46'
+          logoUrl: 'https://{yourOktaDomain}/img/logos/salesforce_logo.png'
+          appName: salesforce
+          appInstanceId: 0oa12ecnxtBQMKOXJSMF
+          appAssignmentId: 0ua173qgj5VAVOBQMCVB
+          credentialsSetup: true
+          hidden: false
+          sortOrder: 2
+    ListUserGroups:
+      value:
+        - id: 0gabcd1234
+          profile:
+            name: Cloud app users
+            description: Users can access cloud apps
+        - id: 0gefgh5678
+          profile:
+            name: Internal app users
+            description: Users can access internal apps
+    ListUserClients:
+      value:
+        - client_id: 0oabskvc6442nkvQO0h7
+          client_name: My App
+          client_uri: null
+          logo_uri: null
+          _links:
+            grants:
+              href: >-
+                https://{yourOktaDomain}/api/v1/users/00u5t60iloOHN9pBi0h7/clients/0oabskvc6442nkvQO0h7/grants
+            tokens:
+              href: >-
+                https://{yourOktaDomain}/api/v1/users/00u5t60iloOHN9pBi0h7/clients/0oabskvc6442nkvQO0h7/tokens
+    APIUserListDevicesResponse:
+      value:
+        - created: '2020-11-03T21:47:01.000Z'
+          deviceUserId: 'lnk46w61OLJz1uSQW0g4'
+          device:
+            id: guo8jx5vVoxfvJeLb0w4
+            status: ACTIVE
+            created: '2020-11-03T21:47:01.000Z'
+            lastUpdated: '2020-11-03T23:46:27.000Z'
+            profile:
+              displayName: DESKTOP-EHAD3IE
+              platform: WINDOWS
+              manufacturer: International Corp
+              model: VMware7,1
+              osVersion: 10.0.18362
+              serialNumber: 56 4d 4f 95 74 c5 d3 e7-fc 3a 57 9c c2 f8 5d ce
+              udid: 954F4D56-C574-E7D3-FC3A-579CC2F85DCE
+              sid: S-1-5-21-3992267483-1860856704-2413701314-500
+              registered: true
+              secureHardwarePresent: false
+              diskEncryptionType: NONE
+            resourceId: guo8jx5vVoxfvJeLb0w4
+            resourceDisplayName:
+              value: DESKTOP-EHAD3IE
+              sensitive: false
+            resourceType: UDDevice
+            resourceAlternateId: null
+            _links:
+              suspend:
+                href: https://{yourOktaDomain}/api/v1/devices/guo8jx5vVoxfvJeLb0w4/lifecycle/suspend
+                hints:
+                  allow:
+                    - POST
+              self:
+                href: https://{yourOktaDomain}/api/v1/devices/guo8jx5vVoxfvJeLb0w4
+                hints:
+                  allow:
+                    - GET
+                    - PATCH
+                    - PUT
+              users:
+                href: https://{yourOktaDomain}/api/v1/devices/guo8jx5vVoxfvJeLb0w4/users
+                hints:
+                  allow:
+                    - GET
+              deactivate:
+                href: https://{yourOktaDomain}/api/v1/devices/guo8jx5vVoxfvJeLb0w4/lifecycle/deactivate
+                hints:
+                  allow:
+                    - POST
+  securitySchemes:
+    $ref: '../base.yaml#/components/securitySchemes'

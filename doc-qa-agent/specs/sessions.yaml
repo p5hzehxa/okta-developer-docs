@@ -1,0 +1,482 @@
+openapi: 3.0.3
+info:
+  title: Sessions API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/sessions:
+    post:
+      summary: Create a session with session token
+      description: Creates a new session for a user with a valid session token. Use this API if, for example, you want to set the session cookie yourself instead of allowing Okta to set it, or want to hold the session ID to delete a session through the API instead of visiting the logout URL.
+      operationId: createSession
+      x-codegen-request-body-name: createSessionRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSessionRequest'
+            examples:
+              SessionsCreate:
+                $ref: '#/components/examples/CreateSessionBody'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+              examples:
+                SessionsCreate:
+                  summary: Create a new session with a valid session token
+                  $ref: '#/components/examples/CreateSessionResponse'
+        '400':
+          description: Bad Request
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+      tags:
+        - Session
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authn-platform
+  /api/v1/sessions/{sessionId}:
+    parameters:
+      - $ref: '#/components/parameters/pathSessionId'
+    get:
+      summary: Retrieve a session
+      description: Retrieves information about the session specified by the given session ID
+      operationId: getSession
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+              examples:
+                SessionsRetrieve:
+                  summary: Retrieve session information for a single session ID
+                  $ref: '#/components/examples/RetrieveSessionResponse'
+        '400':
+          description: Bad Request
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          description: Not Found
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.sessions.read
+      tags:
+        - Session
+    delete:
+      summary: Revoke a session
+      description: Revokes the specified session
+      operationId: revokeSession
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.sessions.manage
+      tags:
+        - Session
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authn-platform
+  /api/v1/sessions/{sessionId}/lifecycle/refresh:
+    parameters:
+      - $ref: '#/components/parameters/pathSessionId'
+    post:
+      summary: Refresh a session
+      description: Refreshes an existing session using the `id` for that session. A successful response contains the refreshed session with an updated `expiresAt` timestamp.
+      operationId: refreshSession
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+              examples:
+                SessionsRefresh:
+                  summary: Refresh an existing session using the session ID
+                  $ref: '#/components/examples/RefreshSessionResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          description: Not Found
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.sessions.manage
+      tags:
+        - Session
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authn-platform
+  /api/v1/sessions/me:
+    get:
+      summary: Retrieve the current session
+      description: |-
+        Retrieves session information for the current user. Use this method in a browser-based app to determine if the user is signed in.
+
+        > **Note:** This operation requires a session cookie for the user. An API token isn't allowed for this operation.
+      operationId: getCurrentSession
+      parameters:
+        - in: header
+          name: Cookie
+          schema:
+            description: Session ID (`sid`) or Identity Engine (`idx`) cookie
+            type: string
+          example: sid=abcde-123 or idx=abcde-123
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+              examples:
+                CurrentSessionsRetrieve:
+                  summary: Retrieve current session information
+                  $ref: '#/components/examples/RetrieveCurrentSessionResponse'
+        '404':
+          description: Not Found
+      security: []
+      tags:
+        - Session
+    delete:
+      summary: Close the current session
+      description: |-
+        Closes the session for the user who is currently signed in. Use this method in a browser-based app to sign out a user.
+
+        > **Note:** This operation requires a session cookie for the user. An API token isn't allowed for this operation.
+      operationId: closeCurrentSession
+      parameters:
+        - in: header
+          name: Cookie
+          schema:
+            description: Session ID (`sid`) or Identity Engine (`idx`) cookie
+            type: string
+          example: sid=abcde-123 or idx=abcde-123
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+      security: []
+      tags:
+        - Session
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authn-platform
+  /api/v1/sessions/me/lifecycle/refresh:
+    post:
+      summary: Refresh the current session
+      description: |-
+        Refreshes the session for the current user
+
+        > **Note:** This operation requires a session cookie for the user. An API token isn't allowed for this operation.
+      operationId: refreshCurrentSession
+      parameters:
+        - in: header
+          name: Cookie
+          schema:
+            description: Session ID (`sid`) or Identity Engine (`idx`) cookie
+            type: string
+          example: sid=abcde-123 or idx=abcde-123
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+              examples:
+                CurrentSessionsRefresh:
+                  summary: Refersh current session
+                  $ref: '#/components/examples/RefreshCurrentSessionResponse'
+        '404':
+          description: Not Found
+      security: []
+      tags:
+        - Session
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authn-platform
+components:
+  examples:
+    CreateSessionBody:
+      summary: Create a new session with a valid session token
+      value:
+        sessionToken: 00HiohZYpJgMSHwmL9TQy7RRzuY-q9soKp1SPmYYow
+    CreateSessionResponse:
+      summary: Create a new session with a valid session token
+      value:
+        amr:
+          - pwd
+        createdAt: '2019-08-24T14:15:22Z'
+        expiresAt: '2019-08-24T14:15:22Z'
+        id: l7FbDVqS8zHSy65uJD85
+        idp:
+          id: 01a2bcdef3GHIJKLMNOP
+          type: ACTIVE_DIRECTORY
+        lastFactorVerification: '2019-08-24T14:15:22Z'
+        lastPasswordVerification: '2019-08-24T14:15:22Z'
+        login: user@example.com
+        status: ACTIVE
+        userId: 00u0abcdefGHIJKLMNOP
+        _links:
+          self:
+            hints:
+              allow:
+                - DELETE
+          href: https://{yourOktaDomain}/api/v1/sessions/l7FbDVqS8zHSy65uJD85
+    RetrieveSessionResponse:
+      summary: Retrieve session information for a single session ID
+      value:
+        amr:
+          - pwd
+        createdAt: '2019-08-24T14:15:22Z'
+        expiresAt: '2019-08-24T14:15:22Z'
+        id: l7FbDVqS8zHSy65uJD85
+        idp:
+          id: 01a2bcdef3GHIJKLMNOP
+          type: ACTIVE_DIRECTORY
+        lastFactorVerification: '2019-08-24T14:15:22Z'
+        lastPasswordVerification: '2019-08-24T14:15:22Z'
+        login: user@example.com
+        status: ACTIVE
+        userId: 00u0abcdefGHIJKLMNOP
+        _links:
+          self:
+            hints:
+              allow:
+                - DELETE
+          href: https://{yourOktaDomain}/api/v1/sessions/l7FbDVqS8zHSy65uJD85
+    RetrieveCurrentSessionResponse:
+      summary: Retrieve current session
+      value:
+        amr:
+          - pwd
+        createdAt: '2019-08-24T14:15:22Z'
+        expiresAt: '2019-08-24T14:15:22Z'
+        id: l7FbDVqS8zHSy65uJD85
+        idp:
+          id: 01a2bcdef3GHIJKLMNOP
+          type: ACTIVE_DIRECTORY
+        lastFactorVerification: '2019-08-24T14:15:22Z'
+        lastPasswordVerification: '2019-08-24T14:15:22Z'
+        login: user@example.com
+        status: ACTIVE
+        userId: 00u0abcdefGHIJKLMNOP
+        _links:
+          self:
+            hints:
+              allow:
+                - GET
+                - DELETE
+            href: https://{yourOktaDomain}/api/v1/sessions/me
+          refresh:
+            hints:
+              allow:
+                - POST
+            href: https://{yourOktaDomain}/api/v1/sessions/me/lifecycle/refresh
+          user:
+            hints:
+              allow:
+                - GET
+            href: https://{yourOktaDomain}/api/v1/users/me
+            name: User Name
+    RefreshCurrentSessionResponse:
+      summary: Refresh current session
+      value:
+        amr:
+          - pwd
+        createdAt: '2019-08-24T14:15:22Z'
+        expiresAt: '2019-08-24T14:15:22Z'
+        id: l7FbDVqS8zHSy65uJD85
+        idp:
+          id: 01a2bcdef3GHIJKLMNOP
+          type: ACTIVE_DIRECTORY
+        lastFactorVerification: '2019-08-24T14:15:22Z'
+        lastPasswordVerification: '2019-08-24T14:15:22Z'
+        login: user@example.com
+        status: ACTIVE
+        userId: 00u0abcdefGHIJKLMNOP
+        _links:
+          self:
+            hints:
+              allow:
+                - GET
+                - DELETE
+            href: https://{yourOktaDomain}/api/v1/sessions/me
+          refresh:
+            hints:
+              allow:
+                - POST
+            href: https://{yourOktaDomain}/api/v1/sessions/me/lifecycle/refresh
+          user:
+            hints:
+              allow:
+                - GET
+            href: https://{yourOktaDomain}/api/v1/users/me
+            name: User Name
+    RefreshSessionResponse:
+      summary: Refresh an existing session using the session ID
+      value:
+        amr:
+          - pwd
+        createdAt: '2019-08-25T14:17:22Z'
+        expiresAt: '2019-08-25T14:17:22Z'
+        id: l7FbDVqS8zHSy65uJD85
+        idp:
+          id: 01a2bcdef3GHIJKLMNOP
+          type: ACTIVE_DIRECTORY
+        lastFactorVerification: '2019-08-24T14:15:22Z'
+        lastPasswordVerification: '2019-08-24T14:15:22Z'
+        login: user@example.com
+        status: ACTIVE
+        userId: 00u0abcdefGHIJKLMNOP
+        _links:
+          self:
+            hints:
+              allow:
+                - DELETE
+          href: https://{yourOktaDomain}/api/v1/sessions/l7FbDVqS8zHSy65uJD85
+  parameters:
+    pathSessionId:
+      name: sessionId
+      description: '`id` of the session'
+      in: path
+      required: true
+      schema:
+        type: string
+        example: l7FbDVqS8zHSy65uJD85
+  schemas:
+    CreateSessionRequest:
+      type: object
+      properties:
+        sessionToken:
+          type: string
+          description: The session token obtained during authentication
+    Session:
+      type: object
+      properties:
+        amr:
+          type: array
+          readOnly: true
+          description: Authentication method reference
+          items:
+            $ref: '#/components/schemas/SessionAuthenticationMethod'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        expiresAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: A timestamp when the session expires
+        id:
+          type: string
+          readOnly: true
+          description: A unique key for the session
+        idp:
+          $ref: '#/components/schemas/SessionIdentityProvider'
+        lastFactorVerification:
+          type: string
+          format: date-time
+          readOnly: true
+          description: A timestamp when the user last performed multifactor authentication
+        lastPasswordVerification:
+          type: string
+          format: date-time
+          readOnly: true
+          description: A timestamp when the user last performed the primary or step-up authentication with a password
+        login:
+          type: string
+          readOnly: true
+          description: A unique identifier for the user (username)
+        status:
+          $ref: '#/components/schemas/SessionStatus'
+          description: Current session status
+        userId:
+          type: string
+          readOnly: true
+          description: A unique key for the user
+        _links:
+          $ref: ./Common.yaml#/components/schemas/LinksSelf
+    SessionAuthenticationMethod:
+      type: string
+      enum:
+        - fpt
+        - geo
+        - hwk
+        - kba
+        - mca
+        - mfa
+        - otp
+        - pwd
+        - sc
+        - sms
+        - swk
+        - tel
+      x-enumDescriptions:
+        pwd: Password authentication. **Inline hook value:** `PASSWORD` **Example:** Standard password-based sign-in flow
+        swk: Proof-of-possession (PoP) of a software key. **Inline hook value:** `POP_SOFTWARE_KEY` **Example:** Okta Verify with Push
+        hwk: Proof-of-possession (PoP) of a hardware key. **Inline hook value:** `POP_HARDWARE_KEY` **Example:** Yubikey factor
+        opt: One-time passcode. **Inline hook value:** `ONE_TIME_PASSWORD`. **Example:** Okta Verify, Google Authenticator
+        sms: SMS text message to the user at a registered number. **Inline hook value:** `SMS_MESSAGE`. **Example:** SMS factor
+        tel: Telephone call to the user at a registered number. **Inline hook value:** `TELEPHONE_CALL`. **Example:** Phone call factor
+        geo: Use of geo-location information. **Inline hook value:** `GEOLOCATION`. **Example:** IP Trust and Network Zone policy conditions
+        fpt: Fingerprint biometric authentication. **Inline hook value:** `BIO_FINGERPRINT`. **Example:** Okta Verify with Touch ID
+        kba: Knowledge-based authentication. **Inline hook value:** `KNOWLEDGE_BASED_AUTHENTICATION`. **Example:** Security Question factor
+        mfa: Multifactor authentication. **Inline hook value:** `MULTIFACTOR_AUTHENTICATION`. **Example:** This value is present whenever any MFA factor verification is performed.
+        mca: Multiple-channel authentication. **Inline hook value:** `MULTIPLE_CHANNEL_AUTHENTICATION`. **Example:** Authentication requires communication over more than one channel, such as the Internet and a mobile network
+        sc: Smart card authentication. **Inline hook value:** `SMART_CARD. **Example:** User authenticated using a smart card, such as a Personal Identity Verification (PIV) card or Common Access Card (CAC)
+    SessionIdentityProvider:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: Identity Provider ID. If the `type` is `OKTA`, then the `id` is the org ID.
+        type:
+          $ref: '#/components/schemas/SessionIdentityProviderType'
+    SessionIdentityProviderType:
+      type: string
+      enum:
+        - ACTIVE_DIRECTORY
+        - FEDERATION
+        - LDAP
+        - OKTA
+        - SOCIAL
+    SessionStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - MFA_ENROLL
+        - MFA_REQUIRED
+      x-enumDescriptions:
+        ACTIVE: The session is established and fully validated.
+        MFA_REQUIRED: The session is established, but requires second factor verification.
+        MFA_ENROLL: The session is established, but the user needs to enroll a second factor.
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

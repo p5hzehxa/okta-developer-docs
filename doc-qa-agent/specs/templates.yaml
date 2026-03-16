@@ -1,0 +1,328 @@
+openapi: 3.0.3
+info:
+  title: Templates API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/templates/sms:
+    get:
+      summary: List all SMS templates
+      description: Lists all custom SMS templates. A subset of templates can be returned that match a template type.
+      operationId: listSmsTemplates
+      parameters:
+        - name: templateType
+          in: query
+          schema:
+            $ref: '#/components/schemas/SmsTemplateType'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SmsTemplate'
+              examples:
+                SMS Template List response:
+                  $ref: '#/components/examples/SMSTemplateListResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.templates.read
+      tags:
+        - Template
+    post:
+      summary: Create an SMS template
+      description: Creates a new custom SMS template
+      operationId: createSmsTemplate
+      x-codegen-request-body-name: smsTemplate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmsTemplate'
+            examples:
+              Create an SMS Template request:
+                $ref: '#/components/examples/CreateOrReplaceSMSTemplateRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsTemplate'
+              examples:
+                Create an SMS Template response:
+                  $ref: '#/components/examples/CreateOrReplaceSMSTemplateResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.templates.manage
+      tags:
+        - Template
+    x-okta-team-detail:
+      x-team-slack: amp-eng-workforce-authenticators
+  /api/v1/templates/sms/{templateId}:
+    parameters:
+      - $ref: '#/components/parameters/pathTemplateId'
+    get:
+      summary: Retrieve an SMS template
+      description: Retrieves a specific template by `id`
+      operationId: getSmsTemplate
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsTemplate'
+              examples:
+                Get an SMS template response:
+                  $ref: '#/components/examples/CreateOrReplaceSMSTemplateResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.templates.read
+      tags:
+        - Template
+    post:
+      summary: Update an SMS template
+      description: |
+        Updates only some of the SMS Template properties:
+          * All properties within the custom SMS Template that have values are updated.
+          * Any translation that doesn't exist is added.
+          * Any translation with a null or empty value is removed.
+          * Any translation with non-empty/null value is updated.
+      operationId: updateSmsTemplate
+      x-codegen-request-body-name: smsTemplate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmsTemplate'
+            examples:
+              Update an SMS Template request:
+                $ref: '#/components/examples/UpdateSMSTemplateRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsTemplate'
+              examples:
+                Update an SMS Template response:
+                  $ref: '#/components/examples/UpdateSMSTemplateResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.templates.manage
+      tags:
+        - Template
+    put:
+      summary: Replace an SMS template
+      description: |
+        Replaces the SMS Template
+        > **Notes:** You can't update the default SMS Template.
+      operationId: replaceSmsTemplate
+      x-codegen-request-body-name: smsTemplate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmsTemplate'
+            examples:
+              Replace an SMS Template request:
+                $ref: '#/components/examples/CreateOrReplaceSMSTemplateRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsTemplate'
+              examples:
+                Replace an SMS Template response:
+                  $ref: '#/components/examples/CreateOrReplaceSMSTemplateResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.templates.manage
+      tags:
+        - Template
+    delete:
+      summary: Delete an SMS template
+      description: Deletes an SMS template
+      operationId: deleteSmsTemplate
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.templates.manage
+      tags:
+        - Template
+    x-okta-team-detail:
+      x-team-slack: amp-eng-workforce-authenticators
+components:
+  examples:
+    SMSTemplateEditablePropertyValues:
+      value:
+        name: Custom
+        type: SMS_VERIFY_CODE
+        template: '${org.name}: your verification code is ${code}'
+        translations: &ref_0
+          es: '${org.name}: el código de verificación es ${code}'
+          fr: '${org.name}: votre code de vérification est ${code}'
+          it: '${org.name}: il codice di verifica è ${code}'
+    SMSTemplateResponseValues:
+      value:
+        id: 6NQUJ5yR3bpgEiYmq8IC
+        name: Custom
+        type: SMS_VERIFY_CODE
+        template: '${org.name}: your verification code is ${code}'
+        translations: *ref_0
+        created: '2024-04-25T17:35:02.000Z'
+        lastUpdated: '2024-04-25T17:35:02.000Z'
+    SMSTemplateListResponse:
+      value:
+        - id: 6NQUJ5yR3bpgEiYmq8IC
+          name: Custom
+          type: SMS_VERIFY_CODE
+          template: '${org.name}: your verification code is ${code}'
+          translations: *ref_0
+          created: '2024-04-25T17:35:02.000Z'
+          lastUpdated: '2024-04-25T17:35:02.000Z'
+    CreateOrReplaceSMSTemplateRequest:
+      value:
+        name: Custom
+        type: SMS_VERIFY_CODE
+        template: '${org.name}: your verification code is ${code}'
+        translations: *ref_0
+    CreateOrReplaceSMSTemplateResponse:
+      value:
+        id: 6NQUJ5yR3bpgEiYmq8IC
+        name: Custom
+        type: SMS_VERIFY_CODE
+        template: '${org.name}: your verification code is ${code}'
+        translations: *ref_0
+        created: '2024-04-25T17:35:02.000Z'
+        lastUpdated: '2024-04-25T17:35:02.000Z'
+    UpdateSMSTemplateRequest:
+      value:
+        translations:
+          de: '${org.name}: ihre bestätigungscode ist ${code}.'
+    UpdateSMSTemplateResponse:
+      value:
+        id: 6NQUJ5yR3bpgEiYmq8IC
+        name: Custom
+        type: SMS_VERIFY_CODE
+        template: '${org.name}: your verification code is ${code}'
+        translations:
+          es: '${org.name}: el código de verificación es ${code}'
+          fr: '${org.name}: votre code de vérification est ${code}'
+          it: '${org.name}: il codice di verifica è ${code}'
+          de: '${org.name}: ihre bestätigungscode ist ${code}.'
+        created: '2024-04-25T17:35:02.000Z'
+        lastUpdated: '2024-04-25T17:35:02.000Z'
+  parameters:
+    pathTemplateId:
+      name: templateId
+      description: '`id` of the Template'
+      in: path
+      required: true
+      schema:
+        type: string
+        example: 6NQUJ5yR3bpgEiYmq8IC
+  schemas:
+    SmsTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          description: Human-readable name of the Template
+          maxLength: 50
+          minLength: 1
+        type:
+          $ref: '#/components/schemas/SmsTemplateType'
+        template:
+          type: string
+          description: Text of the Template, including any [macros](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Template/)
+          maxLength: 161
+          minLength: 1
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        lastUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+        translations:
+          $ref: '#/components/schemas/SmsTemplateTranslations'
+    SmsTemplateTranslations:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      description: |
+        - Template translations are optionally provided when you want to localize the SMS messages. Translations are provided as an object that contains `key:value` pairs: the language and the translated Template text. The key portion is a two-letter country code that conforms to [ISO 639-1](https://www.loc.gov/standards/iso639-2/php/code_list.php). The value is the translated SMS Template.
+        - Just like with regular SMS Templates, the length of the SMS message can't exceed 160 characters.
+      x-okta-extensible: true
+    SmsTemplateType:
+      type: string
+      description: Type of the Template
+      maxLength: 50
+      minLength: 1
+      enum:
+        - SMS_VERIFY_CODE
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

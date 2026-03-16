@@ -1,0 +1,292 @@
+openapi: 3.0.3
+info:
+  title: Directories Integration
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/directories/{appInstanceId}/groups/modify:
+    parameters:
+      - $ref: '#/components/parameters/appInstanceId'
+    post:
+      summary: Update an external directory group membership
+      description: |-
+        Updates an Active Directory or LDAP  group membership directly in the Active Directory or LDAP server.
+        
+        You can add or remove users from groups based on their identity and access requirements. This ensures that changes made to user access in Okta are reflected in AD or LDAP. When you use Okta Access Certifications to revoke a user's membership to an AD or LDAP group, the removal is reflected in AD or LDAP.
+        
+        See [AD Bidirectional Group Management](https://help.okta.com/okta_help.htm?type=oie&id=ad-bidirectional-group-mgmt) and [LDAP Bidirectional Group Management](https://help.okta.com/okta_help.htm?type=oie&id=ldap-bidirectional-group-mgmt).
+      operationId: updateGroupMembership
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentAction'
+            examples:
+              addADUserToGroup:
+                $ref: '#/components/examples/add-user-request'
+              addLdapUserToGroup:
+                $ref: '#/components/examples/add-ldap-user-request'
+        required: true
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+              examples:
+                APIValidationFailed:
+                  $ref: ./Common.yaml#/components/examples/ErrorApiValidationFailed
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '502':
+          $ref: '#/components/responses/Error502NoConnectedAgents'
+        '504':
+          $ref: '#/components/responses/Error504AgentTimeOut'
+      security:
+        - oauth2:
+            - okta.directories.groups.manage
+      tags:
+        - DirectoriesIntegration
+    x-okta-team-detail:
+      x-team-slack: eng-directories
+  /api/v1/directories/{appInstanceId}/groups/{groupId}/query:
+    parameters:
+      - $ref: '#/components/parameters/adAppInstanceId'
+      - $ref: '#/components/parameters/groupId'
+    post:
+      summary: Submit a query for AD Group
+      description: |-
+        Submits a query search on the on-premises agent to asynchronously fetch specific Active Directory (AD) attributes for a group.
+        Returns a `resultId` that is used to poll for the results.
+      operationId: submitGroupAttributeQuery
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupQueryRequest'
+      responses:
+        '202':
+          description: Accepted. Query initiated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupQueryResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: './Common.yaml#/components/schemas/Error'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '502':
+          $ref: '#/components/responses/Error502NoConnectedAgents'
+        '504':
+          $ref: '#/components/responses/Error504AgentTimeOut'
+      security:
+        - oauth2:
+            - okta.directories.groups.read
+      tags:
+        - DirectoriesIntegration
+      x-okta-team-detail:
+        x-team-slack: eng-directories
+  /api/v1/directories/{appInstanceId}/groups/{groupId}/query/{resultId}:
+    parameters:
+      - $ref: '#/components/parameters/adAppInstanceId'
+      - $ref: '#/components/parameters/groupId'
+      - $ref: '#/components/parameters/queryResultId'
+    get:
+      summary: Retrieve the results of an AD group query
+      description: |-
+        Retrieves the results of the requested Active Directory (AD) group attributes using the `resultId` returned from the `POST /api/v1/directories/{appInstanceId}/groups/{groupId}/query` call.
+        If the operation has expired or if the `resultId` is invalid, returns a `404` status.
+      operationId: getGroupAttributeQueryResult
+      responses:
+        '200':
+          description: OK. Returns the group profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupProfileResult'
+        '202':
+          description: Accepted. Query is still in progress.
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+      security:
+        - oauth2:
+            - okta.directories.groups.read
+      tags:
+        - DirectoriesIntegration
+      x-okta-team-detail:
+        x-team-slack: eng-directories
+components:
+  parameters:
+    appInstanceId:
+      name: appInstanceId
+      in: path
+      description: ID of the Active Directory or LDAP app instance in Okta
+      schema:
+        type: string
+      required: true
+    adAppInstanceId:
+      name: appInstanceId
+      in: path
+      description: ID of the AD instance in Okta
+      schema:
+        type: string
+      required: true
+      example: 00a1xucgTZFrziXg10g4
+    groupId:
+      name: groupId
+      in: path
+      description: ID of the Okta group
+      required: true
+      schema:
+        type: string
+      example: 00g1xucgTZFrziXg10g4
+    queryResultId:
+      name: resultId
+      in: path
+      description: The unique identifier returned by the initial POST request (`POST /api/v1/directories/{appInstanceId}/groups/{groupId}/query`)
+      required: true
+      schema:
+        type: string
+  responses:
+    Error502NoConnectedAgents:
+      description: There are no connected agents.
+      content:
+        application/json:
+          schema:
+            $ref: ./Common.yaml#/components/schemas/Error
+          examples:
+            AgentTimeOut:
+              $ref: '#/components/examples/ErrorNoConnectedAgents'
+    Error504AgentTimeOut:
+      description: Timed out waiting for agent
+      content:
+        application/json:
+          schema:
+            $ref: ./Common.yaml#/components/schemas/Error
+          examples:
+            AgentTimeOut:
+              $ref: '#/components/examples/ErrorAgentTimeOut'
+  examples:
+    ErrorNoConnectedAgents:
+      value:
+        errorCode: E0000236
+        errorSummary: There are no connected agents
+        errorLink: E0000236
+        errorId: sampleMlLvGUj_YD5v16vkYWY
+        errorCauses: []
+    ErrorAgentTimeOut:
+      value:
+        errorCode: E0000237
+        errorSummary: Timed out waiting for agent
+        errorLink: E0000237
+        errorId: sampleMlLvGUj_YD5v16vkYWY
+        errorCauses: []
+    add-user-request:
+      summary: Add AD user to group
+      value:
+        id: 00g1xucgTZFrziXg10g4
+        parameters:
+          action: ADD
+          attribute: member
+          values:
+            - 00u1bh5efGKMsSiLv0g4
+    add-ldap-user-request:
+      summary: Add LDAP user to group
+      value:
+        id: 00g1xucgTZFrziXg10g4
+        parameters:
+          action: ADD
+          attribute: uniqueMember
+          values:
+            - 00u1bh5efGKMsSiLv0g4
+  schemas:
+    AgentAction:
+      description: Details about the Active Directory or LDAP group membership update
+      type: object
+      required:
+        - id
+        - parameters
+      properties:
+        id:
+          type: string
+          description: ID of the Active Directory or LDAP group to update
+        parameters:
+          $ref: '#/components/schemas/Parameters'
+    Parameters:
+      description: Attributes used for processing Active Directory or LDAP group membership update
+      type: object
+      required:
+        - action
+        - attribute
+        - values
+      properties:
+        action:
+          type: string
+          description: The update action to take
+          enum:
+            - ADD
+            - REMOVE
+          x-enumDescriptions:
+            ADD: Add to the membership of the group
+            REMOVE: Remove from the membership of the group
+        attribute:
+          type: string
+          description: The attribute that tracks group memberships in Active Directory or LDAP. For Active Directory, use `member`. For LDAP, use the appropriate attribute found in the LDAP server such as, but not limited to, `uniqueMember` or `member`.
+          example: member
+        values:
+          type: array
+          description: List of user IDs whose group memberships to update
+          items:
+            type: string
+            description: ID of an existing user
+    GroupQueryRequest:
+      type: object
+      required:
+        - attributes
+      properties:
+        attributes:
+          type: string
+          description: >-
+            A comma-separated list of LDAP group attributes to retrieve. 
+            Restricted attributes: member, memberOf, *
+          example: "distinguishedName,description,cn,whenCreated"
+    GroupQueryResponse:
+      type: object
+      properties:
+        resultId:
+          type: string
+          description: Identifier used to poll for the query result
+          example: "rdj4edr7pSDGv8QF10g4"
+    GroupProfileResult:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the group
+          example: "00g19oiNHkbKFvNTX0g4"
+        profile:
+          type: object
+          additionalProperties: true
+          description: Map of requested attributes and their values
+          example:
+            distinguishedName: "CN=Finance,OU=Groups,DC=example,DC=com"
+            description: "Finance Department Group"
+            cn: "CN=Finance"
+            whenCreated: "20230101000000.0Z"
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

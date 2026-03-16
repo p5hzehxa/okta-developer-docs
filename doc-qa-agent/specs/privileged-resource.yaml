@@ -1,0 +1,978 @@
+openapi: 3.0.3
+info:
+  title: Privileged Resource Manager API
+  description: Privileged Resource Manager API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /privileged-access/api/v1/resources:
+    post:
+      summary: Create a privileged resource
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        isGenerallyAvailable: false
+        SKUs: []
+      description: Creates a privileged resource either in Okta or for a specified external app. After creation, the `status` param is set to `CREATED`.
+      operationId: createPrivilegedResource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrivilegedResource'
+            examples:
+              OKTA_USER_ACCOUNT_CONVERT:
+                $ref: '#/components/examples/PrivilegedResourceCreateOktaAccountRequestConvert'
+              OKTA_USER_ACCOUNT_NEW:
+                $ref: '#/components/examples/PrivilegedResourceCreateOktaAccountRequestNew'
+              APP_ACCOUNT:
+                $ref: '#/components/examples/PrivilegedResourceCreateAppAccountRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivilegedResource'
+              examples:
+                OKTA_USER_ACCOUNT:
+                  $ref: '#/components/examples/PrivilegedResourceCreateOktaAccountResponse'
+                APP_ACCOUNT:
+                  $ref: '#/components/examples/PrivilegedResourceCreateAppAccountResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.privilegedResources.manage
+      tags:
+        - PrivilegedResource
+    x-okta-team-detail:
+      x-team-slack: eng-ucp
+  /privileged-access/api/v1/resources/{id}:
+    parameters:
+      - $ref: '#/components/parameters/privilegedResourceId'
+    get:
+      summary: Retrieve a privileged resource
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        isGenerallyAvailable: false
+        SKUs: []
+      description: Retrieves a privileged resource specified by ID
+      operationId: getPrivilegedResource
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivilegedResource'
+              examples:
+                OKTA_USER_ACCOUNT:
+                  $ref: '#/components/examples/PrivilegedResourcesGetOktaAccountResponse'
+                APP_ACCOUNT:
+                  $ref: '#/components/examples/PrivilegedResourcesGetAppAccountResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.privilegedResources.read
+      tags:
+        - PrivilegedResource
+    put:
+      summary: Replace a privileged resource
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        isGenerallyAvailable: false
+        SKUs: []
+      description: Replaces a privileged resource specified by ID
+      operationId: replacePrivilegedResource
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrivilegedResourceUpdateRequest'
+            examples:
+              OKTA_USER_ACCOUNT:
+                $ref: '#/components/examples/PrivilegedResourcesOktaUserAccountUpdateRequest'
+              APP_ACCOUNT:
+                $ref: '#/components/examples/PrivilegedResourcesAppAccountUpdateRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivilegedResource'
+              examples:
+                OKTA_USER_ACCOUNT:
+                  $ref: '#/components/examples/PrivilegedResourceCreateOktaAccountResponse'
+                APP_ACCOUNT:
+                  $ref: '#/components/examples/PrivilegedResourceCreateAppAccountResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.privilegedResources.manage
+      tags:
+        - PrivilegedResource
+    delete:
+      summary: Delete a privileged resource
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        isGenerallyAvailable: false
+        SKUs: []
+      description: Deletes a privileged resource specified by ID. This also marks the `status` as `INACTIVE`.
+      operationId: deletePrivilegedResource
+      responses:
+        '204':
+          description: No Content
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.privilegedResources.manage
+      tags:
+        - PrivilegedResource
+    x-okta-team-detail:
+      x-team-slack: eng-ucp
+  /privileged-access/api/v1/resources/{id}/claim:
+    parameters:
+      - $ref: '#/components/parameters/privilegedResourceId'
+    post:
+      summary: Claim a privileged resource for management
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        isGenerallyAvailable: false
+        SKUs: []
+      description: Claims a specified privileged resource for management. This also marks the `status` as `ACTIVE`.
+      operationId: claimPrivilegedResource
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivilegedResource'
+              examples:
+                OKTA_USER_ACCOUNT:
+                  $ref: '#/components/examples/PrivilegedResourceClaimOktaAccountResponse'
+                APP_ACCOUNT:
+                  $ref: '#/components/examples/PrivilegedResourceClaimAppAccountResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.privilegedResources.manage
+      tags:
+        - PrivilegedResource
+    x-okta-team-detail:
+      x-team-slack: eng-ucp
+  /privileged-access/api/v1/resources/{id}/rotate-password:
+    parameters:
+      - $ref: '#/components/parameters/privilegedResourceId'
+    post:
+      summary: Rotate the password for a privileged resource
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        isGenerallyAvailable: false
+        SKUs: []
+      description: Rotates the password for a specified privileged resource
+      operationId: rotatePasswordForPrivilegedResource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RotatePasswordRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivilegedResource'
+              examples:
+                OKTA_USER_ACCOUNT:
+                  $ref: '#/components/examples/PrivilegedResourceRotatePasswordOktaAccountResponse'
+                APP_ACCOUNT:
+                  $ref: '#/components/examples/PrivilegedResourceRotatePasswordAppAccountResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.privilegedResources.manage
+      tags:
+        - PrivilegedResource
+    x-okta-team-detail:
+      x-team-slack: eng-ucp
+  /privileged-access/api/v1/containers/{containerId}/resource-filter-criteria:
+    parameters:
+      - $ref: '#/components/parameters/containerId'
+    put:
+      summary: Replace the filters
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        isGenerallyAvailable: false
+        SKUs: []
+      description: Replaces or creates filters used to identify privileged resources. These filters are used during the privileged resource retrieval operation.
+      operationId: replaceFiltersForPrivilegedResourceIdentification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrivilegedResourceFilters'
+            examples:
+              filtersPayload:
+                $ref: '#/components/examples/PrivilegedResourceFilterCreatePayload'
+        required: true
+      responses:
+        '204':
+          description: Success
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '409':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationConflict409
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.privilegedResources.manage
+      tags:
+        - PrivilegedResource
+    x-okta-team-detail:
+      x-team-slack: eng-ucp
+  /privileged-access/api/v1/containers/{containerId}/prepare-resources:
+    parameters:
+      - $ref: '#/components/parameters/containerId'
+      - $ref: '#/components/parameters/privQueryLastUpdated'
+    post:
+      summary: Prepare the privileged resources
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        isGenerallyAvailable: false
+        SKUs: []
+      description: |-
+        Prepares the privileged resources by scanning imported app users and applying the privileged resource filtering criteria.
+
+        If the request contains the `lastUpdated` parameter, the privileged resource criteria filters out the imported app users that were last updated after the timestamp.
+
+        The value of the `lastUpdated` query parameter should be what the client received in the `ETag` header included in the last response of the previous resource fetch cycle.
+      operationId: preparePrivilegedResourcesToBeFetched
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '409':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationConflict409
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.privilegedResources.manage
+      tags:
+        - PrivilegedResource
+    x-okta-team-detail:
+      x-team-slack: eng-ucp
+  /privileged-access/api/v1/containers/{containerId}/resources:
+    parameters:
+      - $ref: '#/components/parameters/containerId'
+      - $ref: '#/components/parameters/privQueryLastUpdated'
+      - $ref: '#/components/parameters/privQueryStatus'
+      - $ref: '#/components/parameters/privQueryLimit'
+      - $ref: '#/components/parameters/privQueryAfter'
+    get:
+      summary: Retrieve the privileged resources
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        isGenerallyAvailable: false
+        SKUs: []
+      description: Retrieves privileged resources that were filtered based on the search and filtering criteria specified in the query parameters
+      operationId: getPrivilegedResources
+      responses:
+        '200':
+          description: Success
+          headers:
+            ETag:
+              schema:
+                $ref: '#/components/schemas/ETag'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PrivilegedResourceAccountAppResponse'
+              examples:
+                privilegedResourcesList:
+                  $ref: '#/components/examples/PrivilegedResourcesFetchResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '409':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationConflict409
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.privilegedResources.read
+      tags:
+        - PrivilegedResource
+    x-okta-team-detail:
+      x-team-slack: eng-ucp
+components:
+  parameters:
+    privilegedResourceId:
+      name: id
+      in: path
+      description: ID of an existing privileged resource
+      required: true
+      schema:
+        type: string
+    containerId:
+      name: containerId
+      in: path
+      description: ID of an existing container, such as an app instance
+      required: true
+      schema:
+        type: string
+    privQueryLastUpdated:
+      description: Last updated timestamp query parameter
+      name: lastUpdated
+      in: query
+      schema:
+        type: string
+      example: 2024-11-03T00:00:00.000Z
+    privQueryStatus:
+      description: The status of the privileged resource to filter on
+      name: status
+      in: query
+      schema:
+        type: string
+      example: ACTIVE
+    privQueryLimit:
+      description: Specifies the batch size of the results to be returned
+      name: limit
+      in: query
+      schema:
+        type: integer
+        format: int32
+        default: 200
+        maximum: 1000
+    privQueryAfter:
+      description: The cursor used for pagination. It represents the last privileged resource ID returned in the previous fetch operation.
+      name: after
+      in: query
+      schema:
+        type: string
+      example: oprbuthToCeLWOBwh0g4
+  schemas:
+    PrivilegedResource:
+      description: Base class for PrivilegedResourceRequest and PrivilegedResourceResponse
+      type: object
+      discriminator:
+        propertyName: resourceType
+        mapping:
+          APP_ACCOUNT: '#/components/schemas/PrivilegedResourceAccountAppRequest'
+          OKTA_USER_ACCOUNT: '#/components/schemas/PrivilegedResourceAccountOkta'
+      properties:
+        resourceType:
+          $ref: '#/components/schemas/PrivilegedResourceType'
+        id:
+          type: string
+          description: ID of the privileged resource
+          readOnly: true
+          example: opa100xTfFs4MasRf0g4
+        created:
+          type: string
+          description: Timestamp when the object was created
+          format: date-time
+          readOnly: true
+          example: 2024-06-10T11:11:01.000Z
+        lastUpdated:
+          type: string
+          description: Timestamp when the object was last updated
+          format: date-time
+          readOnly: true
+          example: 2024-06-10T11:13:01.000Z
+        status:
+          $ref: '#/components/schemas/PrivilegedResourceStatus'
+        credentialSyncInfo:
+          $ref: '#/components/schemas/CredentialSyncInfo'
+      required:
+        - resourceType
+    PrivilegedResourceAccountAppRequest:
+      allOf:
+        - type: object
+          properties:
+            containerDetails:
+              $ref: '#/components/schemas/AppAccountContainerDetails'
+            credentials:
+              $ref: '#/components/schemas/PrivilegedResourceCredentials'
+        - $ref: '#/components/schemas/PrivilegedResource'
+      required:
+        - containerId
+    PrivilegedResourceAccountAppResponse:
+      allOf:
+        - type: object
+          properties:
+            credentials:
+              $ref: '#/components/schemas/PrivilegedResourceCredentials'
+            profile:
+              $ref: '#/components/schemas/profile'
+        - $ref: '#/components/schemas/PrivilegedResource'
+    AppAccountContainerDetails:
+      type: object
+      description: Container details for resource type APP_ACCOUNT
+      properties:
+        containerId:
+          type: string
+          description: The app ID associated with the privileged resource
+          example: 0oa103099SBEb3Z2b0g4
+        displayName:
+          type: string
+          description: Human-readable name of the container that owns the privileged resource
+          readOnly: true
+          example: Google App1
+        globalAppId:
+          type: string
+          description: The application global ID
+          readOnly: true
+          example: 964b82aa-85b4-5645-b790-83312c473480
+        appName:
+          type: string
+          description: The application name
+          readOnly: true
+          example: google
+        passwordPushSupported:
+          type: boolean
+          description: Indicates if the application supports password push
+          readOnly: true
+          example: true
+        provisioningEnabled:
+          type: boolean
+          description: Indicates if provisioning is enabled for this application
+          readOnly: true
+          example: true
+        status:
+          $ref: '#/components/schemas/AppInstanceContainerStatus'
+        _links:
+          $ref: '#/components/schemas/AppAccountContainerLink'
+      required:
+        - containerId
+    AppInstanceContainerStatus:
+      type: string
+      description: Current status of the application instance
+      readOnly: true
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - DELETED
+    PrivilegedResourceAccountOkta:
+      allOf:
+        - type: object
+          properties:
+            resourceId:
+              type: string
+              description: The user ID associated with the Okta privileged resource
+              example: 00u100xTfFs4MasRf0g4
+            credentials:
+              $ref: '#/components/schemas/PrivilegedResourceCredentials'
+            profile:
+              $ref: '#/components/schemas/profile'
+        - $ref: '#/components/schemas/PrivilegedResource'
+    PrivilegedResourceCredentials:
+      description: Credentials for the privileged resource
+      type: object
+      properties:
+        userName:
+          type: string
+          description: The username associated with the privileged resource
+          minLength: 1
+          maxLength: 100
+          example: testuser@example.com
+        password:
+          type: string
+          description: The password associated with the privileged resource
+          format: password
+          writeOnly: true
+          example: xf1bs9am2
+      required:
+        - userName
+    RotatePasswordRequest:
+      description: Rotate password request for the privileged resource
+      type: object
+      properties:
+        password:
+          type: string
+          description: The password associated with the privileged resource
+          format: password
+          writeOnly: true
+          example: xf1bs9am2
+        secretVersionId:
+          type: string
+          description: The version ID of the password secret from the OPA vault
+          minLength: 1
+          maxLength: 36
+          example: 9f8400-e29b-41d4-a716-926655440034
+      required:
+        - password
+        - secretVersionId
+    PrivilegedResourceUpdateRequest:
+      description: Update request for a privileged resource
+      type: object
+      properties:
+        userName:
+          type: string
+          description: The username associated with the privileged resource
+          minLength: 1
+          maxLength: 100
+          example: testuser@example.com
+        profile:
+          $ref: '#/components/schemas/profile'
+    PrivilegedResourceFilters:
+      type: object
+      properties:
+        organizationalUnits:
+          type: array
+          description: Array of organizational units where privileged app users are present
+          items:
+            $ref: '#/components/schemas/OrganizationalUnit'
+        appGroups:
+          type: array
+          description: Array of app groups whose members might be privileged app users
+          items:
+            $ref: '#/components/schemas/AppGroup'
+    OrganizationalUnit:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the organizational unit where privileged app users are present
+          maxLength: 1024
+          example: OU=example1,DN=globo,DN=com
+      required:
+        - name
+    AppGroup:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the app group whose members might be privileged app users
+          maxLength: 255
+          example: domainAdminsGroup
+        externalId:
+          type: string
+          description: The external ID of the app group whose members might be privileged app users
+          maxLength: 255
+          example: 18070146415
+      required:
+        - name
+        - externalId
+    AppAccountContainerLink:
+      type: object
+      readOnly: true
+      properties:
+        login:
+          $ref: ./Common.yaml#/components/schemas/HrefObjectAppLink
+        logo:
+          $ref: ./Common.yaml#/components/schemas/HrefObjectLogoLink
+    userLink:
+      type: object
+      properties:
+        user:
+          $ref: ./Common.yaml#/components/schemas/HrefObjectUserLink
+    PrivilegedResourceStatus:
+      type: string
+      description: Current status of the privileged resource
+      readOnly: true
+      enum:
+        - PENDING
+        - CREATION_FAILED
+        - CREATED
+        - ACTIVE
+        - INACTIVE
+      x-enumDescriptions:
+        CREATED: The privileged resource is created but not yet managed by OPA
+        ACTIVE: The privileged resource is currently managed by OPA
+        INACTIVE: The privileged resource is `INACTIVE` and not currently managed by OPA
+        PENDING: The privileged resource is pending creation in Okta
+        CREATION_FAILED: The privileged resource creation failed
+    PrivilegedResourceType:
+      type: string
+      description: The type of the resource
+      enum:
+        - APP_ACCOUNT
+        - OKTA_USER_ACCOUNT
+      x-enumDescriptions:
+        APP_ACCOUNT: Represents a privileged resource that belongs to an app
+        OKTA_USER_ACCOUNT: Represents a privileged resource that belongs to Okta
+    CredentialSyncState:
+      type: string
+      enum:
+        - NOT_SYNCED
+        - SYNCING
+        - SYNCED
+        - SYNC_FAILED
+      description: Current credential sync status of the privileged resource
+      x-enumDescriptions:
+        NOT_SYNCED: Credentials are not yet synced
+        SYNCING: Credentials are currently being synced
+        SYNCED: Credentials are successfully synced
+        SYNC_FAILED: Credential sync failed
+      readOnly: true
+    CredentialSyncInfo:
+      type: object
+      properties:
+        secretVersionId:
+          type: string
+          description: The version ID of the password secret from the OPA vault.
+          minLength: 1
+          maxLength: 36
+          example: 9f8400-e29b-41d4-a716-926655440034
+        syncTime:
+          type: string
+          description: Timestamp when the credential was changed
+          format: date-time
+          readOnly: true
+          example: 2024-06-10T11:30:01.000Z
+        syncState:
+          $ref: '#/components/schemas/CredentialSyncState'
+        errorCode:
+          type: string
+          description: The error code for the type of error
+          readOnly: true
+        errorReason:
+          type: string
+          description: A short description of the error
+          readOnly: true
+    profile:
+      description: Specific profile properties for the privileged resource
+      type: object
+      additionalProperties: true
+      readOnly: true
+    ETag:
+      description: Header to track the completion time of the resource fetch job
+      type: string
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes
+  examples:
+    PrivilegedResourceCreateOktaAccountRequestConvert:
+      value:
+        resourceType: OKTA_USER_ACCOUNT
+        resourceId: 00u100xTfFs4MasRf0g4
+    PrivilegedResourceCreateOktaAccountRequestNew:
+      value:
+        resourceType: OKTA_USER_ACCOUNT
+        credentials:
+          userName: username
+        profile:
+          email: testuser@example.com
+    PrivilegedResourceCreateAppAccountRequest:
+      value:
+        resourceType: APP_ACCOUNT
+        containerDetails:
+          containerId: 0oa103099SBEb3Z2b0g4
+        credentials:
+          userName: testuser@example.com
+    PrivilegedResourceFilterCreatePayload:
+      summary: Filters request body
+      value:
+        organizationalUnits:
+          - name: OU=example1,DN=globo,DN=com
+          - name: OU=example2,DN=globo,DN=com
+        appGroups:
+          - name: domainAdminsGroup1
+            externalId: 18070146415
+          - name: domainAdminsGroup2
+            externalId: 7968626130
+    PrivilegedResourceCreateOktaAccountResponse:
+      value:
+        id: opa100xTfFs4MasRf0g4
+        resourceType: OKTA_USER_ACCOUNT
+        resourceId: 00u100xTfFs4MasRf0g4,
+        credentials:
+          userName: username
+        profile:
+          email: testuser@example.com
+        created: 2024-06-10T11:11:01.000Z
+        lastUpdated: 2024-06-10T11:11:01.000Z
+        status: INACTIVE
+        credentialSyncInfo:
+          secretVersionId: ''
+          syncTime: ''
+          syncState: NOT_SYNCED
+          errorCode: ''
+          errorReason: ''
+    PrivilegedResourceCreateAppAccountResponse:
+      value:
+        id: opa100xTfFs4MasRf0g4
+        resourceType: APP_ACCOUNT
+        containerDetails:
+          appName: google,
+          containerId: 0oa103099SBEb3Z2b0g4,
+          displayName: Google App1,
+          globalAppId: 964b82aa-85b4-5645-b790-83312c473480,
+          passwordPushSupported: true,
+          provisioningEnabled: true,
+          _links:
+            login:
+              href: https://appinstance-admin.oktapreview.com/home/google/0oa103099SBEb3Z2b0g4,
+            logo:
+              href: https://appinstance-admin.oktapreview.com/assets/img/logos/default.6770228fb0dab49a1695ef440a5279bb.png,
+        credentials:
+          userName: testuser@example.com
+        created: 2024-06-10T11:11:01.000Z
+        lastUpdated: 2024-06-10T11:11:01.000Z
+        status: INACTIVE
+        credentialSyncInfo:
+          secretVersionId: ''
+          syncTime: ''
+          syncState: NOT_SYNCED
+          errorCode: ''
+          errorReason: ''
+    PrivilegedResourceClaimOktaAccountResponse:
+      value:
+        id: opa100xTfFs4MasRf0g4
+        resourceType: OKTA_USER_ACCOUNT
+        resourceId: 00u100xTfFs4MasRf0g4,
+        credentials:
+          userName: username
+        profile:
+          email: testuser@example.com
+        created: 2024-06-10T11:11:01.000Z
+        lastUpdated: 2024-06-10T11:11:01.000Z
+        status: ACTIVE
+        credentialSyncInfo:
+          secretVersionId: ''
+          syncTime: ''
+          syncState: NOT_SYNCED
+          errorCode: ''
+          errorReason: ''
+    PrivilegedResourceClaimAppAccountResponse:
+      value:
+        id: opa100xTfFs4MasRf0g4
+        resourceType: APP_ACCOUNT
+        containerDetails:
+          appName: google,
+          containerId: 0oa103099SBEb3Z2b0g4,
+          displayName: Google App1,
+          globalAppId: 964b82aa-85b4-5645-b790-83312c473480,
+          passwordPushSupported: true,
+          provisioningEnabled: true,
+          _links:
+            login:
+              href: https://appinstance-admin.oktapreview.com/home/google/0oa103099SBEb3Z2b0g4,
+            logo:
+              href: https://appinstance-admin.oktapreview.com/assets/img/logos/default.6770228fb0dab49a1695ef440a5279bb.png,
+        credentials:
+          userName: testuser@example.com
+        created: 2024-06-10T11:11:01.000Z
+        lastUpdated: 2024-06-10T11:11:01.000Z
+        status: ACTIVE
+        credentialSyncInfo:
+          secretVersionId: ''
+          syncTime: ''
+          syncState: NOT_SYNCED
+          errorCode: ''
+          errorReason: ''
+    PrivilegedResourceRotatePasswordOktaAccountResponse:
+      value:
+        id: opa100xTfFs4MasRf0g4
+        resourceType: OKTA_USER_ACCOUNT
+        resourceId: 00u100xTfFs4MasRf0g4,
+        credentials:
+          userName: username
+        profile:
+          email: testuser@example.com
+        created: 2024-06-10T11:11:01.000Z
+        lastUpdated: 2024-06-10T11:11:01.000Z
+        status: ACTIVE
+        credentialSyncInfo:
+          secretVersionId: 9f8400-e29b-41d4-a716-926655440034
+          syncTime: '2024-06-11T11:11:01.000Z'
+          syncState: SYNCED
+          errorCode: ''
+          errorReason: ''
+    PrivilegedResourceRotatePasswordAppAccountResponse:
+      value:
+        id: opa100xTfFs4MasRf0g4
+        resourceType: APP_ACCOUNT
+        containerDetails:
+          appName: google,
+          containerId: 0oa103099SBEb3Z2b0g4,
+          displayName: Google App1,
+          globalAppId: 964b82aa-85b4-5645-b790-83312c473480,
+          passwordPushSupported: true,
+          provisioningEnabled: true,
+          _links:
+            login:
+              href: https://appinstance-admin.oktapreview.com/home/google/0oa103099SBEb3Z2b0g4,
+            logo:
+              href: https://appinstance-admin.oktapreview.com/assets/img/logos/default.6770228fb0dab49a1695ef440a5279bb.png,
+        credentials:
+          userName: testuser@example.com
+        created: 2024-06-10T11:11:01.000Z
+        lastUpdated: 2024-06-10T11:11:01.000Z
+        status: ACTIVE
+        credentialSyncInfo:
+          secretVersionId: 9f8400-e29b-41d4-a716-926655440034
+          syncTime: ''
+          syncState: SYNCING
+          errorCode: ''
+          errorReason: ''
+    PrivilegedResourcesGetOktaAccountResponse:
+      value:
+        id: opa100xTfFs4MasRf0g4
+        resourceType: OKTA_USER_ACCOUNT
+        resourceId: 00u100xTfFs4MasRf0g4,
+        credentials:
+          userName: testuser@example.com
+        profile:
+          email: testuser@example.com
+        created: 2024-06-10T11:11:01.000Z
+        lastUpdated: 2024-06-10T11:11:01.000Z
+        status: ACTIVE
+        credentialSyncInfo:
+          secretVersionId: 9f8400-e29b-41d4-a716-926655440034
+          syncTime: 2024-06-10T11:30:01.000Z
+          syncState: SYNCED
+          errorCode: ''
+          errorReason: ''
+    PrivilegedResourcesGetAppAccountResponse:
+      value:
+        id: opa100xTfFs4MasRf0g4
+        resourceType: APP_ACCOUNT
+        containerDetails:
+          appName: google,
+          containerId: 0oa103099SBEb3Z2b0g4,
+          displayName: Google App1,
+          globalAppId: 964b82aa-85b4-5645-b790-83312c473480,
+          passwordPushSupported: true,
+          provisioningEnabled: true,
+          _links:
+            login:
+              href: https://appinstance-admin.oktapreview.com/home/google/0oa103099SBEb3Z2b0g4,
+            logo:
+              href: https://appinstance-admin.oktapreview.com/assets/img/logos/default.6770228fb0dab49a1695ef440a5279bb.png,
+        credentials:
+          userName: testuser@example.com
+        created: 2024-06-10T11:11:01.000Z
+        lastUpdated: 2024-06-10T11:11:01.000Z
+        status: ACTIVE
+        credentialSyncInfo:
+          secretVersionId: 9f8400-e29b-41d4-a716-926655440034
+          syncTime: 2024-06-10T11:30:01.000Z
+          syncState: SYNC_FAILED
+          errorCode: UNKNOWN_ERROR
+          errorReason: Password update failed
+    PrivilegedResourcesOktaUserAccountUpdateRequest:
+      value:
+        username: username
+        profile:
+          email: testuser@example.com
+    PrivilegedResourcesAppAccountUpdateRequest:
+      value:
+        username: username
+    PrivilegedResourcesFetchResponse:
+      summary: List privileged resources
+      value:
+        - id: opa100xTfFs4MasRf0g4
+          resourceType: APP_ACCOUNT
+          credentials:
+            userName: john.adams@ct12-100k.local.domain
+          created: 2024-06-10T11:11:01.000Z
+          lastUpdated: 2024-06-10T11:11:01.000Z
+          status: ACTIVE
+          credentialSyncInfo:
+            secretVersionId: 9f8400-e29b-41d4-a716-926655440034
+            syncTime: 2024-06-10T11:30:01.000Z
+            syncState: SYNCED
+            errorCode: ''
+            errorReason: ''
+          profile:
+            firstName: John
+            lastName: Adams
+            displayName: John Adams
+            email: john.adams@ct12-100k.local.domain
+            dn: CN=John Adams,OU=Sales,DC=ct12-100k,DC=local
+            objectSid: sid-1234
+            samAccountName: john-adams
+        - id: opa100xTfFs4MasRf0g5
+          resourceType: APP_ACCOUNT
+          credentials:
+            userName: testuser@example.com
+          created: 2024-06-10T11:11:01.000Z
+          lastUpdated: 2024-06-10T11:11:01.000Z
+          status: ACTIVE
+          credentialSyncInfo:
+            secretVersionId: 9f8400-e29b-41d4-a716-926655440034
+            syncTime: 2024-06-10T11:30:01.000Z
+            syncState: SYNCED
+            errorCode: ''
+            errorReason: ''
+          profile:
+            firstName: John
+            lastName: Doe
+            displayName: John Doe
+            email: john.doe@ct12-100k.local.domain
+            dn: CN=John Doe,OU=Sales,DC=ct12-100k,DC=local
+            objectSid: sid-5678
+            samAccountName: john-doe

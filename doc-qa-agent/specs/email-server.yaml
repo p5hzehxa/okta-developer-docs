@@ -1,0 +1,627 @@
+openapi: 3.0.3
+info:
+  title: Email SMTP servers APIs
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/email-servers:
+    get:
+      summary: List all enrolled SMTP servers
+      description: Lists all the enrolled custom SMTP server configurations
+      operationId: listEmailServers
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailServerListResponse'
+              examples:
+                BasicSMTP:
+                  $ref: "#/components/examples/ListBasicSMTPServer"
+                OAuthClientCredentials:
+                  $ref: "#/components/examples/ListOAuthClientCredentialsServer"
+                OAuthJWT:
+                  $ref: "#/components/examples/ListOAuthJWTServer"
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.emailServers.read
+      tags:
+        - EmailServer
+    post:
+      summary: Create a custom SMTP server
+      description: |-
+        Creates a custom email SMTP server configuration for your org.
+
+        For more information about configuring the OAuth 2.0 authentication methods, see [Custom email providers with OAuth 2.0](https://developer.okta.com/docs/guides/custom-smtp/main/).
+      operationId: createEmailServer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseEmailServer'
+            examples:
+              BasicSMTP:
+                $ref: "#/components/examples/BasicSMTPRequest"
+              OAuthClientCredentials:
+                $ref: "#/components/examples/OAuthClientCredentialsRequest"
+              OAuthJWT:
+                $ref: "#/components/examples/OAuthJWTRequest"
+      responses:
+        '201':
+          description: Successfully enrolled server credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailServerResponse'
+              examples:
+                BasicSMTP:
+                  $ref: "#/components/examples/BasicSMTPResponse"
+                OAuthClientCredentials:
+                  $ref: "#/components/examples/OAuthClientCredentialsResponse"
+                OAuthJWT:
+                  $ref: "#/components/examples/OAuthJWTResponse"
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.emailServers.manage
+      tags:
+        - EmailServer
+    x-okta-team-detail:
+      x-team-slack: amp-eng-workforce-authenticators
+  /api/v1/email-servers/{emailServerId}:
+    parameters:
+      - $ref: '#/components/parameters/pathEmailServerId'
+    get:
+      summary: Retrieve an SMTP server configuration
+      description: Retrieves the specified custom SMTP server configuration
+      operationId: getEmailServer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailServerResponse'
+              examples:
+                SMTPServerResponse:
+                  $ref: "#/components/examples/BasicSMTPResponse"
+                OAuthClientCredentialsResponse:
+                  $ref: "#/components/examples/OAuthClientCredentialsResponse"
+                OAuthJWTResponse:
+                  $ref: "#/components/examples/OAuthJWTResponse"
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.emailServers.read
+      tags:
+        - EmailServer
+    patch:
+      summary: Update an SMTP server configuration
+      description: Updates the specified custom SMTP server configuration
+      operationId: updateEmailServer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseEmailServer'
+            examples:
+              BasicSMTP:
+                $ref: "#/components/examples/BasicSMTPPatchRequest"
+              OAuthClientCredentials:
+                $ref: "#/components/examples/OAuthClientCredentialsPatchRequest"
+              OAuthJWT:
+                $ref: "#/components/examples/OAuthJWTPatchRequest"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailServerResponse'
+              examples:
+                BasicSMTP:
+                  $ref: "#/components/examples/BasicSMTPPatchResponse"
+                OAuthClientCredentials:
+                  $ref: "#/components/examples/OAuthClientCredentialsPatchResponse"
+                OAuthJWT:
+                  $ref: "#/components/examples/OAuthJWTPatchResponse"
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.emailServers.manage
+      tags:
+        - EmailServer
+    delete:
+      summary: Delete an SMTP server configuration
+      description: Deletes the specified custom SMTP server configuration
+      operationId: deleteEmailServer
+      responses:
+        '204':
+          description: No content
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.emailServers.manage
+      tags:
+        - EmailServer
+    x-okta-team-detail:
+      x-team-slack: amp-eng-workforce-authenticators
+  /api/v1/email-servers/{emailServerId}/test:
+    parameters:
+      - $ref: '#/components/parameters/pathEmailServerId'
+    post:
+      summary: Test an SMTP server configuration
+      description: Tests the specified custom SMTP server configuration
+      operationId: testEmailServer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailTestAddresses'
+      responses:
+        '204':
+          description: No content
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.emailServers.manage
+      tags:
+        - EmailServer
+    x-okta-team-detail:
+      x-team-slack: amp-eng-workforce-authenticators
+components:
+  parameters:
+    pathEmailServerId:
+      name: emailServerId
+      in: path
+      required: true
+      schema:
+        type: string
+        description: ID of your SMTP server configuration
+  schemas:
+    BaseEmailServer:
+      type: object
+      properties:
+        alias:
+          type: string
+          description: Human-readable name for your SMTP server
+          example: CustomServer1
+        enabled:
+          type: boolean
+          description: If `true`, all email traffic is routed through your SMTP server
+        host:
+          type: string
+          description: Hostname or IP address of your SMTP server
+          example: 192.168.160.1
+        port:
+          type: integer
+          description: Port number of your SMTP server
+          example: 587
+        username:
+          type: string
+          description: Username that's used to access your SMTP server
+          example: some_user@domain.com
+        id:
+          type: string
+          description: ID of your SMTP server
+          readOnly: true
+        authType:
+          $ref: '#/components/schemas/SmtpAuthType'
+      discriminator:
+        propertyName: authType
+        mapping:
+          BASIC_SMTP_AUTH: '#/components/schemas/BASIC_SMTP_AUTH_REQ'
+          OAUTH2_CLIENT_CREDENTIALS: '#/components/schemas/OAUTH2_CLIENT_CREDENTIALS_REQ'
+          OAUTH2_JWT_BEARER_GRANT: '#/components/schemas/OAUTH2_JWT_BEARER_GRANT_REQ'
+      required:
+        - alias
+        - enabled
+        - host
+        - port
+        - username
+        - authType
+    SmtpAuthType:
+      type: string
+      description: |-
+        The authentication type that's used by your SMTP server
+      x-okta-lifecycle:
+        features:
+          - OAUTH_FOR_CUSTOM_SMTP_SERVER
+      enum:
+        - BASIC_SMTP_AUTH
+        - OAUTH2_CLIENT_CREDENTIALS
+        - OAUTH2_JWT_BEARER_GRANT
+      x-enumDescriptions:
+        BASIC_SMTP_AUTH: Basic SMTP authentication uses a username and password to authenticate with your SMTP server
+        OAUTH2_CLIENT_CREDENTIALS: OAuth 2.0 client credentials requires you to create an OAuth 2.0 app with your email provider to obtain a client ID and client secret
+        OAUTH2_JWT_BEARER_GRANT: OAuth 2.0 JWT bearer token requires you to create an OAuth 2.0 app with your email provider and use a signed JWT to obtain an access token
+    BASIC_SMTP_AUTH_REQ:
+      title: BASIC_SMTP_AUTH
+      allOf:
+        - $ref: '#/components/schemas/BaseEmailServer'
+        - type: object
+          properties:
+            password:
+              type: string
+              description: The password of the user account that's used to sign in to your SMTP server
+          required:
+            - password
+
+    OAUTH2_CLIENT_CREDENTIALS_REQ:
+      title: OAUTH2_CLIENT_CREDENTIALS
+      allOf:
+        - $ref: '#/components/schemas/BaseEmailServer'
+        - type: object
+          properties:
+            clientId:
+              type: string
+              description: |-
+                The client ID that's used to access your SMTP server. This client ID is obtained when you create an OAuth 2.0 app with your email provider.
+            clientSecret:
+              type: string
+              description: |-
+                The client secret that's used to access your SMTP server. This client secret is obtained when you create an OAuth 2.0 app with your email provider.
+            tokenEndpoint:
+              type: string
+              description: The email provider's specific URL where the OAuth 2.0 app sends its credentials (or signed JWT) to exchange them for an access token
+            tokenEndpointAuthMethod:
+              type: string
+              description: |-
+                This method determines how your OAuth 2.0 app sends its credentials (`client_id` and `client_secret`) to the provider's server when requesting an access token.
+              enum:
+                - CLIENT_SECRET_BASIC
+                - CLIENT_SECRET_POST
+              x-enumDescriptions:
+                CLIENT_SECRET_BASIC: The `client_id` and `client_secret` are combined into a single string (separated by a colon), Base64 encoded, and sent in the `Authorization` header
+                CLIENT_SECRET_POST: The `client_id` and `client_secret` are sent as standard form parameters in the payload of the POST request.
+            scopes:
+              type: array
+              description: |-
+                List of OAuth 2.0 scopes for your SMTP server. You must provide a scope that allows your email server to send emails.
+              items:
+                type: string
+          required:
+            - clientId
+            - clientSecret
+            - tokenEndpoint
+            - tokenEndpointAuthMethod
+            - scopes
+    OAUTH2_JWT_BEARER_GRANT_REQ:
+      title: OAUTH2_JWT_BEARER_GRANT
+      allOf:
+        - $ref: '#/components/schemas/BaseEmailServer'
+        - type: object
+          properties:
+            tokenEndpoint:
+              type: string
+              description: |-
+                The email provider's specific URL where the OAuth 2.0 app sends its credentials (or signed JWT) to exchange them for an access token
+            clientId:
+              type: string
+              description: |-
+                The client ID that's used to access your SMTP server. This client ID is obtained when you create an OAuth 2.0 app with your email provider.
+            signingAlgorithm:
+              type: string
+              description: The signing algorithm that's used to sign the JWT
+              enum:
+                - RS256
+            keyId:
+              type: string
+              description: The ID of the private key that's used to sign the JWT
+            issuer:
+              type: string
+              description: |-
+                The unique ID of the entity that creates the JWT. This can sometimes be the email address of the user who creates the JWT. Check with your email provider for the correct value.
+            subject:
+              type: string
+              description: |-
+                The email address of the user account that the OAuth 2.0 app impersonates to send emails
+            audience:
+              type: string
+              description: |-
+                The URI of the authorization server that verifies the token. This is typically the token URI of your JWT.
+            scopes:
+              type: array
+              description: |-
+                List of OAuth 2.0 scopes for your SMTP server. You must provide a scope that allows your email server to send emails.
+              items:
+                type: string
+            privateKey:
+              type: string
+              description: The secret RSA key that's used to cryptographically sign the JWT
+          required:
+            - tokenEndpoint
+            - clientId
+            - signingAlgorithm
+            - keyId
+            - issuer
+            - subject
+            - audience
+            - scopes
+            - privateKey
+    EmailServerListResponse:
+      type: object
+      properties:
+        email-servers:
+          type: array
+          description: List of enrolled SMTP servers
+          items:
+            $ref: '#/components/schemas/EmailServerResponse'
+    EmailServerResponse:
+      $ref: '#/components/schemas/BaseEmailServer'
+    EmailTestAddresses:
+      type: object
+      properties:
+        fromAddress:
+          type: string
+          description: Email address that sends test emails
+          example: sender@host.com
+        toAddress:
+          type: string
+          description: Email address that receives test emails
+          example: receiver@host.com
+      required:
+        - fromAddress
+        - toAddress
+
+  examples:
+    ListBasicSMTPServer:
+      summary: List containing basic authentication SMTP server
+      value:
+        email-servers:
+          - id: ces7n3u7sSohfoaou0g1
+            alias: CustomServer1
+            enabled: true
+            authType: BASIC_SMTP_AUTH
+            host: smtp.example.com
+            port: 587
+            username: user@example.com
+    ListOAuthClientCredentialsServer:
+      summary: List containing OAuth 2.0 client credentials SMTP server
+      x-okta-lifecycle:
+        features:
+          - OAUTH_FOR_CUSTOM_SMTP_SERVER
+      value:
+        email-servers:
+          - id: ces7n3u7sSohfoaou0g2
+            alias: OAuthServer1
+            enabled: true
+            authType: OAUTH2_CLIENT_CREDENTIALS
+            host: smtp.oauth.com
+            port: 587
+            username: user@oauth.com
+            clientId: oauth-client-id
+            tokenEndpoint: https://oauth.example.com/token
+            tokenEndpointAuthMethod: CLIENT_SECRET_BASIC
+            scopes: [send_email]
+    ListOAuthJWTServer:
+      summary: List containing OAuth 2.0 JWT bearer grant SMTP server
+      x-okta-lifecycle:
+        features:
+          - OAUTH_FOR_CUSTOM_SMTP_SERVER
+      value:
+        email-servers:
+          - id: ces7n3u7sSohfoaou0g3
+            alias: OAuthServer2
+            enabled: true
+            authType: OAUTH2_JWT_BEARER_GRANT
+            host: smtp.oauth.com
+            port: 587
+            username: user@oauth.com
+            clientId: oauth-client-id
+            tokenEndpoint: https://oauth.example.com/token
+            signingAlgorithm: RS256
+            issuer: https://oauth.example.com
+            subject: user@oauth.com
+            audience: https://smtp.oauth.com
+            scopes: [org.email.send]
+    BasicSMTPRequest:
+      summary: Create basic authentication SMTP server
+      value:
+        alias: CustomServer1
+        enabled: true
+        host: smtp.example.com
+        port: 587
+        username: user@example.com
+        password: securepassword
+    BasicSMTPPatchRequest:
+      summary: Update basic SMTP server
+      value:
+        alias: CustomServer1 New Alias
+        password: New password
+    OAuthClientCredentialsRequest:
+      summary: Create OAuth client credentials server
+      x-okta-lifecycle:
+        features:
+          - OAUTH_FOR_CUSTOM_SMTP_SERVER
+      value:
+        alias: OAuthServer1
+        enabled: false
+        host: smtp.oauth.com
+        port: 587
+        username: user@oauth.com
+        clientId: oauth-client-id
+        clientSecret: oauth-client-secret
+        tokenEndpoint: https://oauth.example.com/token
+        tokenEndpointAuthMethod: CLIENT_SECRET_BASIC
+        scopes: [send_email]
+    OAuthClientCredentialsPatchRequest:
+      summary: Update OAuth 2.0 client credentials server
+      x-okta-lifecycle:
+        features:
+          - OAUTH_FOR_CUSTOM_SMTP_SERVER
+      value:
+        alias: OAuthServer1 New Alias
+        clientSecret: New client secret
+    OAuthJWTRequest:
+      summary: Create OAuth 2.0 JWT bearer grant server
+      x-okta-lifecycle:
+        features:
+          - OAUTH_FOR_CUSTOM_SMTP_SERVER
+      value:
+        alias: OAuthServer2
+        enabled: false
+        host: smtp.oauth.com
+        port: 587
+        username: user@oauth.com
+        clientId: oauth-client-id
+        tokenEndpoint: https://oauth.example.com/token
+        signingAlgorithm: RS256
+        keyId: oauth-key-id
+        issuer: https://oauth.example.com
+        subject: user@oauth.com
+        audience: https://smtp.oauth.com
+        scopes: [org.email.send]
+        privateKey: |
+          -----BEGIN PRIVATE KEY-----
+          ...
+          -----END PRIVATE KEY-----
+    OAuthJWTPatchRequest:
+      summary: Update OAuth 2.0 JWT bearer grant server
+      x-okta-lifecycle:
+        features:
+          - OAUTH_FOR_CUSTOM_SMTP_SERVER
+      value:
+        alias: OAuthServer2 New Alias
+        keyId: New keyId
+        privateKey: |
+          -----BEGIN PRIVATE KEY-----
+          ... New Private Key Contents ...
+          -----END PRIVATE KEY-----
+    BasicSMTPResponse:
+      summary: Basic authentication SMTP server response
+      value:
+        id: ces7n3u7sSohfoaou0g1
+        alias: CustomServer1
+        enabled: true
+        authType: BASIC_SMTP_AUTH
+        host: smtp.example.com
+        port: 587
+        username: user@example.com
+    BasicSMTPPatchResponse:
+      summary: Basic authentication SMTP server patch response
+      value:
+        id: ces7n3u7sSohfoaou0g1
+        alias: CustomServer1 New Alias
+        enabled: true
+        authType: BASIC_SMTP_AUTH
+        host: smtp.example.com
+        port: 587
+        username: user@example.com
+    OAuthClientCredentialsResponse:
+      summary: OAuth 2.0 client credentials server response
+      x-okta-lifecycle:
+        features:
+          - OAUTH_FOR_CUSTOM_SMTP_SERVER
+      value:
+        id: ces7n3u7sSohfoaou0g2
+        alias: OAuthServer1
+        enabled: false
+        authType: OAUTH2_CLIENT_CREDENTIALS
+        host: smtp.oauth.com
+        port: 587
+        username: user@oauth.com
+        clientId: oauth-client-id
+        tokenEndpoint: https://oauth.example.com/token
+        tokenEndpointAuthMethod: CLIENT_SECRET_BASIC
+        scopes: [send_email]
+    OAuthClientCredentialsPatchResponse:
+      summary: OAuth 2.0 client credentials server patch response
+      x-okta-lifecycle:
+        features:
+          - OAUTH_FOR_CUSTOM_SMTP_SERVER
+      value:
+        id: ces7n3u7sSohfoaou0g2
+        alias: OAuthServer1 New Alias
+        enabled: false
+        authType: OAUTH2_CLIENT_CREDENTIALS
+        host: smtp.oauth.com
+        port: 587
+        username: user@oauth.com
+        clientId: oauth-client-id
+        tokenEndpoint: https://oauth.example.com/token
+        tokenEndpointAuthMethod: CLIENT_SECRET_BASIC
+        scopes: [send_email]
+    OAuthJWTResponse:
+      summary: OAuth 2.0 JWT bearer grant server response
+      x-okta-lifecycle:
+        features:
+          - OAUTH_FOR_CUSTOM_SMTP_SERVER
+      value:
+        id: ces7n3u7sSohfoaou0g3
+        alias: OAuthServer2
+        enabled: false
+        authType: OAUTH2_JWT_BEARER_GRANT
+        host: smtp.oauth.com
+        port: 587
+        username: user@oauth.com
+        clientId: oauth-client-id
+        signingAlgorithm: RS256
+        issuer: https://oauth.example.com
+        subject: user@oauth.com
+        audience: https://smtp.oauth.com
+        scopes: [org.email.send]
+    OAuthJWTPatchResponse:
+      summary: OAuth 2.0 JWT bearer grant server patch response
+      x-okta-lifecycle:
+        features:
+          - OAUTH_FOR_CUSTOM_SMTP_SERVER
+      value:
+        id: ces7n3u7sSohfoaou0g3
+        alias: OAuthServer2 New Alias
+        enabled: false
+        authType: OAUTH2_JWT_BEARER_GRANT
+        host: smtp.oauth.com
+        port: 587
+        username: user@oauth.com
+        clientId: oauth-client-id
+        signingAlgorithm: RS256
+        issuer: https://oauth.example.com
+        subject: user@oauth.com
+        audience: https://smtp.oauth.com
+        scopes: [org.email.send]
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

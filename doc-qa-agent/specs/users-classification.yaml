@@ -1,0 +1,111 @@
+openapi: 3.0.3
+info:
+  title: User's Classification APIs
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/users/{userId}/classification:
+    parameters:
+      - $ref: ./Common.yaml#/components/parameters/pathUserId
+    put:
+      summary: Replace the user's classification
+      description: Replaces the user's classification
+      operationId: replaceUserClassification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReplaceUserClassification'
+            examples:
+              Set user to LITE:
+                $ref: '#/components/examples/Set-User-Classification-Example'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserClassification'
+              examples:
+                Get classification of user:
+                  $ref: '#/components/examples/Get-User-Classification-Example'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserClassification
+    get:
+      summary: Retrieve a user's classification
+      description: Retrieves a user's classification
+      operationId: getUserClassification
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserClassification'
+              examples:
+                Get classification of user:
+                  $ref: '#/components/examples/Get-User-Classification-Example'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.read
+      tags:
+        - UserClassification
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+components:
+  schemas:
+    UserClassification:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/ClassificationType'
+        lastUpdated:
+          type: string
+          description: The timestamp when the user classification was last updated
+          format: date-time
+          readOnly: true
+    ClassificationType:
+      type: string
+      description: The type of user classification
+      enum:
+        - LITE
+        - STANDARD
+      x-enumDescriptions:
+        LITE: Lite
+        STANDARD: Standard
+    ReplaceUserClassification:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/ClassificationType'
+  examples:
+    Set-User-Classification-Example:
+      value:
+        type: LITE
+    Get-User-Classification-Example:
+      value:
+        type: LITE
+        lastUpdated: 2022-05-04T19:50:52.000Z
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

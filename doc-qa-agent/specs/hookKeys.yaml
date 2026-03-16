@@ -1,0 +1,432 @@
+openapi: 3.0.3
+info:
+  title: HookKeys API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/hook-keys:
+    get:
+      summary: List all keys
+      description: Lists all keys
+      operationId: listHookKeys
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HookKey'
+              examples:
+                ResponseExample:
+                  $ref: '#/components/examples/ListAllKeysResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.inlineHooks.read
+      tags:
+        - HookKey
+    post:
+      summary: Create a key
+      description: |-
+        Creates a key for use with other parts of the application, such as inline hooks
+
+        > **Note:**  Use the key name to access this key for inline hook operations.
+
+        The total number of keys that you can create in an Okta org is limited to 50.
+
+         The response is a [Key object](https://developer.okta.com/docs/reference/api/hook-keys/#key-object) that represents the 
+         key that you create. The `id` property in the response serves as the unique ID for the key, which you can specify when 
+         invoking other CRUD operations. The `keyId` provided in the response is the alias of the public key that you can use to get 
+         details of the public key data in a separate call.
+
+        > **Note:** The keyId is the alias of the public key that you can use to retrieve the public key.
+      operationId: createHookKey
+      x-codegen-request-body-name: keyRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KeyRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedHookKeyInstance'
+              examples:
+                ResponseExample:
+                  $ref: '#/components/examples/CreateHookKeyResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.inlineHooks.manage
+      tags:
+        - HookKey
+    x-okta-team-detail:
+      x-team-slack: eng-data-platform
+  /api/v1/hook-keys/public/{keyId}:
+    parameters:
+      - $ref: '#/components/parameters/pathPublicKeyId'
+    get:
+      summary: Retrieve a public key
+      description: |-
+        Retrieves a public key by `keyId`
+
+        >**Note:** keyId is the alias of the public key.
+      operationId: getPublicKey
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: ./apps.yaml#/components/schemas/_embedded
+              examples:
+                ResponseExample:
+                  $ref: '#/components/examples/RetrievePublicKeyResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.inlineHooks.read
+      tags:
+        - HookKey
+    x-okta-team-detail:
+      x-team-slack: eng-data-platform
+  /api/v1/hook-keys/{id}:
+    parameters:
+      - $ref: '#/components/parameters/pathHookKeyId'
+    get:
+      summary: Retrieve a key by ID
+      description: |-
+        Retrieves the public portion of the Key object using the `id` parameter
+
+        >**Note:** The `?expand=publickey` query parameter optionally returns the full object including the details of the public key in the response body's `_embedded` property.
+      operationId: getHookKey
+      parameters:
+        - name: id
+          description: A valid key ID
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HookKey'
+              examples:
+                ResponseExample:
+                  $ref: '#/components/examples/RetrieveKeyResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.inlineHooks.read
+      tags:
+        - HookKey
+    put:
+      summary: Replace a key
+      description: |-
+        Replaces a key by `id`
+
+        This request replaces existing properties after passing validation.
+
+        > **Note:** The only parameter that you can update is the name of the key, which must be unique at all times.
+      operationId: replaceHookKey
+      x-codegen-request-body-name: keyRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KeyRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedHookKeyInstance'
+              examples:
+                ResponseExample:
+                  $ref: '#/components/examples/ReplaceKeyResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.inlineHooks.manage
+      tags:
+        - HookKey
+    delete:
+      summary: Delete a key
+      description: |
+        Deletes a key by `id`. After being deleted, the key is unrecoverable.
+
+        As a safety precaution, only keys that aren't being used are eligible for deletion.
+      operationId: deleteHookKey
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.inlineHooks.manage
+      tags:
+        - HookKey
+    x-okta-team-detail:
+      x-team-slack: eng-data-platform
+components:
+  examples:
+    CreateHookKeyResponse:
+      summary: Create a key response example
+      value:
+        id: HKY1p7jWLndGQV9M60g4
+        keyId: 7fbc27fd-e3df-4522-86bf-1930110256ad
+        name: My new key
+        created: '2022-08-31T18:09:58.000Z'
+        lastUpdated: '2022-08-31T18:09:58.000Z'
+        isUsed: 'false'
+        _embedded:
+          kty: RSA
+          alg: RSA
+          kid: 7fbc27fd-e3df-4522-86bf-1930110256ad
+          use: 'null'
+          e: AQAB
+          'n': 2naqCnv6r4xNQs7207lRtKQvdtnlVND-8k5iYBIiqoKGY3CqUmRm1jleoOniiQoMkFX8Wj2DmVqr002efF3vOQ7_gjtTatBTVUNbNIQLybun4dkVoUtfP7pRc5SLpcP3eGPRVar734ZrpQXzmCEdpqBt3jrVjwYjNE5DqOjbYXFJtMsy8CWE9LRJ3kyHEoHPzo22dG_vMrXH0_sAQoCk_4TgNCbvyzVmGVYXI_BkUnp0hv2pR4bQVRYzGB9dKJdctOh8zULqc_EJ8tiYsS05YnF7whrWEyARK0rH-e4d4W-OmBTga_zhY4kJ4NsoQ4PyvcatZkxjPO92QHQOFDnf3w`
+    ListAllKeysResponse:
+      summary: List all keys response example
+      value:
+        - id: HKY1i2htmXF5UNQhL0g4
+          keyId: bb5bed7d-6e4d-488f-9c86-59b93a2bb3fb
+          name: My new key
+          created: '2022-08-22T16:34:33.000Z'
+          lastUpdated: '2022-08-22T16:34:33.000Z'
+          isUsed: 'true'
+        - id: HKY1p7jWLndGQV9M60g4
+          keyId: 7fbc27fd-e3df-4522-86bf-1930110256ad
+          name: Test key
+          created: '2022-08-31T18:09:58.000Z'
+          lastUpdated: '2022-08-31T18:09:58.000Z'
+          isUsed: 'false'
+    RetrievePublicKeyResponse:
+      summary: Retrieve public key response example
+      value:
+        _embedded:
+          kty: RSA
+          alg: RSA
+          kid: 7fbc27fd-e3df-4522-86bf-1930110256ad
+          use: null
+          e: AQAB
+          'n': 2naqCnv6r4xNQs7207lRtKQvdtnlVND-8k5iYBIiqoKGY3CqUmRm1jleoOniiQoMkFX8Wj2DmVqr002efF3vOQ7_gjtTatBTVUNbNIQLybun4dkVoUtfP7pRc5SLpcP3eGPRVar734ZrpQXzmCEdpqBt3jrVjwYjNE5DqOjbYXFJtMsy8CWE9LRJ3kyHEoHPzo22dG_vMrXH0_sAQoCk_4TgNCbvyzVmGVYXI_BkUnp0hv2pR4bQVRYzGB9dKJdctOh8zULqc_EJ8tiYsS05YnF7whrWEyARK0rH-e4d4W-OmBTga_zhY4kJ4NsoQ4PyvcatZkxjPO92QHQOFDnf3w`
+    RetrieveKeyResponse:
+      summary: Retrieve a key by ID response example
+      value:
+        id: HKY1p7jWLndGQV9M60g4
+        keyId: 7fbc27fd-e3df-4522-86bf-1930110256ad
+        name: My new key
+        created: '2022-08-31T18:09:58.000Z'
+        lastUpdated: '2022-08-31T18:09:58.000Z'
+        isUsed: 'false'
+    ReplaceKeyResponse:
+      summary: Replace a key response example
+      value:
+        id: HKY1p7jWLndGQV9M60g4
+        keyId: 7fbc27fd-e3df-4522-86bf-1930110256ad
+        name: My updated new key
+        created: '2022-08-31T18:09:58.000Z'
+        lastUpdated: '2022-08-31T18:16:59.000Z'
+        isUsed: 'false'
+  parameters:
+    pathHookKeyId:
+      name: id
+      description: ID of the Hook Key
+      in: path
+      required: true
+      schema:
+        type: string
+        example: XreKU5laGwBkjOTehusG
+    pathPublicKeyId:
+      name: keyId
+      description: id" of the Public Key
+      in: path
+      required: true
+      schema:
+        type: string
+        example: FcH2P9Eg7wr0o8N2FuV0
+  schemas:
+    HookKey:
+      title: HookKeyInstance
+      description: |-
+        The `id` property in the response as `id` serves as the unique ID for the key, which you can specify when invoking other CRUD operations. 
+
+        The `keyId` provided in the response is the alias of the public key that you can use to get details of the public key data in a separate call.
+      type: object
+      properties:
+        created:
+          type: string
+          format: date-time
+          description: Timestamp when the key was created
+          readOnly: true
+          nullable: true
+        id:
+          type: string
+          description: The unique identifier for the key
+          readOnly: true
+          nullable: false
+        isUsed:
+          type: string
+          format: boolean
+          description: Whether this key is currently in use by other applications
+          nullable: false
+          readOnly: true
+        keyId:
+          type: string
+          description: The alias of the public key
+          nullable: false
+          readOnly: true
+        lastUpdated:
+          type: string
+          format: date-time
+          description: Timestamp when the key was updated
+          readOnly: true
+          nullable: true
+        name:
+          type: string
+          description: Display name of the key
+          readOnly: false
+          nullable: false
+          minLength: 1
+          maxLength: 255
+    DetailedHookKeyInstance:
+      title: DetailedHookKeyInstance
+      description: A key object with public key details
+      type: object
+      properties:
+        created:
+          type: string
+          format: date-time
+          description: Timestamp when the key was created
+          readOnly: true
+          nullable: true
+        id:
+          type: string
+          description: The unique Okta ID of this key record
+          readOnly: true
+          nullable: false
+        isUsed:
+          type: string
+          format: boolean
+          description: Whether this key is currently in use by other applications
+          nullable: false
+          readOnly: true
+        keyId:
+          type: string
+          description: The alias of the public key
+          nullable: false
+          readOnly: true
+        lastUpdated:
+          type: string
+          format: date-time
+          description: Timestamp when the key was updated
+          readOnly: true
+          nullable: true
+        name:
+          type: string
+          description: Display name of the key
+          readOnly: false
+          nullable: false
+          minLength: 1
+          maxLength: 255
+        _embedded:
+          $ref: ./apps.yaml#/components/schemas/_embedded
+    KeyRequest:
+      type: object
+      properties:
+        name:
+          description: Display name for the key
+          type: string
+          uniqueItems: true
+          readOnly: false
+          minLength: 1
+          maxLength: 255
+          nullable: false
+    _embedded:
+      type: object
+      description: The Public Key Details are defined in the `_embedded` property of the Key object.
+      properties:
+        kty:
+          description: Cryptographic algorithm family for the certificate's keypair
+          type: string
+          nullable: false
+          readOnly: true
+        alg:
+          description: Algorithm used in the key
+          type: string
+          nullable: false
+          readOnly: true
+        kid:
+          description: Unique identifier for the certificate
+          type: string
+          uniqueItems: true
+          nullable: false
+          readOnly: true
+        use:
+          description: Acceptable use of the certificate
+          type: string
+          nullable: true
+          readOnly: true
+        e:
+          description: RSA key value (exponent) for key binding
+          type: string
+          nullable: false
+          readOnly: true
+        'n':
+          description: RSA key value (modulus) for key binding
+          type: string
+          nullable: false
+          readOnly: true
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

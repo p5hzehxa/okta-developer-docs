@@ -1,0 +1,1784 @@
+openapi: 3.0.3
+info:
+  title: Users API
+  version: 1.0.0
+servers:
+  - url: https://subdomain.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/users/{id}/blocks:
+    parameters:
+      - $ref: '#/components/parameters/pathId'
+    get:
+      summary: List all user blocks
+      description: Lists information about how the user is blocked from accessing their account
+      operationId: listUserBlocks
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserBlock'
+              examples:
+                BlocksUnknownDevices:
+                  $ref: '#/components/examples/ListUserBlocksUnknownDevicesResponse'
+                BlocksAnyDevices:
+                  $ref: '#/components/examples/ListUserBlocksAnyDevicesResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.read
+      tags:
+        - User
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authenticator-platform
+  /api/v1/users/{userId}/roles:
+    parameters:
+      - $ref: '#/components/parameters/pathUserId'
+    get:
+      summary: List all user role assignments
+      description: Lists all roles assigned to a user (identified by `userId`)
+      operationId: listAssignedRolesForUser
+      parameters:
+        - $ref: ./roles.yaml#/components/parameters/pathQueryRoleExpand
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: ./roles.yaml#/components/schemas/StandardRole
+                    - $ref: ./roles.yaml#/components/schemas/CustomRole
+                  discriminator:
+                    propertyName: type
+                    mapping:
+                      API_ACCESS_MANAGEMENT_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                      APP_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                      GROUP_MEMBERSHIP_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                      HELP_DESK_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                      MOBILE_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                      ORG_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                      READ_ONLY_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                      REPORT_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                      SUPER_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                      USER_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                      WORKFLOWS_ADMIN: ./roles.yaml#/components/schemas/CustomRole
+                      ACCESS_CERTIFICATIONS_ADMIN: ./roles.yaml#/components/schemas/CustomRole
+                      ACCESS_REQUESTS_ADMIN: ./roles.yaml#/components/schemas/CustomRole
+                      CUSTOM: ./roles.yaml#/components/schemas/CustomRole
+              examples:
+                Standard roles:
+                  $ref: '#/components/examples/StandardRolesListResponse'
+                Custom roles:
+                  $ref: '#/components/examples/StandardAndCustomRolesListResponse'
+                IAM-based standard roles:
+                  $ref: '#/components/examples/IAMStandardRolesListResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.read
+      tags:
+        - RoleAssignmentAUser
+    post:
+      summary: Assign a user role
+      description: |-
+        Assigns a [standard role](/openapi/okta-management/guides/roles/#standard-roles) to a user.
+
+        You can also assign a custom role to a user, but the preferred method to assign a custom role to a user is to create a binding between the custom role, the resource set, and the user. See [Create a role resource set binding](/openapi/okta-management/management/roledresourcesetbinding/createresourcesetbinding).
+
+        > **Notes:**
+        > * The request payload is different for standard and custom role assignments.
+        > * For IAM-based standard role assignments, use the request payload for standard roles. However, the response payload for IAM-based role assignments is similar to the custom role's assignment response.
+      operationId: assignRoleToUser
+      parameters:
+        - name: disableNotifications
+          description: Setting this to `true` grants the user third-party admin status
+          in: query
+          schema:
+            type: boolean
+            default: false
+      x-codegen-request-body-name: assignRoleRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              x-okta-ignore-redocly-rules-for-sdk: true
+              oneOf:
+                - $ref: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                - $ref: ./roles.yaml#/components/schemas/CustomRoleAssignmentSchema
+              discriminator:
+                propertyName: type
+                mapping:
+                  API_ACCESS_MANAGEMENT_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  APP_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  GROUP_MEMBERSHIP_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  HELP_DESK_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  ORG_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  READ_ONLY_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  REPORT_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  SUPER_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  USER_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  WORKFLOWS_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  ACCESS_CERTIFICATIONS_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  ACCESS_REQUESTS_ADMIN: ./roles.yaml#/components/schemas/StandardRoleAssignmentSchema
+                  CUSTOM: ./roles.yaml#/components/schemas/CustomRoleAssignmentSchema
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                x-okta-ignore-redocly-rules-for-sdk: true
+                oneOf:
+                  - $ref: ./roles.yaml#/components/schemas/StandardRole
+                  - $ref: ./roles.yaml#/components/schemas/CustomRole
+                discriminator:
+                  propertyName: type
+                  mapping:
+                    API_ACCESS_MANAGEMENT_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    APP_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    GROUP_MEMBERSHIP_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    HELP_DESK_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    ORG_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    READ_ONLY_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    REPORT_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    SUPER_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    USER_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    WORKFLOWS_ADMIN: ./roles.yaml#/components/schemas/CustomRole
+                    ACCESS_CERTIFICATIONS_ADMIN: ./roles.yaml#/components/schemas/CustomRole
+                    ACCESS_REQUESTS_ADMIN: ./roles.yaml#/components/schemas/CustomRole
+                    CUSTOM: ./roles.yaml#/components/schemas/CustomRole
+              examples:
+                Standard roles:
+                  $ref: '#/components/examples/StandardRoleResponseUser'
+                Custom roles:
+                  $ref: '#/components/examples/CustomRoleResponseUser'
+                IAM-based standard roles:
+                  $ref: '#/components/examples/IAMStandardRoleResponseUser'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - RoleAssignmentAUser
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /api/v1/users/{userId}/roles/{roleAssignmentId}:
+    parameters:
+      - $ref: '#/components/parameters/pathUserId'
+      - $ref: '#/components/parameters/pathRoleAssignmentId'
+    get:
+      summary: Retrieve a user role assignment
+      description: Retrieves a role assigned to a user (identified by `userId`). The `roleAssignmentId` parameter is the unique identifier for either a standard role assignment object or a custom role resource set binding object.
+      operationId: getUserAssignedRole
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: ./roles.yaml#/components/schemas/StandardRole
+                  - $ref: ./roles.yaml#/components/schemas/CustomRole
+                discriminator:
+                  propertyName: type
+                  mapping:
+                    API_ACCESS_MANAGEMENT_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    APP_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    GROUP_MEMBERSHIP_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    HELP_DESK_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    ORG_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    READ_ONLY_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    REPORT_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    SUPER_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    USER_ADMIN: ./roles.yaml#/components/schemas/StandardRole
+                    WORKFLOWS_ADMIN: ./roles.yaml#/components/schemas/CustomRole
+                    ACCESS_CERTIFICATIONS_ADMIN: ./roles.yaml#/components/schemas/CustomRole
+                    ACCESS_REQUESTS_ADMIN: ./roles.yaml#/components/schemas/CustomRole
+                    CUSTOM: ./roles.yaml#/components/schemas/CustomRole
+              examples:
+                Standard roles:
+                  $ref: '#/components/examples/StandardRoleResponseUser'
+                Custom roles:
+                  $ref: '#/components/examples/CustomRoleResponseUser'
+                IAM-based standard roles:
+                  $ref: '#/components/examples/IAMStandardRoleResponseUser'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.read
+      tags:
+        - RoleAssignmentAUser
+    delete:
+      summary: Unassign a user role
+      description: Unassigns a role assignment (identified by `roleAssignmentId`) from a user (identified by `userId`)
+      operationId: unassignRoleFromUser
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - RoleAssignmentAUser
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /api/v1/users/{userId}/roles/{roleAssignmentId}/targets/catalog/apps:
+    parameters:
+      - $ref: '#/components/parameters/pathUserId'
+      - $ref: '#/components/parameters/pathRoleAssignmentId'
+    get:
+      summary: List all admin role app targets
+      description: Lists all app targets for an `APP_ADMIN` role assigned to a user. The response is a list that includes OIN-cataloged apps or app instances. The response payload for an app instance contains the `id` property, but an OIN-cataloged app payload doesn't.
+      operationId: listApplicationTargetsForApplicationAdministratorRoleForUser
+      parameters:
+        - $ref: ./Common.yaml#/components/parameters/queryAfter
+        - $ref: ./Common.yaml#/components/parameters/queryLimit
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ./roles.yaml#/components/schemas/CatalogApplication
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.read
+      tags:
+        - RoleBTargetAdmin
+    put:
+      summary: Assign all apps as target to admin role
+      description: Assigns all apps as target to an `APP_ADMIN` role
+      operationId: assignAllAppsAsTargetToRoleForUser
+      responses:
+        '200':
+          description: Success
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - RoleBTargetAdmin
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /api/v1/users/{userId}/roles/{roleAssignmentId}/targets/catalog/apps/{appName}:
+    parameters:
+      - $ref: '#/components/parameters/pathUserId'
+      - $ref: '#/components/parameters/pathRoleAssignmentId'
+      - $ref: ./oauth.yaml#/components/parameters/pathAppName
+    put:
+      summary: Assign an admin role app target
+      description: |
+        Assigns an OIN app target for an `APP_ADMIN` role assignment to an admin user. When you assign the first app target, you reduce the scope of the role assignment.
+        The role no longer applies to all app targets, but applies only to the specified target.
+
+        Assigning an OIN app target overrides any existing app instance targets of the OIN app.
+        For example, if a user was assigned to administer a specific Facebook instance, a successful request to add an OIN app target with `facebook` for `appName` makes that user the admin for all Facebook instances.
+      operationId: assignAppTargetToAdminRoleForUser
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - RoleBTargetAdmin
+    delete:
+      summary: Unassign an admin role app target
+      description: |
+        Unassigns an OIN app target from an `APP_ADMIN` role assignment to an admin user.
+
+        > **Note:** You can't remove the last OIN app target from a role assignment since this causes an exception.
+        > If you need a role assignment that applies to all apps, delete the `APP_ADMIN` role assignment to the user and recreate a new one.
+      operationId: unassignAppTargetFromAppAdminRoleForUser
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - RoleBTargetAdmin
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /api/v1/users/{userId}/roles/{roleAssignmentId}/targets/catalog/apps/{appName}/{appId}:
+    parameters:
+      - $ref: '#/components/parameters/pathUserId'
+      - $ref: '#/components/parameters/pathRoleAssignmentId'
+      - $ref: ./oauth.yaml#/components/parameters/pathAppName
+      - $ref: ./Common.yaml#/components/parameters/pathAppId
+    put:
+      summary: Assign an admin role app instance target
+      description: |
+        Assigns an app instance target to an `APP_ADMIN` role assignment to an admin user. When you assign the first OIN app or app instance target, you reduce the scope of the role assignment.
+        The role no longer applies to all app targets, but applies only to the specified target.
+
+        > **Note:** You can target a mixture of both OIN app and app instance targets, but can't assign permissions to manage all instances of an OIN app and then assign a subset of permission to the same OIN app.
+        > For example, you can't specify that an admin has access to manage all instances of the Salesforce app and then also manage specific configurations of the Salesforce app.
+      operationId: assignAppInstanceTargetToAppAdminRoleForUser
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - RoleBTargetAdmin
+    delete:
+      summary: Unassign an admin role app instance target
+      description: |-
+        Unassigns an app instance target from an `APP_ADMIN` role assignment to an admin user.
+
+        > **Note:** You can't remove the last app instance target from a role assignment since this causes an exception.
+        > If you need a role assignment that applies to all apps, delete the `APP_ADMIN` role assignment and recreate a new one.
+      operationId: unassignAppInstanceTargetFromAdminRoleForUser
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - RoleBTargetAdmin
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /api/v1/users/{userId}/roles/{roleAssignmentId}/targets/groups:
+    parameters:
+      - $ref: '#/components/parameters/pathUserId'
+      - $ref: '#/components/parameters/pathRoleAssignmentId'
+    get:
+      summary: List all admin role group targets
+      description: |
+        Lists all group targets for a `USER_ADMIN`, `HELP_DESK_ADMIN`, or `GROUP_MEMBERSHIP_ADMIN` role assignment to an admin user.
+        If the role isn't scoped to specific group targets, an empty array `[]` is returned.
+      operationId: listGroupTargetsForRole
+      parameters:
+        - $ref: ./Common.yaml#/components/parameters/queryAfter
+        - $ref: ./Common.yaml#/components/parameters/queryLimit
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ./groups.yaml#/components/schemas/Group
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.read
+      tags:
+        - RoleBTargetAdmin
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /api/v1/users/{userId}/roles/{roleAssignmentId}/targets/groups/{groupId}:
+    parameters:
+      - $ref: '#/components/parameters/pathUserId'
+      - $ref: '#/components/parameters/pathRoleAssignmentId'
+      - $ref: ./groups.yaml#/components/parameters/pathGroupId
+    put:
+      summary: Assign an admin role group target
+      description: |
+        Assigns a group target for a `USER_ADMIN`, `HELP_DESK_ADMIN`, or `GROUP_MEMBERSHIP_ADMIN` role assignment to an admin user.
+        When you assign the first group target, you reduce the scope of the role assignment. The role no longer applies to all targets but applies only to the specified target.
+      operationId: assignGroupTargetToUserRole
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - RoleBTargetAdmin
+    delete:
+      summary: Unassign an admin role group target
+      description: |
+        Unassigns a group target from a `USER_ADMIN`, `HELP_DESK_ADMIN`, or `GROUP_MEMBERSHIP_ADMIN` role assignment to an admin user.
+
+        > **Note:** You can't remove the last group target from a role assignment since this causes an exception.
+        > If you need a role assignment that applies to all groups, delete the role assignment to the user and recreate a new one.
+      operationId: unassignGroupTargetFromUserAdminRole
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.manage
+      tags:
+        - RoleBTargetAdmin
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /api/v1/users/{userId}/roles/{roleIdOrEncodedRoleId}/targets:
+    parameters:
+      - $ref: '#/components/parameters/pathUserId'
+      - $ref: '#/components/parameters/pathRoleIdOrEncodedRoleId'
+    get:
+      summary: Retrieve a role target by assignment type
+      description: |
+        Retrieves all role targets for an `APP_ADMIN`, `USER_ADMIN`, `HELP_DESK_ADMIN`, or `GROUP_MEMBERSHIP_ADMIN` role assignment to an admin user by user or group assignment type.
+        If the role isn't scoped to specific group targets or any app targets, an empty array `[]` is returned.
+      operationId: getRoleTargetsByUserIdAndRoleId
+      parameters:
+        - $ref: '#/components/parameters/assignmentType'
+        - $ref: ./Common.yaml#/components/parameters/queryAfter
+        - $ref: ./Common.yaml#/components/parameters/queryLimit
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoleTarget'
+              examples:
+                Group Target:
+                  $ref: '#/components/examples/RoleTargetGroupResponse'
+                App Target:
+                  $ref: '#/components/examples/RoleTargetAppResponse'
+                App Instance Target:
+                  $ref: '#/components/examples/RoleTargetAppInstanceResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.roles.read
+      tags:
+        - RoleBTargetAdmin
+  /api/v1/users/{userId}/subscriptions:
+    parameters:
+      - $ref: '#/components/parameters/pathUserId'
+    get:
+      summary: List all subscriptions for a user
+      description: Lists all subscriptions available to a specified user. Returns an `AccessDeniedException` message if requests are made for another user.
+      operationId: listSubscriptionsUser
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+            description: The unique ID of the user
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: ./roles.yaml#/components/schemas/Subscription
+                type: array
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          description: Not Found
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.read
+      tags:
+        - Subscription
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /api/v1/users/{userId}/subscriptions/{notificationType}:
+    parameters:
+      - $ref: '#/components/parameters/pathUserId'
+      - $ref: ./roles.yaml#/components/parameters/pathNotificationType
+    get:
+      summary: Retrieve a subscription for a user
+      description: Retrieves a subscription by `notificationType` for a specified user. Returns an `AccessDeniedException` message if requests are made for another user.
+      operationId: getSubscriptionsNotificationTypeUser
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+            description: The unique ID of the user
+        - $ref: ./roles.yaml#/components/parameters/pathNotificationType
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: ./roles.yaml#/components/schemas/Subscription
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          description: Not Found
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.read
+      tags:
+        - Subscription
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /api/v1/users/{userId}/subscriptions/{notificationType}/subscribe:
+    parameters:
+      - $ref: '#/components/parameters/pathUserId'
+      - $ref: ./roles.yaml#/components/parameters/pathNotificationType
+    post:
+      summary: Subscribe a user to a specific notification type
+      description: Subscribes the current user to a specified notification type. Returns an `AccessDeniedException` message if requests are made for another user.
+      operationId: subscribeByNotificationTypeUser
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+            description: The unique ID of the user
+        - $ref: ./roles.yaml#/components/parameters/pathNotificationType
+      responses:
+        '200':
+          description: No Content
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          description: Not Found
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - Subscription
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+  /api/v1/users/{userId}/subscriptions/{notificationType}/unsubscribe:
+    parameters:
+      - $ref: '#/components/parameters/pathUserId'
+      - $ref: ./roles.yaml#/components/parameters/pathNotificationType
+    post:
+      summary: Unsubscribe a user from a specific notification type
+      description: Unsubscribes the current user from a specified notification type. Returns an `AccessDeniedException` message if requests are made for another user.
+      operationId: unsubscribeByNotificationTypeUser
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+            description: The unique ID of the user
+        - $ref: ./roles.yaml#/components/parameters/pathNotificationType
+      responses:
+        '200':
+          description: No Content
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          description: Not Found
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - Subscription
+    x-okta-team-detail:
+      x-team-slack: eng-dda
+components:
+  examples:
+    RoleTargetGroupResponse:
+      value:
+        - orn: orn:okta:directory:00o5v1t2W4OSF9r4N0g4:groups:00g5vhi3rEJMOog1S0g4
+          assignmentType: USER
+          expiration: 2025-05-10T20:21:11.000Z
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/groups/00g5vhi3rEJMOog1S0g4
+    RoleTargetAppResponse:
+      value:
+        - orn: orn:okta:idp:00ozjqqlt6mmHQonQ0g3:apps:gooddata
+          assignmentType: GROUP
+          expiration: 2025-05-10T20:21:11.000Z
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/apps%3Ffilter%3Dname%2Beq%2B%22gooddata%22
+    RoleTargetAppInstanceResponse:
+      value:
+        - orn: orn:okta:idp:00o5yd9J0satsK2Rp0g4:apps:myownapp:0oa5yriAxuR12wfQ30g4
+          assignmentType: USER
+          expiration: 2025-05-10T20:21:11.000Z
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/apps/0oa5yriAxuR12wfQ30g4
+    list-user-example:
+      value:
+        - id: 00u1f96ECLNVOKVMUSEA
+          status: ACTIVE
+          created: '2013-12-12T16:14:22.000Z'
+          activated: '2013-12-12T16:14:22.000Z'
+          statusChanged: '2013-12-12T22:14:22.000Z'
+          lastLogin: '2013-12-12T22:14:22.000Z'
+          lastUpdated: '2015-11-15T19:23:32.000Z'
+          passwordChanged: '2013-12-12T22:14:22.000Z'
+          profile:
+            firstName: Easy
+            lastName: E
+            email: easy-e@example.com
+            login: easy-e@example.com
+            mobilePhone: null
+          credentials:
+            password: {}
+            provider:
+              type: OKTA
+              name: OKTA
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/users/00u1f96ECLNVOKVMUSEA
+    ListUserBlocksAnyDevicesResponse:
+      value:
+        - type: DEVICE_BASED
+          appliesTo: ANY_DEVICES
+    ListUserBlocksUnknownDevicesResponse:
+      value:
+        - type: DEVICE_BASED
+          appliesTo: UNKNOWN_DEVICES
+    ListRealmAwareUsersResponse:
+      summary: List all users
+      value:
+        - id: 00u118oQYT4TBGuay0g4
+          status: ACTIVE
+          created: 2022-04-04T15:56:05.000Z
+          activated: null
+          statusChanged: null
+          lastLogin: 2022-05-04T19:50:52.000Z
+          lastUpdated: 2022-05-05T18:15:44.000Z
+          passwordChanged: 2022-04-04T16:00:22.000Z
+          type:
+            id: oty1162QAr8hJjTaq0g4
+          profile:
+            firstName: Alice
+            lastName: Smith
+            mobilePhone: null
+            secondEmail: null
+            login: alice.smith@example.com
+            email: alice.smith@example.com
+          realmId: guo1afiNtSnZYILxO0g4
+          credentials:
+            password: {}
+            provider:
+              type: OKTA
+              name: OKTA
+          _links:
+            self:
+              href: http://your-subdomain.okta.com/api/v1/users/00u118oQYT4TBGuay0g4
+    GetUserLinkedObjectResponse:
+      summary: Retrieve user linked object value
+      value:
+        - _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/users/00u5t60iloOHN9pBi0h7
+    StandardRolesListResponse:
+      value:
+        - id: IFIFAX2BIRGUSTQ
+          label: Application administrator
+          type: APP_ADMIN
+          status: ACTIVE
+          created: 2019-02-06T16:17:40.000Z
+          lastUpdated: 2019-02-06T16:17:40.000Z
+          assignmentType: USER
+          _links:
+            assignee:
+              href: https://{yourOktaDomain}/api/v1/users/00ur32Vg0fvpyHZeQ0g3
+        - id: JBCUYUC7IRCVGS27IFCE2SKO
+          label: Help Desk administrator
+          type: HELP_DESK_ADMIN
+          status: ACTIVE
+          created: 2019-02-06T16:17:40.000Z
+          lastUpdated: 2019-02-06T16:17:40.000Z
+          assignmentType: USER
+          _links:
+            assignee:
+              href: https://{yourOktaDomain}/api/v1/users/00ur32Vg0fvpyHZeQ0g3
+        - id: ra125eqBFpETrMwu80g4
+          label: Organization administrator
+          type: ORG_ADMIN
+          status: ACTIVE
+          created: 2019-02-06T16:17:40.000Z
+          lastUpdated: 2019-02-06T16:17:40.000Z
+          assignmentType: USER
+          _links:
+            assignee:
+              href: https://{yourOktaDomain}/api/v1/users/00ur32Vg0fvpyHZeQ0g3
+        - id: gra25fapn1prGTBKV0g4
+          label: API Access Management administrator
+          type: API_ACCESS_MANAGEMENT_ADMIN
+          status: ACTIVE
+          created": 2019-02-06T16:20:57.000Z
+          lastUpdated": 2019-02-06T16:20:57.000Z
+          assignmentType": GROUP
+          _links":
+            assignee":
+              href": https://{yourOktaDomain}/api/v1/groups/00g1ousb3XCr9Dkr20g4
+    StandardAndCustomRolesListResponse:
+      value:
+        - id: IFIFAX2BIRGUSTQ
+          label: Application administrator
+          type: APP_ADMIN
+          status: ACTIVE
+          created: 2019-02-06T16:17:40.000Z
+          lastUpdated: 2019-02-06T16:17:40.000Z
+          assignmentType: USER
+          _links:
+            assignee:
+              href: https://{yourOktaDomain}/api/v1/users/00ur32Vg0fvpyHZeQ0g3
+        - id: JBCUYUC7IRCVGS27IFCE2SKO
+          label: Help Desk administrator
+          type: HELP_DESK_ADMIN
+          status: ACTIVE
+          created: 2019-02-06T16:17:40.000Z
+          lastUpdated: 2019-02-06T16:17:40.000Z
+          assignmentType: USER
+          _links:
+            assignee:
+              href: https://{yourOktaDomain}/api/v1/users/00ur32Vg0fvpyHZeQ0g3
+        - id: ra125eqBFpETrMwu80g4
+          label: Organization administrator
+          type: ORG_ADMIN
+          status: ACTIVE
+          created: 2019-02-06T16:17:40.000Z
+          lastUpdated: 2019-02-06T16:17:40.000Z
+          assignmentType: USER
+          _links:
+            assignee:
+              href: https://{yourOktaDomain}/api/v1/users/00ur32Vg0fvpyHZeQ0g3
+        - id: gra25fapn1prGTBKV0g4
+          label: API Access Management administrator
+          type: API_ACCESS_MANAGEMENT_ADMIN
+          status: ACTIVE
+          created: 2019-02-06T16:20:57.000Z
+          lastUpdated: 2019-02-06T16:20:57.000Z
+          assignmentType: GROUP
+          _links:
+            assignee:
+              href: https://{yourOktaDomain}/api/v1/groups/00g1ousb3XCr9Dkr20g4
+        - id: irb1q92TFAHzySt3x0g4
+          role: cr0Yq6IJxGIr0ouum0g3
+          label: UserCreatorRole
+          type: CUSTOM
+          status: ACTIVE
+          created: 2019-02-06T16:20:57.000Z
+          lastUpdated: 2019-02-06T16:20:57.000Z
+          assignmentType: USER
+          resource-set: iamoJDFKaJxGIr0oamd9g
+          _links:
+            assignee:
+              href": https://{yourOktaDomain}/api/v1/users/00u1gytb3XCr9Dkr18r2
+            resource-set:
+              href: https://{yourOktaDomain}/api/v1/iam/resource-sets/iamoJDFKaJxGIr0oamd9g
+            member:
+              href: https://{yourOktaDomain}/api/v1/iam/resource-sets/iamoJDFKaJxGIr0oamd9g/bindings/cr0Yq6IJxGIr0ouum0g3/members/irb1qe6PGuMc7Oh8N0g4
+            role:
+              href: https://{yourOktaDomain}/api/v1/iam/roles/cr0Yq6IJxGIr0ouum0g3
+            permissions:
+              href: https://{yourOktaDomain}/api/v1/iam/permission-sets/cr0Yq6IJxGIr0ouum0g3/permissions
+        - id: irb5e92YgBazyyQ3x1q5
+          role: cr0Yq6IJxGIr0ouum0g3
+          label: UserCreatorRole
+          type: CUSTOM
+          status: ACTIVE
+          created: 2019-02-06T16:20:57.000Z
+          lastUpdated: 2019-02-06T16:20:57.000Z
+          assignmentType: GROUP
+          resource-set: iamoakjsdQaJxGIr03int1o
+          _links:
+            assignee:
+              href: https://{ yourOktaDomain }/api/v1/groups/00g1ousb3XCr9Dkr20g4
+            resource-set:
+              href: https://{ yourOktaDomain }/api/v1/iam/resource-sets/iamoakjsdQaJxGIr03int1o
+            member:
+              href: https://{ yourOktaDomain }/api/v1/iam/resource-sets/iamoJDFKaJxGIr0oamd9g/bindings/cr0Yq6IJxGIr0ouum0g3/members/irb1qe6PGuMc7Oh8N0g4
+            role:
+              href: https://{ yourOktaDomain }/api/v1/iam/roles/cr0Yq6IJxGIr0ouum0g3
+            permissions:
+              href: https://{ yourOktaDomain }/api/v1/iam/permission-sets/cr0Yq6IJxGIr0ouum0g3/permissions
+    IAMStandardRolesListResponse:
+      value:
+        - id: IFIFAX2BIRGUSTQ
+          label: Application administrator
+          type: APP_ADMIN
+          status: ACTIVE
+          created: 2019-02-06T16:17:40.000Z
+          lastUpdated: 2019-02-06T16:17:40.000Z
+          assignmentType: USER
+          _links:
+            assignee:
+              href: https://{yourOktaDomain}/api/v1/users/00ur32Vg0fvpyHZeQ0g3
+        - id: irb1q92TFAHzySt3x0g4
+          role: cr0Yq6IJxGIr0ouum0g3
+          label: UserCreatorRole
+          type: CUSTOM
+          status: ACTIVE
+          created: 2019-02-06T16:20:57.000Z
+          lastUpdated: 2019-02-06T16:20:57.000Z
+          assignmentType: USER
+          resource-set: iamoJDFKaJxGIr0oamd9g
+          _links:
+            assignee:
+              href: https://{yourOktaDomain}/api/v1/users/00u1gytb3XCr9Dkr18r2
+            resource-set:
+              href: https://{yourOktaDomain}/api/v1/iam/resource-sets/iamoJDFKaJxGIr0oamd9g
+            member:
+              href: https://{yourOktaDomain}/api/v1/iam/resource-sets/iamoJDFKaJxGIr0oamd9g/bindings/cr0Yq6IJxGIr0ouum0g3/members/irb1qe6PGuMc7Oh8N0g4
+            role:
+              href: https://{yourOktaDomain}/api/v1/iam/roles/cr0Yq6IJxGIr0ouum0g3
+            permissions:
+              href: https://{yourOktaDomain}/api/v1/iam/permission-sets/cr0Yq6IJxGIr0ouum0g3/permissions
+        - id: irb5e92YgBazyyQ3x1q5
+          role: ACCESS_CERTIFICATIONS_ADMIN
+          label: Access Certifications administrator
+          type: ACCESS_CERTIFICATIONS_ADMIN
+          status: ACTIVE
+          created: 2019-02-06T16:20:57.000Z
+          lastUpdated: 2019-02-06T16:20:57.000Z
+          assignmentType: USER
+          resource-set: ACCESS_CERTIFICATIONS_IAM_POLICY
+          _links:
+            assignee:
+              href: https://{yourOktaDomain}/api/v1/users/00u1gytb3XCr9Dkr18r2
+            resource-set:
+              href: https://{yourOktaDomain}/api/v1/iam/resource-sets/ACCESS_CERTIFICATIONS_IAM_POLICY
+            member:
+              href: https://{yourOktaDomain}/api/v1/iam/resource-sets/ACCESS_CERTIFICATIONS_IAM_POLICY/bindings/ACCESS_CERTIFICATIONS_ADMIN/members/irb1qe6PGuMc7Oh8N0g4
+            role:
+              href: https://{yourOktaDomain}/api/v1/iam/roles/ACCESS_CERTIFICATIONS_ADMIN
+            permissions:
+              href: https://{yourOktaDomain}/api/v1/iam/permission-sets/OKTA_IAM_TEST_DELIVERED_ROLE/permissions
+    StandardRoleResponseUser:
+      value:
+        id: ra1b8anIk7rx7em7L0g4
+        label: Super Organization administrator
+        type: SUPER_ADMIN
+        status: ACTIVE
+        created: 2015-09-06T15:28:47.000Z
+        lastUpdated: 2015-09-06T15:28:47.000Z
+        assignmentType: USER
+        _links:
+          assignee:
+            href: https://{yourOktaDomain}/api/v1/users/00ub0oNGTSWTBKOLGLNR
+    CustomRoleResponseUser:
+      value:
+        id: irb1q92TFAHzySt3x0g4
+        role: cr0Yq6IJxGIr0ouum0g3
+        label: UserCreatorRole
+        type: CUSTOM
+        status: ACTIVE
+        created: 2019-02-06T16:20:57.000Z
+        lastUpdated: 2019-02-06T16:20:57.000Z
+        assignmentType: USER
+        resource-set: iamoJDFKaJxGIr0oamd9g
+        _links:
+          assignee:
+            href": https://{yourOktaDomain}/api/v1/users/00ub0oNGTSWTBKOLGLNR
+          resource-set:
+            href: https://{yourOktaDomain}/api/v1/iam/resource-sets/iamoJDFKaJxGIr0oamd9g
+          role:
+            href: https://{yourOktaDomain}/api/v1/iam/roles/cr0Yq6IJxGIr0ouum0g3
+          permissions:
+            href: https://{yourOktaDomain}/api/v1/iam/roles/cr0Yq6IJxGIr0ouum0g3/permissions
+    IAMStandardRoleResponseUser:
+      value:
+        id: irb1q92TFAHzySt3x0g4
+        role: ACCESS_REQUESTS_ADMIN
+        label: Access Requests administrator
+        type: ACCESS_REQUESTS_ADMIN
+        status: ACTIVE
+        created: 2019-02-06T16:20:57.000Z
+        lastUpdated: 2019-02-06T16:20:57.000Z
+        assignmentType: USER
+        resource-set: ACCESS_CERTIFICATIONS_IAM_POLICY
+        _links:
+          assignee:
+            href: https://{yourOktaDomain}/api/v1/users/00ub0oNGTSWTBKOLGLNR
+          resource-set:
+            href: https://{yourOktaDomain}/api/v1/iam/resource-sets/ACCESS_CERTIFICATIONS_IAM_POLICY
+          role:
+            href: https://{yourOktaDomain}/api/v1/iam/roles/ACCESS_REQUESTS_ADMIN
+          permissions:
+            href: https://{yourOktaDomain}/api/v1/iam/roles/ACCESS_REQUESTS_ADMIN/permissions
+          member:
+            href: https://{yourOktaDomain}/api/v1/iam/resource-sets/ACCESS_CERTIFICATIONS_IAM_POLICY/bindings/ACCESS_REQUESTS_ADMIN/members/irb1q92TFAHzySt3x0g4
+  parameters:
+    pathRoleId:
+      name: roleId
+      description: '`id` of the role'
+      in: path
+      required: true
+      schema:
+        type: string
+        example: 3Vg1Pjp3qzw4qcCK5EdO
+    pathRoleIdOrEncodedRoleId:
+      name: roleIdOrEncodedRoleId
+      description: The `id` of the role or Base32 encoded `id` of the role name
+      in: path
+      required: true
+      schema:
+        type: string
+        example: JBCUYUC7IRCVGS27IFCE2SKO
+    pathUserId:
+      name: userId
+      description: ID of an existing Okta user
+      in: path
+      required: true
+      schema:
+        type: string
+        example: 00ub0oNGTSWTBKOLGLNR
+    pathId:
+      name: id
+      description: An ID, login, or login shortname (as long as the shortname is unambiguous) of an existing Okta user
+      in: path
+      required: true
+      schema:
+        type: string
+    queryUserExpand:
+      name: expand
+      in: query
+      description: 'An optional parameter to include metadata in the `_embedded` attribute. Valid value: `blocks`.'
+      x-okta-feature-flag-amends:
+        LITE_USERS:
+          description: 'An optional parameter to include metadata in the `_embedded` attribute. Valid values: `blocks` or <x-lifecycle class="ea"></x-lifecycle> `classification`.'
+      required: false
+      schema:
+        type: string
+        example: blocks
+    assignmentType:
+      name: assignmentType
+      description: Specifies the assignment type of the user
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - USER
+          - GROUP
+        example: GROUP
+    pathRoleAssignmentId:
+      name: roleAssignmentId
+      description: The `id` of the role assignment
+      in: path
+      required: true
+      schema:
+        type: string
+        example: JBCUYUC7IRCVGS27IFCE2SKO
+  schemas:
+    RoleTarget:
+      type: object
+      properties:
+        orn:
+          type: string
+          readOnly: true
+          example: orn:okta:directory:00o5v1t2W4OSF9r4N0g4:groups:00g5vhi3rEJMOog1S0g4
+          description: The [Okta Resource Name (ORN)](https://support.okta.com/help/s/article/understanding-okta-resource-name-orn) of the app target or group target
+        assignmentType:
+          type: string
+          readOnly: true
+          example: GROUP
+          description: The assignment type of how the user receives this target
+        expiration:
+          type: string
+          format: date-time
+          example: '2023-08-25T12:00:00.000Z'
+          readOnly: true
+          description: The expiry time stamp of the associated target. It's only included in the response if the associated target will expire.
+        _links:
+          $ref: ./Common.yaml#/components/schemas/LinksSelf
+    AuthenticationProvider:
+      type: object
+      description: Specifies the authentication provider that validates the user's password credential. The user's current provider is managed by the **Delegated Authentication** settings for your org. The provider object is **read-only**.
+      readOnly: true
+      properties:
+        name:
+          type: string
+          description: The name of the authentication provider
+          readOnly: true
+          example: OKTA
+        type:
+          $ref: '#/components/schemas/AuthenticationProviderType'
+    AuthenticationProviderType:
+      type: string
+      description: The type of authentication provider
+      readOnly: true
+      enum:
+        - ACTIVE_DIRECTORY
+        - FEDERATION
+        - IMPORT
+        - LDAP
+        - OKTA
+        - SOCIAL
+      x-enumDescriptions:
+        ACTIVE_DIRECTORY: Specifies the Microsoft Active Directory instance name as the `name` property
+        FEDERATION: Specifies a federated identity provider (such as an SAML IdP) that validates the user's password credentials. Doesn't support a `password` or `recovery question` credential. The user must authenticate through a trusted identity provider.
+        IMPORT: Specifies a hashed password that was imported from an external source
+        LDAP: Specifies the LDAP directory instance name as the `name` property
+        OKTA: Specifies the Okta identity provider
+        SOCIAL: Specifies an OIDC or third-party social identity provider. Doesn't support a `password` or `recovery question` credential. The user must authenticate through a trusted identity provider.
+    AuthenticationProviderWritable:
+      type: object
+      description: Specifies the authentication provider that validates the user password credential. The user's current provider is managed by the **Delegated Authentication** settings in your org. See [Create user with authentication provider](/openapi/okta-management/management/user/create-user-with-password-and-recovery-question#user/Create-user-with-authentication-provider).
+      properties:
+        name:
+          type: string
+          description: The name of the authentication provider
+          example: OKTA
+        type:
+          $ref: '#/components/schemas/AuthenticationProviderTypeWritable'
+    AuthenticationProviderTypeWritable:
+      type: string
+      description: The type of authentication provider
+      enum:
+        - ACTIVE_DIRECTORY
+        - FEDERATION
+        - IMPORT
+        - LDAP
+        - OKTA
+        - SOCIAL
+      x-enumDescriptions:
+        ACTIVE_DIRECTORY: Specifies a Microsoft Active Directory instance name as the `name` property
+        FEDERATION: Specifies a federated identity provider (such as a SAML IdP) that validates the user's password credentials. Doesn't support a `password` or `recovery question` credential. The user must authenticate through a trusted identity provider.
+        IMPORT: Specifies a hashed password that was imported from an external source
+        LDAP: Specifies the LDAP directory instance name as the `name` property
+        OKTA: Specifies the Okta identity provider
+        SOCIAL: Specifies an OIDC or third-party social identity provider. Doesn't support a `password` or `recovery question` credential. The user must authenticate through a trusted identity provider.
+    ChangePasswordRequest:
+      type: object
+      properties:
+        newPassword:
+          $ref: '#/components/schemas/PasswordCredential'
+        oldPassword:
+          $ref: '#/components/schemas/PasswordCredential'
+        revokeSessions:
+          type: boolean
+          description: When set to `true`, revokes all user sessions, except for the current session
+          default: false
+    CreateUserRequest:
+      type: object
+      properties:
+        credentials:
+          $ref: '#/components/schemas/UserCredentialsWritable'
+        groupIds:
+          type: array
+          description: The list of group IDs of groups that the user is added to at the time of creation
+          items:
+            type: string
+        profile:
+          $ref: '#/components/schemas/UserProfile'
+        realmId:
+          type: string
+          description: The ID of the realm in which the user is residing. See [Realms](/openapi/okta-management/management/realm).
+          example: guo1bfiNtSnZYILxO0g4
+        type:
+          type: object
+          description: |-
+            The ID of the user type. Add this value if you want to create a user with a non-default [User Type](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserType/).
+            The user type determines which [schema](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Schema/) applies to that user. After a user has been created, the user can
+            only be assigned a different user type by an administrator through a full replacement (`PUT`) operation.
+          properties:
+            id:
+              type: string
+              description: The ID of the user type
+      required:
+        - profile
+    DigestAlgorithm:
+      type: string
+      description: Algorithm used to generate the key. Only required for the PBKDF2 algorithm.
+      enum:
+        - SHA256_HMAC
+        - SHA512_HMAC
+    ForgotPasswordResponse:
+      type: object
+      properties:
+        resetPasswordUrl:
+          type: string
+          readOnly: true
+    PasswordCredential:
+      type: object
+      description: |-
+        Specifies a password for a user.
+
+        When a user has a valid password, imported hashed password, or password hook, and a response object contains
+        a password credential, then the password object is a bare object without the value property defined (for example, `password: {}`). This indicates that a password value exists. You can modify password policy requirements in the Admin Console by editing the Password authenticator:  **Security** > **Authenticators** > **Password** (or for Okta Classic orgs, use **Security** > **Authentication** > **Password**).
+
+        For information on defaults and configuring your password policies, see [Configure the password authenticator](https://help.okta.com/okta_help.htm?type=oie&id=ext-configure-password) in the help documentation.
+      properties:
+        hash:
+          $ref: '#/components/schemas/PasswordCredentialHash'
+        hook:
+          $ref: '#/components/schemas/PasswordCredentialHook'
+        value:
+          type: string
+          writeOnly: true
+          description: Specifies the password for a user. The password policy validates this password.
+          format: password
+          example: pa$$word
+    PasswordCredentialHash:
+      type: object
+      description: |-
+        Specifies a hashed password to import into Okta. This allows an existing password to be imported into Okta directly
+        from some other store. Okta supports the BCRYPT, SHA-512, SHA-256, SHA-1, MD5, and PBKDF2 hash functions for password import.
+         A hashed password may be specified in a password object when creating or updating a user, but not for other operations.
+         See the [Create user with imported hashed password](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/User/#create-user-with-imported-hashed-password) description. When you update a user with a hashed password, the user must be in the `STAGED` status.
+      properties:
+        algorithm:
+          $ref: '#/components/schemas/PasswordCredentialHashAlgorithm'
+        digestAlgorithm:
+          $ref: '#/components/schemas/DigestAlgorithm'
+        iterationCount:
+          type: integer
+          description: The number of iterations used when hashing passwords using PBKDF2. Must be >= 4096. Only required for PBKDF2 algorithm.
+        keySize:
+          type: integer
+          description: Size of the derived key in bytes. Only required for PBKDF2 algorithm.
+        salt:
+          description: |-
+            Only required for salted hashes. For BCRYPT, this specifies Radix-64 as the encoded salt used to generate the hash,
+            which must be 22 characters long. For other salted hashes, this specifies the Base64-encoded salt used to
+            generate the hash.
+          type: string
+        saltOrder:
+          type: string
+          description: Specifies whether salt was pre- or postfixed to the password before hashing. Only required for salted algorithms.
+        value:
+          description: |-
+            For SHA-512, SHA-256, SHA-1, MD5, and PBKDF2, this is the actual base64-encoded hash of the password (and salt, if used).
+            This is the Base64-encoded `value` of the SHA-512/SHA-256/SHA-1/MD5/PBKDF2 digest that was computed by either pre-fixing or post-fixing
+            the `salt` to the `password`, depending on the `saltOrder`. If a `salt` was not used in the `source` system, then this should just be
+            the Base64-encoded `value` of the password's SHA-512/SHA-256/SHA-1/MD5/PBKDF2 digest. For BCRYPT, this is the actual Radix-64 encoded hashed password.
+          type: string
+        workFactor:
+          type: integer
+          description: Governs the strength of the hash and the time required to compute it. Only required for BCRYPT algorithm.
+          minimum: 1
+          maximum: 20
+    PasswordCredentialHashAlgorithm:
+      type: string
+      description: The algorithm used to generate the hash using the password (and salt, when applicable).
+      enum:
+        - BCRYPT
+        - MD5
+        - PBKDF2
+        - SHA-1
+        - SHA-256
+        - SHA-512
+    PasswordCredentialHook:
+      type: object
+      description: Specify a [password import inline hook](/openapi/okta-management/management/tags/inlinehook/createpasswordimportinlinehook) to trigger verification of the user's password the first time the user signs in. This allows an existing password to be imported into Okta directly from some other store.
+      properties:
+        type:
+          type: string
+          description: The type of password inline hook. Currently, must be set to default.
+    RecoveryQuestionCredential:
+      type: object
+      description: |-
+        Specifies a secret question and answer that's validated (case insensitive) when a user forgets their
+        password or unlocks their account. The answer property is write-only.
+      properties:
+        question:
+          type: string
+          description: The recovery question
+          minimum: 1
+          maximum: 100
+          example: what is your favourite movie?
+        answer:
+          type: string
+          description: The answer to the recovery question
+          minimum: 1
+          maximum: 100
+          writeOnly: true
+          example: se7en
+    ResponseLinks:
+      type: object
+      properties:
+        _links:
+          $ref: ./Common.yaml#/components/schemas/LinksSelf
+      description: Link objects
+    Role:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        assignmentType:
+          $ref: ./roles.yaml#/components/schemas/RoleAssignmentType
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        description:
+          type: string
+        id:
+          type: string
+          readOnly: true
+        label:
+          type: string
+          readOnly: true
+        lastUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+        status:
+          $ref: ./Common.yaml#/components/schemas/LifecycleStatus
+        type:
+          $ref: ./roles.yaml#/components/schemas/RoleType
+        _embedded:
+          type: object
+          additionalProperties:
+            type: object
+            properties: {}
+          readOnly: true
+        _links:
+          $ref: ./Common.yaml#/components/schemas/LinksSelf
+    TempPassword:
+      type: object
+      properties:
+        tempPassword:
+          type: string
+          readOnly: true
+    UpdateUserRequest:
+      type: object
+      properties:
+        credentials:
+          $ref: '#/components/schemas/UserCredentials'
+        profile:
+          $ref: '#/components/schemas/UserProfile'
+        realmId:
+          type: string
+          description: The ID of the realm in which the user is residing. See [Realms](/openapi/okta-management/management/realm).
+          example: guo1bfiNtSnZYILxO0g4
+        type:
+          type: object
+          description: |-
+            The ID of the user type. Add this value if you want to create a user with a non-default [User Type](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserType/).
+            The user type determines which [schema](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Schema/) applies to that user. After a user has been created, the user can
+            only be assigned a different user type by an admin through a full replacement (`PUT`) operation.
+          properties:
+            id:
+              type: string
+              description: The ID of the user type
+    User:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        activated:
+          type: string
+          description: The timestamp when the user status transitioned to `ACTIVE`
+          format: date-time
+          readOnly: true
+          nullable: true
+        created:
+          type: string
+          description: The timestamp when the user was created
+          format: date-time
+          readOnly: true
+        credentials:
+          $ref: '#/components/schemas/UserCredentials'
+        id:
+          type: string
+          description: The unique key for the user
+          readOnly: true
+        lastLogin:
+          type: string
+          description: The timestamp of the last login
+          format: date-time
+          readOnly: true
+          nullable: true
+        lastUpdated:
+          type: string
+          description: The timestamp when the user was last updated
+          format: date-time
+          readOnly: true
+        passwordChanged:
+          type: string
+          description: The timestamp when the user's password was last updated
+          format: date-time
+          readOnly: true
+          nullable: true
+        profile:
+          $ref: '#/components/schemas/UserProfile'
+        realmId:
+          type: string
+          description: The ID of the realm in which the user is residing. See [Realms](/openapi/okta-management/management/realm).
+          example: guo1bfiNtSnZYILxO0g4
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/UserStatus'
+        statusChanged:
+          type: string
+          description: The timestamp when the status of the user last changed
+          format: date-time
+          readOnly: true
+          nullable: true
+        transitioningToStatus:
+          type: string
+          description: The target status of an in-progress asynchronous status transition. This property is only returned if the user's state is transitioning.
+          readOnly: true
+          nullable: true
+          enum:
+            - ACTIVE
+            - DEPROVISIONED
+            - PROVISIONED
+        type:
+          type: object
+          description: |-
+            The user type that determines the schema for the user's profile. The `type` property is a map that identifies the [User Types](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserType/#tag/UserType).
+
+            Currently it contains a single element, `id`. It can be specified when creating a new user, and can be updated by an admin on a full replace of an existing user (but not a partial update).
+          properties:
+            id:
+              type: string
+              description: The ID of the user type
+        _embedded:
+          type: object
+          description: Embedded resources related to the user using the [JSON Hypertext Application Language](https://datatracker.ietf.org/doc/html/draft-kelly-json-hal-06) specification
+          additionalProperties:
+            type: object
+            properties: {}
+          readOnly: true
+        _links:
+          description: |-
+            Specifies link relations (see [Web Linking](https://datatracker.ietf.org/doc/html/rfc8288) available for the current status of a user.
+            The links object is used for dynamic discovery of related resources, lifecycle operations, and credential operations. The links object is read-only.
+
+            For an individual user result, the links object contains a full set of link relations available for that user as determined by your policies.
+            For a collection of users, the links object contains only the `self` link. Operations that return a collection of users include [List all users](https://developer.okta.com/docs/api/openapi/okta-management/management/user/listusers) and [List all group member users](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Group/#tag/Group/operation/listGroupUsers).
+          allOf:
+            - $ref: ./Common.yaml#/components/schemas/LinksSelf
+            - type: object
+              properties:
+                self:
+                  description: URL to the individual user
+                  allOf:
+                    - $ref: ./Common.yaml#/components/schemas/HrefObject
+                activate:
+                  description: URL to activate the user
+                  allOf:
+                    - $ref: ./Common.yaml#/components/schemas/HrefObject
+                resetPassword:
+                  description: URL to reset the user's password
+                  allOf:
+                    - $ref: ./Common.yaml#/components/schemas/HrefObject
+                resetFactors:
+                  description: URL to reset the user's factors
+                  allOf:
+                    - $ref: ./Common.yaml#/components/schemas/HrefObject
+                expirePassword:
+                  description: URL to expire the user's password
+                  allOf:
+                    - $ref: ./Common.yaml#/components/schemas/HrefObject
+                forgotPassword:
+                  description: URL to initiate a forgot password operation
+                  allOf:
+                    - $ref: ./Common.yaml#/components/schemas/HrefObject
+                changeRecoveryQuestion:
+                  description: URL to change the user's recovery question
+                  allOf:
+                    - $ref: ./Common.yaml#/components/schemas/HrefObject
+                deactivate:
+                  description: URL to deactivate a user
+                  allOf:
+                    - $ref: ./Common.yaml#/components/schemas/HrefObject
+                reactivate:
+                  description: URL to reactivate the user
+                  allOf:
+                    - $ref: ./Common.yaml#/components/schemas/HrefObject
+                changePassword:
+                  description: URL to change the user's password
+                  allOf:
+                    - $ref: ./Common.yaml#/components/schemas/HrefObject
+                schema:
+                  description: URL to the user's profile schema
+                  allOf:
+                    - $ref: ./Common.yaml#/components/schemas/HrefObject
+                suspend:
+                  description: URL to suspend the user
+                  allOf:
+                    - $ref: ./Common.yaml#/components/schemas/HrefObject
+                unsuspend:
+                  description: URL to unsuspend the user
+                  allOf:
+                    - $ref: ./Common.yaml#/components/schemas/HrefObject
+                unlock:
+                  description: URL to unlock the locked-out user
+                  allOf:
+                    - $ref: ./Common.yaml#/components/schemas/HrefObject
+                type:
+                  description: URL to the user type
+                  allOf:
+                    - $ref: ./Common.yaml#/components/schemas/HrefObject
+            - readOnly: true
+    UserGetSingleton:
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          properties:
+            _embedded:
+              type: object
+              description: The embedded resources related to the object if the `expand` query parameter is specified
+              properties:
+                blocks:
+                  type: array
+                  description: A list of access block details for the user account
+                  items:
+                    $ref: '#/components/schemas/UserBlock'
+    UserBlock:
+      type: object
+      description: Describes how the account is blocked from access. If `appliesTo` is `ANY_DEVICES`, then the account is blocked for all devices. If `appliesTo` is `UNKNOWN_DEVICES`, then the account is only blocked for unknown devices.
+      properties:
+        type:
+          type: string
+          readOnly: true
+          description: Type of access block
+          enum:
+            - DEVICE_BASED
+        appliesTo:
+          type: string
+          readOnly: true
+          description: The devices that the block applies to
+          enum:
+            - ANY_DEVICES
+            - UNKNOWN_DEVICES
+          x-enumDescriptions:
+            ANY_DEVICES: The account is blocked for all devices
+            UNKNOWN_DEVICES: The account is only blocked for unknown devices
+    UserCredentials:
+      type: object
+      description: Specifies primary authentication and recovery credentials for a user. Credential types and requirements vary depending on the provider and security policy of the org.
+      properties:
+        password:
+          $ref: '#/components/schemas/PasswordCredential'
+        provider:
+          $ref: '#/components/schemas/AuthenticationProvider'
+        recovery_question:
+          $ref: '#/components/schemas/RecoveryQuestionCredential'
+    UserCredentialsWritable:
+      type: object
+      description: Specifies primary authentication and recovery credentials for a user. Credential types and requirements vary depending on the provider and security policy of the org.
+      properties:
+        password:
+          $ref: '#/components/schemas/PasswordCredential'
+        provider:
+          $ref: '#/components/schemas/AuthenticationProviderWritable'
+        recovery_question:
+          $ref: '#/components/schemas/RecoveryQuestionCredential'
+    UserNextLogin:
+      type: string
+      enum:
+        - changePassword
+    UserProfile:
+      additionalProperties: true
+      type: object
+      description: |-
+        Specifies the default and custom profile properties for a user.
+
+        The default user profile is based on the [System for Cross-domain Identity Management: Core Schema](https://datatracker.ietf.org/doc/html/rfc7643).
+
+        The only permitted customizations of the default profile are to update permissions, change whether the `firstName` and `lastName` properties are nullable, and specify a [pattern](https://developer.okta.com/docs/reference/api/schemas/#login-pattern-validation) for `login`. You can use the Profile Editor in the Admin Console or the [Schemas API](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UISchema/#tag/UISchema) to make schema modifications.
+
+        You can extend user profiles with custom properties. You must first add the custom property to the user profile schema before you reference it.
+        You can use the Profile Editor in the Admin Console or the [Schemas API](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UISchema/#tag/UISchema) to manage schema extensions.
+
+        Custom attributes can contain HTML tags. It's the client's responsibility to escape or encode this data before displaying it. Use [best-practices](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html) to prevent cross-site scripting.
+      properties:
+        city:
+          type: string
+          description: The city or locality of the user's address (`locality`)
+          maxLength: 128
+          nullable: true
+        costCenter:
+          type: string
+          description: Name of the cost center assigned to a user
+          nullable: true
+        countryCode:
+          description: The country name component of the user's address (`country`). For validation, see [ISO 3166-1 alpha 2 "short" code format](https://datatracker.ietf.org/doc/html/draft-ietf-scim-core-schema-22#ref-ISO3166).
+          type: string
+          maxLength: 2
+          nullable: true
+        department:
+          type: string
+          description: Name of the user's department
+        displayName:
+          type: string
+          description: Name of the user suitable for display to end users
+          nullable: true
+        division:
+          type: string
+          description: Name of the user's division
+          nullable: true
+        email:
+          type: string
+          description: The primary email address of the user. For validation, see [RFC 5322 Section 3.2.3](https://datatracker.ietf.org/doc/html/rfc5322#section-3.2.3).
+          format: email
+          minLength: 5
+          maxLength: 100
+        employeeNumber:
+          description: The organization or company assigned unique identifier for the user
+          type: string
+        firstName:
+          type: string
+          description: Given name of the user (`givenName`)
+          minLength: 1
+          maxLength: 50
+          nullable: true
+        honorificPrefix:
+          type: string
+          description: Honorific prefix(es) of the user, or title in most Western languages
+          nullable: true
+        honorificSuffix:
+          type: string
+          description: Honorific suffix(es) of the user
+          nullable: true
+        lastName:
+          type: string
+          description: The family name of the user (`familyName`)
+          minLength: 1
+          maxLength: 50
+          nullable: true
+        locale:
+          type: string
+          description: |-
+            The user's default location for purposes of localizing items such as currency, date time format, numerical representations, and so on.
+            A locale value is a concatenation of the ISO 639-1 two-letter language code, an underscore, and the ISO 3166-1 two-letter country code. For example, en_US specifies the language English and country US. This value is `en_US` by default.
+        login:
+          type: string
+          description: |-
+            The unique identifier for the user (`username`). For validation, see [Login pattern validation](https://developer.okta.com/docs/reference/api/schemas/#login-pattern-validation).
+
+            Every user within your Okta org must have a unique identifier for a login. This constraint applies to all users you import from other systems or applications such as Active Directory. Your organization is the top-level namespace to mix and match logins from all your connected applications or directories. Careful consideration of naming conventions for your login identifier will make it easier to onboard new applications in the future.
+
+            Logins are not considered unique if they differ only in case and/or diacritical marks. If one of your users has a login of Isaac.Brock@example.com, there cannot be another user whose login is isaac.brock@example.com, nor isáàc.bröck@example.com.
+
+            Okta has a default ambiguous name resolution policy for usernames that include @-signs. (By default, usernames must be formatted as email addresses and thus always include @-signs. You can remove that restriction using either the Admin Console or the [Schemas API](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Schema/). Users can sign in with their non-qualified short name (for example: isaac.brock with username isaac.brock@example.com) as long as the short name is still unique within the organization.
+            maxLength: 100
+          minLength: 5
+        manager:
+          type: string
+          description: The `displayName` of the user's manager
+          nullable: true
+        managerId:
+          type: string
+          description: The `id` of the user's manager
+          nullable: true
+        middleName:
+          type: string
+          description: The middle name of the user
+          nullable: true
+        mobilePhone:
+          type: string
+          description: The mobile phone number of the user
+          maxLength: 100
+          minLength: 0
+          nullable: true
+        nickName:
+          type: string
+          description: The casual way to address the user in real life
+          nullable: true
+        organization:
+          type: string
+          description: Name of the the user's organization
+          nullable: true
+        postalAddress:
+          type: string
+          description: Mailing address component of the user's address
+          maxLength: 4096
+          nullable: true
+        preferredLanguage:
+          type: string
+          description: The user's preferred written or spoken language. For validation, see [RFC 7231 Section 5.3.5](https://datatracker.ietf.org/doc/html/rfc7231#section-5.3.5).
+          nullable: true
+        primaryPhone:
+          type: string
+          description: The primary phone number of the user such as a home number
+          maxLength: 100
+          minLength: 0
+          nullable: true
+        profileUrl:
+          type: string
+          description: The URL of the user's online profile. For example, a web page. See [URL](https://datatracker.ietf.org/doc/html/rfc1808).
+          nullable: true
+        secondEmail:
+          type: string
+          format: email
+          description: The secondary email address of the user typically used for account recovery. For validation, see [RFC 5322 Section 3.2.3](https://datatracker.ietf.org/doc/html/rfc5322#section-3.2.3).
+          minLength: 5
+          maxLength: 100
+          nullable: true
+        state:
+          type: string
+          description: The state or region component of the user's address (`region`)
+          maxLength: 128
+          nullable: true
+        streetAddress:
+          type: string
+          description: The full street address component of the user's address
+          maxLength: 1024
+          nullable: true
+        timezone:
+          type: string
+          description: The user's time zone
+          nullable: true
+        title:
+          type: string
+          description: The user's title, such as Vice President
+          nullable: true
+        userType:
+          type: string
+          description: |-
+            The property used to describe the organization-to-user relationship, such as employee or contractor
+
+            > **Note:** The `userType` property is a standard string attribute and should be treated as a descriptive label rather than a functional setting. Unlike a user's assigned user [`type`](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/User/#tag/User/operation/createUser!path=type&t=request), this property is purely informational and doesn't influence the behavior of the Okta platform.
+          nullable: true
+        zipCode:
+          type: string
+          description: The ZIP code or postal code component of the user's address (`postalCode`)
+          maxLength: 50
+          nullable: true
+    UserStatus:
+      type: string
+      description: |-
+        The current status of the user.
+
+        The status of a user changes in response to explicit events, such as admin-driven lifecycle changes, user login, or self-service password recovery. Okta doesn't asynchronously sweep through users and update their password expiry state, for example. Instead, Okta evaluates password policy at login time, notices the password has expired, and moves the user to the expired state. When running reports, remember that the data is valid as of the last login or lifecycle event for that user.
+
+        > **Note:** The `ACTIVATING` status is a transitional status that occurs when a user is being activated but hasn't completed the activation process. This status isn't directly settable through the API, nor should you use it for any of your user management workflows.
+      readOnly: true
+      enum:
+        - ACTIVE
+        - DEPROVISIONED
+        - LOCKED_OUT
+        - PASSWORD_EXPIRED
+        - PROVISIONED
+        - RECOVERY
+        - STAGED
+        - SUSPENDED
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes
+
+
+

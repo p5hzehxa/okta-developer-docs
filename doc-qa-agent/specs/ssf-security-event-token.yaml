@@ -1,0 +1,309 @@
+openapi: 3.0.3
+info:
+  title: SSF Security Event Tokens
+  version: 1.0.0
+servers:
+  $ref: ../../base.yaml#/servers
+tags:
+  $ref: ../../base.yaml#/tags
+paths:
+  /security/api/v1/security-events:
+    post:
+      summary: Publish a security event token
+      description: |-
+        Publishes a security event token (SET) sent by a security events provider. After the token is verified, Okta ingests the event and performs any appropriate action.
+      operationId: publishSecurityEventTokens
+      x-codegen-request-body-name: Security Event Token
+      security: []
+      requestBody:
+        required: true
+        description: |
+          The request body is a signed [SET](https://datatracker.ietf.org/doc/html/rfc8417), which is a type of JSON Web Token (JWT).
+
+          For SET JWT header and body descriptions, see [SET JWT header](/openapi/okta-management/management/ssfsecurityeventtoken/securityeventtokenrequestjwtheader) and [SET JWT body payload](/openapi/okta-management/management/ssfsecurityeventtoken/securityeventtokenrequestjwtbody).
+        content:
+          application/secevent+jwt:
+            schema:
+              type: string
+            examples:
+              SET:
+                value: "eyJraWQiOiJzYW1wbGVfa2lkIiwidHlwIjoic2ZXZlbnQra ... mrtmw"
+      responses:
+        '202':
+          description: Accepted
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityEventTokenError'
+      tags:
+        - SSFSecurityEventToken
+    x-okta-team-detail:
+      x-team-slack: amp-rad
+components:
+  schemas:
+    SecurityEventTokenError:
+      title: Security event token error
+      description: Error object thrown when parsing the security event token
+      type: object
+      properties:
+        err:
+          type: string
+          description: A code that describes the category of the error
+          example: invalid_request
+          enum:
+            - authentication_failed
+            - invalid_audience
+            - invalid_issuer
+            - invalid_key
+            - invalid_request
+        description:
+          type: string
+          description: |
+            Describes the error
+            > **Note:** SET claim fields with underscores (snake case) are presented in camelcase. For example, `previous_status` appears as `previousStatus`.
+          example: "Failed claim validation in security event token. 'events.mediationDeviceComplianceChangeEvent.previousStatus': The field cannot be left blank"
+    SecurityEventTokenRequestJwtHeader:
+      title: Security event token JWT header
+      x-tags:
+        - SSFSecurityEventToken
+      type: object
+      description: JSON web token header for a security event token
+      properties:
+        kid:
+          type: string
+          description: Key ID used to sign or encrypt the JWT
+        typ:
+          type: string
+          description: The type of content being signed or encrypted
+          example: "secevent+jwt"
+        alg:
+          type: string
+          description: Algorithm used to sign or encrypt the JWT
+          example: RS256
+      required:
+        - kid
+        - typ
+        - alg
+    SecurityEventTokenRequestJwtBody:
+      title: Security event token JWT body payload
+      x-tags:
+        - SSFSecurityEventToken
+      type: object
+      description: JSON web token body payload for a security event token
+      properties:
+        iss:
+          type: string
+          description: Token issuer
+          example: "https://transmitter.example.com"
+        aud:
+          type: string
+          description: Audience
+          example: "https://receiverexample.okta.com/"
+        jti:
+          type: string
+          description: Token ID
+          example: "24c63fb56f ... a9fa24"
+        iat:
+          type: integer
+          format: int64
+          description: Token issue time (UNIX timestamp)
+          example: 1702448550
+        events:
+          $ref: '#/components/schemas/SecurityEventTokenRequestJwtEvents'
+      required:
+        - iss
+        - aud
+        - jti
+        - iat
+        - events
+    SecurityEventTokenRequestJwtEvents:
+      description: A non-empty collection of events
+      type: object
+      properties:
+        https://schemas.okta.com/secevent/okta/event-type/ip-change:
+          $ref: '#/components/schemas/OktaIpChangeEvent'
+        https://schemas.openid.net/secevent/caep/event-type/session-revoked:
+          $ref: '#/components/schemas/CaepSessionRevokedEvent'
+        https://schemas.openid.net/secevent/caep/event-type/device-compliance-change:
+          $ref: '#/components/schemas/CaepDeviceComplianceChangeEvent'
+        https://schemas.openid.net/secevent/risc/event-type/identifier-changed:
+          $ref: '#/components/schemas/RiscIdentifierChangedEvent'
+        https://schemas.okta.com/secevent/okta/event-type/device-risk-change:
+          $ref: '#/components/schemas/OktaDeviceRiskChangeEvent'
+        https://schemas.okta.com/secevent/okta/event-type/user-risk-change:
+          $ref: '#/components/schemas/OktaUserRiskChangeEvent'
+    SecurityEventSubject:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      description: The event subjects
+      properties:
+        user:
+          type: object
+          description: The user involved with the event
+          example:
+            format: email
+            email: john@doe.net
+        device:
+          type: object
+          description: The device involved with the event
+          example:
+            format: opaque
+            id: device-identifier-001
+    SecurityEvent:
+      type: object
+      properties: &SecurityEventProperties
+        subject:
+          $ref: '#/components/schemas/SecurityEventSubject'
+        event_timestamp:
+          type: integer
+          format: int64
+          description: The time of the event (UNIX timestamp)
+          example: 1702448550
+      required:
+        - event_timestamp
+        - subject
+    SecurityEventReason:
+      type: object
+      properties:
+        en:
+          type: string
+          description: The event reason in English
+          example: Event message example
+      required:
+        - en
+    CaepSecurityEvent:
+      type: object
+      properties: &CaepSecurityEventProperties
+        <<: *SecurityEventProperties
+        initiating_entity:
+          type: string
+          description: The entity that initiated the event
+          enum: ['admin', 'user', 'policy', 'system']
+        reason_admin:
+          allOf:
+            - $ref: '#/components/schemas/SecurityEventReason'
+            - type: object
+              description: A localized administrative message intended for logging and auditing.<br>Either `reason_admin` or `reason_user` is required.
+        reason_user:
+          allOf:
+            - $ref: '#/components/schemas/SecurityEventReason'
+            - type: object
+              description: A localized message intended for the end user.<br>Either `reason_admin` or `reason_user` is required.
+      required:
+        - event_timestamp
+        - subject
+    OktaIpChangeEvent:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      description: IP changed for the subject's session
+      properties:
+        <<: *CaepSecurityEventProperties
+        current_ip_address:
+          type: string
+          description: Current IP address of the subject
+          example: 123.4.5.6
+        previous_ip_address:
+          type: string
+          description: Previous IP address of the subject
+          example: 123.45.67.8
+      required:
+        - event_timestamp
+        - subject
+        - current_ip_address
+        - previous_ip_address
+    OktaDeviceRiskChangeEvent:
+      type: object
+      description: The device risk level changed
+      properties:
+        <<: *CaepSecurityEventProperties
+        current_level:
+          type: string
+          description: Current risk level of the device
+          enum: ['low', 'medium', 'high', 'secure', 'none']
+          example: low
+        previous_level:
+          type: string
+          description: Previous risk level of the device
+          enum: ['low', 'medium', 'high', 'secure', 'none']
+          example: medium
+      required:
+        - event_timestamp
+        - subject
+        - current_level
+        - previous_level
+    OktaUserRiskChangeEvent:
+      type: object
+      description: The user risk level changed
+      properties:
+        <<: *CaepSecurityEventProperties
+        current_level:
+          type: string
+          description: Current risk level of the user
+          enum: ['low', 'medium', 'high', 'secure', 'none']
+          example: low
+        previous_level:
+          type: string
+          description: Previous risk level of the user
+          enum: ['low', 'medium', 'high', 'secure', 'none']
+          example: medium
+      required:
+        - event_timestamp
+        - subject
+        - current_level
+        - previous_level
+    CaepSessionRevokedEvent:
+      type: object
+      description: The session of the subject was revoked
+      properties:
+        <<: *CaepSecurityEventProperties
+        current_ip:
+          type: string
+          description: Current IP of the session
+          example: 123.4.5.6
+        last_known_ip:
+          type: string
+          description: Last known IP of the session
+          example: 123.4.5.6
+        current_user_agent:
+          type: string
+          description: Current user agent of the session
+          example: CurrentUserAgent
+        last_known_user_agent:
+          type: string
+          description: Last known user agent of the session
+          example: LastUserAgent
+      required:
+        - event_timestamp
+        - subject
+    CaepDeviceComplianceChangeEvent:
+      type: object
+      description: The subject's device compliance was revoked
+      properties:
+        <<: *CaepSecurityEventProperties
+        current_status:
+          type: string
+          description: Current device compliance status
+          enum: ['compliant', 'not-compliant']
+          example: "non-compliant"
+        previous_status:
+          type: string
+          description: Previous device compliance status
+          enum: ['compliant', 'not-compliant']
+      required:
+        - event_timestamp
+        - subject
+        - current_status
+        - previous_status
+    RiscIdentifierChangedEvent:
+      type: object
+      description: The subject's identifier has changed, which is either an email address or a phone number change
+      properties:
+        <<: *SecurityEventProperties
+        new-value:
+          type: string
+          description: The new identifier value
+          example: "new.email@okta.example.com"
+      required:
+        - event_timestamp
+        - subject

@@ -1,0 +1,2659 @@
+openapi: 3.0.3
+info:
+  title: Your OIN Integrations API
+  description: Resources for OIN Integration Submissions
+  version: 1.0.0
+tags: {$ref: ../base.yaml#/tags}
+paths:
+  /integrations/api/v1/submissions/{submissionId}:
+    parameters:
+      - $ref: '#/components/parameters/pathSubmissionId'
+    get:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: Retrieve an OIN integration
+      description: Retrieves an OIN Integration by ID
+      operationId: getSubmissionByOperationId
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionResponseWithApiResponse'
+              examples:
+                SubmissionSamlResponse:
+                  $ref: '#/components/examples/SubmissionSamlResponse'
+                SubmissionOidcResponse:
+                  $ref: '#/components/examples/SubmissionOidcResponse'
+                SubmissionScimResponse:
+                  $ref: '#/components/examples/SubmissionScimResponse'
+                SubmissionEMResponse:
+                  $ref: '#/components/examples/SubmissionEMResponse'
+                SubmissionAPIServiceResponse:
+                  $ref: '#/components/examples/SubmissionAPIServiceResponse'
+                SubmissionUniversalLogoutResponse:
+                  $ref: '#/components/examples/SubmissionUniversalLogoutResponse'
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.manifests.read
+      tags: [YourOinIntegrations]
+    put:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: Replace an OIN integration
+      description: Replaces the properties of an OIN Integration identified by ID
+      operationId: replaceSubmission
+      parameters:
+        - $ref: '#/components/parameters/pathSubmissionId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmissionRequest'
+            examples:
+              SubmissionSaml:
+                $ref: '#/components/examples/SubmissionSamlRequest'
+              SubmissionOidc:
+                $ref: '#/components/examples/SubmissionOidcRequest'
+              SubmissionScim:
+                $ref: '#/components/examples/SubmissionScimRequest'
+              SubmissionEM:
+                $ref: '#/components/examples/SubmissionEMRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionResponseWithApiResponse'
+              examples:
+                SubmissionSaml:
+                  $ref: '#/components/examples/SubmissionSamlResponse'
+                SubmissionOidc:
+                  $ref: '#/components/examples/SubmissionOidcResponse'
+                SubmissionScim:
+                  $ref: '#/components/examples/SubmissionScimResponse'
+                SubmissionEM:
+                  $ref: '#/components/examples/SubmissionEMResponse'
+                SubmissionAPIServiceResponse:
+                  $ref: '#/components/examples/SubmissionAPIServiceResponse'
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.manifests.manage
+      tags: [YourOinIntegrations]
+    x-okta-team-detail:
+      x-team-slack: isv-submissions
+  /integrations/api/v1/submissions:
+    get:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: List all OIN integrations
+      description: Lists all OIN Integration submissions created through the org
+      operationId: listSubmissions
+      parameters:
+        - $ref: './Common.yaml#/components/parameters/queryLimit'
+        - name: after
+          in: query
+          description: Specify the pagination cursor (OIN Integration instance `id`) for the next page of OIN Integrations.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubmissionResponseWithApiResponse'
+              examples:
+                SubmissionsResponse:
+                  $ref: '#/components/examples/SubmissionsResponse'
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.manifests.read
+      tags: [YourOinIntegrations]
+    post:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: Create an OIN integration
+      description: Creates an OIN Integration submission for verification and publication
+      operationId: createSubmission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmissionRequest'
+            examples:
+              SubmissionSaml:
+                $ref: '#/components/examples/SubmissionSamlRequest'
+              SubmissionOidc:
+                $ref: '#/components/examples/SubmissionOidcRequest'
+              SubmissionScim:
+                $ref: '#/components/examples/SubmissionScimRequest'
+              SubmissionEM:
+                $ref: '#/components/examples/SubmissionEMRequest'
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionResponseWithApiResponse'
+              examples:
+                SubmissionSaml:
+                  $ref: '#/components/examples/SubmissionSamlResponse'
+                SubmissionOidc:
+                  $ref: '#/components/examples/SubmissionOidcResponse'
+                SubmissionScim:
+                  $ref: '#/components/examples/SubmissionScimResponse'
+                SubmissionEM:
+                  $ref: '#/components/examples/SubmissionEMResponse'
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.manifests.manage
+      tags: [YourOinIntegrations]
+    x-okta-team-detail:
+      x-team-slack: isv-submissions
+  /integrations/api/v1/submissions/logo:
+    post:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: Upload an OIN integration logo
+      description: Uploads a logo to your org. The image uploaded must adhere to the [OIN logo guidelines](https://developer.okta.com/docs/guides/submit-app-prereq/main/#logo-guidelines). Use the URL returned in the response header to specify the [`logo`](/openapi/okta-management/management/tag/YourOinIntegrations/#tag/YourOinIntegrations/operation/createSubmission!path=logo&t=request) parameter when you [create your OIN Integration submission](/openapi/okta-management/management/tag/YourOinIntegrations/#tag/YourOinIntegrations/operation/createSubmission). This logo appears in the OIN catalog for your app integration.
+      operationId: uploadSubmissionLogo
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Success
+          headers:
+            location:
+              schema:
+                type: string
+                format: uri
+                description: Uploaded logo URL
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.manifests.manage
+      tags: [YourOinIntegrations]
+
+    x-okta-team-detail:
+      x-team-slack: isv-submissions
+  /integrations/api/v1/submissions/logo/default:
+    post:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: Upload a default logo for an OIN integration
+      description: Uploads a default logo to the OIN submission. The image must adhere to the [OIN logo guidelines](https://developer.okta.com/docs/guides/submit-app-prereq/main/#logo-guidelines). Use the URL returned in the response header to specify the [`logo`](/openapi/okta-management/management/tag/YourOinIntegrations/#tag/YourOinIntegrations/operation/createSubmission!path=logo&t=request) parameter when you [create your OIN Integration submission](/openapi/okta-management/management/tag/YourOinIntegrations/#tag/YourOinIntegrations/operation/createSubmission). This logo appears in the OIN catalog for your app integration.
+      operationId: uploadSubmissionDefaultLogo
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Success
+          headers:
+            location:
+              schema:
+                type: string
+                format: uri
+                description: Uploaded default logo URL
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.manifests.manage
+      tags: [YourOinIntegrations]
+
+    x-okta-team-detail:
+      x-team-slack: isv-submissions
+  /integrations/api/v1/submissions/integration-capabilities/{status}:
+    parameters:
+      - $ref: '#/components/parameters/IntegrationCapabilityStatus'
+    get:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: Retrieve the integration capability status
+      description: Retrieves a list of integration capabilities by status
+      operationId: getIntegrationCapabilities
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IntegrationCapability'
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: [ ]
+        - oauth2:
+            - okta.manifests.read
+      tags: [ YourOinIntegrations ]
+
+    x-okta-team-detail:
+      x-team-slack: isv-submissions
+  /integrations/api/v1/submissions/{submissionId}/submit:
+    parameters:
+      - $ref: '#/components/parameters/pathSubmissionId'
+    post:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: Submit an OIN integration
+      description: Submits an OIN Integration for Okta verification
+      operationId: submitSubmission
+      responses:
+        '202':
+          description: Success
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.manifests.manage
+      tags: [YourOinIntegrations]
+    x-okta-team-detail:
+      x-team-slack: isv-submissions
+  /integrations/api/v1/submissions/{submissionId}/testing:
+    parameters:
+      - $ref: '#/components/parameters/pathSubmissionId'
+    get:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: Retrieve an OIN integration testing information
+      description: Retrieves the testing information for an existing OIN Integration
+      operationId: getSubmissionTestInfo
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestInfo'
+              examples:
+                TestInfoSamlResponse:
+                  $ref: '#/components/examples/TestInfoSamlResponse'
+                TestInfoOidcResponse:
+                  $ref: '#/components/examples/TestInfoOidcResponse'
+                TestInfoScimResponse:
+                  $ref: '#/components/examples/TestInfoScimResponse'
+                TestInfoEMResponse:
+                  $ref: '#/components/examples/TestInfoEMResponse'
+                TestInfoApiServiceResponse:
+                  $ref: '#/components/examples/TestInfoApiServiceResponse'
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.manifests.read
+      tags: [YourOinIntegrations]
+    put:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: Upsert an OIN integration testing information
+      description: Upserts (adds or replaces) testing information for an OIN Integration
+      operationId: upsertSubmissionTestInfo
+      parameters:
+        - $ref: '#/components/parameters/pathSubmissionId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestInfo'
+            examples:
+              TestInfoSamlRequest:
+                $ref: '#/components/examples/TestInfoSamlRequest'
+              TestInfoOidcRequest:
+                $ref: '#/components/examples/TestInfoOidcRequest'
+              TestInfoScimRequest:
+                $ref: '#/components/examples/TestInfoScimRequest'
+              TestInfoEMRequest:
+                $ref: '#/components/examples/TestInfoEMRequest'
+              TestInfoApiServiceRequest:
+                $ref: '#/components/examples/TestInfoApiServiceRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestInfo'
+              examples:
+                TestInfoSamlResponse:
+                  $ref: '#/components/examples/TestInfoSamlResponse'
+                TestInfoOidcResponse:
+                  $ref: '#/components/examples/TestInfoOidcResponse'
+                TestInfoScimResponse:
+                  $ref: '#/components/examples/TestInfoScimResponse'
+                TestInfoEMResponse:
+                  $ref: '#/components/examples/TestInfoEMResponse'
+                TestInfoApiServiceResponse:
+                  $ref: '#/components/examples/TestInfoApiServiceResponse'
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.manifests.manage
+      tags: [YourOinIntegrations]
+    x-okta-team-detail:
+      x-team-slack: isv-submissions
+  /integrations/api/v1/submissions/{submissionId}/capabilities:
+    parameters:
+      - $ref: '#/components/parameters/pathSubmissionId'
+    get:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: List all supported capabilities
+      description: Lists all capabilities for an OIN Integration submission
+      operationId: listSubmissionCapabilities
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionCapabilities'
+              example:
+                $ref: '#/components/examples/SubmissionCapabilities'
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.manifests.read
+      tags: [YourOinIntegrations]
+
+    put:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: Upsert the submission supported capabilities
+      description: Upserts (adds or replaces) capabilities for an OIN Integration submission
+      operationId: upsertSubmissionCapabilities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmissionCapabilities'
+            example:
+              $ref: '#/components/examples/SubmissionCapabilities'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionCapabilities'
+              example:
+                $ref: '#/components/examples/SubmissionCapabilities'
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.manifests.manage
+      tags: [YourOinIntegrations]
+
+    x-okta-team-detail:
+      x-team-slack: isv-submissions
+  /integrations/api/v1/submissions/{submissionId}/auth-settings/default:
+    parameters:
+      - $ref: '#/components/parameters/pathSubmissionId'
+    get:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: Retrieve the authentication settings
+      description: Retrieves the authentication settings for an OIN Integration submission
+      operationId: getSubmissionAuthSettings
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSettings'
+              examples:
+                CustomAuthSettings:
+                  $ref: '#/components/examples/CustomAuthSettings'
+                OAuth2AuthSettings:
+                  $ref: '#/components/examples/OAuth2AuthSettings'
+                BasicAuthSettings:
+                  $ref: '#/components/examples/BasicAuthSettings'
+                ScimHeaderAuthSettings:
+                  $ref: '#/components/examples/ScimHeaderAuthSettings'
+                ScimBearerAuthSettings:
+                  $ref: '#/components/examples/ScimBearerAuthSettings'
+
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.manifests.read
+      tags: [YourOinIntegrations]
+
+    put:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: Upsert the submission authentication settings
+      description: Upserts (adds or replaces) authentication settings for an OIN Integration submission
+      operationId: upsertSubmissionAuthSettings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthSettings'
+            examples:
+              CustomAuthSettings:
+                $ref: '#/components/examples/CustomAuthSettings'
+              OAuth2AuthSettings:
+                $ref: '#/components/examples/OAuth2AuthSettings'
+              BasicAuthSettings:
+                $ref: '#/components/examples/BasicAuthSettings'
+              ScimHeaderAuthSettings:
+                $ref: '#/components/examples/ScimHeaderAuthSettings'
+              ScimBearerAuthSettings:
+                $ref: '#/components/examples/ScimBearerAuthSettings'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSettings'
+              examples:
+                CustomAuthSettings:
+                  $ref: '#/components/examples/CustomAuthSettings'
+                OAuth2AuthSettings:
+                  $ref: '#/components/examples/OAuth2AuthSettings'
+                BasicAuthSettings:
+                  $ref: '#/components/examples/BasicAuthSettings'
+                ScimHeaderAuthSettings:
+                  $ref: '#/components/examples/ScimHeaderAuthSettings'
+                ScimBearerAuthSettings:
+                  $ref: '#/components/examples/ScimBearerAuthSettings'
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.manifests.manage
+      tags: [YourOinIntegrations]
+
+    x-okta-team-detail:
+      x-team-slack: isv-submissions
+  /integrations/api/v1/submissions/{submissionId}/tenant-settings:
+    parameters:
+      - $ref: '#/components/parameters/pathSubmissionId'
+    get:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: Retrieve the tenant settings
+      description: Retrieves the tenant settings for an OIN Integration submission
+      operationId: getSubmissionTenantSettings
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantSettings'
+              example:
+                $ref: '#/components/examples/TenantSettings'
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.manifests.read
+      tags: [YourOinIntegrations]
+
+    put:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: Upsert the submission tenant settings
+      description: Upserts (adds or replaces) tenant settings for an OIN Integration submission
+      operationId: upsertSubmissionTenantSettings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantSettings'
+            example:
+              $ref: '#/components/examples/TenantSettings'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantSettings'
+              example:
+                $ref: '#/components/examples/TenantSettings'
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.manifests.manage
+      tags: [YourOinIntegrations]
+
+    x-okta-team-detail:
+      x-team-slack: isv-submissions
+  /integrations/api/v1/submissions/{submissionId}/capabilities/{capability}/protocols/actions:
+    parameters:
+      - $ref: '#/components/parameters/pathSubmissionId'
+      - $ref: '#/components/parameters/pathCapability'
+    get:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: Retrieve all actions for OIN integration
+      description: Retrieves all actions for a specific capability in an OIN Integration submission
+      operationId: getSubmissionActions
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionActions'
+              example:
+                $ref: '#/components/examples/SubmissionActions'
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.manifests.read
+      tags: [YourOinIntegrations]
+
+    put:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: Upsert the submission actions
+      description: Upserts (adds or replaces) actions for a specific capability in an OIN Integration submission
+      operationId: upsertSubmissionActions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmissionActions'
+            example:
+              $ref: '#/components/examples/SubmissionActions'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionActions'
+              example:
+                $ref: '#/components/examples/SubmissionActions'
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.manifests.manage
+      tags: [YourOinIntegrations]
+
+    x-okta-team-detail:
+      x-team-slack: isv-submissions
+  /integrations/api/v1/submissions/{submissionId}/capabilities/{capability}/protocols/actions/actions-provider/{actionsProviderType}/available-actions:
+    parameters:
+      - $ref: '#/components/parameters/pathSubmissionId'
+      - $ref: '#/components/parameters/pathCapability'
+      - $ref: '#/components/parameters/pathActionsProviderType'
+    get:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: List all available actions for an OIN integration
+      description: Lists all available actions from an actions provider (such as Workflows) for a specific OIN integration
+      operationId: listAvailableActions
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableActions'
+              example:
+                $ref: '#/components/examples/AvailableActions'
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.manifests.read
+      tags: [YourOinIntegrations]
+
+    x-okta-team-detail:
+      x-team-slack: isv-submissions
+  /integrations/api/v1/submissions/{submissionId}/capabilities/{capability}/protocols/actions/actions-provider/{actionsProviderType}/validate-actions:
+    parameters:
+      - $ref: '#/components/parameters/pathSubmissionId'
+      - $ref: '#/components/parameters/pathCapability'
+      - $ref: '#/components/parameters/pathActionsProviderType'
+    post:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: Verify the submission actions
+      description: Verifies the submission actions' correctness with an actions provider, such as Workflows
+      operationId: verifyActions
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                    description: Indicates if the submission actions are valid
+                  validationDetails:
+                    type: array
+                    description: List of validation details (if `valid` is false)
+                    items:
+                      $ref: '#/components/schemas/ValidationDetail'
+                required:
+                  - valid
+              examples:
+                ValidationDetailsResult:
+                   $ref: '#/components/examples/ValidationDetailsResult'
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.manifests.read
+      tags: [YourOinIntegrations]
+
+    x-okta-team-detail:
+      x-team-slack: isv-submissions
+  /integrations/api/v1/submissions/{submissionId}/capabilities/api-service/protocols/oauth2:
+    parameters:
+      - $ref: '#/components/parameters/pathSubmissionId'
+    get:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: Retrieve the API service configuration details for a submission
+      description: Retrieves the API service configuration details for a specific submission. This is a granular GET request for the API service component
+      operationId: getApiServiceConfig
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiService'
+              examples:
+                ApiServiceExample:
+                  $ref: '#/components/examples/ApiServiceExample'
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.manifests.read
+      tags: [YourOinIntegrations]
+    put:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        SKUs: [ Integrator Free ]
+      summary: Replace the API service configuration details for a submission
+      description: Replaces the API service configuration details for a specific submission. This is a granular PUT request for the API service component
+      operationId: replaceApiServiceConfig
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiService'
+            example:
+              $ref: '#/components/examples/ApiServiceExample'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiService'
+              examples:
+                ApiServiceExample:
+                  $ref: '#/components/examples/ApiServiceExample'
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: [ ]
+        - oauth2:
+            - okta.manifests.manage
+      tags: [ YourOinIntegrations ]
+
+    x-okta-team-detail:
+      x-team-slack: isv-submissions
+components:
+  parameters:
+    pathSubmissionId:
+      name: submissionId
+      description: OIN Integration ID
+      in: path
+      required: true
+      schema:
+        type: string
+        example: acme_submissionapp_1
+    pathCapability:
+      name: capability
+      description: Capability
+      in: path
+      required: true
+      schema:
+        type: string
+        enum:
+          - sso
+          - universal-logout
+          - provisioning
+          - entitlements
+          - shared
+        example: provisioning
+    pathActionId:
+      name: actionId
+      description: Action ID
+      in: path
+      required: true
+      schema:
+        type: string
+        example: action_1234567890
+    pathActionsProviderType:
+      name: actionsProviderType
+      description: Actions provider type
+      in: path
+      required: true
+      schema:
+        type: string
+        enum:
+          - workflows
+        example: workflows
+    IntegrationCapabilityStatus:
+      name: status
+      description: Integration capability status
+      in: path
+      required: true
+      schema:
+        type: string
+        enum:
+          - upcoming
+          - released
+          - deprecated
+          - unknown
+        example: upcoming
+  schemas:
+    ApiService:
+      type: object
+      properties:
+        setupInstructionsUri:
+          type: string
+          format: uri
+          description: The URL for the API service integration configuration document
+          example: https://example.com/strawberry/help/apiServiceSetup
+        authenticationMethod:
+          type: string
+          description: Specifies the authentication method used by the API service application when requesting an access token<br> **Note:** Only the `client_secret_basic` method is supported
+          enum:
+              - client_secret_basic
+          example: client_secret_basic
+        scopes:
+          description: A list of Okta OAuth 2.0 scopes required for the API service app to function
+          type: array
+          items:
+            $ref: '#/components/schemas/Scope'
+    Scope:
+      type: string
+    SubmissionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: OIN Integration ID
+          readOnly: true
+          example: acme_submissionapp_1
+        name:
+          type: string
+          maxLength: 64
+          minLength: 1
+          description: The app integration name. This is the main title used for your integration in the OIN catalog.
+          example: Strawberry Central
+        description:
+          type: string
+          maxLength: 1024
+          minLength: 1
+          description: A general description of your application and the benefits provided to your customers
+          example: Your one source for in-season strawberry deals. Okta's Strawberry Central integration allow users to securely access those sweet deals.
+        defaultLogo:
+          type: boolean
+          default: false
+          description: |
+            Indicates whether the app submission uses a default logo or a custom-uploaded logo:
+            * If `true`: Uses the default Okta-provided placeholder logo.
+            * If `false`: Uses a custom logo type other than the default logo.
+        logo:
+          type: string
+          format: uri
+          description: URL to an uploaded application logo. This logo appears next to your app integration name in the OIN catalog. You must first [Upload an OIN Integration logo](/openapi/okta-management/management/tag/YourOinIntegrations/#tag/YourOinIntegrations/operation/uploadSubmissionLogo) to obtain the logo URL before you can specify this value.
+          example: https://acme.okta.com/bc/image/fileStoreRecord?id=fs03xxd3KmkDBwJU80g4
+        sso:
+          $ref: '#/components/schemas/Sso'
+        provisioning:
+          $ref: '#/components/schemas/ProvisioningDetails'
+        config:
+          type: array
+          description: "List of org-level variables for the customer per-tenant configuration. For example, a `subdomain` variable can be used in the ACS URL: `https://${org.subdomain}.example.com/saml/login`"
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+                description: Display name of the variable in the Admin Console
+                example: Subdomain
+              name:
+                type: string
+                maxLength: 1024
+                minLength: 1
+                description: Name of the variable
+                example: subdomain
+        globalTokenRevocation:
+          $ref: '#/components/schemas/GlobalTokenRevocation'
+        capabilities:
+          type: array
+          description: List of capabilities supported by this integration with embedded protocol configurations
+          items:
+            $ref: '#/components/schemas/SubmissionCapabilityEnhanced'
+        authSettings:
+          $ref: '#/components/schemas/AuthSettings'
+        appContactDetails:
+          type: array
+          description: List of contact details for the app integration
+          items:
+            type: object
+            properties:
+              contactType:
+                type: string
+                enum:
+                  - CUSTOMER_SUPPORT
+                  - ESCALATION_SUPPORT
+                description: |
+                  Type of contact
+                  * `CUSTOMER_SUPPORT` - Public support contact details visible on your OIN catalog page for end users needing assistance with your integration.
+                  * `ESCALATION_SUPPORT` - Private support contact used by Okta to reach your organization during emergencies or escalations post-publication of the app (not shared with customers).
+                example: CUSTOMER_SUPPORT
+              contactValueType:
+                type: string
+                enum:
+                  - URL
+                  - EMAIL
+                  - PHONE
+                description: Format of the contact value
+                example: EMAIL
+              contact:
+                type: string
+                description: The contact value (email, phone, or URL)
+                example: support@example.com
+            required:
+              - contactType
+              - contactValueType
+              - contact
+        status:
+          type: string
+          description: Status of the OIN Integration submission
+          readOnly: true
+          example: New
+        lastUpdated:
+          type: string
+          description: Timestamp when the OIN Integration instance was last updated
+          readOnly: true
+          example: 2023-08-24T14:15:22Z
+        lastUpdatedBy:
+          type: string
+          description: ID of the user who made the last update
+          readOnly: true
+          example: 00ub0oNGTSWTBKOLGLNR
+        lastPublished:
+          type: string
+          description: Timestamp when the OIN Integration was last published
+          readOnly: true
+          example: 2023-08-24T14:15:22Z
+        oinFeatures:
+          type: string
+          description: Type of feature supported by the OIN integration
+          readOnly: true
+          example: "OIDC"
+        caseLastUpdated:
+          type: string
+          description: The most recent date and time when a Salesforce case associated with the OIN integration was updated
+          readOnly: true
+          example: 2024-01-15T10:30:45.000Z
+    SubmissionResponseWithApiResponse:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/SubmissionResponse'
+      properties:
+        apiService:
+          $ref: '#/components/schemas/ApiService'
+    SubmissionRequest:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/SubmissionResponse'
+      required:
+        - name
+        - description
+        - logo
+    IntegrationCapability:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the integration capability
+          example: icp3eoa6r26zMq51w0g4
+        name:
+          type: string
+          description: Name of the integration capability
+          example: API Service integration
+        description:
+          type: string
+          description: Description of the integration capability
+          example: API Service Integration
+        helpUrl:
+          type: string
+          format: uri
+          description: URL to the help documentation for the integration capability
+          example: https://example.com/docs/integration-capabilities/api-service
+        status:
+          type: string
+          description: Status of the integration capability
+          enum:
+            - upcoming
+            - released
+            - deprecated
+            - unknown
+        releaseDate:
+          type: string
+          format: date-time
+          description: The date when the integration capability was released
+          readOnly: true
+          example: 2023-08-24T14:15:22Z
+    Sso:
+      type: object
+      description: "Supported SSO protocol configurations. You must configure at least one protocol: `oidc` or `saml`"
+      properties:
+        saml:
+          $ref: '#/components/schemas/Saml'
+        oidc:
+          $ref: '#/components/schemas/Oidc'
+    Saml:
+      type: object
+      description: SAML configuration details
+      properties:
+        acs:
+          type: array
+          minItems: 1
+          description: "List of Assertion Consumer Service (ACS) URLs. The default ACS URL is required and is indicated by a null `index` value. You can use the org-level variables you defined in the `config` array in the URL. For example: `https://${org.subdomain}.example.com/saml/login`"
+          items:
+            type: object
+            properties:
+              index:
+                type: number
+                minimum: 0
+                maximum: 65535
+                description: Index of ACS URL. You can't reuse the same index in the ACS URL array.
+                example: 0
+              url:
+                type: string
+                format: uri
+                maxLength: 1024
+                description: Assertion Consumer Service (ACS) URL
+                example: https://${org.subdomain}.example.com/saml/login
+        entityId:
+          type: string
+          description: Globally unique name for your SAML entity. For instance, your Identity Provider (IdP) or Service Provider (SP) URL.
+          example: https://${org.subdomain}.example.com
+        claims:
+          type: array
+          description: Attribute statements to appear in the Okta SAML assertion
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The attribute name
+                example: Address
+              values:
+                type: array
+                description: The Okta values inserted in the attribute statement
+                items:
+                  type: string
+                  example: ${user.homeAddress}
+        groups:
+          type: array
+          description: Defines the group attribute names for the SAML assertion statement. Okta inserts the list of Okta user groups into the attribute names in the statement.
+          items:
+            type: string
+            description: A group attribute name in your SAML app
+            example: groups
+        doc:
+          type: string
+          format: uri
+          description: The URL to your customer-facing instructions for configuring your SAML integration. See [Customer configuration document guidelines](https://developer.okta.com/docs/guides/submit-app-prereq/main/#customer-configuration-document-guidelines).
+          example: https://example.com/strawberry/help/samlSetup
+      required:
+        - acs
+        - entityId
+        - doc
+    Oidc:
+      type: object
+      description: OIDC configuration details
+      properties:
+        redirectUris:
+          type: array
+          minItems: 1
+          description: List of sign-in redirect URIs
+          items:
+            type: string
+            format: uri
+            description: Sign-in redirect URI
+            example: https://{app.subdomain}.example.com/strawberry/oidc/login
+        initiateLoginUri:
+          type: string
+          format: uri
+          description: The URL to redirect users when they click on your app from their Okta End-User Dashboard
+          example: https://{app.subdomain}.example.com/strawberry/oidc/sp-init
+        postLogoutUris:
+          type: array
+          description: The sign-out redirect URIs for your app. You can send a request to `/v1/logout` to sign the user out and redirect them to one of these URIs.
+          items:
+            type: string
+            format: uri
+            description: 'A sign-out redirect URI. You can use the app-level properties you defined in the `config` array as variables in your URI. For example: `https://{app.subdomain}.example.com/strawberry/oidc/logged-out`'
+            example: https://{app.subdomain}.example.com/strawberry/oidc/logged-out
+        doc:
+          type: string
+          format: uri
+          description: The URL to your customer-facing instructions for configuring your OIDC integration. See [Customer configuration document guidelines](https://developer.okta.com/docs/guides/submit-app-prereq/main/#customer-configuration-document-guidelines).
+          example: https://example.com/strawberry/help/oidcSetup
+      required:
+        - redirectUris
+        - doc
+    ProvisioningDetails:
+      type: object
+      x-okta-lifecycle:
+        features:
+          - SCIM_SUBMISSION
+      description: Supported provisioning configurations for your integration
+      properties:
+        features:
+          type: array
+          minItems: 1
+          description: List of provisioning features supported in this integration
+          items:
+            type: string
+            description: Feature
+            enum:
+              - CREATE_USER
+              - READ_USER
+              - UPDATE_USER
+              - DEACTIVATE_USER
+              - IMPORT_USER_SCHEMA
+              - CREATE_GROUP
+              - READ_GROUP
+              - UPDATE_GROUP
+              - DEACTIVATE_GROUP
+            x-enumDescriptions:
+              CREATE_USER: Assigns a new external app account to each user managed by Okta. Okta doesn't create an account if it detects that the username specified in Okta exists in the external app.
+              READ_USER: Imports users and their profiles from the external app to Okta. This feature is required.
+              UPDATE_USER: Updates the profiles of users assigned to that app integration and synchronizes those changes to downstream apps. Profile changes made in the external app are overwritten with their respective Okta profile values.
+              DEACTIVATE_USER: Automatically deactivates user accounts when they're unassigned in Okta or their Okta accounts are deactivated. Okta also reactivates the external app account if the app integration is reassigned to a user in Okta.
+              IMPORT_USER_SCHEMA: Imports the user profile schema from an external app to Okta.
+              CREATE_GROUP: Assigns new group in the external app for existing Okta groups
+              READ_GROUP: Imports groups from the external app to Okta. This feature is required.
+              UPDATE_GROUP: Updates the groups and their memberships
+              DEACTIVATE_GROUP: Automatically deactivates groups when they're unassigned in Okta
+        scim:
+          $ref: '#/components/schemas/Scim'
+      required:
+        - features
+        - scim
+    Scim:
+      type: object
+      description: SCIM configuration details
+      properties:
+        baseUri:
+          type: string
+          format: uri
+          description: |-
+            The base URL that Okta uses to send outbound calls to your SCIM server.
+            Only the HTTPS protocol is supported.
+            You can use the app-level variables defined in the `config` array for the base URL.
+            For example, if you have a `subdomain` variable defined in the `config` array and the URL to retrieve SCIM users for your integration is `https://${subdomain}.example.com/scim/v2/Users`,
+            then specify the following base URL: `'https://' + app.subdomain + '.example.com/scim/v2'`.
+        authMode:
+          type: string
+          description: |-
+            The authentication mode for requests to your SCIM server
+
+            | authMode | Description |
+            | -------- | ----------- |
+            | `header` | Uses authorization header with a customer-provided token value in the following format: `Authorization: {API token}` |
+            | `bearer` | Uses authorization header with a customer-provided bearer token in the following format: `Authorization: Bearer {API token}` |
+            | {authModeId} | The ID of the auth mode object that contains OAuth 2.0 credentials. <br> **Note:** Use the `/integrations/api/v1/internal/authModes` endpoint to create the auth mode object. |
+          example: header
+        setupInstructionsUri:
+          type: string
+          format: uri
+          description: The URL to your customer-facing instructions for configuring your SCIM integration. See [Customer configuration document guidelines](https://developer.okta.com/docs/guides/submit-app-prereq/main/#customer-configuration-document-guidelines).
+        scimServerConfig:
+          type: object
+          description: SCIM server schema configuration
+          properties:
+            patch:
+              type: object
+              description: PATCH operation options
+              properties:
+                supported:
+                  type: boolean
+                  description: Specifies if the PATCH operation is supported
+                  default: false
+            changePassword:
+              type: object
+              description:  Password change options
+              properties:
+                supported:
+                  type: boolean
+                  description: Specifies if password change is supported
+                  default: false
+        entitlementTypes:
+          $ref: '#/components/schemas/entitlementTypes'
+      required:
+        - baseUri
+        - authMode
+        - setupInstructionsUri
+        - scimServerConfig
+    entitlementTypes:
+      type: array
+      description: List of supported entitlement types
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+            description: The entitlement type name
+          description:
+            type: string
+            description: Description of the entitlement type
+          endpoint:
+            type: string
+            description: URL of the entitlement type endpoint
+          attributes:
+            type: object
+            description: Attributes for the entitlement type
+            properties:
+              required:
+                type: boolean
+                description: A boolean value to indicate if this entitlement type is required for the user
+                default: false
+              multivalued:
+                type: boolean
+                description: A boolean value to indicate if a user can have multiple entitlements of this type
+                default: false
+          mappings:
+            type: object
+            description: The property mapping between an Okta entitlement and an app entitlement
+            properties:
+              id:
+                type: string
+                description: The field that maps to the entitlement ID
+              displayName:
+                type: string
+                description: The field that maps to the entitlement display name
+              description:
+                type: string
+                description: The field that maps to entitlement description
+            required:
+              - id
+              - displayName
+        required:
+          - name
+          - endpoint
+          - attributes
+          - mappings
+    TestInfo:
+      type: object
+      description: Integration Testing Information
+      properties:
+        testAccount:
+          type: object
+          description: An account on a test instance of your app with admin privileges. A test admin account is required by Okta for integration testing. During OIN QA testing, an Okta analyst uses this admin account to configure your app for the various test case flows.
+          properties:
+            url:
+              type: string
+              format: uri
+              maxLength: 512
+              description: The sign-in URL to a test instance of your app
+              example: https://example.com/strawberry/login
+            username:
+              type: string
+              maxLength: 255
+              description: The username for your app admin account
+              example: test@example.com
+            password:
+              type: string
+              maxLength: 255
+              description: The password for your app admin account
+              example: sUperP@ssw0rd
+            instructions:
+              type: string
+              maxLength: 2048
+              description: Additional instructions to test the app integration, including instructions for obtaining test accounts
+              example: Go to your app URL from a browser and enter your credentials
+          required:
+            - url
+            - username
+            - password
+        escalationSupportContact:
+          type: string
+          maxLength: 255
+          description: An email for Okta to contact your company about your integration. This email isn't shared with customers.
+          example: strawberry.support@example.com
+        samlTestConfiguration:
+          type: object
+          description: SAML test details
+          properties:
+            idp:
+              type: boolean
+              description: Indicates if your integration supports IdP-initiated sign-in
+            sp:
+              type: boolean
+              description: Indicates if your integration supports SP-initiated sign-in
+            jit:
+              type: boolean
+              description: Indicates if your integration supports Just-In-Time (JIT) provisioning
+            spInitiateUrl:
+              type: string
+              format: uri
+              maxLength: 512
+              description: URL for SP-initiated sign-in flows (required if `sp = true`)
+              example: https://test.example.com/strawberry/saml/sp-init
+            spInitiateDescription:
+              type: string
+              maxLength: 2048
+              description: Instructions on how to sign in to your app using the SP-initiated flow (required if `sp = true`)
+              example: Go to the app URL from a browser and enter your username
+          required:
+            - spInitiateUrl
+        oidcTestConfiguration:
+          type: object
+          description: OIDC test details
+          properties:
+            idp:
+              type: boolean
+              description: Read only.<br>Indicates if your integration supports IdP-initiated sign-in flows. If [`sso.oidc.initiateLoginUri`](/openapi/okta-management/management/tag/YourOinIntegrations/#tag/YourOinIntegrations/operation/createSubmission!path=sso/oidc/initiateLoginUri&t=request) is specified, this property is set to `true`. If [`sso.oidc.initiateLoginUri`](/openapi/okta-management/management/tag/YourOinIntegrations/#tag/YourOinIntegrations/operation/createSubmission!path=sso/oidc/initiateLoginUri&t=request) isn't set for the integration submission, this property is set to `false`
+              readOnly: true
+            sp:
+              type: boolean
+              description: Read only.<br>Indicates if your integration supports SP-initiated sign-in flows and is always set to `true` for OIDC SSO
+              readOnly: true
+            jit:
+              type: boolean
+              description: Indicates if your integration supports Just-In-Time (JIT) provisioning
+            spInitiateUrl:
+              type: string
+              format: uri
+              maxLength: 512
+              description: URL for SP-initiated sign-in flows (required if `sp = true`)
+              example: https://test.example.com/strawberry/oidc/sp-init
+          required:
+            - spInitiateUrl
+        scimTestConfiguration:
+          type: object
+          description: SCIM test details
+          properties:
+            specTestResults:
+              type: string
+              format: uri
+              maxLength: 512
+              description: The Runscope URL to your SCIM server specification test results. See [Test your SCIM API](https://developer.okta.com/docs/guides/build-provisioning-integration/test-scim-api/).
+              example: https://www.runscope.com/radar/abcdefghijkl/m01nopq2-3456-7r8s-9012-t34567uvw890/history/123ef4gh-i567-89j0-1k2l-3m4n5o678901
+            crudTestResults:
+              type: string
+              format: uri
+              maxLength: 512
+              description: The Runscope URL to your Okta SCIM CRUD test results. See [Test your Okta SCIM integration](https://developer.okta.com/docs/guides/scim-provisioning-integration-test/main/).
+              example: https://www.runscope.com/radar/radfebnsefbd/msdfsvx2-3456-7r8s-9012-t34567uvw890/history/123ef4gh-i567-89j0-1k2l-cdgj455hw45u
+            entitlementsTestResults:
+              type: string
+              format: uri
+              maxLength: 512
+              description: The Runscope URL to your entitlements test results
+              example: https://www.runscope.com/radar/fgdffghfghfg/m01nopq2-3456-7r8s-9012-t34567uvw890/history/123ef4gh-i567-89j0-1k2l-r434565g5451
+          required:
+            - specTestResults
+            - crudTestResults
+        apiServiceTestConfiguration:
+          type: object
+          description: Details required to test the API service integration
+          properties:
+            scopeExplanation:
+              type: string
+              maxLength: 5000
+              description: Justification for each OAuth 2.0 scope—specifically write scopes—required for the API service integration to function. This information helps the operations team understand the integration and test it effectively.
+
+    Capability:
+      type: string
+      enum:
+        - SSO
+        - UNIVERSAL_LOGOUT
+        - PROVISIONING
+        - ENTITLEMENTS
+        - API_SERVICE
+
+    Protocol:
+      type: string
+      enum:
+        - OIDC
+        - SAML
+        - GTR
+        - SCIM
+        - ACTIONS
+        - OAUTH2
+
+    ActionProviderType:
+        type: string
+        enum:
+            - workflows
+
+    ActionProviderPayloadType:
+      type: string
+      enum:
+        - WORKFLOWS
+      description: Type of action provider
+
+    SubmissionCapabilities:
+      type: object
+      properties:
+        capabilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubmissionCapability'
+      required:
+        - capabilities
+
+    ValidationDetailProvider:
+      type: object
+      description: Action provider validation details
+      properties:
+        type:
+          $ref: '#/components/schemas/ActionProviderPayloadType'
+        externalId:
+          type: string
+          description: The unique identifier of the action flow in the provider system
+      discriminator:
+        propertyName: type
+        mapping:
+          WORKFLOWS: '#/components/schemas/WorkflowsValidationDetailProvider'
+      required:
+        - type
+        - externalId
+
+    WorkflowsValidationDetailProvider:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/ValidationDetailProvider'
+      properties:
+        result:
+          $ref: '#/components/schemas/WorkflowsValidationErrorType'
+      required:
+        - result
+
+    ValidationDetail:
+      type: object
+      description: Validation detail
+      properties:
+        id:
+          type: string
+          description: Action identifier
+          example: "okta:action1"
+        provider:
+          $ref: '#/components/schemas/WorkflowsValidationDetailProvider'
+      required:
+        - id
+        - provider
+
+
+    WorkflowsValidationErrorType:
+        type: string
+        description: Validation error type
+        enum:
+          - DUPLICATE_FLOW_NAME
+          - INVALID_EVENT_CARD
+          - INVALID_FLOW_NAME
+          - MISSING_FIELDS
+          - PROHIBITED_CHAR_IN_OPTION_LABEL
+          - INVALID_DEPENDENT_OPTIONS
+          - INVALID_DYNAMIC_INPUT_FLOW
+          - INVALID_DYNAMIC_OUTPUT_FLOW
+          - INVALID_FLOW_REFERENCE
+          - INVALID_CHAR_IN_AUTH_PARAM_LABEL
+          - NO_CHILD_FLOW_FOR_AUTH_PARAM_LABEL
+
+    SubmissionCapability:
+      type: object
+      description: Simple capability structure for capabilities endpoints (PUT/GET /capabilities)
+      properties:
+        capability:
+          $ref: '#/components/schemas/Capability'
+        supportedProtocols:
+          type: array
+          items:
+            $ref: '#/components/schemas/Protocol'
+      required:
+        - capability
+        - supportedProtocols
+
+    SubmissionCapabilityEnhanced:
+      description: Enhanced capability structure with embedded protocol configurations for submission GET endpoint
+      oneOf:
+        - $ref: '#/components/schemas/SsoCapability'
+        - $ref: '#/components/schemas/UniversalLogoutCapability'
+        - $ref: '#/components/schemas/ProvisioningCapability'
+        - $ref: '#/components/schemas/EntitlementsCapability'
+        - $ref: '#/components/schemas/ApiServiceCapability'
+      discriminator:
+        propertyName: capability
+        mapping:
+          SSO: '#/components/schemas/SsoCapability'
+          UNIVERSAL_LOGOUT: '#/components/schemas/UniversalLogoutCapability'
+          PROVISIONING: '#/components/schemas/ProvisioningCapability'
+          ENTITLEMENTS: '#/components/schemas/EntitlementsCapability'
+          API_SERVICE: '#/components/schemas/ApiServiceCapability'
+
+    GlobalTokenRevocation:
+      type: object
+      properties:
+        endpoint:
+          type: string
+          format: uri
+          description: URL of the authorization server's global token revocation endpoint
+        subjectFormat:
+          type: string
+          description: The format of the subject
+          enum:
+            - EMAIL
+            - ISS_SUB
+        authMethod:
+          type: string
+          description: Authentication method <br> **Note:** Currently, only the `SIGNED_JWT` method is supported
+          enum:
+            - SIGNED_JWT
+        partialLogout:
+          type: boolean
+          description: Allow partial support for Universal Logout
+          default: false
+      required:
+        - endpoint
+        - subjectFormat
+        - authMethod
+
+    SsoCapability:
+      type: object
+      description: SSO capability configuration with embedded protocol details
+      properties:
+        capability:
+          type: string
+          enum: [SSO]
+          description: SSO capability identifier
+        supportedProtocols:
+          type: array
+          description: List of supported SSO protocols
+          items:
+            type: string
+            enum: [OIDC, SAML, GTR]
+      required:
+        - capability
+        - supportedProtocols
+
+    UniversalLogoutCapability:
+      type: object
+      description: |
+        Universal Logout capability configuration with embedded protocol details.
+        
+        **Protocol validation rule:**
+        - The `actions` parameter is required when `supportedProtocols` is set to `ACTIONS`.
+      properties:
+        capability:
+          type: string
+          enum: [UNIVERSAL_LOGOUT]
+          description: Universal Logout capability identifier
+        supportedProtocols:
+          type: array
+          description: List of supported logout protocols
+          minItems: 1
+          items:
+            type: string
+            enum: [GTR, ACTIONS]
+        actions:
+          type: array
+          description: Configuration for the Actions protocol. This parameter is required when `supportedProtocols` is set to `ACTIONS`.
+          items:
+            $ref: '#/components/schemas/SubmissionAction'
+      required:
+        - capability
+        - supportedProtocols
+
+    ProvisioningCapability:
+      type: object
+      description: |
+        Provisioning capability configuration with embedded protocol details.
+        
+        *Protocol validation rule:**
+        - The `actions` parameter is required when `supportedProtocols` is set to `ACTIONS`.
+      properties:
+        capability:
+          type: string
+          enum: [PROVISIONING]
+          description: Provisioning capability identifier
+        supportedProtocols:
+          type: array
+          description: List of supported provisioning protocols
+          minItems: 1
+          items:
+            type: string
+            enum: [SCIM, ACTIONS, OAUTH2]
+        actions:
+          type: array
+          description: Configuration for the Actions protocol. This parameter is required when `supportedProtocols` is set to `ACTIONS`.
+          items:
+            $ref: '#/components/schemas/SubmissionAction'
+      required:
+        - capability
+        - supportedProtocols
+
+    EntitlementsCapability:
+      type: object
+      description: |
+        Entitlements capability configuration with embedded protocol details.
+        
+        **Protocol validation rule:**
+        - The `actions` parameter is required when `supportedProtocols` is set to `ACTIONS`.
+      properties:
+        capability:
+          type: string
+          enum: [ENTITLEMENTS]
+          description: Entitlements capability identifier
+        supportedProtocols:
+          type: array
+          description: List of supported entitlements protocols
+          minItems: 1
+          items:
+            type: string
+            enum: [ACTIONS]
+        actions:
+          type: array
+          description: Configuration for the Actions protocol. This parameter is required when `supportedProtocols` is set to `ACTIONS`.
+          items:
+            $ref: '#/components/schemas/SubmissionAction'
+      required:
+        - capability
+        - supportedProtocols
+
+    ApiServiceCapability:
+      type: object
+      description: API Service capability configuration with embedded protocol details
+      properties:
+        capability:
+          type: string
+          enum: [API_SERVICE]
+          description: API Service capability identifier
+        supportedProtocols:
+          type: array
+          description: List of supported protocols
+          items:
+            type: string
+            enum: [OAUTH2]
+      required:
+        - capability
+        - supportedProtocols
+
+    SubmissionAction:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Action identifier
+          example: "okta:action1"
+        provider:
+          $ref: '#/components/schemas/WorkflowActionProvider'
+      required:
+        - id
+        - provider
+
+    SubmissionActions:
+      type: object
+      properties:
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubmissionAction'
+
+    ActionProvider:
+      type: object
+      properties:
+        externalId:
+          type: string
+          description: The unique identifier of the action flow in the provider system
+        type:
+          $ref: '#/components/schemas/ActionProviderPayloadType'
+      discriminator:
+        propertyName: type
+        mapping:
+          WORKFLOWS: '#/components/schemas/WorkflowActionProvider'
+      required:
+        - type
+        - externalId
+
+    AvailableActionProvider:
+      type: object
+      properties:
+        link:
+          type: string
+          format: uri
+          description: The URL to the action flow interface in Workflows platform
+        externalId:
+          type: string
+          description: The unique identifier of the action flow in the provider system
+        type:
+          $ref: '#/components/schemas/ActionProviderPayloadType'
+        actionName:
+          type: string
+          description: The name of the action flow
+      discriminator:
+        propertyName: type
+        mapping:
+          WORKFLOWS: '#/components/schemas/WorkflowAvailableActionProvider'
+      required:
+        - actionName
+        - link
+        - externalId
+        - type
+
+    WorkflowActionProvider:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/ActionProvider'
+
+    WorkflowAvailableActionProvider:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/AvailableActionProvider'
+
+    AvailableAction:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Action identifier
+          example: "okta:action1"
+        provider:
+          $ref: '#/components/schemas/WorkflowAvailableActionProvider'
+      required:
+        - id
+        - provider
+
+    AvailableActions:
+      type: object
+      properties:
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AvailableAction'
+
+    OAuth2Settings:
+      type: object
+      description: OAuth 2.0 configuration used for authType `OAUTH2`
+      properties:
+        authorizeEndpoint:
+          type: string
+          format: uri
+          description: The URL to the authorization server's authorization endpoint
+        tokenEndpoint:
+          type: string
+          format: uri
+          description: The URL to the authorization server's token endpoint
+        clientId:
+          type: string
+          description: The OAuth 2.0 client identifier
+        clientSecret:
+          type: string
+          description: The OAuth 2.0 client secret
+        scopes:
+          type: array
+          description: List of OAuth 2.0 scopes
+          items:
+            type: string
+        publicKey:
+          type: object
+          readOnly: true
+          description: The public key in JWK format. Returned when the OAuth authentication method is `PRIVATE_KEY_JWT`.
+          properties:
+            kty:
+              type: string
+              description: Key type (e.g., `RSA`, `EC`)
+            kid:
+              type: string
+              description: Key ID
+            e:
+              type: string
+              description: RSA public exponent
+            n:
+              type: string
+              description: RSA modulus
+          additionalProperties: true
+      required:
+        - authorizeEndpoint
+        - tokenEndpoint
+        - clientId
+        - clientSecret
+
+    CustomAuthSettings:
+      type: object
+      description: Set of AIPs used for authType `CUSTOM`
+      properties:
+        appInstanceProperties:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppInstanceProperty'
+
+    AuthType:
+      type: string
+      enum:
+        - BASIC
+        - CUSTOM
+        - OAUTH2
+        - SCIM_HEADER
+        - SCIM_BEARER
+
+    AuthSettings:
+      type: object
+      properties:
+        authType:
+          $ref: '#/components/schemas/AuthType'
+        oAuth2Settings:
+          $ref: '#/components/schemas/OAuth2Settings'
+        customSettings:
+          $ref: '#/components/schemas/CustomAuthSettings'
+      required:
+        - authType
+
+    TenantSettings:
+      type: object
+      properties:
+        appInstanceProperties:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppInstanceProperty'
+
+    AppInstanceProperty:
+      type: object
+      properties:
+        name:
+          type: string
+        label:
+          type: string
+      required:
+        - name
+        - label
+
+  examples:
+    ApiServiceExample:
+      summary: API Service Configuration example
+      value: &ApiServiceExample
+        setupInstructionsUri: https://doc.example.com/api-service-setup
+        authenticationMethod: client_secret_basic
+        scopes:
+          - okta.users.manage
+          - okta.groups.read
+    SubmissionCapabilities:
+      summary: Example of submission capabilities
+      value:
+        capabilities:
+          - capability: "SSO"
+            supportedProtocols:
+              - "SAML"
+              - "OIDC"
+          - capability: "PROVISIONING"
+            supportedProtocols:
+              - "ACTIONS"
+
+    OAuth2AuthSettings:
+      summary: OAuth2 auth settings example
+      value:
+        authType: "OAUTH2"
+        oAuth2Settings:
+          authorizeEndpoint: "https://example.com/oauth/authorize"
+          tokenEndpoint: "https://example.com/oauth/token"
+          clientId: "client123"
+          clientSecret: "secret456"
+          scopes:
+            - "scope1"
+            - "scope2"
+    CustomAuthSettings:
+        summary: Custom auth settings example
+        value:
+            authType: "CUSTOM"
+            customSettings:
+            appInstanceProperties:
+                - name: "apiKey"
+                  label: "API Key"
+                - name: "apiSecret"
+                  label: "API Secret"
+    BasicAuthSettings:
+      summary: Basic auth settings example
+      value:
+        authType: "BASIC"
+
+    ScimHeaderAuthSettings:
+        summary: SCIM header auth settings example
+        value:
+            authType: "SCIM_HEADER"
+
+    ScimBearerAuthSettings:
+        summary: SCIM bearer auth settings example
+        value:
+            authType: "SCIM_BEARER"
+
+    TenantSettings:
+        summary: Tenant settings example
+        value:
+            appInstanceProperties:
+            - name: "subdomain"
+              label: "Subdomain"
+            - name: "region"
+              label: "Region"
+
+    SubmissionActions:
+        summary: Submission actions example
+        value:
+          actions:
+            - id: "okta:action1"
+              provider:
+                type: "WORKFLOWS"
+                externalId: "JKL490DQNV"
+
+    AvailableActions:
+        summary: Available actions example
+        value:
+          actions:
+            - id: "okta:action1"
+              provider:
+                type: "WORKFLOWS"
+                link: "https://example.com/workflows/flow1"
+                externalId: "JKL490DQNV"
+                actionName: "Provision User"
+
+    ValidationDetailsResult:
+      summary: Validation details example
+      value:
+        - valid: false
+          validationDetails:
+            - id: "okta:action1"
+              provider:
+                type: "WORKFLOWS"
+                externalId: "JKL490DQNV"
+                result: "INVALID_FLOW_REFERENCE"
+
+    SubmissionSamlRequest:
+      summary: Submission SAML request example
+      value:
+        name: Strawberry Central
+        description: Your one source for in-season strawberry deals
+        logo: https://acme.okta.com/bc/image/fileStoreRecord?id=fs03xxd3KmkDBwJU80g4
+        sso:
+          saml:
+            acs:
+              - url: https://${org.subdomain}.example.com/saml/login
+            entityId: https://${org.subdomain}.example.com
+            claims:
+              - name: manager
+                values: ["${user.manager}"]
+            groups:
+              - name: groups
+            doc: https://example.com/strawberry/help/samlSetup
+        config:
+          - name: subdomain
+            label: Subdomain
+        globalTokenRevocation:
+          endpoint: "'https://' + app.subdomain + '.example.org/gtr'"
+          subjectFormat: EMAIL
+          authMethod: SIGNED_JWT
+          partialLogout: false
+    SubmissionSamlResponse:
+      summary: Submission SAML response example
+      value:
+        id: acme_strawberrycentral_1
+        name: Strawberry Central
+        description: Your one source for in-season strawberry deals
+        defaultLogo: false
+        logo: https://acme.okta.com/bc/image/fileStoreRecord?id=fs03xxd3KmkDBwJU80g4
+        capabilities:
+          - capability: SSO
+            supportedProtocols:
+              - SAML
+        sso:
+          saml:
+            acs:
+              - url: https://${org.subdomain}.example.com/saml/login
+            entityId: https://${org.subdomain}.example.com
+            claims:
+              - name: manager
+                values: ["${user.manager}"]
+            groups:
+              - name: groups
+            doc: https://example.com/strawberry/help/samlSetup
+        config:
+          - name: subdomain
+            label: Subdomain
+        globalTokenRevocation:
+          endpoint: "'https://' + app.subdomain + '.example.org/gtr'"
+          subjectFormat: EMAIL
+          authMethod: SIGNED_JWT
+          partialLogout: false
+        status: To be reviewed by Okta
+        lastUpdated: 2023-08-24T14:15:22Z
+        lastUpdatedBy: 00ub0oNGTSWTBKOLGLNR
+        lastPublished: null
+        oinFeatures: "SAML"
+        caseLastUpdated: 2024-01-15T10:30:45.000Z
+    SubmissionScimRequest:
+      summary: Submission SCIM request example
+      x-okta-lifecycle:
+        features:
+          - SCIM_SUBMISSION
+      value:
+        name: Strawberry Central
+        description: Your one source for in-season strawberry deals
+        logo: https://acme.okta.com/bc/image/fileStoreRecord?id=fs03xxd3KmkDBwJU80g4
+        provisioning:
+          features:
+            - CREATE_USER
+            - READ_USER
+            - UPDATE_USER
+            - DEACTIVATE_USER
+            - IMPORT_USER_SCHEMA
+            - CREATE_GROUP
+            - READ_GROUP
+            - UPDATE_GROUP
+            - DEACTIVATE_GROUP
+          scim:
+            baseUri: "'https://' + app.subdomain + '.example.com/scim/v2'"
+            authMode: header
+            setupInstructionsUri: https://doc.example.com/scim-provisioning
+            scimServerConfig:
+              patch:
+                supported: true
+              changePassword:
+                supported: true
+        config:
+          - name: subdomain
+            label: Subdomain
+        globalTokenRevocation:
+          endpoint: "'https://' + app.subdomain + '.example.org/gtr'"
+          subjectFormat: EMAIL
+          authMethod: SIGNED_JWT
+          partialLogout: false
+    SubmissionEMRequest:
+      summary: Submission SCIM with entitlements request example
+      x-okta-lifecycle:
+        features:
+          - ENTITLEMENTS_SUBMISSION
+      value:
+        name: Strawberry Central
+        description: Your one source for in-season strawberry deals
+        logo: https://acme.okta.com/bc/image/fileStoreRecord?id=fs03xxd3KmkDBwJU80g4
+        provisioning:
+          features:
+            - CREATE_USER
+            - READ_USER
+            - UPDATE_USER
+            - DEACTIVATE_USER
+            - IMPORT_USER_SCHEMA
+            - CREATE_GROUP
+            - READ_GROUP
+            - UPDATE_GROUP
+            - DEACTIVATE_GROUP
+          scim:
+            baseUri: "'https://' + app.subdomain + '.example.com/scim/v2'"
+            authMode: header
+            setupInstructionsUri: https://doc.example.com/scim-provisioning
+            scimServerConfig:
+              patch:
+                supported: true
+              changePassword:
+                supported: true
+            entitlementTypes:
+              - name: 'Role'
+                description: 'Roles'
+                endpoint: '/Roles'
+                attributes:
+                  required: true
+                  multivalued: false
+                mappings:
+                  id: 'roleId'
+                  displayName: 'roleName'
+                  description: 'description'
+        config:
+          - name: subdomain
+            label: Subdomain
+        globalTokenRevocation:
+          endpoint: "'https://' + app.subdomain + '.example.org/gtr'"
+          subjectFormat: EMAIL
+          authMethod: SIGNED_JWT
+          partialLogout: false
+    SubmissionScimResponse:
+      summary: Submission SCIM response example
+      x-okta-lifecycle:
+        features:
+          - SCIM_SUBMISSION
+      value:
+        id: acme_strawberrycentral_1
+        name: Strawberry Central
+        description: Your one source for in-season strawberry deals
+        defaultLogo: false
+        logo: https://acme.okta.com/bc/image/fileStoreRecord?id=fs03xxd3KmkDBwJU80g4
+        capabilities:
+          - capability: PROVISIONING
+            supportedProtocols:
+              - SCIM
+        provisioning:
+          features:
+            - CREATE_USER
+            - READ_USER
+            - UPDATE_USER
+            - DEACTIVATE_USER
+            - IMPORT_USER_SCHEMA
+            - CREATE_GROUP
+            - READ_GROUP
+            - UPDATE_GROUP
+            - DEACTIVATE_GROUP
+          scim:
+            baseUri: "'https://' + app.subdomain + '.example.com/scim/v2'"
+            authMode: header
+            setupInstructionsUri: https://doc.example.com/scim-provisioning
+            scimServerConfig:
+              patch:
+                supported: true
+              changePassword:
+                supported: true
+        config:
+          - name: subdomain
+            label: Subdomain
+        globalTokenRevocation:
+          endpoint: "'https://' + app.subdomain + '.example.org/gtr'"
+          subjectFormat: EMAIL
+          authMethod: SIGNED_JWT
+          partialLogout: false
+        status: To be reviewed by Okta
+        lastUpdated: 2023-08-24T14:15:22Z
+        lastUpdatedBy: 00ub0oNGTSWTBKOLGLNR
+        lastPublished: null
+        oinFeatures: "SCIM"
+        caseLastUpdated: 2024-01-15T10:30:45.000Z
+    SubmissionEMResponse:
+      summary: Submission SCIM with entitlements response example
+      x-okta-lifecycle:
+        features:
+          - ENTITLEMENTS_SUBMISSION
+      value:
+        id: acme_strawberrycentral_1
+        name: Strawberry Central
+        description: Your one source for in-season strawberry deals
+        defaultLogo: false
+        logo: https://acme.okta.com/bc/image/fileStoreRecord?id=fs03xxd3KmkDBwJU80g4
+        capabilities:
+          - capability: PROVISIONING
+            supportedProtocols:
+              - SCIM
+        provisioning:
+          features:
+            - CREATE_USER
+            - READ_USER
+            - UPDATE_USER
+            - DEACTIVATE_USER
+            - IMPORT_USER_SCHEMA
+            - CREATE_GROUP
+            - READ_GROUP
+            - UPDATE_GROUP
+            - DEACTIVATE_GROUP
+          scim:
+            baseUri: "'https://' + app.subdomain + '.example.com/scim/v2'"
+            authMode: header
+            setupInstructionsUri: https://doc.example.com/scim-provisioning
+            scimServerConfig:
+              patch:
+                supported: true
+              changePassword:
+                supported: true
+            entitlementTypes:
+              - name: 'Role'
+                description: 'Roles'
+                endpoint: '/Roles'
+                attributes:
+                  required: true
+                  multivalued: false
+                mappings:
+                  id: 'roleId'
+                  displayName: 'roleName'
+                  description: 'description'
+        config:
+          - name: subdomain
+            label: Subdomain
+        globalTokenRevocation:
+          endpoint: "'https://' + app.subdomain + '.example.org/gtr'"
+          subjectFormat: EMAIL
+          authMethod: SIGNED_JWT
+          partialLogout: false
+        status: To be reviewed by Okta
+        lastUpdated: 2023-08-24T14:15:22Z
+        lastUpdatedBy: 00ub0oNGTSWTBKOLGLNR
+        lastPublished: null
+        oinFeatures: "SCIM"
+        caseLastUpdated: 2024-01-15T10:30:45.000Z
+    SubmissionOidcRequest:
+      summary: Submission OIDC request example
+      value:
+        name: Strawberry Central
+        description: Your one source for in-season strawberry deals
+        logo: https://acme.okta.com/bc/image/fileStoreRecord?id=fs03xxd3KmkDBwJU80g4
+        sso:
+          oidc:
+            redirectUris:
+              - https://{app.subdomain}.example.com/strawberry/oidc/login
+            initiateLoginUri: https://{app.subdomain}.example.com/strawberry/oidc/sp-init
+            postLogoutUris:
+              - https://{app.subdomain}.example.com/strawberry/oidc/logged-out
+            doc: https://example.com/strawberry/help/oidcSetup
+        config:
+          - name: subdomain
+            label: Subdomain
+        globalTokenRevocation:
+          endpoint: "'https://' + app.subdomain + '.example.org/gtr'"
+          subjectFormat: EMAIL
+          authMethod: SIGNED_JWT
+          partialLogout: false
+    SubmissionAPIServiceResponse:
+      summary: Example of submission API Service response
+      value: &SubmissionAPIServiceResponse
+        id: acme_strawberrycentral_api_1
+        name: Strawberry Central
+        description: Your one source for in-season strawberry deals
+        defaultLogo: false
+        logo: https://acme.okta.com/bc/image/fileStoreRecord?id=fs03xxd3KmkDBwJU80g4
+        capabilities:
+          - capability: API_SERVICE
+            supportedProtocols:
+              - OAUTH2
+        apiService:
+          <<: *ApiServiceExample
+        status: Complete
+        lastUpdated: 2023-08-24T14:15:22Z
+        lastUpdatedBy: 00ub0oNGTSWTBKOLGLNR
+        lastPublished: 2023-09-01T13:23:45Z
+    SubmissionOidcResponse:
+      summary: Example of submission OIDC response
+      value:
+        id: acme_strawberrycentral_1
+        name: Strawberry Central
+        description: Your one source for in-season strawberry deals
+        defaultLogo: false
+        logo: https://acme.okta.com/bc/image/fileStoreRecord?id=fs03xxd3KmkDBwJU80g4
+        capabilities:
+          - capability: SSO
+            supportedProtocols:
+              - OIDC
+        sso:
+          oidc:
+            redirectUris:
+              - https://{app.subdomain}.example.com/strawberry/oidc/login
+            initiateLoginUri: https://{app.subdomain}.example.com/strawberry/oidc/sp-init
+            postLogoutUris:
+              - https://{app.subdomain}.example.com/strawberry/oidc/logged-out
+            doc: https://example.com/strawberry/help/oidcSetup
+        config:
+          - name: subdomain
+            label: Subdomain
+        globalTokenRevocation:
+          endpoint: "'https://' + app.subdomain + '.example.org/gtr'"
+          subjectFormat: EMAIL
+          authMethod: SIGNED_JWT
+          partialLogout: false
+        status: New
+        lastUpdated: 2023-08-24T14:15:22Z
+        lastUpdatedBy: 00ub0oNGTSWTBKOLGLNR
+        lastPublished: 2023-09-01T13:23:45Z
+        oinFeatures: "OIDC"
+        caseLastUpdated: 2024-01-15T10:30:45.000Z
+    SubmissionUniversalLogoutResponse:
+      summary: Submission with Universal Logout and Actions example
+      value:
+        id: acme_strawberrycentral_2
+        name: Strawberry Central Plus
+        description: Your one source for in-season strawberry deals with advanced logout
+        defaultLogo: false
+        logo: https://acme.okta.com/bc/image/fileStoreRecord?id=fs03xxd3KmkDBwJU80g4
+        capabilities:
+          - capability: SSO
+            supportedProtocols:
+              - SAML
+          - capability: UNIVERSAL_LOGOUT
+            supportedProtocols:
+              - ACTIONS
+            actions:
+              - id: "okta:universal_logout"
+                provider:
+                  type: "WORKFLOWS"
+                  externalId: "WF003LOGOUT"
+              - id: "okta:session_cleanup"
+                provider:
+                  type: "WORKFLOWS"
+                  externalId: "WF004CLEANUP"
+        sso:
+          saml:
+            acs:
+              - url: https://${org.subdomain}.example.com/saml/login
+            entityId: https://${org.subdomain}.example.com
+            claims:
+              - name: email
+                values: ["${user.email}"]
+            groups:
+              - name: groups
+            doc: https://example.com/strawberry/help/samlSetup
+        config:
+          - name: subdomain
+            label: Subdomain
+        globalTokenRevocation:
+          endpoint: "'https://' + app.subdomain + '.example.org/gtr'"
+          subjectFormat: EMAIL
+          authMethod: SIGNED_JWT
+          partialLogout: false
+        status: To be reviewed by Okta
+        lastUpdated: 2023-08-24T14:15:22Z
+        lastUpdatedBy: 00ub0oNGTSWTBKOLGLNR
+        lastPublished: null
+    SubmissionItemResponse:
+      summary: Submission item example
+      value: &SubmissionItemResponse
+        - id: acme_strawberrycentral_1
+          name: Strawberry Central
+          description: Your one source for in-season strawberry deals
+          defaultLogo: false
+          logo: https://acme.okta.com/bc/image/fileStoreRecord?id=fs03xxd3KmkDBwJU80g4
+          sso:
+            saml:
+              acs:
+                - url: https://${org.subdomain}.example.com/saml/login
+              entityId: https://${org.subdomain}.example.com
+              claims:
+                - name: manager
+                  values: ["${user.manager}"]
+              groups:
+                - name: groups
+              doc: https://example.com/strawberry/help/samlSetup
+          provisioning:
+            features:
+              - CREATE_USER
+              - READ_USER
+              - UPDATE_USER
+              - DEACTIVATE_USER
+              - IMPORT_USER_SCHEMA
+              - CREATE_GROUP
+              - READ_GROUP
+              - UPDATE_GROUP
+              - DEACTIVATE_GROUP
+            scim:
+              baseUri: "'https://' + app.subdomain + '.example.com/scim/v2'"
+              authMode: header
+              setupInstructionsUri: https://doc.example.com/scim-provisioning
+              scimServerConfig:
+                patch:
+                  supported: true
+                changePassword:
+                  supported: true
+          config:
+            - name: subdomain
+              label: Subdomain
+          globalTokenRevocation:
+            endpoint: "'https://' + app.subdomain + '.example.org/gtr'"
+            subjectFormat: EMAIL
+            authMethod: SIGNED_JWT
+            partialLogout: false
+          status: Complete
+          lastUpdated: 2023-08-24T14:15:22Z
+          lastUpdatedBy: 00ub0oNGTSWTBKOLGLNR
+          lastPublished: 2023-09-01T13:23:45Z
+          oinFeatures: "SCIM"
+          caseLastUpdated: 2024-01-15T10:30:45.000Z
+    SubmissionsResponse:
+      summary: Submission list example
+      value:
+        - <<: *SubmissionItemResponse
+        - <<: *SubmissionAPIServiceResponse
+    TestInfoSamlRequest:
+      summary: SAML SSO submission testing information request
+      value:
+        testAccount:
+          url: https://example.com/strawberry/login
+          username: test@example.com
+          password: sUperP@ssw0rd
+          instructions: Go to your app URL from a browser and enter your credentials
+        escalationSupportContact: strawberry.support@example.com
+        samlTestConfiguration:
+          idp: true
+          sp: true
+          jit: false
+          spInitiateUrl: https://test.example.com/strawberry/saml/sp-init
+          spInitiateDescription: Go to the app URL from a browser and enter your username
+    TestInfoSamlResponse:
+      summary: SAML SSO submission testing information response
+      value:
+        testAccount:
+          url: https://example.com/strawberry/login
+          username: test@example.com
+          password: sUperP@ssw0rd
+          instructions: Go to your app URL from a browser and enter your credentials
+        escalationSupportContact: strawberry.support@example.com
+        samlTestConfiguration:
+          idp: true
+          sp: true
+          jit: false
+          spInitiateUrl: https://test.example.com/strawberry/saml/sp-init
+          spInitiateDescription: Go to the app URL from a browser and enter your username
+    TestInfoOidcRequest:
+      summary: OIDC SSO submission testing information request
+      value:
+        testAccount:
+          url: https://example.com/strawberry/login
+          username: test@example.com
+          password: sUperP@ssw0rd
+          instructions: Go to your app URL from a browser and enter your credentials
+        escalationSupportContact: strawberry.support@example.com
+        oidcTestConfiguration:
+          jit: false
+          spInitiateUrl: https://test.example.com/strawberry/oidc/sp-init
+    TestInfoOidcResponse:
+      summary: OIDC SSO submission testing information response
+      value:
+        testAccount:
+          url: https://example.com/strawberry/login
+          username: test@example.com
+          password: sUperP@ssw0rd
+          instructions: Go to your app URL from a browser and enter your credentials
+        escalationSupportContact: strawberry.support@example.com
+        oidcTestConfiguration:
+          idp: true
+          sp: true
+          jit: false
+          spInitiateUrl: https://test.example.com/strawberry/oidc/sp-init
+    TestInfoScimRequest:
+      summary: SCIM submission testing information request
+      value:
+        testAccount:
+          url: https://example.com/strawberry/login
+          username: test@example.com
+          password: sUperP@ssw0rd
+          instructions: Go to your app URL from a browser and enter your credentials
+        escalationSupportContact: strawberry.support@example.com
+        scimTestConfiguration:
+          specTestResults: https://www.runscope.com/radar/abcdefghijkl/m01nopq2-3456-7r8s-9012-t34567uvw890/history/123ef4gh-i567-89j0-1k2l-3m4n5o678901
+          crudTestResults: https://www.runscope.com/radar/radfebnsefbd/msdfsvx2-3456-7r8s-9012-t34567uvw890/history/123ef4gh-i567-89j0-1k2l-cdgj455hw45u
+    TestInfoEMRequest:
+      summary: SCIM submission with entitlements testing information request
+      value:
+        testAccount:
+          url: https://example.com/strawberry/login
+          username: test@example.com
+          password: sUperP@ssw0rd
+          instructions: Go to your app URL from a browser and enter your credentials
+        escalationSupportContact: strawberry.support@example.com
+        scimTestConfiguration:
+          specTestResults: https://www.runscope.com/radar/abcdefghijkl/m01nopq2-3456-7r8s-9012-t34567uvw890/history/123ef4gh-i567-89j0-1k2l-3m4n5o678901
+          crudTestResults: https://www.runscope.com/radar/radfebnsefbd/msdfsvx2-3456-7r8s-9012-t34567uvw890/history/123ef4gh-i567-89j0-1k2l-cdgj455hw45u
+          entitlementsTestResults: https://www.runscope.com/radar/fgdffghfghfg/m01nopq2-3456-7r8s-9012-t34567uvw890/history/123ef4gh-i567-89j0-1k2l-r434565g5451
+    TestInfoApiServiceRequest:
+      summary: Request for the testing details to validate API service submission
+      value:
+        apiServiceTestConfiguration:
+          scopeExplanation: >
+            The okta.users.write scope enables the application to update user information, allowing users to manage their profiles directly from the app interface.
+    TestInfoScimResponse:
+      summary: SCIM submission testing information response
+      value:
+        testAccount:
+          url: https://example.com/strawberry/login
+          username: test@example.com
+          password: sUperP@ssw0rd
+          instructions: Go to your app URL from a browser and enter your credentials
+        escalationSupportContact: strawberry.support@example.com
+        scimTestConfiguration:
+          specTestResults: https://www.runscope.com/radar/abcdefghijkl/m01nopq2-3456-7r8s-9012-t34567uvw890/history/123ef4gh-i567-89j0-1k2l-3m4n5o678901
+          crudTestResults: https://www.runscope.com/radar/radfebnsefbd/msdfsvx2-3456-7r8s-9012-t34567uvw890/history/123ef4gh-i567-89j0-1k2l-cdgj455hw45u
+
+    TestInfoApiServiceResponse:
+      summary: API Service submission testing information response
+      value:
+        testAccount:
+          url: https://example.com/strawberry/login
+          username: test@example.com
+          password: sUperP@ssw0rd
+          instructions: Go to your app URL from a browser and enter your credentials
+        escalationSupportContact: strawberry.support@example.com
+        apiServiceTestConfiguration:
+          scopeExplanation: >
+            The okta.users.write scope enables the application to update user information, allowing users to manage their profiles directly from the app interface.
+
+    TestInfoEMResponse:
+      summary: SCIM submission with entitlements testing information response
+      value:
+        testAccount:
+          url: https://example.com/strawberry/login
+          username: test@example.com
+          password: sUperP@ssw0rd
+          instructions: Go to your app URL from a browser and enter your credentials
+        escalationSupportContact: strawberry.support@example.com
+        scimTestConfiguration:
+          specTestResults: https://www.runscope.com/radar/abcdefghijkl/m01nopq2-3456-7r8s-9012-t34567uvw890/history/123ef4gh-i567-89j0-1k2l-3m4n5o678901
+          crudTestResults: https://www.runscope.com/radar/radfebnsefbd/msdfsvx2-3456-7r8s-9012-t34567uvw890/history/123ef4gh-i567-89j0-1k2l-cdgj455hw45u
+          entitlementsTestResults: https://www.runscope.com/radar/fgdffghfghfg/m01nopq2-3456-7r8s-9012-t34567uvw890/history/123ef4gh-i567-89j0-1k2l-r434565g5451
+  securitySchemes:
+    $ref: '../base.yaml#/components/securitySchemes'

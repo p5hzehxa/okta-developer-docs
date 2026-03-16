@@ -1,0 +1,485 @@
+openapi: 3.0.3
+info:
+  title: UI Schema API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../../base.yaml#/tags
+paths:
+  /api/v1/meta/uischemas:
+    get:
+      summary: List all UI schemas
+      description: Lists all UI Schemas in your org
+      operationId: listUISchemas
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UISchemasResponseObject'
+              examples:
+                UIISchemaList:
+                  summary: Lists all UI schemas response
+                  $ref: '#/components/examples/ListUISchemaResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.uischemas.read
+      tags:
+        - UISchema
+    post:
+      summary: Create a UI schema
+      description: Creates an input for an enrollment form
+      operationId: createUISchema
+      x-codegen-request-body-name: uischemabody
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUISchema'
+            examples:
+              UISchemaCreate:
+                $ref: '#/components/examples/CreateUISchemaBody'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UISchemasResponseObject'
+              examples:
+                UISchemaCreate:
+                  $ref: '#/components/examples/CreateUISchemaResponse'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.uischemas.manage
+      tags:
+        - UISchema
+    x-okta-team-detail:
+      x-team-slack: amp-eng-auth-experience
+  /api/v1/meta/uischemas/{id}:
+    parameters:
+      - $ref: '#/components/parameters/UISchemaId'
+    get:
+      summary: Retrieve a UI schema
+      description: Retrieves a UI Schema by `id`
+      operationId: getUISchema
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UISchemasResponseObject'
+              examples:
+                UISchemaRetrieve:
+                  summary: Retrieves a UI schema response
+                  $ref: '#/components/examples/RetrieveUISchemaResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.uischemas.read
+      tags:
+        - UISchema
+    put:
+      summary: Replace a UI schema
+      description: Replaces a UI Schema by `id`
+      operationId: replaceUISchemas
+      x-codegen-request-body-name: updateUISchemaBody
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUISchema'
+            examples:
+              UISchemaPUT:
+                $ref: '#/components/examples/CreateUISchemaBody'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UISchemasResponseObject'
+              examples:
+                UISchemaUpdate:
+                  $ref: '#/components/examples/CreateUISchemaResponse'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.uischemas.manage
+      tags:
+        - UISchema
+    delete:
+      summary: Delete a UI schema
+      description: Deletes a UI Schema by `id`
+      operationId: deleteUISchemas
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.uischemas.manage
+      tags:
+        - UISchema
+    x-okta-team-detail:
+      x-team-slack: amp-eng-auth-experience
+components:
+  parameters:
+    UISchemaId:
+      name: id
+      description: The unique ID of the UI Schema
+      in: path
+      required: true
+      schema:
+        type: string
+        example: uis4a7liocgcRgcxZ0g7
+  schemas:
+    UISchemasResponseObject:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the UI Schema
+          readOnly: true
+        uiSchema:
+          $ref: '#/components/schemas/UISchemaObject'
+        created:
+          type: string
+          format: date-time
+          description: Timestamp when the UI Schema was created (ISO 86001)
+          readOnly: true
+        lastUpdated:
+          type: string
+          format: date-time
+          description: Timestamp when the UI Schema was last modified (ISO 86001)
+          readOnly: true
+        _links:
+          $ref: ../Common.yaml#/components/schemas/LinksSelf
+      required:
+        - id
+        - uiSchema
+        - created
+        - lastUpdated
+        - _links
+    UISchemaObject:
+      type: object
+      description: Properties of the UI schema
+      properties:
+        buttonLabel:
+          type: string
+          description: Specifies the button label for the `Submit` button at the bottom of the enrollment form
+          default: Submit
+        label:
+          type: string
+          description: Specifies the label at the top of the enrollment form under the logo
+          default: Sign in
+        type:
+          type: string
+          description: Specifies the type of layout
+        elements:
+          type: array
+          items:
+            $ref: '#/components/schemas/UIElement'
+    UIElement:
+      type: object
+      description: Specifies the configuration of an input field on an enrollment form
+      properties:
+        type:
+          type: string
+          description: Specifies the relationship between this input element and `scope`. The `Control` value specifies that this input controls the value represented by `scope`.
+        scope:
+          type: string
+          description: Specifies the property bound to the input field. It must follow the format `#/properties/PROPERTY_NAME` where `PROPERTY_NAME` is a variable name for an attribute in `profile editor`.
+        label:
+          type: string
+          description: Label name for the UI element
+        options:
+          type: object
+          description: UI Schema element options object
+          properties:
+            format:
+              type: string
+              description: Specifies how the input appears
+              enum:
+                - text
+                - radio
+                - select
+                - checkbox
+                - radio_yes_no
+                - radio_true_false
+              x-enumDescriptions:
+                text: The default format for the majority of property types
+                radio: Radio button options. This option is only available for `string` data types with an `enum` or `one of` constraint.
+                select: Displays input as a dropdown list. This option is only available for the `country-code` data type or a string data type with an enum or one of constraint.
+                checkbox: Displays input as a checkbox. This option is only available for Boolean data types.
+                radio_yes_no: Displays input as two radio buttons, one with the option `yes` and the other `no`. This option is only available for Boolean data types.
+                radio_true_false: Displays input as two radio buttons, one with the option `true` and the other `false`. This option is only available for Boolean data types.
+    UpdateUISchema:
+      type: object
+      description: The updated request body properties
+      properties:
+        uiSchema:
+          $ref: '#/components/schemas/UISchemaObject'
+    CreateUISchema:
+      type: object
+      description: The request body properties for the new UI Schema
+      properties:
+        uiSchema:
+          $ref: '#/components/schemas/UISchemaObject'
+  securitySchemes:
+    $ref: ../../base.yaml#/components/securitySchemes
+  examples:
+    ListUISchemaResponse:
+      summary: Lists all UI schemas response
+      value:
+        - id: uis4a7liocgcRgcxZ0g7
+          uiSchema:
+            type: Group
+            label: Sign in
+            buttonLabel: Submit
+            elements:
+              - type: Control
+                scope: '#/properties/firstName'
+                label: First name
+                options:
+                  format: text
+              - type: Control
+                scope: '#/properties/lastName'
+                label: Last name
+                options:
+                  format: text
+              - type: Control
+                scope: '#/properties/email'
+                label: Email
+                options:
+                  format: text
+              - type: Control
+                scope: '#/properties/countryCode'
+                label: Country code
+                options:
+                  format: select
+              - type: Control
+                scope: '#/properties/bool2'
+                label: bool2
+                options:
+                  format: checkbox
+              - type: Control
+                scope: '#/properties/date'
+                label: date
+                options:
+                  format: text
+              - type: Control
+                scope: '#/properties/enum'
+                label: enum
+                options:
+                  format: radio
+          created: '2022-07-25T12:56:31.000Z'
+          lastUpdated: '2022-07-26T11:53:59.000Z'
+          _links:
+            self:
+              href: https://example.com/api/v1/meta/uischemas/uis4a7liocgcRgcxZ0g7
+              hints:
+                allow:
+                  - GET
+                  - PUT
+                  - DELETE
+        - id: uis4abjqkkKXVPGAU0g7
+          uiSchema:
+            type: Group
+            label: Sign in 2
+            buttonLabel: Submit
+            elements:
+              - type: Control
+                scope: '#/properties/firstName'
+                label: First name
+                options:
+                  format: text
+              - type: Control
+                scope: '#/properties/lastName'
+                label: Last name
+                options:
+                  format: text
+              - type: Control
+                scope: '#/properties/email'
+                label: Email
+                options:
+                  format: text
+              - type: Control
+                scope: '#/properties/countryCode'
+                label: Country code
+                options:
+                  format: select
+              - type: Control
+                scope: '#/properties/bool2'
+                label: bool2
+                options:
+                  format: checkbox
+              - type: Control
+                scope: '#/properties/date'
+                label: date
+              - type: Control
+                scope: '#/properties/enum'
+                label: enum
+                options:
+                  format: radio
+          created: '2022-07-25T12:56:31.000Z'
+          lastUpdated: '2022-07-26T11:53:59.000Z'
+          _links:
+            self:
+              href: https://example.com/api/v1/meta/uischemas/uis4abjqkkKXVPGAU0g7
+              hints:
+                allow:
+                  - GET
+                  - PUT
+                  - DELETE
+    RetrieveUISchemaResponse:
+      summary: Retrieves a UI schema response
+      value:
+        id: uis4a7liocgcRgcxZ0g7
+        uiSchema:
+          type: Group
+          label: Sign in
+          buttonLabel: Submit
+          elements:
+            - type: Control
+              scope: '#/properties/firstName'
+              label: First name
+              options:
+                format: text
+            - type: Control
+              scope: '#/properties/lastName'
+              label: Last name
+              options:
+                format: text
+            - type: Control
+              scope: '#/properties/email'
+              label: Email
+              options:
+                format: text
+            - type: Control
+              scope: '#/properties/countryCode'
+              label: Country code
+              options:
+                format: select
+            - type: Control
+              scope: '#/properties/bool2'
+              label: bool2
+              options:
+                format: checkbox
+            - type: Control
+              scope: '#/properties/date'
+              label: date
+            - type: Control
+              scope: '#/properties/enum'
+              label: enum
+              options:
+                format: radio
+        created: '2022-07-25T12:56:31.000Z'
+        lastUpdated: '2022-07-26T11:53:59.000Z'
+        _links:
+          self:
+            href: https://exmaple.com/api/v1/meta/uischemas/uis4a7liocgcRgcxZ0g7
+            hints:
+              allow:
+                - GET
+                - PUT
+                - DELETE
+    CreateUISchemaBody:
+      summary: UI schema body request
+      value:
+        uiSchema:
+          type: Group
+          elements:
+            - type: Control
+              scope: '#/properties/firstName'
+              label: First Name
+              options:
+                format: text
+            - type: Control
+              scope: '#/properties/lastName'
+              label: Last Name
+              options:
+                format: text
+            - type: Control
+              scope: '#/properties/email'
+              label: Primary email
+              options:
+                format: text
+          buttonLabel: Submit
+          label: Sign in
+    CreateUISchemaResponse:
+      summary: Returns full UI schema body
+      value:
+        id: uis4a7liocgcRgcxZ0g7
+        uiSchema:
+          type: Group
+          label: Sign in
+          buttonLabel: Submit
+          elements:
+            - type: Control
+              scope: '#/properties/firstName'
+              label: First name
+              options:
+                format: text
+            - type: Control
+              scope: '#/properties/lastName'
+              label: Last name
+              options:
+                format: text
+            - type: Control
+              scope: '#/properties/email'
+              label: Primary email
+              options:
+                format: text
+        created: '2022-07-25T12:56:31.000Z'
+        lastUpdated: '2022-07-26T11:53:59.000Z'
+        _links:
+          self:
+            href: https://exmaple.com/api/v1/meta/uischemas/uis4a7liocgcRgcxZ0g7
+            hints:
+              allow:
+                - GET
+                - PUT
+                - DELETE

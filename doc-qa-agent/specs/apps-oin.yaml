@@ -1,0 +1,638 @@
+openapi: 3.0.3
+info:
+  title: Apps API related schemas
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths: {}
+components:
+  schemas:
+    OINApplication:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        accessibility:
+          $ref: ./apps.yaml#/components/schemas/ApplicationAccessibility
+        credentials:
+          $ref: ./apps.yaml#/components/schemas/SchemeApplicationCredentials
+        name:
+          type: string
+          description: The key name for the OIN app definition
+        label:
+          $ref: ./apps.yaml#/components/schemas/ApplicationLabel
+        licensing:
+          $ref: ./apps.yaml#/components/schemas/ApplicationLicensing
+        profile:
+          type: object
+          description: Contains any valid JSON schema for specifying properties that can be referenced from a request (only available to OAuth 2.0 client apps)
+          additionalProperties:
+            type: object
+            properties: { }
+        signOnMode:
+          type: string
+          description: Authentication mode for the app
+        status:
+          $ref: ./apps.yaml#/components/schemas/ApplicationLifecycleStatus
+        visibility:
+          $ref: ./apps.yaml#/components/schemas/ApplicationVisibility
+    OINSaml11ApplicationSettingsSignOn:
+      type: object
+      title: SAML 1.1 settings
+      description: "Contains SAML 1.1 sign-on mode attributes"
+      properties:
+        defaultRelayState:
+          type: string
+          description: Identifies a specific application resource in an IdP-initiated SSO scenario
+        ssoAcsUrlOverride:
+          type: string
+          description: Assertion Consumer Service (ACS) URL override for CASB configuration. See [CASB config guide](https://help.okta.com/en-us/Content/Topics/Apps/CASB-config-guide.htm).
+        audienceOverride:
+          type: string
+          description: Audience override for CASB configuration. See [CASB config guide](https://help.okta.com/en-us/Content/Topics/Apps/CASB-config-guide.htm).
+        recipientOverride:
+          type: string
+          description: Recipient override for CASB configuration. See [CASB config guide](https://help.okta.com/en-us/Content/Topics/Apps/CASB-config-guide.htm).
+    OINSaml20ApplicationSettingsSignOn:
+      type: object
+      title: SAML 2.0 settings
+      description: |-
+        Contains SAML 2.0 sign-on mode attributes.
+        > **Note:** Set `destinationOverride` to configure any other SAML 2.0 attributes in this section.
+      properties:
+        defaultRelayState:
+          type: string
+          description: Identifies a specific application resource in an IdP-initiated SSO scenario
+          nullable: true
+        ssoAcsUrlOverride:
+          type: string
+          description: Assertion Consumer Service (ACS) URL override for CASB configuration. See [CASB config guide](https://help.okta.com/en-us/Content/Topics/Apps/CASB-config-guide.htm).
+          nullable: true
+        audienceOverride:
+          type: string
+          description: Audience override for CASB configuration. See [CASB config guide](https://help.okta.com/en-us/Content/Topics/Apps/CASB-config-guide.htm).
+          nullable: true
+        recipientOverride:
+          type: string
+          description: Recipient override for CASB configuration. See [CASB config guide](https://help.okta.com/en-us/Content/Topics/Apps/CASB-config-guide.htm).
+          nullable: true
+        destinationOverride:
+          type: string
+          description: Destination override for CASB configuration. See [CASB config guide](https://help.okta.com/en-us/Content/Topics/Apps/CASB-config-guide.htm).
+          nullable: true
+        attributeStatements:
+          description: |
+            A list of custom attribute statements for the app's SAML assertion. See [SAML 2.0 Technical Overview](https://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0-cd-02.html).
+
+            There are two types of attribute statements:
+            | Type | Description |
+            | ---- | ----------- |
+            | EXPRESSION | Generic attribute statement that can be dynamic and supports [Okta Expression Language](https://developer.okta.com/docs/reference/okta-expression-language/) |
+            | GROUP | Group attribute statement |
+
+          type: array
+          items:
+            $ref: ./apps.yaml#/components/schemas/SamlAttributeStatement
+        samlAssertionLifetimeSeconds:
+          x-okta-lifecycle:
+            features:
+              - SAML_ASSERTION_LIFETIME_SECONDS_ON_APPS_API
+          type: integer
+          description: Determines the SAML app session lifetimes with Okta
+          example: 3600
+    GoogleApplication:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      title: Google Workspace
+      x-tags:
+        - Application
+      x-okta-defined-as:
+        name: google
+      example:
+        name: google
+        label: Sample Google App
+        signOnMode: SAML_2_0
+        settings:
+          app:
+            domain: my-company-domain
+        # $ref: '#/components/examples/GoogleApplicationRequestEx'
+      description: |
+        Schema for the Google Workspace app (key name: `google`)
+
+        To create a Google Workspace app, use the [Create an Application](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/application/other/createapplication) request with the following parameters in the request body.
+        > **Note:** The Google Workspace app only supports `BROWSER_PLUGIN` and `SAML_2_0` sign-on modes.
+      allOf:
+        - $ref: '#/components/schemas/OINApplication'
+        - type: object
+        - required:
+            - name
+            - label
+            - settings
+          properties:
+            name:
+              type: string
+              enum:
+                - google
+              example: google
+            signOnMode:
+              type: string
+              enum:
+                - BROWSER_PLUGIN
+                - SAML_2_0
+              example: BROWSER_PLUGIN
+            settings:
+              $ref: '#/components/schemas/GoogleApplicationSettings'
+    GoogleApplicationSettings:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: ./apps.yaml#/components/schemas/ApplicationSettings
+        - type: object
+        - required:
+            - app
+          properties:
+            app:
+              $ref: '#/components/schemas/GoogleApplicationSettingsApplication'
+            signOn:
+              $ref: '#/components/schemas/OINSaml20ApplicationSettingsSignOn'
+    GoogleApplicationSettingsApplication:
+      type: object
+      description: Google app instance properties
+      required:
+        - domain
+      properties:
+        domain:
+          type: string
+          description: Your Google company domain
+        rpId:
+          type: string
+          description: RPID
+    Office365Application:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      title: Microsoft Office 365
+      x-tags:
+        - Application
+      x-okta-defined-as:
+        name: office365
+      description: |
+        Schema for the Microsoft Office 365 app (key name: `office365`)
+
+        To create a Microsoft Office 365 app, use the [Create an Application](/openapi/okta-management/management/tags/application/other/createapplication) request with the following parameters in the request body.
+        > **Note:** The Office 365 app only supports `BROWSER_PLUGIN` and `SAML_1_1` sign-on modes.
+      allOf:
+        - $ref: '#/components/schemas/OINApplication'
+        - type: object
+        - required:
+            - name
+            - label
+            - settings
+          properties:
+            name:
+              type: string
+              enum:
+                - office365
+              example: office365
+            signOnMode:
+              type: string
+              enum:
+                - BROWSER_PLUGIN
+                - SAML_1_1
+              example: BROWSER_PLUGIN
+            settings:
+              $ref: '#/components/schemas/Office365ApplicationSettings'
+      example:
+        name: office365
+        label: Sample Office365 App
+        signOnMode: SAML_1_1
+        settings:
+          app:
+            domain: myintegration.okta365test.net
+            msftTenant: mycompanyinc
+    Office365ApplicationSettings:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: ./apps.yaml#/components/schemas/ApplicationSettings
+        - type: object
+        - required:
+            - app
+          properties:
+            app:
+              $ref: '#/components/schemas/Office365ApplicationSettingsApplication'
+            signOn:
+              $ref: '#/components/schemas/OINSaml11ApplicationSettingsSignOn'
+    Office365ApplicationSettingsApplication:
+      type: object
+      description: Office365 app instance properties
+      required:
+        - msftTenant
+        - domain
+      properties:
+        domain:
+          type: string
+          description: The domain for your Office 365 account
+        msftTenant:
+          type: string
+          description: Microsoft tenant name
+    SalesforceApplication:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      title: Salesforce
+      x-tags:
+        - Application
+      x-okta-defined-as:
+        name: salesforce
+      example:
+        name: salesforce
+        label: Sample Salesforce App
+        signOnMode: SAML_2_0
+        settings:
+          app:
+            instanceType: SANDBOX
+            integrationType: STANDARD
+      description: |
+        Schema for the Salesforce app (key name: `salesforce`)
+
+        To create a Salesforce app, use the [Create an Application](/openapi/okta-management/management/tags/application/other/createapplication) request with the following parameters in the request body.
+        > **Note:** The Salesforce app only supports `BROWSER_PLUGIN`, `BOOKMARK`, and `SAML_2_0` sign-on modes.
+      allOf:
+        - $ref: '#/components/schemas/OINApplication'
+        - type: object
+        - required:
+            - name
+            - label
+            - settings
+          properties:
+            name:
+              type: string
+              enum:
+                - salesforce
+              example: salesforce
+            signOnMode:
+              type: string
+              enum:
+                - BROWSER_PLUGIN
+                - BOOKMARK
+                - SAML_2_0
+              example: BROWSER_PLUGIN
+            settings:
+              $ref: '#/components/schemas/SalesforceApplicationSettings'
+    SalesforceApplicationSettings:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: ./apps.yaml#/components/schemas/ApplicationSettings
+        - type: object
+        - required:
+            - app
+          properties:
+            app:
+              $ref: '#/components/schemas/SalesforceApplicationSettingsApplication'
+            signOn:
+              $ref: '#/components/schemas/OINSaml20ApplicationSettingsSignOn'
+    SalesforceApplicationSettingsApplication:
+      type: object
+      description: Salesforce app instance properties
+      required:
+        - integrationType
+        - instanceType
+      properties:
+        integrationType:
+          type: string
+          description: Salesforce integration type
+          enum:
+            - STANDARD
+            - PORTAL
+            - COMMUNITY
+        instanceType:
+          type: string
+          description: Salesforce instance that you want to connect to
+          enum:
+            - SANDBOX
+            - PRODUCTION
+            - GOVERNMENT
+        loginUrl:
+          type: string
+          description: The Login URL specified in your Salesforce Single Sign-On settings
+        logoutUrl:
+          type: string
+          description: Salesforce Logout URL
+    SlackApplication:
+      title: Slack
+      x-okta-ignore-redocly-rules-for-sdk: true
+      x-tags:
+        - Application
+      x-okta-defined-as:
+        name: slack
+      example:
+        name: slack
+        label: Sample Slack App
+        signOnMode: SAML_2_0
+        settings:
+          app:
+            domain: my-company-domain
+      description: |
+        Schema for the Slack app (key name: `slack`)
+
+        To create a Slack app, use the [Create an Application](/openapi/okta-management/management/tags/application/other/createapplication) request with the following parameters in the request body.
+        > **Note:** The Slack app only supports `BROWSER_PLUGIN` and `SAML_2_0` sign-on modes.
+      allOf:
+        - $ref: '#/components/schemas/OINApplication'
+        - type: object
+        - required:
+            - name
+            - label
+            - settings
+          properties:
+            name:
+              type: string
+              enum:
+                - slack
+              example: slack
+            signOnMode:
+              type: string
+              enum:
+                - BROWSER_PLUGIN
+                - SAML_2_0
+            settings:
+              $ref: '#/components/schemas/SlackApplicationSettings'
+    SlackApplicationSettings:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: ./apps.yaml#/components/schemas/ApplicationSettings
+        - type: object
+        - required:
+            - app
+          properties:
+            app:
+              $ref: '#/components/schemas/SlackApplicationSettingsApplication'
+            signOn:
+              $ref: '#/components/schemas/OINSaml20ApplicationSettingsSignOn'
+    SlackApplicationSettingsApplication:
+      type: object
+      description: Slack app instance properties
+      required:
+        - domain
+      properties:
+        domain:
+          type: string
+          description: The Slack app domain name
+        userEmailValue:
+          type: string
+          description: The `User.Email` attribute value
+    TrendMicroApexOneServiceApplication:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      title: Trend Micro Apex One Service
+      x-tags:
+        - Application
+      x-okta-defined-as:
+        name: trendmicroapexoneservice
+      example:
+        name: trendmicroapexoneservice
+        label: Sample Trend Micro Apex One as a Service App
+        signOnMode: SAML_2_0
+        settings:
+          app:
+            baseURL: https://acme.trendmicro.com
+      description: |
+        Schema for Trend Micro Apex One as a Service app (key name: `trendmicroapexoneservice`)
+
+        To create a Trend Micro Apex One as a Service app, use the [Create an Application](/openapi/okta-management/management/tags/application/other/createapplication) request with the following parameters in the request body.
+        > **Note:** The Trend Micro Apex One as a Service app only supports `SAML_2_0` sign-on mode.
+      allOf:
+        - $ref: '#/components/schemas/OINApplication'
+        - type: object
+        - required:
+            - name
+            - label
+            - settings
+          properties:
+            name:
+              type: string
+              enum:
+                - trendmicroapexoneservice
+              example: trendmicroapexoneservice
+            signOnMode:
+              type: string
+              enum:
+                - SAML_2_0
+            settings:
+              $ref: '#/components/schemas/TrendMicroApexOneServiceApplicationSettings'
+    TrendMicroApexOneServiceApplicationSettings:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: ./apps.yaml#/components/schemas/ApplicationSettings
+        - type: object
+        - required:
+            - app
+          properties:
+            app:
+              $ref: '#/components/schemas/TrendMicroApexOneServiceApplicationSettingsApplication'
+            signOn:
+              $ref: '#/components/schemas/OINSaml20ApplicationSettingsSignOn'
+    TrendMicroApexOneServiceApplicationSettingsApplication:
+      type: object
+      description: Trend Micro Apex One as a Service app instance properties
+      required:
+        - baseURL
+      properties:
+        baseURL:
+          type: string
+          description: Base Trend Micro Apex One Service URL
+    ZoomUsApplication:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      title: Zoom
+      x-tags:
+        - Application
+      x-okta-defined-as:
+        name: zoomus
+      example:
+        name: zoomus
+        label: Sample Zoom App
+        signOnMode: SAML_2_0
+        settings:
+          app:
+            subDomain: my-zoom-subdomain
+      description: |
+        Schema for the Zoom app (key name: `zoomus`)
+
+        To create a Zoom app, use the [Create an Application](/openapi/okta-management/management/tags/application/other/createapplication) request with the following parameters in the request body.
+        > **Note:** The Zoom app only supports `SAML_2_0` sign-on mode.
+      allOf:
+        - $ref: '#/components/schemas/OINApplication'
+        - type: object
+        - required:
+            - name
+            - label
+            - settings
+          properties:
+            name:
+              type: string
+              enum:
+                - zoomus
+              example: zoomus
+            signOnMode:
+              type: string
+              enum:
+                - SAML_2_0
+            settings:
+              $ref: '#/components/schemas/ZoomUsApplicationSettings'
+    ZoomUsApplicationSettings:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: ./apps.yaml#/components/schemas/ApplicationSettings
+        - type: object
+        - required:
+            - app
+          properties:
+            app:
+              $ref: '#/components/schemas/ZoomUsApplicationSettingsApplication'
+            signOn:
+              $ref: '#/components/schemas/OINSaml20ApplicationSettingsSignOn'
+    ZoomUsApplicationSettingsApplication:
+      type: object
+      description: Zoom app instance properties
+      required:
+        - subDomain
+      properties:
+        subDomain:
+          type: string
+          description: Your Zoom subdomain
+    ZscalerbyzApplication:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      title: Zscaler 2.0
+      x-tags:
+        - Application
+      x-okta-defined-as:
+        name: zscalerbyz
+      example:
+        name: zscalerbyz
+        label: Sample Zscaler 2.0 App
+        signOnMode: SAML_2_0
+      description: |
+        Schema for the Zscaler 2.0 app (key name: `zscalerbyz`)
+
+        To create a Zscaler 2.0 app, use the [Create an Application](/openapi/okta-management/management/tags/application/other/createapplication) request with the following parameters in the request body.
+        > **Note:** The Zscaler 2.0 app only supports `BROWSER_PLUGIN` and `SAML_2_0` sign-on modes.
+      allOf:
+        - $ref: '#/components/schemas/OINApplication'
+        - type: object
+        - required:
+            - name
+            - label
+            - settings
+          properties:
+            name:
+              type: string
+              enum:
+                - zscalerbyz
+              example: zscalerbyz
+            signOnMode:
+              type: string
+              enum:
+                - BROWSER_PLUGIN
+                - SAML_2_0
+            settings:
+              $ref: '#/components/schemas/ZscalerbyzApplicationSettings'
+    ZscalerbyzApplicationSettings:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: ./apps.yaml#/components/schemas/ApplicationSettings
+        - type: object
+        - required:
+            - app
+          properties:
+            app:
+              $ref: '#/components/schemas/ZscalerbyzApplicationSettingsApplication'
+            signOn:
+              $ref: '#/components/schemas/OINSaml20ApplicationSettingsSignOn'
+    ZscalerbyzApplicationSettingsApplication:
+      type: object
+      description: Zscaler app instance properties
+      properties:
+        siteDomain:
+          type: string
+          description: Your Zscaler domain
+    Org2OrgApplication:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      title: Org2Org
+      x-tags:
+        - Application
+      x-okta-defined-as:
+        name: okta_org2org
+      example:
+        name: okta_org2org
+        label: Okta Org2Org
+        signOnMode: SAML_2_0
+        settings:
+          app:
+            acsUrl: "https://example.okta.com/sso/saml2/exampleid"
+            audRestriction: "https://www.okta.com/saml2/service-provider/exampleid"
+            baseUrl: "https://example.okta.com"
+      description: |
+        Schema for the Okta Org2Org app (key name: `okta_org2org`)
+
+        To create an Org2Org app, use the [Create an Application](/openapi/okta-management/management/tags/application/other/createapplication) request with the following parameters in the request body.
+        > **Notes:**
+        > * The Okta Org2Org (`okta_org2org`) app isn't available in Okta Integrator Free Plan orgs. If you need to test this feature in your Integrator Free Plan org, contact your Okta account team.
+        > * The Okta Org2Org app supports `SAML_2_0` and `AUTO_LOGIN` sign-on modes.
+      allOf:
+        - $ref: '#/components/schemas/OINApplication'
+        - type: object
+        - required:
+            - name
+            - label
+            - settings
+          properties:
+            name:
+              type: string
+              enum:
+                - okta_org2org
+              example: okta_org2org
+            signOnMode:
+              type: string
+              default: SAML_2_0
+              enum:
+                - SAML_2_0
+                - AUTO_LOGIN
+              x-enumDescriptions:
+                SAML_2_0: Federated Authentication with SAML 2.0 WebSSO
+                AUTO_LOGIN: Secure Web Authentication (SWA)
+            settings:
+              $ref: '#/components/schemas/Org2OrgApplicationSettings'
+    Org2OrgApplicationSettings:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: ./apps.yaml#/components/schemas/ApplicationSettings
+        - type: object
+        - required:
+            - app
+          properties:
+            app:
+              $ref: '#/components/schemas/Org2OrgApplicationSettingsApplication'
+            signOn:
+              $ref: '#/components/schemas/OINSaml20ApplicationSettingsSignOn'
+    Org2OrgApplicationSettingsApplication:
+      type: object
+      description: Org2Org app instance properties
+      properties:
+        acsUrl:
+          type: string
+          description: The Assertion Consumer Service (ACS) URL of the source org (for `SAML_2_0` sign-on mode)
+        audRestriction:
+          type: string
+          description: The entity ID of the SP (for `SAML_2_0` sign-on mode)
+          example: "https://www.okta.com/saml2/service-provider/exampleid"
+        baseUrl:
+          type: string
+          description: The base URL of the target Okta org (for `SAML_2_0` sign-on mode)
+        token:
+          type: string
+          description: An API token from the target org that's used to secure the connection between the orgs
+        tokenEncrypted:
+          type: string
+          description: Encrypted token to enhance security
+        creationState:
+          type: string
+          description: Used to track and manage the state of the app's creation or the provisioning process between two Okta orgs
+        preferUsernameOverEmail:
+          type: boolean
+          description: Indicates that you don't want to use an email address as the username
+      required:
+        - baseUrl

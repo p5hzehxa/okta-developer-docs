@@ -1,0 +1,527 @@
+openapi: 3.0.3
+info:
+  title: Common Components
+  description: components shared across all APIs
+  version: 1.0.0
+tags:
+  $ref: ../base.yaml#/tags
+paths: {}
+components:
+  examples:
+    ErrorAccessDenied:
+      summary: Access Denied
+      value:
+        errorCode: E0000006
+        errorSummary: You do not have permission to perform the requested action
+        errorLink: E0000006
+        errorId: sampleNUSD_8fdkFd8fs8SDBK
+        errorCauses: []
+    ErrorApiValidationFailed:
+      summary: API Validation Failed
+      value:
+        errorCode: E0000001
+        errorSummary: 'Api validation failed: {0}'
+        errorLink: E0000001
+        errorId: sampleiCF-8D5rLW6myqiPItW
+        errorCauses: []
+    ErrorInvalidTokenProvided:
+      summary: Invalid Token Provided
+      value:
+        errorCode: E0000011
+        errorSummary: Invalid token provided
+        errorLink: E0000011
+        errorId: sampleQPivGUj_ND5v78vbYWW
+        errorCauses: []
+    ErrorMissingRequiredParameter:
+      summary: Missing Required Parameter
+      value:
+        errorCode: E0000028
+        errorSummary: The request is missing a required parameter.
+        errorLink: E0000028
+        errorId: sampleiCF-l7mr9XqM1NQ
+        errorCauses: []
+    ErrorResourceNotFound:
+      summary: Resource Not Found
+      value:
+        errorCode: E0000007
+        errorSummary: 'Not found: {0}'
+        errorLink: E0000007
+        errorId: sampleMlLvGUj_YD5v16vkYWY
+        errorCauses: []
+    ErrorTooManyRequests:
+      summary: Too Many Requests
+      value:
+        errorCode: E0000047
+        errorSummary: API call exceeded rate limit due to too many requests.
+        errorLink: E0000047
+        errorId: sampleQPivGUj_ND5v78vbYWW
+        errorCauses: []
+    ErrorInternalServer:
+      summary: Internal Server Error
+      value:
+        errorCode: E0000009
+        errorSummary: Internal Server Error
+        errorLink: E0000000
+        errorId: sampleAlJ82XS2SDB_vaNIWgcA
+        errorCauses: []
+    ErrorApiValidationConflict:
+      summary: Conflict
+      value:
+        errorCode: E0000195
+        errorSummary: 'Api validation failed due to conflict: {0}'
+        errorLink: E0000195
+        errorId: sampleMlLvGUj_YD5v15vkYWX
+        errorCauses: []
+  parameters:
+    pathUserId:
+      name: userId
+      description: ID of an existing Okta user
+      in: path
+      required: true
+      schema:
+        type: string
+        example: 00ub0oNGTSWTBKOLGLNR
+    pathAppId:
+      name: appId
+      description: Application ID
+      in: path
+      required: true
+      schema:
+        type: string
+        example: 0oafxqCAJWWGELFTYASJ
+    queryAfter:
+      name: after
+      in: query
+      schema:
+        type: string
+      description: The cursor to use for pagination. It is an opaque string that specifies your current location in the list and is obtained from the `Link` response header. See [Pagination](https://developer.okta.com/docs/api/#pagination) and [Link header](https://developer.okta.com/docs/api/#link-header).
+    queryLimit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 200
+        default: 20
+      description: A limit on the number of objects to return
+    queryFilter:
+      name: q
+      in: query
+      description: Searches the records for matching value
+      schema:
+        type: string
+    querySortOrder:
+      name: sortOrder
+      in: query
+      description: "Specifies sort order: `asc` or `desc` (for search queries only). This parameter is ignored if `sortBy` isn't present."
+      schema:
+        type: string
+        default: asc
+    queryExpand:
+      name: expand
+      in: query
+      schema:
+        type: string
+      description: 'Valid value: `scope`. If specified, scope details are included in the `_embedded` attribute.'
+  responses:
+    ErrorApiValidationFailed400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            APIValidationFailed:
+              $ref: '#/components/examples/ErrorApiValidationFailed'
+    ErrorMissingRequiredParameter400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            MissingRequiredParameter:
+              $ref: '#/components/examples/ErrorMissingRequiredParameter'
+    ErrorInvalidToken401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            InvalidTokenProvided:
+              $ref: '#/components/examples/ErrorInvalidTokenProvided'
+    ErrorAccessDenied403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            AccessDenied:
+              $ref: '#/components/examples/ErrorAccessDenied'
+    ErrorResourceNotFound404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            ResourceNotFound:
+              $ref: '#/components/examples/ErrorResourceNotFound'
+    ErrorApiValidationConflict409:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            AccessDenied:
+              $ref: '#/components/examples/ErrorApiValidationConflict'
+    ErrorTooManyRequests429:
+      description: Too Many Requests
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            TooManyRequests:
+              $ref: '#/components/examples/ErrorTooManyRequests'
+    ErrorInternalServer500:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            InternalServerError:
+              $ref: '#/components/examples/ErrorInternalServer'
+  schemas:
+    EnabledStatus:
+      type: string
+      description: Setting status
+      enum:
+        - DISABLED
+        - ENABLED
+    Error:
+      title: Error
+      type: object
+      properties:
+        errorCauses:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorCause'
+        errorCode:
+          type: string
+          description: An Okta code for this type of error
+        errorId:
+          type: string
+          description: A unique identifier for this error. This can be used by Okta Support to help with troubleshooting.
+        errorLink:
+          type: string
+          description: An Okta code for this type of error
+        errorSummary:
+          type: string
+          description: A short description of what caused this error. Sometimes this contains dynamically-generated information about your specific error.
+    ErrorCause:
+      type: object
+      properties:
+        errorSummary:
+          type: string
+    HrefHints:
+      type: object
+      description: Describes allowed HTTP verbs for the `href`
+      properties:
+        allow:
+          type: array
+          items:
+            $ref: '#/components/schemas/HttpMethod'
+    HrefObject:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      title: Link Object
+      type: object
+      additionalProperties: true
+      properties:
+        hints:
+          $ref: '#/components/schemas/HrefHints'
+          readOnly: true
+        href:
+          type: string
+          description: Link URI
+        name:
+          type: string
+          description: Link name
+          readOnly: true
+        type:
+          type: string
+          description: The media type of the link. If omitted, it is implicitly `application/json`.
+          readOnly: true
+        templated:
+          type: boolean
+          description: Indicates whether the link object's `href` property is a URI template.
+          readOnly: true
+      required:
+        - href
+    HrefObjectActivateLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to activate the resource
+    HrefObjectDeactivateLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to deactivate the resource
+    HrefObjectRulesLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to the rules resource
+    HrefObjectMappingsLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to the mappings resource
+    HrefObjectDeleteLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to delete the resource
+    HrefObjectLogoLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to the logo resource
+    HrefObjectClientLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to the client resource
+    HrefObjectSelfLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to the resource (self)
+    HrefObjectWebLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to the resource in the Okta Admin Console
+    HrefObjectNextLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to the next resource
+    HrefObjectAppLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to the app resource
+    HrefObjectGroupLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to the group resource
+    HrefObjectUserLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to the user resource
+    HrefObjectSuspendLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to suspend the resource
+    HrefObjectUnsuspendLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to unsuspend the resource
+    HrefObjectMemberLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to the member resource
+    HrefObjectMembersLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to the members resource
+    HrefObjectBindingsLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to the bindings resource
+    HrefObjectBindingLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to the binding resource
+    HrefObjectAssigneeLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to the assignee resource
+    HrefObjectResourceSetLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to the resource set resource
+    HrefObjectResourceSetResourcesLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to resource set resources
+    HrefObjectRoleLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to the role resource
+    HrefObjectPermissionsLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/HrefObject'
+        - description: Link to the permissions resource
+    HttpMethod:
+      type: string
+      enum:
+        - DELETE
+        - GET
+        - POST
+        - PUT
+    IssuerMode:
+      type: string
+      enum:
+        - CUSTOM_URL
+        - DYNAMIC
+        - ORG_URL
+    Language:
+      description: The language specified as an [IETF BCP 47 language tag](https://datatracker.ietf.org/doc/html/rfc5646)
+      type: string
+    LifecycleStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+    LinksNext:
+      description: Specifies link relations (see [Web Linking](https://www.rfc-editor.org/rfc/rfc8288)) available for the current status of an application using the [JSON Hypertext Application Language](https://datatracker.ietf.org/doc/html/draft-kelly-json-hal-06) specification. Use the `LinksNext` object for dynamic discovery of related resources and lifecycle operations.
+      type: object
+      properties:
+        next:
+          $ref: '#/components/schemas/HrefObjectNextLink'
+      readOnly: true
+    LinksSelf:
+      description: Specifies link relations (see [Web Linking](https://www.rfc-editor.org/rfc/rfc8288)) available using the [JSON Hypertext Application Language](https://datatracker.ietf.org/doc/html/draft-kelly-json-hal-06) specification. This object is used for dynamic discovery of related resources and lifecycle operations.
+      type: object
+      properties:
+        self:
+          $ref: '#/components/schemas/HrefObjectSelfLink'
+      readOnly: true
+    LinksSelfAndLifecycle:
+      allOf:
+        - $ref: '#/components/schemas/LinksSelf'
+        - type: object
+          properties:
+            activate:
+              $ref: '#/components/schemas/HrefObjectActivateLink'
+            deactivate:
+              $ref: '#/components/schemas/HrefObjectDeactivateLink'
+    Created:
+      type: string
+      format: date-time
+      readOnly: true
+      description: Timestamp when the object was created
+      example: '2016-01-03T18:15:47.000Z'
+    LastUpdated:
+      type: string
+      format: date-time
+      readOnly: true
+      description: Timestamp when the object was last updated
+      example: '2016-01-03T18:15:47.000Z'
+    ExpiresAt:
+      type: string
+      format: date-time
+      readOnly: true
+      description: Timestamp when the object expires
+      example: '2016-01-03T18:15:47.000Z'
+    TimeDuration:
+      description: A time duration specified as an [ISO 8601 duration](https://en.wikipedia.org/wiki/ISO_8601#Durations).
+      type: string
+      pattern: ^P(?:$)(\d+Y)?(\d+M)?(\d+W)?(\d+D)?(T(?:\d)(\d+H)?(\d+M)?(\d+S)?)?$
+    DateTime:
+      description: An [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations) formatted date and time.
+      type: string
+      format: date-time
+      example: '2024-12-01T00:00:00Z'
+    Version:
+      description: The version specified as a [Semantic Version](https://semver.org/). This value can be a wildcard (`*`), a major version range (for example, `^2`), a major-only version (for example, `7`), or a specific `Major.Minor` version (for example, `5.15`).
+      type: string
+      pattern: ^(?:\*|\^?\d+(?:\.\d+){0,2})$
+    WidgetGeneration:
+      type: string
+      description: The generation of the Sign-in Widget
+      enum:
+        - G2
+        - G3
+    PatchAction:
+      type: string
+      description: The operation (PATCH action)
+      enum:
+        - remove
+        - replace
+      x-enumDescriptions:
+        remove: Removes the attribute in `path` if allowed
+        replace: Replaces the attribute in content `path` with the content in `value`
+    PostAuthKeepMeSignedInPrompt:
+      x-okta-lifecycle:
+        features:
+          - POST_AUTH_KMSI_IN_AUTH_POLICY
+      type: object
+      properties:
+        title:
+          type: string
+          description: The title on the Sign-In Widget when prompting for Stay signed in
+        subtitle:
+          type: string
+          description: The subtitle on the Sign-In Widget when prompting for Stay signed in
+        acceptButtonText:
+          type: string
+          description: The label on the accept button when prompting for Stay signed in
+        rejectButtonText:
+          type: string
+          description: The label on the reject button when prompting for Stay signed in
+    AuthenticatorType:
+      description: The type of authenticator
+      type: string
+      enum:
+        - app
+        - email
+        - federated
+        - password
+        - phone
+        - security_key
+        - security_question
+      x-okta-feature-flag-amends:
+        TEMPORARY_ACCESS_CODE:
+          enum:
+            - tac
+    GracePeriodRequiredSoon:
+      x-okta-lifecycle:
+        features:
+          - ENROLLMENT_POLICY_GRACE_PERIOD_V2
+      type: object
+      description: |
+        Customizable strings to use with [grace periods](https://developer.okta.com/docs/concepts/policies/#authenticator-enrollment-policies) that are shown on the Sign-In Widget
+
+        You can use the `gracePeriodRequiredSoonDescription` string without using either of the custom link strings.
+        However, if you use one of the custom link strings (`gracePeriodRequiredSoonCustomLinkLabel` or `gracePeriodRequiredSoonCustomLinkUrl`), then both are required.
+      properties:
+        gracePeriodRequiredSoonDescription:
+          type: string
+          description: The description that's shown on the Sign-In Widget for users who are within an authenticator grace period. This description prompts users to enroll required authenticators before their grace period ends.
+        gracePeriodRequiredSoonCustomLinkLabel:
+          type: string
+          description: The label of the custom link that's shown on the Sign-In Widget when users are prompted to enroll required authenticators before their grace period ends.
+        gracePeriodRequiredSoonCustomLinkUrl:
+          type: string
+          description: The URL for the custom link that's shown on the Sign-In Widget when users are prompted to enroll required authenticators before their grace period ends.

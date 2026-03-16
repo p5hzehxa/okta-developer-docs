@@ -1,0 +1,539 @@
+openapi: 3.0.3
+info:
+  title: Captchas API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../../base.yaml#/tags
+paths:
+  /api/v1/captchas:
+    get:
+      summary: List all CAPTCHA instances
+      description: Lists all CAPTCHA instances with pagination support. A subset of CAPTCHA instances can be returned that match a supported filter expression or query.
+      operationId: listCaptchaInstances
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CAPTCHAInstance'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.captchas.read
+      tags:
+        - CAPTCHA
+    post:
+      summary: Create a CAPTCHA instance
+      description: Creates a new CAPTCHA instance. Currently, an org can only configure a single CAPTCHA instance.
+      operationId: createCaptchaInstance
+      x-codegen-request-body-name: instance
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CAPTCHAInstance'
+            examples:
+              HCaptcha:
+                $ref: '#/components/examples/CAPTCHAInstanceRequestHCaptcha'
+              ReCaptcha:
+                $ref: '#/components/examples/CAPTCHAInstanceRequestReCaptcha'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CAPTCHAInstance'
+              examples:
+                HCaptcha:
+                  $ref: '#/components/examples/CAPTCHAInstanceResponseHCaptcha'
+                ReCaptcha:
+                  $ref: '#/components/examples/CAPTCHAInstanceResponseReCaptcha'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../Common.yaml#/components/schemas/Error
+              examples:
+                Access Denied:
+                  $ref: ../Common.yaml#/components/examples/ErrorAccessDenied
+                Error Limit of One CAPTCHA instance per org:
+                  $ref: '#/components/examples/ErrorCAPTCHALimitOfOne'
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.captchas.manage
+      tags:
+        - CAPTCHA
+    x-okta-team-detail:
+      x-team-slack: amp-eng-auth-experience
+  /api/v1/captchas/{captchaId}:
+    parameters:
+      - $ref: '#/components/parameters/pathCaptchaId'
+    get:
+      summary: Retrieve a CAPTCHA instance
+      description: Retrieves the properties of a specified CAPTCHA instance
+      operationId: getCaptchaInstance
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CAPTCHAInstance'
+              examples:
+                HCaptcha:
+                  $ref: '#/components/examples/CAPTCHAInstanceResponseHCaptcha'
+                ReCaptcha:
+                  $ref: '#/components/examples/CAPTCHAInstanceResponseReCaptcha'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.captchas.read
+      tags:
+        - CAPTCHA
+    post:
+      summary: Update a CAPTCHA instance
+      description: Partially updates the properties of a specified CAPTCHA instance
+      operationId: updateCaptchaInstance
+      x-codegen-request-body-name: instance
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CAPTCHAInstance'
+            examples:
+              HCaptcha:
+                $ref: '#/components/examples/CAPTCHAInstanceRequestHCaptcha'
+              ReCaptcha:
+                $ref: '#/components/examples/CAPTCHAInstanceRequestReCaptcha'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CAPTCHAInstance'
+              examples:
+                HCaptcha:
+                  $ref: '#/components/examples/CAPTCHAInstanceResponseHCaptcha'
+                ReCaptcha:
+                  $ref: '#/components/examples/CAPTCHAInstanceResponseReCaptcha'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.captchas.manage
+      tags:
+        - CAPTCHA
+    put:
+      summary: Replace a CAPTCHA instance
+      description: Replaces the properties for a specified CAPTCHA instance
+      operationId: replaceCaptchaInstance
+      x-codegen-request-body-name: instance
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CAPTCHAInstance'
+            examples:
+              HCaptcha:
+                $ref: '#/components/examples/CAPTCHAInstanceRequestHCaptcha'
+              ReCaptcha:
+                $ref: '#/components/examples/CAPTCHAInstanceRequestReCaptcha'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CAPTCHAInstance'
+              examples:
+                HCaptcha:
+                  $ref: '#/components/examples/CAPTCHAInstanceResponseHCaptcha'
+                ReCaptcha:
+                  $ref: '#/components/examples/CAPTCHAInstanceResponseReCaptcha'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.captchas.manage
+      tags:
+        - CAPTCHA
+    delete:
+      summary: Delete a CAPTCHA instance
+      description: |-
+        Deletes a specified CAPTCHA instance
+        > **Note:** If your CAPTCHA instance is still associated with your org, the request fails. You must first update your Org-wide CAPTCHA settings to remove the CAPTCHA instance.
+      operationId: deleteCaptchaInstance
+      responses:
+        '204':
+          description: No Content
+        '403':
+          description: Forbidden
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: ../Common.yaml#/components/schemas/Error
+              examples:
+                Access Denied:
+                  $ref: ../Common.yaml#/components/examples/ErrorAccessDenied
+                Cannot remove CAPTCHA in use:
+                  $ref: '#/components/examples/ErrorCAPTCHAOrgWideSetting'
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.captchas.manage
+      tags:
+        - CAPTCHA
+    x-okta-team-detail:
+      x-team-slack: amp-eng-auth-experience
+  /api/v1/org/captcha:
+    get:
+      summary: Retrieve the org-wide CAPTCHA settings
+      description: |-
+        Retrieves the CAPTCHA settings object for your organization
+        > **Note**: If the current organization hasn't configured CAPTCHA Settings, the request returns an empty object.
+      operationId: getOrgCaptchaSettings
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgCAPTCHASettings'
+              examples:
+                configured:
+                  $ref: '#/components/examples/OrgCAPTCHASettingsConfigured'
+                empty:
+                  $ref: '#/components/examples/OrgCAPTCHASettingsEmpty'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.captchas.read
+      tags:
+        - CAPTCHA
+    put:
+      summary: Replace the org-wide CAPTCHA settings
+      description: |-
+        Replaces the CAPTCHA settings object for your organization
+        > **Note**: You can disable CAPTCHA for your organization by setting `captchaId` and `enabledPages` to `null`.
+      operationId: replacesOrgCaptchaSettings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrgCAPTCHASettings'
+            examples:
+              Update:
+                $ref: '#/components/examples/OrgCAPTCHASettingsUpdate'
+              Disable:
+                $ref: '#/components/examples/OrgCAPTCHASettingsDisable'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgCAPTCHASettings'
+              examples:
+                Update:
+                  $ref: '#/components/examples/OrgCAPTCHASettingsUpdated'
+                Disable:
+                  $ref: '#/components/examples/OrgCAPTCHASettingsDisabled'
+        '400':
+          description: Bad Request
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: ../Common.yaml#/components/schemas/Error
+              examples:
+                NoDisable:
+                  $ref: '#/components/examples/ErrorCAPTCHAOrgWideSettingNull'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.captchas.manage
+      tags:
+        - CAPTCHA
+    delete:
+      summary: Delete the org-wide CAPTCHA settings
+      description: Deletes the CAPTCHA settings object for your organization
+      operationId: deleteOrgCaptchaSettings
+      responses:
+        '204':
+          description: No Content
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.captchas.manage
+      tags:
+        - CAPTCHA
+    x-okta-team-detail:
+      x-team-slack: amp-eng-auth-experience
+components:
+  examples:
+    CAPTCHAInstanceRequestHCaptcha:
+      value:
+        name: myHCaptcha
+        secretKey: xxxxxxxxxxx
+        siteKey: xxxxxxxxxxx
+        type: HCAPTCHA
+    CAPTCHAInstanceRequestReCaptcha:
+      value:
+        name: myReCaptcha
+        secretKey: xxxxxxxxxxx
+        siteKey: yyyyyyyyyyyyyyy
+        type: RECAPTCHA_V2
+    CAPTCHAInstanceResponseHCaptcha:
+      value:
+        id: abcd1234
+        name: myHCaptcha
+        siteKey: xxxxxxxxxxx
+        type: HCAPTCHA
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/captchas/abcd1234
+            hints:
+              allow:
+                - GET
+                - POST
+                - PUT
+                - DELETE
+    CAPTCHAInstanceResponseReCaptcha:
+      value:
+        id: abcd4567
+        name: myReCaptcha
+        siteKey: yyyyyyyyyyyyyyy
+        type: RECAPTCHA_V2
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/captchas/abcd4567
+            hints:
+              allow:
+                - GET
+                - POST
+                - PUT
+                - DELETE
+    ErrorCAPTCHALimitOfOne:
+      value:
+        errorCode: E0000165
+        errorSummary: CAPTCHA count limit reached. At most one CAPTCHA instance is allowed per Org.
+        errorLink: E0000165
+        errorId: oaejrB1fWL1S7mc-2KcG-SOtw
+        errorCauses: []
+    ErrorCAPTCHAOrgWideSetting:
+      value:
+        errorCode: E0000149
+        errorSummary: Current CAPTCHA is associated with org-wide settings, cannot be removed.
+        errorLink: E0000149
+        errorId: samplezsusshPdiTWiITwqBt8
+        errorCauses: []
+    ErrorCAPTCHAOrgWideSettingNull:
+      summary: captchaId is null, but enabledPages is defined
+      value:
+        errorCode: E0000001
+        errorSummary: 'Api validation failed: captchaId'
+        errorLink: E0000001
+        errorId: oae-hk3rssXQmOWDRsaFfxe8A
+        errorCauses:
+          errorSummary: 'captchaId: Invalid CAPTCHA ID. The value of captchaId cannot be blank when enabledPages is not empty. Please resubmit with an existing CAPTCHA ID or disable CAPTCHA support on all supported pages.'
+    OrgCAPTCHASettingsConfigured:
+      summary: org-wide Captcha settings are configured
+      value:
+        captchaId: abcd4567
+        enabledPages:
+          - SSR
+          - SIGN_IN
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/captchas/abcd4567
+            hints:
+              allow:
+                - GET
+                - POST
+                - PUT
+                - DELETE
+    OrgCAPTCHASettingsDisable:
+      summary: Disable org-wide Captcha settings
+      value:
+        captchaId: 'null'
+        enabledPages: 'null'
+    OrgCAPTCHASettingsDisabled:
+      summary: Disabled org-wide Captcha settings
+      value:
+        captchaId: 'null'
+        enabledPages: '[]'
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/captchas/
+            hints:
+              allow:
+                - GET
+                - PUT
+    OrgCAPTCHASettingsEmpty:
+      summary: Org-wide Captcha settings aren't configured
+      value:
+        captchaId: null
+        enabledPages: []
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/captchas
+            hints:
+              allow:
+                - GET
+                - POST
+                - PUT
+                - DELETE
+    OrgCAPTCHASettingsUpdate:
+      summary: Update org-wide Captcha settings
+      value:
+        captchaId: abcd4567
+        enabledPages:
+          - SSR
+          - SIGN_IN
+    OrgCAPTCHASettingsUpdated:
+      summary: Updated org-wide Captcha settings
+      value:
+        captchaId: abcd4567
+        enabledPages:
+          - SSR
+          - SIGN_IN
+        _links:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/captchas/abcd4567
+            hints:
+              allow:
+                - GET
+                - POST
+                - PUT
+                - DELETE
+  parameters:
+    pathCaptchaId:
+      name: captchaId
+      in: path
+      schema:
+        type: string
+      required: true
+      description: The unique key used to identify your CAPTCHA instance
+  schemas:
+    CAPTCHAInstance:
+      title: CAPTCHAInstance
+      description: ''
+      type: object
+      properties:
+        id:
+          description: The unique key for the CAPTCHA instance
+          type: string
+          readOnly: true
+        name:
+          description: The name of the CAPTCHA instance
+          type: string
+        secretKey:
+          description: The secret key issued from the CAPTCHA provider to perform server-side validation for a CAPTCHA token
+          type: string
+          writeOnly: true
+        siteKey:
+          description: The site key issued from the CAPTCHA provider to render a CAPTCHA on a page
+          type: string
+        type:
+          $ref: '#/components/schemas/CAPTCHAType'
+        _links:
+          $ref: ../Common.yaml#/components/schemas/LinksSelf
+    CAPTCHAType:
+      description: The type of CAPTCHA provider
+      type: string
+      enum:
+        - HCAPTCHA
+        - RECAPTCHA_V2
+    OrgCAPTCHASettings:
+      title: OrgCAPTCHASettings
+      description: ''
+      type: object
+      properties:
+        captchaId:
+          description: The unique key of the associated CAPTCHA instance
+          type: string
+        enabledPages:
+          description: An array of pages that have CAPTCHA enabled
+          type: array
+          items:
+            $ref: '#/components/schemas/enabledPagesType'
+        _links:
+          type: object
+          description: Link relations for the CAPTCHA settings object
+          properties:
+            self:
+              $ref: ../Common.yaml#/components/schemas/HrefObject
+          readOnly: true
+    enabledPagesType:
+      title: enabledPages
+      type: string
+      enum:
+        - SIGN_IN
+        - SSPR
+        - SSR
+      x-enumDescriptions:
+        SIGN_IN: User sign-in page
+        SSPR: Self-service Password Recovery page
+        SSR: Self-service Registration page
+  securitySchemes:
+    $ref: ../../base.yaml#/components/securitySchemes

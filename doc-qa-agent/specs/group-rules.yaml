@@ -1,0 +1,491 @@
+openapi: 3.0.3
+info:
+  title: Group Rules API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/groups/rules:
+    get:
+      summary: List all group rules
+      description: Lists all group rules for your org
+      operationId: listGroupRules
+      parameters:
+        - name: limit
+          in: query
+          description: Specifies the number of rule results in a page
+          schema:
+            type: integer
+            format: int32
+            default: 50
+            minimum: 1
+            maximum: 200
+        - name: after
+          in: query
+          description: Specifies the pagination cursor for the next page of rules
+          schema:
+            type: string
+        - name: search
+          in: query
+          description: Specifies the keyword to search rules for
+          schema:
+            type: string
+        - $ref: "#/components/parameters/queryExpandGroupIdToGroupNameMap"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupRule'
+              examples:
+                ListGroupRulesExample:
+                  $ref: '#/components/examples/list-group-rules-example'
+                ListGroupRulesExampleWithExpand:
+                  $ref: '#/components/examples/list-group-rules-with-expand-parameter'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.groups.read
+      tags:
+        - GroupRule
+    post:
+      summary: Create a group rule
+      description: |-
+        Creates a group rule to dynamically add users to the specified group if they match the condition.
+        > **Note:** Group rules are created with the status set to `'INACTIVE'`.
+      operationId: createGroupRule
+      x-codegen-request-body-name: groupRule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGroupRuleRequest'
+            examples:
+              GroupRuleExample:
+                $ref: '#/components/examples/create-group-rule-request-example'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupRule'
+              examples:
+                GroupRuleExample:
+                  $ref: '#/components/examples/group-rule-example'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.groups.manage
+      tags:
+        - GroupRule
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+  /api/v1/groups/rules/{groupRuleId}:
+    parameters:
+      - $ref: '#/components/parameters/pathGroupRuleId'
+    get:
+      summary: Retrieve a group rule
+      description: Retrieves a specific group rule by ID from your org
+      operationId: getGroupRule
+      parameters:
+        - $ref: "#/components/parameters/queryExpandGroupIdToGroupNameMap"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupRule'
+              examples:
+                GroupRuleExample:
+                  $ref: '#/components/examples/group-rule-example'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.groups.read
+      tags:
+        - GroupRule
+    put:
+      summary: Replace a group rule
+      description: |-
+        Replaces a group rule
+        > **Notes:** You can only update rules with a group whose status is set to `INACTIVE`.
+        >
+        > You currently can't update the `actions` section.
+      operationId: replaceGroupRule
+      x-codegen-request-body-name: groupRule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupRule'
+            examples:
+              GroupRuleExample:
+                $ref: '#/components/examples/group-rule-example'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupRule'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.groups.manage
+      tags:
+        - GroupRule
+    delete:
+      summary: Delete a group rule
+      description: Deletes a specific group rule by `groupRuleId`
+      operationId: deleteGroupRule
+      parameters:
+        - name: removeUsers
+          in: query
+          description: If set to `true`, removes users from groups assigned by this rule
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '202':
+          description: Accepted
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.groups.manage
+      tags:
+        - GroupRule
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+  /api/v1/groups/rules/{groupRuleId}/lifecycle/activate:
+    parameters:
+      - $ref: '#/components/parameters/pathGroupRuleId'
+    post:
+      summary: Activate a group rule
+      description: Activates a specific group rule by ID from your org
+      operationId: activateGroupRule
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.groups.manage
+      tags:
+        - GroupRule
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+  /api/v1/groups/rules/{groupRuleId}/lifecycle/deactivate:
+    parameters:
+      - $ref: '#/components/parameters/pathGroupRuleId'
+    post:
+      summary: Deactivate a group rule
+      description: Deactivates a specific group rule by ID from your org
+      operationId: deactivateGroupRule
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.groups.manage
+      tags:
+        - GroupRule
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+components:
+  parameters:
+    pathGroupRuleId:
+      name: groupRuleId
+      description: The `id` of the group rule
+      in: path
+      required: true
+      schema:
+        type: string
+        example: 0pr3f7zMZZHPgUoWO0g4
+    queryExpandGroupIdToGroupNameMap:
+      name: expand
+      in: query
+      description: "If specified, returns the mapping of group IDs to group names in the `_embedded` object."
+      schema:
+        type: string
+        enum:
+          - groupIdToGroupNameMap
+      x-okta-added-version: 1.3.0
+  schemas:
+    CreateGroupRuleRequest:
+      type: object
+      properties:
+        actions:
+          $ref: '#/components/schemas/GroupRuleAction'
+        conditions:
+          $ref: '#/components/schemas/GroupRuleConditions'
+        name:
+          type: string
+          description: Name of the group rule
+          minLength: 1
+          maxLength: 50
+        type:
+          type: string
+          enum:
+            - group_rule
+    GroupRule:
+      type: object
+      properties:
+        actions:
+          $ref: '#/components/schemas/GroupRuleAction'
+        conditions:
+          $ref: '#/components/schemas/GroupRuleConditions'
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation date for group rule
+        id:
+          type: string
+          readOnly: true
+          description: ID of the group rule
+        lastUpdated:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Date group rule was last updated
+        name:
+          type: string
+          description: Name of the group rule
+          minLength: 1
+          maxLength: 50
+        status:
+          $ref: '#/components/schemas/GroupRuleStatus'
+        type:
+          type: string
+          description: Type to indicate a group rule operation. Only `group_rule` is allowed.
+        _embedded:
+          type: object
+          description: This object appears with embedded resources related to the group rule if you use the `expand` query parameter
+          readOnly: true
+          properties:
+            groupIdToGroupNameMap:
+              type: object
+              description: A mapping of group IDs to group names
+              readOnly: true
+              additionalProperties:
+                type: string
+    GroupRuleAction:
+      type: object
+      description: Defines which users and groups to assign
+      properties:
+        assignUserToGroups:
+          $ref: '#/components/schemas/GroupRuleGroupAssignment'
+    GroupRuleConditions:
+      type: object
+      description: Defines group rule conditions
+      properties:
+        expression:
+          $ref: '#/components/schemas/GroupRuleExpression'
+        people:
+          $ref: '#/components/schemas/GroupRulePeopleCondition'
+    GroupRuleExpression:
+      type: object
+      description: Defines Okta specific [group-rules expression](https://developer.okta.com/docs/reference/okta-expression-language/#expressions-in-group-rules)
+      properties:
+        type:
+          type: string
+          description: Expression type. Only valid value is '`urn:okta:expression:1.0`'.
+        value:
+          type: string
+          description: Okta expression that would result in a Boolean value
+          example: user.role==\"Engineer\"
+    GroupRuleGroupAssignment:
+      type: object
+      description: Contains the `groupIds` array
+      properties:
+        groupIds:
+          description: Array of `groupIds` to which users are added
+          type: array
+          items:
+            type: string
+    GroupRuleGroupCondition:
+      type: object
+      description: Currently not supported
+      properties:
+        exclude:
+          type: array
+          description: Currently not supported
+          items:
+            type: string
+    GroupRulePeopleCondition:
+      type: object
+      description: Defines conditions for `people` in a group rule
+      properties:
+        groups:
+          $ref: '#/components/schemas/GroupRuleGroupCondition'
+        users:
+          $ref: '#/components/schemas/GroupRuleUserCondition'
+    GroupRuleStatus:
+      type: string
+      description: |-
+        Status of group rule. You can't update the status of a rule from `INACTIVE` to `ACTIVE`. You must use the activate and deactivate lifecycle operations.
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - INVALID
+    GroupRuleUserCondition:
+      type: object
+      description: Defines conditions specific to user exclusion
+      properties:
+        exclude:
+          type: array
+          description: Excluded `userIds` when processing rules
+          items:
+            type: string
+  examples:
+    group-rule-example:
+      summary: Group rule example
+      description: Example of a group rule
+      value:
+        type: group_rule
+        id: 0pr3f7zMZZHPgUoWO0g4
+        status: INACTIVE
+        name: Engineering group rule
+        created: '2016-12-01T14:40:04.000Z'
+        lastUpdated: '2016-12-01T14:40:04.000Z'
+        conditions:
+          people:
+            users:
+              exclude:
+                - 00u22w79JPMEeeuLr0g4
+            groups:
+              exclude: []
+          expression:
+            value: user.role=="Engineer"
+            type: urn:okta:expression:1.0
+        actions:
+          assignUserToGroups:
+            groupIds:
+              - 00gjitX9HqABSoqTB0g3
+    list-group-rules-example:
+      summary: List group rules example
+      description: List all group rules example
+      value:
+        - type: group_rule
+          id: 0pr3f7zMZZHPgUoWO0g4
+          status: INACTIVE
+          name: Engineering group rule
+          created: '2016-12-01T14:40:04.000Z'
+          lastUpdated: '2016-12-01T14:40:04.000Z'
+          conditions:
+            people:
+              users:
+                exclude:
+                  - 00u22w79JPMEeeuLr0g4
+              groups:
+                exclude: []
+            expression:
+              value: user.role=="Engineer"
+              type: urn:okta:expression:1.0
+          actions:
+            assignUserToGroups:
+              groupIds:
+                - 00gjitX9HqABSoqTB0g3
+    list-group-rules-with-expand-parameter:
+      summary: List group rules (expanded)
+      description: Example response when `expand=groupIdToGroupNameMap` is specified in the query parameter
+      value:
+        - type: group_rule
+          id: 0pr3f7zMZZHPgUoWO0g4
+          status: INACTIVE
+          name: Engineering group rule
+          created: '2016-12-01T14:40:04.000Z'
+          lastUpdated: '2016-12-01T14:40:04.000Z'
+          conditions:
+            people:
+              users:
+                exclude:
+                  - 00u22w79JPMEeeuLr0g4
+              groups:
+                exclude: []
+            expression:
+              value: user.role=="Engineer"
+              type: 'urn:okta:expression:1.0'
+          actions:
+            assignUserToGroups:
+              groupIds:
+                - 00gjitX9HqABSoqTB0g3
+          _embedded:
+            groupIdToGroupNameMap:
+              "00gjitX9HqABSoqTB0g3": "Engineering"
+    create-group-rule-request-example:
+      summary: Create group rule request example
+      value:
+        type: group_rule
+        name: Engineering group rule
+        conditions:
+          people:
+            users:
+              exclude:
+                - 00u22w79JPMEeeuLr0g4
+            groups:
+              exclude: []
+          expression:
+            value: user.role=="Engineer"
+            type: urn:okta:expression:1.0
+        actions:
+          assignUserToGroups:
+            groupIds:
+              - 00gjitX9HqABSoqTB0g3
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

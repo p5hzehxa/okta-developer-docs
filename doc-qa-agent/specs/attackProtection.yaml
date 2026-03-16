@@ -1,0 +1,150 @@
+openapi: 3.0.3
+info:
+  title: Attack Protection API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../../base.yaml#/tags
+paths:
+  /attack-protection/api/v1/user-lockout-settings:
+    get:
+      summary: Retrieve the user lockout settings
+      description: Retrieves the User Lockout Settings for an org
+      operationId: getUserLockoutSettings
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLockoutSettings'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.orgs.read
+      tags:
+        - AttackProtection
+    put:
+      summary: Replace the user lockout settings
+      description: Replaces the User Lockout Settings for an org
+      operationId: replaceUserLockoutSettings
+      x-codegen-request-body-name: lockoutSettings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLockoutSettings'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLockoutSettings'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../Common.yaml#/components/schemas/Error
+              examples:
+                Access Denied:
+                  $ref: ../Common.yaml#/components/examples/ErrorAccessDenied
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.orgs.manage
+      tags:
+        - AttackProtection
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authenticator-platform
+  /attack-protection/api/v1/authenticator-settings:
+    get:
+      summary: Retrieve the authenticator settings
+      description: Retrieves the Authenticator Settings for an org
+      operationId: getAuthenticatorSettings
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttackProtectionAuthenticatorSettings'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.orgs.read
+      tags:
+        - AttackProtection
+    put:
+      summary: Replace the authenticator settings
+      description: Replaces the Authenticator Settings for an org
+      operationId: replaceAuthenticatorSettings
+      x-codegen-request-body-name: authenticatorSettings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttackProtectionAuthenticatorSettings'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttackProtectionAuthenticatorSettings'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../Common.yaml#/components/schemas/Error
+              examples:
+                Access Denied:
+                  $ref: ../Common.yaml#/components/examples/ErrorAccessDenied
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.orgs.manage
+      tags:
+        - AttackProtection
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authenticator-platform
+components:
+  parameters: {}
+  schemas:
+    UserLockoutSettings:
+      type: object
+      properties:
+        preventBruteForceLockoutFromUnknownDevices:
+          type: boolean
+          description: Prevents brute-force lockout from unknown devices for the password authenticator.
+          default: false
+    AttackProtectionAuthenticatorSettings:
+      type: object
+      properties:
+        verifyKnowledgeSecondWhen2faRequired:
+          type: boolean
+          description: If true, requires users to verify a possession factor before verifying a knowledge factor when the assurance requires two-factor authentication (2FA).
+          default: false
+  securitySchemes:
+    $ref: ../../base.yaml#/components/securitySchemes

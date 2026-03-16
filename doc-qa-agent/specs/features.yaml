@@ -1,0 +1,400 @@
+openapi: 3.0.3
+info:
+  title: Features API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/features:
+    get:
+      summary: List all features
+      description: Lists all self-service features for your org
+      operationId: listFeatures
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Feature'
+              examples:
+                FeaturesList:
+                  summary: List all self-service features for your org
+                  $ref: '#/components/examples/ListFeaturesResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.features.read
+      tags:
+        - Feature
+    x-okta-team-detail:
+      x-team-slack: eng-ace
+  /api/v1/features/{featureId}:
+    parameters:
+      - $ref: '#/components/parameters/pathFeatureId'
+    get:
+      summary: Retrieve a feature
+      description: Retrieves a feature by ID
+      operationId: getFeature
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feature'
+              examples:
+                FeaturesRetrieve:
+                  summary: Retrieve a feature by ID
+                  $ref: '#/components/examples/RetrieveFeaturesResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.features.read
+      tags:
+        - Feature
+    x-okta-team-detail:
+      x-team-slack: eng-ace
+  /api/v1/features/{featureId}/dependencies:
+    parameters:
+      - $ref: '#/components/parameters/pathFeatureId'
+    get:
+      summary: List all dependencies
+      description: |-
+        Lists all feature dependencies for a specified feature.
+
+        A feature's dependencies are the features that it requires to be enabled in order for itself to be enabled.
+      operationId: listFeatureDependencies
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Feature'
+              examples:
+                FeaturesDependenciesList:
+                  summary: List all dependencies
+                  $ref: '#/components/examples/ListFeatureDependenciesResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.features.read
+      tags:
+        - Feature
+    x-okta-team-detail:
+      x-team-slack: eng-ace
+  /api/v1/features/{featureId}/dependents:
+    parameters:
+      - $ref: '#/components/parameters/pathFeatureId'
+    get:
+      summary: List all dependents
+      description: |-
+        Lists all feature dependents for the specified feature.
+
+        A feature's dependents are the features that need to be disabled in order for the feature itself to be disabled.
+      operationId: listFeatureDependents
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Feature'
+              examples:
+                FeaturesDependentsList:
+                  summary: List all feature dependents for the specified feature
+                  $ref: '#/components/examples/ListFeatureDependentsResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.features.read
+      tags:
+        - Feature
+    x-okta-team-detail:
+      x-team-slack: eng-ace
+  /api/v1/features/{featureId}/{lifecycle}:
+    parameters:
+      - $ref: '#/components/parameters/pathFeatureId'
+      - $ref: '#/components/parameters/pathLifecycle'
+    post:
+      summary: Update a feature lifecycle
+      description: |-
+        Updates a feature's lifecycle status. Use this endpoint to enable or disable a feature for your org.
+
+        Use the `mode=force` parameter to override dependency restrictions for a particular feature. Normally, you can't enable a feature if it has one or more dependencies that aren't enabled.
+
+        When you use the `mode=force` parameter while enabling a feature, Okta first tries to enable any disabled features that this feature may have as dependencies. If you don't pass the `mode=force` parameter and the feature has dependencies that need to be enabled before the feature is enabled, a 400 error is returned.
+
+        When you use the `mode=force` parameter while disabling a feature, Okta first tries to disable any enabled features that this feature may have as dependents. If you don't pass the `mode=force` parameter and the feature has dependents that need to be disabled before the feature is disabled, a 400 error is returned.
+
+        The following chart shows the different state transitions for a feature.
+
+        <img alt="Example" src="https://developer.okta.com/docs/api/images/features/update-ssfeat-flowchart.png" width="1000"/>
+      operationId: updateFeatureLifecycle
+      parameters:
+        - name: mode
+          in: query
+          description: Indicates if you want to force enable or disable a feature. Supported value is `force`.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feature'
+              examples:
+                FeaturesUpdate:
+                  summary: Update the feature lifecycle status
+                  $ref: '#/components/examples/UpdateFeatureLifecycleResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.features.manage
+      tags:
+        - Feature
+    x-okta-team-detail:
+      x-team-slack: eng-ace
+components:
+  examples:
+    ListFeaturesResponse:
+      summary: List all self-service features for your org
+      value:
+        - id: ftrZooGoT8b41iWRiQs7
+          description: Example feature description
+          name: Example feature name
+          stage:
+            state: CLOSED
+            value: BETA
+          status: DISABLED
+          type: self-service
+          _links:
+            self:
+              hints:
+                allow:
+                  - POST
+              href: https://{yourOktaDomain}/api/v1/features/ftrZooGoT8b41iWRiQs7
+            dependents:
+              href: https://{yourOktaDomain}/api/v1/features/ftrlBDFcGwYP2epXCGYn/dependents
+            dependencies:
+              href: https://{yourOktaDomain}/api/v1/features/ftrlBDFcGwYP2epXCGYn/dependencies
+    RetrieveFeaturesResponse:
+      summary: Retrieve a feature by ID
+      value:
+        id: ftrZooGoT8b41iWRiQs7
+        description: Example feature description
+        name: Example feature name
+        stage:
+          state: CLOSED
+          value: BETA
+        status: DISABLED
+        type: self-service
+        _links:
+          self:
+            hints:
+              allow:
+                - POST
+            href: https://{yourOktaDomain}/api/v1/features/ftrZooGoT8b41iWRiQs7
+          dependents:
+            href: https://{yourOktaDomain}/api/v1/features/ftrlBDFcGwYP2epXCGYn/dependents
+          dependencies:
+            href: https://{yourOktaDomain}/api/v1/features/ftrlBDFcGwYP2epXCGYn/dependencies
+    ListFeatureDependenciesResponse:
+      summary: List all dependencies for a feature
+      value:
+        - id: ftrZooGoT8b41iWRiQs7
+          description: Example feature description
+          name: Example feature name
+          stage:
+            state: OPEN
+            value: EA
+          status: ENABLED
+          type: self-service
+          _links:
+            self:
+              hints:
+                allow:
+                  - POST
+              href: https://{yourOktaDomain}/api/v1/features/ftrZooGoT8b41iWRiQs7
+            dependents:
+              href: https://{yourOktaDomain}/api/v1/features/ftrlBDFcGwYP2epXCGYn/dependents
+            dependencies:
+              href: https://{yourOktaDomain}/api/v1/features/ftrlBDFcGwYP2epXCGYn/dependencies
+    ListFeatureDependentsResponse:
+      summary: List all feature dependents for the specified feature
+      value:
+        - id: ftrZooGoT8b41iWRiQs7
+          description: Example feature description
+          name: Example feature name
+          stage:
+            state: OPEN
+            value: EA
+          status: ENABLED
+          type: self-service
+          _links:
+            self:
+              hints:
+                allow:
+                  - POST
+              href: https://{yourOktaDomain}/api/v1/features/ftrZooGoT8b41iWRiQs7
+            dependents:
+              href: https://{yourOktaDomain}/api/v1/features/ftrlBDFcGwYP2epXCGYn/dependents
+            dependencies:
+              href: https://{yourOktaDomain}/api/v1/features/ftrlBDFcGwYP2epXCGYn/dependencies
+    UpdateFeatureLifecycleResponse:
+      summary: Update the feature lifecycle status
+      value:
+        description: Example feature description
+        id: ftrZooGoT8b41iWRiQs7
+        name: Example feature name
+        stage:
+          state: OPEN
+          value: BETA
+        status: DISABLED
+        type: self-service
+        _links:
+          self:
+            hints:
+              allow:
+                - POST
+            href: https://{yourOktaDomain}/api/v1/features/ftrZooGoT8b41iWRiQs7
+          dependents:
+            href: https://{yourOktaDomain}/api/v1/features/ftrlBDFcGwYP2epXCGYn/dependents
+          dependencies:
+            href: https://{yourOktaDomain}/api/v1/features/ftrlBDFcGwYP2epXCGYn/dependencies
+  parameters:
+    pathFeatureId:
+      name: featureId
+      description: '`id` of the feature'
+      in: path
+      required: true
+      schema:
+        type: string
+        example: R5HjqNn1pEqWGy48E9jg
+    pathLifecycle:
+      name: lifecycle
+      description: Whether to `ENABLE` or `DISABLE` the feature
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/FeatureLifecycle'
+  schemas:
+    Feature:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      description: Specifies feature release cycle information
+      properties:
+        description:
+          type: string
+          description: Brief description of the feature and what it provides
+        id:
+          type: string
+          description: Unique identifier for this feature
+          readOnly: true
+        name:
+          type: string
+          description: Name of the feature
+        stage:
+          $ref: '#/components/schemas/FeatureStage'
+        status:
+          $ref: ./Common.yaml#/components/schemas/EnabledStatus
+        type:
+          $ref: '#/components/schemas/FeatureType'
+        _links:
+          allOf:
+            - $ref: ./Common.yaml#/components/schemas/LinksSelf
+            - properties:
+                dependents:
+                  description: Link to feature dependents
+                  type: object
+                  readOnly: true
+                  properties:
+                    href:
+                      description: Link URI
+                      type: string
+                      readOnly: true
+                dependencies:
+                  description: Link to feature dependencies
+                  type: object
+                  readOnly: true
+                  properties:
+                    href:
+                      description: Link URI
+                      type: string
+                      readOnly: true
+    FeatureLifecycle:
+      example: ENABLE
+      type: string
+      enum:
+        - DISABLE
+        - ENABLE
+    FeatureStage:
+      type: object
+      description: |-
+        Current release cycle stage of a feature
+
+        If a feature's stage value is `EA`, the state is `null` and not returned. If the value is `BETA`, the state is `OPEN` or `CLOSED` depending on whether the `BETA` feature is manageable.
+
+        > **Note:** If a feature's stage is `OPEN BETA`, you can update it only in Preview cells. If a feature's stage is `CLOSED BETA`, you can disable it only in Preview cells.
+      properties:
+        state:
+          $ref: '#/components/schemas/FeatureStageState'
+        value:
+          $ref: '#/components/schemas/FeatureStageValue'
+    FeatureStageState:
+      type: string
+      description: Indicates the release state of the feature
+      enum:
+        - CLOSED
+        - OPEN
+    FeatureStageValue:
+      type: string
+      description: Current release stage of the feature
+      enum:
+        - BETA
+        - EA
+    FeatureType:
+      type: string
+      description: Type of feature
+      enum:
+        - self-service
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

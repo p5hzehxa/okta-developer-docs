@@ -1,0 +1,93 @@
+openapi: 3.0.3
+info:
+  title: User Sessions APIs
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/users/{userId}/sessions:
+    parameters:
+      - $ref: ./Common.yaml#/components/parameters/pathUserId
+    delete:
+      summary: Revoke all user sessions
+      description: |-
+        Revokes all active identity provider sessions of the user. This forces the user to authenticate on the next operation. Optionally revokes OpenID Connect and OAuth refresh and access tokens issued to the user.
+
+        You can also clear the user's remembered factors for all devices using the `forgetDevices` parameter. See [forgetDevices](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserSessions/#tag/UserSessions/operation/revokeUserSessions!in=query&path=forgetDevices&t=request).
+        > **Note:** This operation doesn't clear the sessions created for web or native apps.
+      operationId: revokeUserSessions
+      parameters:
+        - name: oauthTokens
+          in: query
+          description: Revokes issued OpenID Connect and OAuth refresh and access tokens
+          schema:
+            type: boolean
+            default: false
+        - name: forgetDevices
+          in: query
+          description: |-
+            Clears the user's remembered factors for all devices.
+            > **Note:** This parameter defaults to false in Classic Engine.
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserSessions
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authn-platform
+  /api/v1/users/me/lifecycle/delete_sessions:
+    post:
+      summary: End a current user session
+      description: |-
+        Ends Okta sessions for the currently signed in user. By default, the current session remains active. Use this method in a browser-based app.
+        > **Note:** This operation requires a session cookie for the user. The API token isn't allowed for this operation.
+      operationId: endUserSessions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KeepCurrent'
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2: []
+      tags:
+        - UserSessions
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authn-platform
+components:
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes
+  schemas:
+    KeepCurrent:
+      type: object
+      properties:
+        keepCurrent:
+          description: Skip deleting the user's current session when set to `true`
+          type: boolean
+          default: true

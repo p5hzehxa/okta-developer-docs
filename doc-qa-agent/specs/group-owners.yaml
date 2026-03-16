@@ -1,0 +1,228 @@
+openapi: 3.0.3
+info:
+  title: Group Owners API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/groups/{groupId}/owners:
+    parameters:
+      - $ref: ./groups.yaml#/components/parameters/pathGroupId
+    get:
+      summary: List all group owners
+      description: Lists all owners for a specific group
+      operationId: listGroupOwners
+      parameters:
+        - name: search
+          in: query
+          description: SCIM filter expression for group owners. Allows you to filter owners by type.
+          schema:
+            type: string
+        - name: after
+          in: query
+          description: Specifies the pagination cursor for the next page of owners
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Specifies the number of owner results in a page
+          schema:
+            type: integer
+            format: int32
+            default: 1000
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupOwner'
+              examples:
+                ListsOneOwnerOfaGroup:
+                  $ref: '#/components/examples/ListsOwnerOneResponse'
+                ListsMultipleOwnersOfaGroup:
+                  $ref: '#/components/examples/ListsOwnersMultipleResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.groups.read
+      tags:
+        - GroupOwner
+    post:
+      summary: Assign a group owner
+      description: Assigns a group owner
+      operationId: assignGroupOwner
+      parameters:
+        - $ref: ./groups.yaml#/components/parameters/pathGroupId
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignGroupOwnerRequestBody'
+            examples:
+              AssignAGroupOwner:
+                $ref: '#/components/examples/AssignGroupOwnerRequest'
+        required: true
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupOwner'
+              examples:
+                AssignAGroupOwner:
+                  $ref: '#/components/examples/AssignGroupOwnerResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.groups.manage
+      tags:
+        - GroupOwner
+    x-okta-team-detail:
+      x-team-slack: eng-adv_apps
+  /api/v1/groups/{groupId}/owners/{ownerId}:
+    parameters:
+      - $ref: ./groups.yaml#/components/parameters/pathGroupId
+      - $ref: '#/components/parameters/pathOwnerId'
+    delete:
+      summary: Delete a group owner
+      description: Deletes a group owner from a specific group
+      operationId: deleteGroupOwner
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.groups.manage
+      tags:
+        - GroupOwner
+    x-okta-team-detail:
+      x-team-slack: eng-adv_apps
+components:
+  examples:
+    ListsOwnerOneResponse:
+      summary: Lists a response with one owner
+      value:
+        - id: 00g1gae1k0znUcLuU0h8
+          type: GROUP
+          resolved: true
+          originId: 'null'
+          originType: OKTA_DIRECTORY
+          displayName: Product & Engineering
+          lastUpdated: '2023-03-29 18:18:37.0'
+    ListsOwnersMultipleResponse:
+      summary: Lists a response with multiple owners
+      value:
+        - id: 00u1cmbqjkkmFXeqb0h8
+          type: USER
+          resolved: true
+          originId: 'null'
+          originType: OKTA_DIRECTORY
+          displayName: Mabel Mora
+          lastUpdated: 2023-03-29T18:30:58.000Z
+        - id: 00u1cmc52x5B86cnZ0h8
+          type: USER
+          resolved: true
+          originId: 'null'
+          originType: OKTA_DIRECTORY
+          displayName: Cinda Canning
+          lastUpdated: 2023-03-29T18:30:55.000Z
+    AssignGroupOwnerRequest:
+      summary: Assign a group owner request example
+      value:
+        id: 00u1cmc03xjzePoWD0h8
+        type: USER
+    AssignGroupOwnerResponse:
+      summary: Assign a group owner response example
+      value:
+        id: 00u1cmc03xjzePoWD0h8
+        type: USER
+        resolved: true
+        originId: null
+        originType: OKTA_DIRECTORY
+        displayName: Oliver Putnam
+        lastUpdated: Wed Mar 29 18:34:31 UTC 2023
+  parameters:
+    pathOwnerId:
+      description: The `id` of the group owner
+      name: ownerId
+      in: path
+      required: true
+      schema:
+        type: string
+        example: 00u1emaK22TWRYd3TtG
+  schemas:
+    AssignGroupOwnerRequestBody:
+      type: object
+      properties:
+        id:
+          description: The `id` of the group owner
+          type: string
+        type:
+          $ref: '#/components/schemas/GroupOwnerType'
+    GroupOwner:
+      type: object
+      properties:
+        displayName:
+          description: The display name of the group owner
+          type: string
+          readOnly: true
+        id:
+          description: The `id` of the group owner
+          type: string
+        lastUpdated:
+          description: Timestamp when the group owner was last updated
+          type: string
+          format: date-time
+          readOnly: true
+        originId:
+          description: The ID of the app instance if the `originType` is `APPLICATION`. This value is `NULL` if `originType` is `OKTA_DIRECTORY`.
+          type: string
+        originType:
+          $ref: '#/components/schemas/GroupOwnerOriginType'
+        resolved:
+          description: If `originType`is APPLICATION, this parameter is set to `FALSE` until the owner's `originId` is reconciled with an associated Okta ID.
+          type: boolean
+        type:
+          $ref: '#/components/schemas/GroupOwnerType'
+    GroupOwnerOriginType:
+      description: The source where group ownership is managed
+      type: string
+      enum:
+        - APPLICATION
+        - OKTA_DIRECTORY
+    GroupOwnerType:
+      description: The entity type of the owner
+      type: string
+      enum:
+        - GROUP
+        - USER
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

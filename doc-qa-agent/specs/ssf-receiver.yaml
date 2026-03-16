@@ -1,0 +1,433 @@
+openapi: 3.0.3
+info:
+  title: SSF Receiver
+  version: 1.0.0
+servers:
+  $ref: ../../base.yaml#/servers
+tags:
+  $ref: ../../base.yaml#/tags
+paths:
+  /api/v1/security-events-providers:
+    get:
+      summary: List all security events providers
+      description: Lists all security events provider instances
+      operationId: listSecurityEventsProviderInstances
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.securityEventsProviders.read
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SecurityEventsProviderResponse'
+              examples:
+                list:
+                  $ref: '#/components/examples/ListOfSecurityEventsProviderInstances'
+        '401':
+          $ref: ../Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      tags:
+        - SSFReceiver
+    post:
+      summary: Create a security events provider
+      description: Creates a security events provider instance
+      operationId: createSecurityEventsProviderInstance
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.securityEventsProviders.manage
+      x-codegen-request-body-name: instance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecurityEventsProviderRequest'
+            examples:
+              well-known-URL-provided:
+                $ref: '#/components/examples/SecurityEventsProviderRequestWellKnownUrl'
+              issuer-and-JWKS-URL-provided:
+                $ref: '#/components/examples/SecurityEventsProviderRequestIssuerAndJwksUrl'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityEventsProviderResponse'
+              examples:
+                well-known-URL-provided:
+                  $ref: '#/components/examples/SecurityEventsProviderResponseWellKnownUrl'
+                issuer-and-JWKS-URL-provided:
+                  $ref: '#/components/examples/SecurityEventsProviderResponseIssuerAndJwksUrl'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '401':
+          $ref: ../Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      tags:
+        - SSFReceiver
+    x-okta-team-detail:
+      x-team-slack: amp-rad
+  /api/v1/security-events-providers/{securityEventProviderId}:
+    parameters:
+      - $ref: '#/components/parameters/pathSecurityEventProviderId'
+    get:
+      summary: Retrieve the security events provider
+      description: Retrieves the security events provider instance specified by `id`
+      operationId: getSecurityEventsProviderInstance
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.securityEventsProviders.read
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityEventsProviderResponse'
+              examples:
+                get:
+                  $ref: '#/components/examples/SecurityEventsProviderResponseWellKnownUrl'
+        '401':
+          $ref: ../Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      tags:
+        - SSFReceiver
+    put:
+      summary: Replace a security events provider
+      description: Replaces a security events provider instance specified by `id`
+      operationId: replaceSecurityEventsProviderInstance
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.securityEventsProviders.manage
+      x-codegen-request-body-name: instance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecurityEventsProviderRequest'
+            examples:
+              well-known-URL-provided:
+                $ref: '#/components/examples/SecurityEventsProviderRequestWellKnownUrl'
+              issuer-and-JWKS-URL-provided:
+                $ref: '#/components/examples/SecurityEventsProviderRequestIssuerAndJwksUrl'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityEventsProviderResponse'
+              examples:
+                well-known-URL-provided:
+                  $ref: '#/components/examples/SecurityEventsProviderResponseWellKnownUrl'
+                issuer-and-JWKS-URL-provided:
+                  $ref: '#/components/examples/SecurityEventsProviderResponseIssuerAndJwksUrl'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '401':
+          $ref: ../Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      tags:
+        - SSFReceiver
+    delete:
+      summary: Delete a security events provider
+      description: Deletes a security events provider instance specified by `id`
+      operationId: deleteSecurityEventsProviderInstance
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.securityEventsProviders.manage
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '401':
+          $ref: ../Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      tags:
+        - SSFReceiver
+    x-okta-team-detail:
+      x-team-slack: amp-rad
+  /api/v1/security-events-providers/{securityEventProviderId}/lifecycle/activate:
+    parameters:
+      - $ref: '#/components/parameters/pathSecurityEventProviderId'
+    post:
+      summary: Activate a security events provider
+      description: |-
+        Activates a security events provider instance by setting its status to `ACTIVE`.
+        This operation resumes the flow of events from the security events provider to Okta.
+      operationId: activateSecurityEventsProviderInstance
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.securityEventsProviders.manage
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityEventsProviderResponse'
+              examples:
+                activatedInstance:
+                  $ref: '#/components/examples/SecurityEventsProviderResponseWellKnownUrl'
+        '401':
+          $ref: ../Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      tags:
+        - SSFReceiver
+    x-okta-team-detail:
+      x-team-slack: amp-rad
+  /api/v1/security-events-providers/{securityEventProviderId}/lifecycle/deactivate:
+    parameters:
+      - $ref: '#/components/parameters/pathSecurityEventProviderId'
+    post:
+      summary: Deactivate a security events provider
+      description: |-
+        Deactivates a security events provider instance by setting its status to `INACTIVE`.
+        This operation stops the flow of events from the security events provider to Okta.
+      operationId: deactivateSecurityEventsProviderInstance
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.securityEventsProviders.manage
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityEventsProviderResponse'
+              examples:
+                deactivatedInstance:
+                  $ref: '#/components/examples/DeactivatedSecurityEventsProviderResponse'
+        '401':
+          $ref: ../Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      tags:
+        - SSFReceiver
+    x-okta-team-detail:
+      x-team-slack: amp-rad
+components:
+  securitySchemes:
+    $ref: ../../base.yaml#/components/securitySchemes
+  examples:
+    SecurityEventsProviderRequestWellKnownUrl:
+      summary: Provider with well-known URL
+      value:
+        name: Security events provider with well-known URL
+        type: okta
+        settings:
+          well_known_url: https://example.okta.com/.well-known/ssf-configuration
+    SecurityEventsProviderRequestIssuerAndJwksUrl:
+      summary: Provider with issuer and JWKS
+      value:
+        name: Security events provider with an issuer and a JWKS URL
+        type: okta
+        settings:
+          issuer: Issuer
+          jwks_url: https://example.okta.com/jwks/path
+    SecurityEventsProviderResponseWellKnownUrl:
+      summary: Provider with well-known URL
+      value: &SecurityEventsProviderResponseWellKnownUrlValue
+        id: sse1qg25RpusjUP6m0g5
+        name: Security events provider with well-known URL
+        type: okta
+        status: ACTIVE
+        settings:
+          well_known_url: https://example.okta.com/.well-known/ssf-configuration
+          issuer: Issuer
+          jwks_url: https://example.okta.com/jwks/path
+        _links:
+          self:
+            href: https://example.okta.com/api/v1/security-events-providers/sse1qg25RpusjUP6m0g5
+            hints:
+              allow: ["GET", "PUT", "DELETE"]
+          deactivate:
+            href: https://example.okta.com/api/v1/security-events-providers/sse1qg25RpusjUP6m0g5/lifecycle/deactivate
+            hints:
+              allow: ["POST"]
+    SecurityEventsProviderResponseIssuerAndJwksUrl:
+      summary: Provider with issuer and JWKS
+      value: &SecurityEventsProviderResponseIssuerAndJwksUrlValue
+        id: sse1qu4fUtsoD12iF0g5
+        name: Security events provider with an issuer and a JWKS URL
+        type: okta
+        status: ACTIVE
+        settings:
+          issuer: Issuer
+          jwks_url: https://example.okta.com/jwks/path
+        _links:
+          self:
+            href: https://example.okta.com/api/v1/security-events-providers/sse1qu4fUtsoD12iF0g5
+            hints:
+              allow: ["GET", "PUT", "DELETE"]
+          deactivate:
+            href: https://example.okta.com/api/v1/security-events-providers/sse1qu4fUtsoD12iF0g5/lifecycle/deactivate
+            hints:
+              allow: ["POST"]
+    ListOfSecurityEventsProviderInstances:
+      summary: List of security events providers
+      value:
+        - <<: *SecurityEventsProviderResponseWellKnownUrlValue
+        - <<: *SecurityEventsProviderResponseIssuerAndJwksUrlValue
+    DeactivatedSecurityEventsProviderResponse:
+      summary: Inactive security events provider
+      value:
+        <<: *SecurityEventsProviderResponseWellKnownUrlValue
+        status: INACTIVE
+        _links:
+          self:
+            href: https://example.okta.com/api/v1/security-events-providers/sse1qg25RpusjUP6m0g5
+            hints:
+              allow: ["GET", "PUT", "DELETE"]
+          activate:
+            href: https://example.okta.com/api/v1/security-events-providers/sse1qg25RpusjUP6m0g5/lifecycle/activate
+            hints:
+              allow: ["POST"]
+  parameters:
+    pathSecurityEventProviderId:
+      name: securityEventProviderId
+      in: path
+      schema:
+        type: string
+        example: sse1qg25RpusjUP6m0g5
+      required: true
+      description: '`id` of the security events provider instance'
+  schemas:
+    SecurityEventsProviderRequest:
+      title: Security events provider request
+      description: The request schema for creating or updating a security events provider. The `settings` must match one of the schemas.
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties: &SecurityEventsProviderBase
+        name:
+          description: The name of the security events provider instance
+          type: string
+          maxLength: 100
+          example: Target SSF Provider
+        settings:
+          type: object
+          description: Information about the security events provider for signal ingestion
+          oneOf:
+            - $ref: '#/components/schemas/SecurityEventsProviderSettingsSSFCompliant'
+            - $ref: '#/components/schemas/SecurityEventsProviderSettingsNonSSFCompliant'
+        type:
+          description: The app type of the security events provider
+          maxLength: 255
+          type: string
+          example: okta
+      required:
+        - name
+        - settings
+        - type
+    SecurityEventsProviderResponse:
+      title: Security events provider response
+      description: The security events provider response
+      type: object
+      properties:
+        <<: *SecurityEventsProviderBase
+        id:
+          description: The unique identifier of this instance
+          type: string
+          readOnly: true
+          example: sse1qg25RpusjUP6m0g5
+        status:
+          description: Indicates whether the security events provider is active or not
+          type: string
+          enum: ['ACTIVE', 'INACTIVE']
+          readOnly: true
+        settings: # overwrite the settings
+          description: Information about the security events provider for signal ingestion
+          $ref: '#/components/schemas/SecurityEventsProviderSettingsResponse'
+        _links:
+          $ref: ../Common.yaml#/components/schemas/LinksSelfAndLifecycle
+    SecurityEventsProviderSettingsSSFCompliant:
+      title: Provider with well-known URL setting
+      description: |-
+        Security events provider with well-known URL setting
+      type: object
+      properties:
+        well_known_url:
+          type: string
+          format: url
+          description: The published well-known URL of the security events provider (the SSF transmitter)
+          maxLength: 1000
+          example: https://example.okta.com/.well-known/ssf-configuration
+      required:
+        - well_known_url
+    SecurityEventsProviderSettingsNonSSFCompliant:
+      title: Provider with issuer and JWKS settings
+      description: |-
+        Security events provider with issuer and JWKS settings for signal ingestion
+      type: object
+      properties: &SecurityEventsProviderSettingsNonSSFCompliantProperties
+        jwks_url:
+          type: string
+          format: url
+          description: The public URL where the JWKS public key is uploaded
+          maxLength: 1000
+          example: https://example.okta.com/oauth2/v1/keys
+        issuer:
+          type: string
+          description: Issuer URL
+          maxLength: 700
+          example: example.okta.com
+      required:
+        - jwks_url
+        - issuer
+    SecurityEventsProviderSettingsResponse:
+      title: Security events provider settings
+      description: |-
+        Security events provider settings
+      type: object
+      properties:
+        well_known_url:
+          type: string
+          format: url
+          description: The well-known URL of the security events provider (the SSF transmitter)
+          nullable: true
+          maxLength: 1000
+          example: https://example.okta.com/.well-known/ssf-configuration
+        <<: *SecurityEventsProviderSettingsNonSSFCompliantProperties

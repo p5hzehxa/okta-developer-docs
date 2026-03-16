@@ -1,0 +1,595 @@
+openapi: 3.0.3
+info:
+  title: Risk Provider and Event APIs
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../../base.yaml#/tags
+paths:
+  /api/v1/risk/events/ip:
+    post:
+      deprecated: true
+      summary: Send multiple risk events
+      description: |-
+        Sends multiple IP risk events to Okta.
+        This request is used by a third-party risk provider to send IP risk events to Okta. The third-party risk provider needs to be registered with Okta before they can send events to Okta. See [Risk Providers](/openapi/okta-management/management/tags/riskprovider).
+        This API has a rate limit of 30 requests per minute. You can include multiple risk events (up to a maximum of 20 events) in a single payload to reduce the number of API calls. Prioritize sending high risk signals if you have a burst of signals to send that would exceed the maximum request limits.
+      operationId: sendRiskEvents
+      x-codegen-request-body-name: instance
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/RiskEvent'
+            examples:
+              RiskEventsRequestExample:
+                $ref: '#/components/examples/RiskEventsRequestExample'
+        required: true
+      responses:
+        '202':
+          description: Accepted
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../Common.yaml#/components/schemas/Error
+              examples:
+                Access Denied:
+                  $ref: ../Common.yaml#/components/examples/ErrorAccessDenied
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.riskEvents.manage
+      tags:
+        - RiskEvent
+    x-okta-team-detail:
+      x-team-slack: amp-rad
+  /api/v1/risk/providers:
+    get:
+      deprecated: true
+      summary: List all risk providers
+      description: Lists all risk provider objects
+      operationId: listRiskProviders
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RiskProvider'
+              examples:
+                RiskProviderList:
+                  $ref: '#/components/examples/ListRiskProviderResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.riskProviders.read
+      tags:
+        - RiskProvider
+    post:
+      deprecated: true
+      summary: Create a risk provider
+      description: Creates a risk provider object. You can create a maximum of three risk provider objects.
+      operationId: createRiskProvider
+      x-codegen-request-body-name: instance
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RiskProvider'
+            examples:
+              RiskProviderRequestExample:
+                $ref: '#/components/examples/RiskProviderRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskProvider'
+              examples:
+                RiskProviderPostResponseExample:
+                  $ref: '#/components/examples/RiskProviderResponse'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../Common.yaml#/components/schemas/Error
+              examples:
+                Access Denied:
+                  $ref: ../Common.yaml#/components/examples/ErrorAccessDenied
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.riskProviders.manage
+      tags:
+        - RiskProvider
+    x-okta-team-detail:
+      x-team-slack: amp-rad
+  /api/v1/risk/providers/{riskProviderId}:
+    parameters:
+      - $ref: '#/components/parameters/pathRiskProviderId'
+    get:
+      deprecated: true
+      summary: Retrieve a risk provider
+      description: Retrieves a risk provider object by ID
+      operationId: getRiskProvider
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskProvider'
+              examples:
+                RiskProviderGetResponseExample:
+                  $ref: '#/components/examples/RiskProviderResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.riskProviders.read
+      tags:
+        - RiskProvider
+    put:
+      deprecated: true
+      summary: Replace a risk provider
+      description: Replaces the properties for a given risk provider object ID
+      operationId: replaceRiskProvider
+      x-codegen-request-body-name: instance
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RiskProvider'
+            examples:
+              RiskProviderPutRequestExample:
+                $ref: '#/components/examples/RiskProviderPutRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskProvider'
+              examples:
+                RiskProviderPutResponseExample:
+                  $ref: '#/components/examples/RiskProviderPutResponse'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.riskProviders.manage
+      tags:
+        - RiskProvider
+    delete:
+      deprecated: true
+      summary: Delete a risk provider
+      description: Deletes a risk provider object by its ID
+      operationId: deleteRiskProvider
+      responses:
+        '204':
+          description: No Content
+        '403':
+          description: Forbidden
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: ../Common.yaml#/components/schemas/Error
+              examples:
+                Access Denied:
+                  $ref: ../Common.yaml#/components/examples/ErrorAccessDenied
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.riskProviders.manage
+      tags:
+        - RiskProvider
+    x-okta-team-detail:
+      x-team-slack: amp-rad
+  /api/v1/users/{userId}/risk:
+    parameters:
+      - $ref: ../Common.yaml#/components/parameters/pathUserId
+    get:
+      summary: Retrieve the user's risk
+      description: Retrieves the user risk object for a user ID
+      operationId: getUserRisk
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRiskGetResponse'
+              examples:
+                UserRiskResponseExample:
+                  $ref: '#/components/examples/UserRiskResponse'
+                UserRiskNoneResponseExample:
+                  $ref: '#/components/examples/UserRiskNoneResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.userRisk.read
+      tags:
+        - UserRisk
+    put:
+      summary: Upsert the user's risk
+      description: Upserts (creates or updates) the user risk object for a user ID
+      operationId: upsertUserRisk
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRiskRequest'
+            examples:
+              RiskProviderRequestExample:
+                $ref: '#/components/examples/UserRiskRequest'
+        required: true
+      responses:
+        '200':
+          description: Updated the user's risk
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRiskPutResponse'
+              examples:
+                UserRiskResponseExample:
+                  $ref: '#/components/examples/UserRiskResponse'
+        '201':
+          description: Created the user's risk
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRiskPutResponse'
+              examples:
+                UserRiskResponseExample:
+                  $ref: '#/components/examples/UserRiskResponse'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.userRisk.manage
+      tags:
+        - UserRisk
+    x-okta-team-detail:
+      x-team-slack: amp-rad
+components:
+  examples:
+    RiskEventsRequestExample:
+      summary: Risk events payload example
+      value:
+        - timestamp: '2021-01-20T00:00:00.001Z'
+          subjects:
+            - ip: 6.7.6.7
+              riskLevel: MEDIUM
+            - ip: 1.1.1.1
+              riskLevel: HIGH
+              message: Detected Attack tooling and suspicious activity
+        - timestamp: '2021-01-20T01:00:00.001Z'
+          subjects:
+            - ip: 6.7.6.7
+              riskLevel: LOW
+            - ip: 2.2.2.2
+              riskLevel: HIGH
+    RiskProviderRequest:
+      summary: Risk provider payload example
+      value:
+        name: Risk-Partner-X
+        action: log_only
+        clientId: 00ckjsfgjkdkjdkkljjsd
+    RiskProviderPutRequest:
+      summary: Replace risk provider request example
+      value:
+        name: Risk-Partner-Y
+        action: enforce_and_log
+        clientId: 00ckjsfgjkdkjdkkljjsd
+    RiskProviderResponse:
+      summary: Risk provider response example
+      value:
+        id: 00rp12r4skkjkjgsn
+        action: log_only
+        name: Risk-Partner-X
+        clientId: 00ckjsfgjkdkjdkkljjsd
+        created: '2021-01-05 22:18:30'
+        lastUpdated: '2021-01-05 22:18:30'
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/risk/providers/00rp12r4skkjkjgsn
+            hints:
+              allow:
+                - GET
+                - PUT
+    ListRiskProviderResponse:
+      summary: List risk provider response example
+      value:
+        - id: 00rp12r4skkjkjgsn
+          action: log_only
+          name: Risk-Partner-X
+          clientId: 00ckjsfgjkdkjdkkljjsd
+          created: '2021-01-05 22:18:30'
+          lastUpdated: '2021-01-05 22:18:30'
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/risk/providers/00rp12r4skkjkjgsn
+              hints:
+                allow:
+                  - GET
+                  - PUT
+    RiskProviderPutResponse:
+      summary: Replace risk provider response example
+      value:
+        id: 00rp12r4skkjkjgsn
+        action: enforce_and_log
+        name: Risk-Partner-Y
+        clientId: 00ckjsfgjkdkjdkkljjsd
+        created: '2021-01-05 22:18:30'
+        lastUpdated: '2021-01-05 23:18:30'
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/risk/providers/00rp12r4skkjkjgsn
+            hints:
+              allow:
+                - GET
+                - PUT
+    UserRiskRequest:
+      summary: Example upsert the risk for a user request
+      value:
+        riskLevel: HIGH
+    UserRiskResponse:
+      summary: Example user risk response
+      value:
+        riskLevel: HIGH
+        reason: Admin override risk
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/{userId}/risk
+            hints:
+              allow:
+                - GET
+                - PUT
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/{userId}
+            hints:
+              allow:
+                - GET
+    UserRiskNoneResponse:
+      summary: Example user risk with NONE risk level response
+      value:
+        riskLevel: NONE
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/{userId}/risk
+            hints:
+              allow:
+                - GET
+                - PUT
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/{userId}
+            hints:
+              allow:
+                - GET
+  parameters:
+    pathRiskProviderId:
+      name: riskProviderId
+      in: path
+      schema:
+        type: string
+        example: 00rp12r4skkjkjgsn
+      required: true
+      description: '`id` of the risk provider object'
+  schemas:
+    RiskEvent:
+      type: object
+      properties:
+        expiresAt:
+          type: string
+          format: date-time
+          description: 'Timestamp at which the event expires (expressed as a UTC time zone using ISO 8601 format: yyyy-MM-dd`T`HH:mm:ss.SSS`Z`). If this optional field isn''t included, Okta automatically expires the event 24 hours after the event is consumed.'
+        subjects:
+          type: array
+          description: List of risk event subjects
+          items:
+            $ref: '#/components/schemas/RiskEventSubject'
+        timestamp:
+          type: string
+          format: date-time
+          description: 'Timestamp of when the event is produced (expressed as a UTC time zone using ISO 8601 format: yyyy-MM-dd`T`HH:mm:ss.SSS`Z`)'
+      required:
+        - subjects
+    RiskEventSubject:
+      type: object
+      properties:
+        ip:
+          type: string
+          description: The risk event subject IP address (either an IPv4 or IPv6 address)
+        message:
+          type: string
+          description: Additional reasons for the risk level of the IP
+          maxLength: 512
+          pattern: ^[a-zA-Z0-9 .\-_]*$
+        riskLevel:
+          $ref: '#/components/schemas/RiskEventSubjectRiskLevel'
+      required:
+        - ip
+        - riskLevel
+    RiskEventSubjectRiskLevel:
+      description: The risk level associated with the IP
+      type: string
+      enum:
+        - HIGH
+        - LOW
+        - MEDIUM
+    UserRiskLevelAll:
+      description: The risk level associated with the user
+      type: string
+      enum:
+        - HIGH
+        - LOW
+        - MEDIUM
+        - NONE
+    UserRiskLevelPut:
+      description: The risk level associated with the user
+      type: string
+      enum:
+        - HIGH
+        - LOW
+    UserRiskReason:
+      description: Describes the risk level for the user
+      type: string
+      example: Admin override risk
+    RiskProvider:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/RiskProviderAction'
+        clientId:
+          type: string
+          description: The ID of the [OAuth 2.0 service app](https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/#create-a-service-app-and-grant-scopes) that's used to send risk events to Okta
+          example: 00cjkjjkkgjkdkjdkkljjsd
+        created:
+          type: string
+          format: date-time
+          description: Timestamp when the risk provider object was created
+          readOnly: true
+          example: '2021-01-05 22:18:30'
+        id:
+          type: string
+          description: The ID of the risk provider object
+          readOnly: true
+          example: 00rp12r4skkjkjgsn
+        lastUpdated:
+          type: string
+          format: date-time
+          description: Timestamp when the risk provider object was last updated
+          readOnly: true
+          example: '2021-01-05 22:18:30'
+        name:
+          type: string
+          description: Name of the risk provider
+          maxLength: 50
+          example: Risk-Partner-X
+        _links:
+          $ref: ../Common.yaml#/components/schemas/LinksSelf
+      required:
+        - name
+        - clientId
+        - action
+        - id
+        - _links
+    RiskProviderAction:
+      description: Action taken by Okta during authentication attempts based on the risk events sent by this provider
+      default: log_only
+      type: string
+      enum:
+        - log_only
+        - none
+        - enforce_and_log
+      x-enumDescriptions:
+        log_only: Include risk event information in the System Log
+        none: No action
+        enforce_and_log: Use risk event information to evaluate risks during authentication attempts and include risk event information in the System Log
+    UserRiskRequest:
+      type: object
+      properties:
+        riskLevel:
+          type: string
+          description: The risk level associated with the user
+          enum:
+            - HIGH
+            - LOW
+    UserRiskGetResponse:
+      type: object
+      properties:
+        riskLevel:
+          $ref: '#/components/schemas/UserRiskLevelAll'
+        _links:
+          allOf:
+            - $ref: ../Common.yaml#/components/schemas/LinksSelf
+            - $ref: '#/components/schemas/LinksUserRef'
+      discriminator:
+        propertyName: riskLevel
+        mapping:
+          HIGH: '#/components/schemas/UserRiskLevelExists'
+          MEDIUM: '#/components/schemas/UserRiskLevelExists'
+          LOW: '#/components/schemas/UserRiskLevelExists'
+          NONE: '#/components/schemas/UserRiskLevelNone'
+    UserRiskLevelExists:
+      allOf:
+        - $ref: '#/components/schemas/UserRiskGetResponse'
+        - type: object
+          properties:
+            reason:
+              $ref: '#/components/schemas/UserRiskReason'
+    UserRiskLevelNone:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/UserRiskGetResponse'
+    UserRiskPutResponse:
+      type: object
+      properties:
+        riskLevel:
+          $ref: '#/components/schemas/UserRiskLevelPut'
+        reason:
+          $ref: '#/components/schemas/UserRiskReason'
+        _links:
+          allOf:
+            - $ref: ../Common.yaml#/components/schemas/LinksSelf
+            - $ref: '#/components/schemas/LinksUserRef'
+    LinksUserRef:
+      type: object
+      properties:
+        user:
+          $ref: ../Common.yaml#/components/schemas/HrefObjectUserLink
+  securitySchemes:
+    $ref: ../../base.yaml#/components/securitySchemes

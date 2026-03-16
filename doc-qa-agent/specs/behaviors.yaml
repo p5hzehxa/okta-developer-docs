@@ -1,0 +1,451 @@
+openapi: 3.0.3
+info:
+  title: Behavior Detection Rules API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../../base.yaml#/tags
+paths:
+  /api/v1/behaviors:
+    get:
+      summary: List all behavior detection rules
+      description: Lists all behavior detection rules with pagination support
+      operationId: listBehaviorDetectionRules
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BehaviorRule'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.behaviors.read
+      tags:
+        - Behavior
+    post:
+      summary: Create a behavior detection rule
+      description: Creates a new behavior detection rule
+      operationId: createBehaviorDetectionRule
+      x-codegen-request-body-name: rule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BehaviorRule'
+            examples:
+              Behavior Rule Request:
+                $ref: '#/components/examples/BehaviorRuleRequest'
+        required: true
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BehaviorRule'
+              examples:
+                Behavior Rule Response:
+                  $ref: '#/components/examples/BehaviorRuleResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ../Common.yaml#/components/schemas/Error
+              examples:
+                API Validation Failed:
+                  $ref: ../Common.yaml#/components/examples/ErrorApiValidationFailed
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.behaviors.manage
+      tags:
+        - Behavior
+    x-okta-team-detail:
+      x-team-slack: amp-rad
+  /api/v1/behaviors/{behaviorId}:
+    parameters:
+      - $ref: '#/components/parameters/pathBehaviorId'
+    get:
+      summary: Retrieve a behavior detection rule
+      description: Retrieves a Behavior Detection Rule by `behaviorId`
+      operationId: getBehaviorDetectionRule
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BehaviorRule'
+              examples:
+                Behavior Rule Response:
+                  $ref: '#/components/examples/BehaviorRuleResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ../Common.yaml#/components/schemas/Error
+              examples:
+                Resource Not Found:
+                  $ref: ../Common.yaml#/components/examples/ErrorResourceNotFound
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.behaviors.read
+      tags:
+        - Behavior
+    put:
+      summary: Replace a behavior detection rule
+      description: Replaces a Behavior Detection Rule by `behaviorId`
+      operationId: replaceBehaviorDetectionRule
+      x-codegen-request-body-name: rule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BehaviorRule'
+            examples:
+              Behavior Rule Request:
+                $ref: '#/components/examples/BehaviorRuleRequest'
+        required: true
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BehaviorRule'
+              examples:
+                Behavior Rule Response:
+                  $ref: '#/components/examples/BehaviorRuleResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ../Common.yaml#/components/schemas/Error
+              examples:
+                API Validation Failed:
+                  $ref: ../Common.yaml#/components/examples/ErrorApiValidationFailed
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ../Common.yaml#/components/schemas/Error
+              examples:
+                Resource Not Found:
+                  $ref: ../Common.yaml#/components/examples/ErrorResourceNotFound
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.behaviors.manage
+      tags:
+        - Behavior
+    delete:
+      summary: Delete a behavior detection rule
+      description: Deletes a Behavior Detection Rule by `behaviorId`
+      operationId: deleteBehaviorDetectionRule
+      responses:
+        '204':
+          description: No Content
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ../Common.yaml#/components/schemas/Error
+              examples:
+                Resource Not Found:
+                  $ref: ../Common.yaml#/components/examples/ErrorResourceNotFound
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.behaviors.manage
+      tags:
+        - Behavior
+    x-okta-team-detail:
+      x-team-slack: amp-rad
+  /api/v1/behaviors/{behaviorId}/lifecycle/activate:
+    parameters:
+      - $ref: '#/components/parameters/pathBehaviorId'
+    post:
+      summary: Activate a behavior detection rule
+      description: Activates a behavior detection rule
+      operationId: activateBehaviorDetectionRule
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BehaviorRule'
+              examples:
+                Behavior Rule Response:
+                  $ref: '#/components/examples/BehaviorRuleResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.behaviors.manage
+      tags:
+        - Behavior
+    x-okta-team-detail:
+      x-team-slack: amp-rad
+  /api/v1/behaviors/{behaviorId}/lifecycle/deactivate:
+    parameters:
+      - $ref: '#/components/parameters/pathBehaviorId'
+    post:
+      summary: Deactivate a behavior detection rule
+      description: Deactivates a behavior detection rule
+      operationId: deactivateBehaviorDetectionRule
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BehaviorRule'
+              examples:
+                Behavior Rule Response:
+                  $ref: '#/components/examples/BehaviorRuleResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.behaviors.manage
+      tags:
+        - Behavior
+    x-okta-team-detail:
+      x-team-slack: amp-rad
+components:
+  examples:
+    BehaviorRuleRequest:
+      value:
+        name: My Behavior Rule
+        type: VELOCITY
+    BehaviorRuleResponse:
+      value:
+        id: abcd1234
+        name: My Behavior Rule
+        type: VELOCITY
+        settings:
+          velocityKph: 805
+        status: ACTIVE
+        created: '2021-11-09 20:38:10.0'
+        lastUpdated: '2021-11-11 20:38:10.0'
+        _link:
+          self:
+            href: https://your-subdomain.okta.com/api/v1/behaviors/abcd1234
+            hints:
+              allow:
+                - GET
+                - POST
+                - PUT
+                - DELETE
+  parameters:
+    pathBehaviorId:
+      name: behaviorId
+      in: path
+      schema:
+        type: string
+        example: abcd1234
+      required: true
+      description: ID of the Behavior Detection Rule
+  schemas:
+    BehaviorRule:
+      title: Behavior Detection Rule
+      type: object
+      properties:
+        created:
+          type: string
+          description: Timestamp when the Behavior Detection Rule was created
+          readOnly: true
+        id:
+          type: string
+          description: ID of the Behavior Detection Rule
+          readOnly: true
+        lastUpdated:
+          type: string
+          description: Timestamp when the Behavior Detection Rule was last modified
+          readOnly: true
+        name:
+          type: string
+          description: Name of the Behavior Detection Rule
+          maxLength: 128
+        status:
+          $ref: ../Common.yaml#/components/schemas/LifecycleStatus
+        type:
+          $ref: '#/components/schemas/BehaviorRuleType'
+        _link:
+          $ref: ../Common.yaml#/components/schemas/LinksSelf
+      required:
+        - name
+        - type
+      discriminator:
+        propertyName: type
+        mapping:
+          ANOMALOUS_LOCATION: '#/components/schemas/BehaviorRuleAnomalousLocation'
+          ANOMALOUS_IP: '#/components/schemas/BehaviorRuleAnomalousIP'
+          ANOMALOUS_DEVICE: '#/components/schemas/BehaviorRuleAnomalousDevice'
+          VELOCITY: '#/components/schemas/BehaviorRuleVelocity'
+        x-okta-feature-flag-amends:
+          BEHAVIOR_DETECTION_NEW_ASN:
+            mapping:
+              ANOMALOUS_ASN: '#/components/schemas/BehaviorRuleASN'
+    BehaviorRuleAnomalousDevice:
+      allOf:
+        - $ref: '#/components/schemas/BehaviorRule'
+        - type: object
+          properties:
+            settings:
+              $ref: '#/components/schemas/BehaviorRuleSettingsAnomalousDevice'
+    BehaviorRuleAnomalousIP:
+      allOf:
+        - $ref: '#/components/schemas/BehaviorRule'
+        - type: object
+          properties:
+            settings:
+              $ref: '#/components/schemas/BehaviorRuleSettingsAnomalousIP'
+    BehaviorRuleAnomalousLocation:
+      allOf:
+        - $ref: '#/components/schemas/BehaviorRule'
+        - type: object
+          properties:
+            settings:
+              $ref: '#/components/schemas/BehaviorRuleSettingsAnomalousLocation'
+    BehaviorRuleASN:
+      x-okta-lifecycle:
+        features:
+          - BEHAVIOR_DETECTION_NEW_ASN
+      allOf:
+        - $ref: '#/components/schemas/BehaviorRule'
+        - type: object
+          properties:
+            settings:
+              $ref: '#/components/schemas/BehaviorRuleSettingsAnomalousASN'
+    BehaviorRuleSettings:
+      title: Behavior Detection Rule Settings
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+    BehaviorRuleSettingsAnomalousDevice:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/BehaviorRuleSettingsHistoryBased'
+    BehaviorRuleSettingsAnomalousASN:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/BehaviorRuleSettingsHistoryBased'
+    BehaviorRuleSettingsAnomalousIP:
+      allOf:
+        - $ref: '#/components/schemas/BehaviorRuleSettingsHistoryBased'
+        - type: object
+          properties:
+            maxEventsUsedForEvaluation:
+              type: integer
+              minimum: 0
+              maximum: 100
+              default: 50
+    BehaviorRuleSettingsAnomalousLocation:
+      allOf:
+        - $ref: '#/components/schemas/BehaviorRuleSettingsHistoryBased'
+        - type: object
+          properties:
+            granularity:
+              $ref: '#/components/schemas/LocationGranularity'
+            radiusKilometers:
+              type: integer
+              description: Required when `granularity` is `LAT_LONG`. Radius from the provided coordinates in kilometers.
+          required:
+            - granularity
+    BehaviorRuleSettingsHistoryBased:
+      allOf:
+        - $ref: '#/components/schemas/BehaviorRuleSettings'
+        - title: Behavior Detection Rule Settings based on Event History
+          type: object
+          properties:
+            maxEventsUsedForEvaluation:
+              type: integer
+              minimum: 1
+              maximum: 100
+              default: 20
+            minEventsNeededForEvaluation:
+              type: integer
+              minimum: 0
+              maximum: 10
+              default: 0
+    BehaviorRuleSettingsVelocity:
+      allOf:
+        - $ref: '#/components/schemas/BehaviorRuleSettings'
+        - title: Behavior Detection Rule Settings based on device velocity in kilometers per hour.
+          type: object
+          properties:
+            velocityKph:
+              type: integer
+              minimum: 1
+              default: 805
+          required:
+            - velocityKph
+    BehaviorRuleType:
+      type: string
+      enum:
+        - ANOMALOUS_DEVICE
+        - ANOMALOUS_IP
+        - ANOMALOUS_LOCATION
+        - VELOCITY
+      x-okta-feature-flag-amends:
+        BEHAVIOR_DETECTION_NEW_ASN:
+          enum:
+            - ANOMALOUS_ASN
+    BehaviorRuleVelocity:
+      allOf:
+        - $ref: '#/components/schemas/BehaviorRule'
+        - type: object
+          properties:
+            settings:
+              $ref: '#/components/schemas/BehaviorRuleSettingsVelocity'
+    LocationGranularity:
+      type: string
+      enum:
+        - CITY
+        - COUNTRY
+        - LAT_LONG
+        - SUBDIVISION
+  securitySchemes:
+    $ref: ../../base.yaml#/components/securitySchemes

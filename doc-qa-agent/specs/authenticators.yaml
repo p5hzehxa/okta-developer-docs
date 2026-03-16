@@ -1,0 +1,2480 @@
+openapi: 3.0.3
+info:
+  title: Authenticators API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../../base.yaml#/tags
+paths:
+  /.well-known/app-authenticator-configuration:
+    get:
+      summary: Retrieve the well-known app authenticator configuration
+      x-okta-lifecycle:
+        features:
+          - CUSTOM_PUSH_AUTHENTICATOR
+      description: Retrieves the well-known app authenticator configuration. Includes an app authenticator's settings, supported methods, and other details.
+      operationId: getWellKnownAppAuthenticatorConfiguration
+      parameters:
+        - name: oauthClientId
+          in: query
+          description: Filters app authenticator configurations by `oauthClientId`
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WellKnownAppAuthenticatorConfiguration'
+              examples:
+                AuthenticatorConfiguration:
+                  $ref: '#/components/examples/WellKnownAppAuthenticatorConfigurationCustomApp'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorMissingRequiredParameter400
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security: []
+      tags:
+        - Authenticator
+  /api/v1/authenticators:
+    get:
+      summary: List all authenticators
+      description: Lists all authenticators
+      operationId: listAuthenticators
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/AuthenticatorBase'
+                type: array
+              examples:
+                OrgAuthenticatorsEx:
+                  $ref: '#/components/examples/AuthenticatorsResponse'
+                OrgAuthenticatorsExWithWebAuthnNameAndDescription:
+                  $ref: '#/components/examples/AuthenticatorsResponseWithWebAuthnNameAndDescription'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.authenticators.read
+      tags:
+        - Authenticator
+    post:
+      summary: Create an authenticator
+      description: Creates an authenticator
+      operationId: createAuthenticator
+      parameters:
+        - in: query
+          name: activate
+          description: Whether to execute the activation lifecycle operation when Okta creates the authenticator
+          schema:
+            type: boolean
+            default: true
+      x-codegen-request-body-name: authenticator
+      requestBody:
+        $ref: '#/components/requestBodies/AuthenticatorRequestBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/AuthenticatorResponse'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.authenticators.manage
+      tags:
+        - Authenticator
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authenticator-platform
+  /api/v1/authenticators/{authenticatorId}:
+    parameters:
+      - $ref: '#/components/parameters/pathAuthenticatorId'
+    get:
+      summary: Retrieve an authenticator
+      description: Retrieves an authenticator from your Okta organization by `authenticatorId`
+      operationId: getAuthenticator
+      responses:
+        '200':
+          $ref: '#/components/responses/AuthenticatorResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.authenticators.read
+      tags:
+        - Authenticator
+    put:
+      summary: Replace an authenticator
+      description: Replaces the properties for an authenticator identified by `authenticatorId`
+      operationId: replaceAuthenticator
+      x-codegen-request-body-name: authenticator
+      requestBody:
+        $ref: '#/components/requestBodies/AuthenticatorRequestBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/AuthenticatorResponse'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.authenticators.manage
+      tags:
+        - Authenticator
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authenticator-platform
+  /api/v1/authenticators/{authenticatorId}/lifecycle/activate:
+    parameters:
+      - $ref: '#/components/parameters/pathAuthenticatorId'
+    post:
+      summary: Activate an authenticator
+      description: Activates an authenticator by `authenticatorId`
+      operationId: activateAuthenticator
+      responses:
+        '200':
+          $ref: '#/components/responses/AuthenticatorResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.authenticators.manage
+      tags:
+        - Authenticator
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authenticator-platform
+  /api/v1/authenticators/{authenticatorId}/lifecycle/deactivate:
+    parameters:
+      - $ref: '#/components/parameters/pathAuthenticatorId'
+    post:
+      summary: Deactivate an authenticator
+      description: Deactivates an authenticator by `authenticatorId`
+      operationId: deactivateAuthenticator
+      responses:
+        '200':
+          $ref: '#/components/responses/AuthenticatorResponseInactiveWebAuthn'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.authenticators.manage
+      tags:
+        - Authenticator
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authenticator-platform
+  /api/v1/authenticators/{authenticatorId}/methods:
+    parameters:
+      - $ref: '#/components/parameters/pathAuthenticatorId'
+    get:
+      summary: List all methods of an authenticator
+      description: Lists all methods of an authenticator identified by `authenticatorId`
+      operationId: listAuthenticatorMethods
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuthenticatorMethodBase'
+              examples:
+                Phone:
+                  $ref: '#/components/examples/AuthenticatorMethodPhone'
+                TAC:
+                  $ref: '#/components/examples/AuthenticatorMethodTac'
+                WebAuthn:
+                  $ref: '#/components/examples/AuthenticatorMethodWebAuthn'
+                WebAuthnWithRpId:
+                  $ref: '#/components/examples/AuthenticatorMethodWebAuthnWithRpId'
+                WebAuthnWithRebrandSettings:
+                  $ref: '#/components/examples/AuthenticatorMethodWebAuthnWithRebrandSettings'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.authenticators.read
+      tags:
+        - Authenticator
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authenticator-platform
+  /api/v1/authenticators/{authenticatorId}/methods/{methodType}:
+    parameters:
+      - $ref: '#/components/parameters/pathAuthenticatorId'
+      - $ref: '#/components/parameters/pathMethodType'
+    get:
+      summary: Retrieve an authenticator method
+      description: Retrieves a method identified by `methodType` of an authenticator identified by `authenticatorId`
+      operationId: getAuthenticatorMethod
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticatorMethodBase'
+              examples:
+                sms:
+                  $ref: '#/components/examples/AuthenticatorMethodSms'
+                voice:
+                  $ref: '#/components/examples/AuthenticatorMethodInactiveVoice'
+                tac:
+                  $ref: '#/components/examples/AuthenticatorMethodTac'
+                webauthn:
+                  $ref: '#/components/examples/AuthenticatorMethodWebAuthn'
+                webauthnWithRpId:
+                  $ref: '#/components/examples/AuthenticatorMethodWebAuthnWithRpId'
+                WebAuthnWithRebrandSettings:
+                  $ref: '#/components/examples/AuthenticatorMethodWebAuthnWithRebrandSettings'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.authenticators.read
+      tags:
+        - Authenticator
+    put:
+      summary: Replace an authenticator method
+      description: Replaces a method of `methodType` for an authenticator identified by `authenticatorId`
+      operationId: replaceAuthenticatorMethod
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthenticatorMethodBase'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticatorMethodBase'
+              examples:
+                sms:
+                  $ref: '#/components/examples/AuthenticatorMethodSms'
+                voice:
+                  $ref: '#/components/examples/AuthenticatorMethodInactiveVoice'
+                tac:
+                  $ref: '#/components/examples/AuthenticatorMethodTac'
+                webauthn:
+                  $ref: '#/components/examples/AuthenticatorMethodWebAuthn'
+                webauthnWithRpId:
+                  $ref: '#/components/examples/AuthenticatorMethodWebAuthnWithRpId'
+                webauthnWithRebrandSettings:
+                  $ref: '#/components/examples/AuthenticatorMethodWebAuthnWithRebrandSettings'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.authenticators.manage
+      tags:
+        - Authenticator
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authenticator-platform
+  /api/v1/authenticators/{authenticatorId}/methods/{methodType}/lifecycle/activate:
+    parameters:
+      - $ref: '#/components/parameters/pathAuthenticatorId'
+      - $ref: '#/components/parameters/pathMethodType'
+    post:
+      summary: Activate an authenticator method
+      description: Activates a method for an authenticator identified by `authenticatorId` and `methodType`
+      operationId: activateAuthenticatorMethod
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticatorMethodBase'
+              examples:
+                sms:
+                  $ref: '#/components/examples/AuthenticatorMethodSms'
+                tac:
+                  $ref: '#/components/examples/AuthenticatorMethodTac'
+                webauthn:
+                  $ref: '#/components/examples/AuthenticatorMethodWebAuthn'
+                webauthnWithRpId:
+                  $ref: '#/components/examples/AuthenticatorMethodWebAuthnWithRpId'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.authenticators.manage
+      tags:
+        - Authenticator
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authenticator-platform
+  /api/v1/authenticators/{authenticatorId}/methods/{methodType}/lifecycle/deactivate:
+    parameters:
+      - $ref: '#/components/parameters/pathAuthenticatorId'
+      - $ref: '#/components/parameters/pathMethodType'
+    post:
+      summary: Deactivate an authenticator method
+      description: Deactivates a method for an authenticator identified by `authenticatorId` and `methodType`
+      operationId: deactivateAuthenticatorMethod
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticatorMethodBase'
+              examples:
+                voice:
+                  $ref: '#/components/examples/AuthenticatorMethodInactiveVoice'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.authenticators.manage
+      tags:
+        - Authenticator
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authenticator-platform
+  /api/v1/authenticators/{authenticatorId}/methods/{webAuthnMethodType}/verify-rp-id-domain:
+    parameters:
+      - $ref: '#/components/parameters/pathAuthenticatorId'
+      - $ref: '#/components/parameters/pathWebAuthnMethodType'
+    post:
+      summary: Verify a Relying Party ID domain
+      description: Verifies the [Relying Party identifier (RP ID)](https://www.w3.org/TR/webauthn/#relying-party-identifier) domain for the specified WebAuthn authenticator and the specific `webauthn` authenticator method
+      operationId: verifyRpIdDomain
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.authenticators.manage
+      tags:
+        - Authenticator
+  /api/v1/authenticators/{authenticatorId}/aaguids:
+    parameters:
+      - $ref: '#/components/parameters/pathAuthenticatorId'
+    get:
+      summary: List all custom AAGUIDs
+      x-okta-lifecycle:
+        features:
+          - WEBAUTHN_CUSTOM_AAGUID
+      description: |-
+        Lists all custom Authenticator Attestation Global Unique Identifiers (AAGUIDs) in the org
+
+        Only custom AAGUIDs that an admin has created are returned.
+      operationId: listAllCustomAAGUIDs
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllCustomAAGUIDResponseObject'
+              examples:
+                default:
+                  $ref: '#/components/examples/AllCustomAAGUIDResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.authenticators.read
+      tags:
+        - Authenticator
+    post:
+      summary: Create a custom AAGUID
+      x-okta-lifecycle:
+        features:
+          - WEBAUTHN_CUSTOM_AAGUID
+      description: Creates a custom AAGUID for the WebAuthn authenticator
+      operationId: createCustomAAGUID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomAAGUIDCreateRequestObject'
+            examples:
+              default:
+                $ref: '#/components/examples/CustomAAGUIDRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomAAGUIDResponseObject'
+              examples:
+                default:
+                  $ref: '#/components/examples/CustomAAGUIDResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.authenticators.manage
+      tags:
+        - Authenticator
+  /api/v1/authenticators/{authenticatorId}/aaguids/{aaguid}:
+    parameters:
+      - $ref: '#/components/parameters/pathAuthenticatorId'
+      - $ref: '#/components/parameters/pathAAGUID'
+    get:
+      summary: Retrieve a custom AAGUID
+      x-okta-lifecycle:
+        features:
+          - WEBAUTHN_CUSTOM_AAGUID
+      description: Retrieves a custom AAGUID
+      operationId: getCustomAAGUID
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomAAGUIDResponseObject'
+              examples:
+                default:
+                  $ref: '#/components/examples/CustomAAGUIDResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.authenticators.read
+      tags:
+        - Authenticator
+    put:
+      summary: Replace a custom AAGUID
+      x-okta-lifecycle:
+        features:
+          - WEBAUTHN_CUSTOM_AAGUID
+      description: Replaces a custom AAGUID for the specified WebAuthn authenticator
+      operationId: replaceCustomAAGUID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomAAGUIDUpdateRequestObject'
+            examples:
+              default:
+                $ref: '#/components/examples/CustomAAGUIDUpdateRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomAAGUIDResponseObject'
+              examples:
+                default:
+                  $ref: '#/components/examples/CustomAAGUIDResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.authenticators.manage
+      tags:
+        - Authenticator
+    patch:
+      summary: Update a custom AAGUID
+      x-okta-lifecycle:
+        features:
+          - WEBAUTHN_CUSTOM_AAGUID
+      description: Updates the properties of a custom AAGUID by the `authenticatorId` and `aaguid` ID
+      operationId: updateCustomAAGUID
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/CustomAAGUIDUpdateRequestObject'
+            examples:
+              default:
+                $ref: '#/components/examples/CustomAAGUIDUpdateRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomAAGUIDResponseObject'
+              examples:
+                default:
+                  $ref: '#/components/examples/CustomAAGUIDResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.authenticators.manage
+      tags:
+        - Authenticator
+    delete:
+      summary: Delete a custom AAGUID
+      x-okta-lifecycle:
+        features:
+          - WEBAUTHN_CUSTOM_AAGUID
+      description: |-
+        Deletes a custom AAGUID
+
+        You can only delete custom AAGUIDs that an admin has created.
+      operationId: deleteCustomAAGUID
+      responses:
+        '204':
+          description: Deleted
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.authenticators.manage
+      tags:
+        - Authenticator
+components:
+  examples:
+    WellKnownAppAuthenticatorConfigurationCustomApp:
+      summary: Retrieve app authenticator configuration
+      value:
+        - authenticatorId: aut22f6xzargnJZYE3l7
+          orgId: 00o1vhf34q20MfCFC3l7
+          type: app
+          key: custom_app
+          name: Custom authenticator
+          createdDate: '2022-10-11T08:56:45.000Z'
+          lastUpdated: '2023-09-07T11:31:35.000Z'
+          settings:
+            userVerification: PREFERRED
+          supportedMethods:
+            - type: push
+              status: ACTIVE
+              settings:
+                algorithms:
+                  - RS256
+                  - ES256
+                keyProtection: ANY
+          appAuthenticatorEnrollEndpoint: https://{yourOktaDomain}/idp/myaccount/app-authenticators
+    AuthenticatorRequestDuo:
+      summary: Duo
+      value:
+        key: duo
+        name: Duo Security
+        provider:
+          type: DUO
+          configuration:
+            userNameTemplate:
+              template: oktaId
+            integrationKey: testIntegrationKey
+            secretKey: testSecretKey
+            host: https://api-xxxxxxxx.duosecurity.com
+    AuthenticatorResponseDuo:
+      summary: Duo
+      value:
+        type: app
+        id: aut9gnvcjUHIWb37J0g4
+        key: duo
+        status: ACTIVE
+        name: Duo Security
+        created: '2022-07-15T21:14:02.000Z'
+        lastUpdated: '2022-07-15T21:14:02.000Z'
+        settings: {}
+        provider:
+          type: DUO
+          configuration:
+            host: https://api-xxxxxxxx.duosecurity.com
+            userNameTemplate:
+              template: oktaId
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut5gnvcjUHIWb25J0g4
+            hints:
+              allow:
+                - GET
+                - PUT
+          deactivate:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut5gnvcjUHIWb25J0g4/lifecycle/deactivate
+            hints:
+              allow:
+                - POST
+          methods:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut5gnvcjUHIWb25J0g4/methods
+            hints:
+              allow:
+                - GET
+    AuthenticatorResponseEmail:
+      summary: Email
+      value:
+        type: email
+        id: aut1nbsPHh7jNjjyP0g4
+        key: okta_email
+        status: ACTIVE
+        name: Email
+        created: '2020-07-26T21:05:23.000Z'
+        lastUpdated: '2020-07-28T21:45:52.000Z'
+        settings:
+          allowedFor: any
+          tokenLifetimeInMinutes: 5
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbsPHh7jNjjyP0g4
+            hints:
+              allow:
+                - GET
+                - PUT
+          methods:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbsPHh7jNjjyP0g4/methods
+            hints:
+              allow:
+                - GET
+          deactivate:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbsPHh7jNjjyP0g4/lifecycle/deactivate
+            hints:
+              allow:
+                - POST
+    AuthenticatorResponsePassword:
+      summary: Password
+      value:
+        type: password
+        id: aut1nbtrJKKA9m45a0g4
+        key: okta_password
+        status: ACTIVE
+        name: Password
+        created: '2020-07-26T21:05:23.000Z'
+        lastUpdated: '2020-07-26T21:05:23.000Z'
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbtrJKKA9m45a0g4
+            hints:
+              allow:
+                - GET
+                - PUT
+          methods:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbtrJKKA9m45a0g4/methods
+            hints:
+              allow:
+                - GET
+    AuthenticatorResponsePhone:
+      summary: Phone
+      value:
+        type: phone
+        id: aut1nbuyD8m1ckAYc0g4
+        key: phone_number
+        status: INACTIVE
+        name: Phone
+        created: '2020-07-26T21:05:23.000Z'
+        lastUpdated: '2020-07-29T00:21:29.000Z'
+        settings:
+          allowedFor: none
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbuyD8m1ckAYc0g4
+            hints:
+              allow:
+                - GET
+                - PUT
+          methods:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbuyD8m1ckAYc0g4/methods
+            hints:
+              allow:
+                - GET
+          activate:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbuyD8m1ckAYc0g4/lifecycle/activate
+            hints:
+              allow:
+                - POST
+    AuthenticatorResponseSecurityQuestion:
+      summary: Security question
+      value:
+        type: security_question
+        id: aut1nbvIgEenhwE6c0g4
+        key: security_question
+        status: ACTIVE
+        name: Security Question
+        created: '2020-07-26T21:05:23.000Z'
+        lastUpdated: '2020-07-26T21:05:23.000Z'
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbvIgEenhwE6c0g4
+            hints:
+              allow:
+                - GET
+          methods:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbvIgEenhwE6c0g4/methods
+            hints:
+              allow:
+                - GET
+          deactivate:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbvIgEenhwE6c0g4/lifecycle/deactivate
+            hints:
+              allow:
+                - POST
+    AuthenticatorResponseWebAuthn:
+      summary: WebAuthn
+      value:
+        type: security_key
+        id: aut1nd8PQhGcQtSxB0g4
+        key: webauthn
+        status: ACTIVE
+        name: Security Key or Biometric
+        created: '2020-07-26T21:16:37.000Z'
+        lastUpdated: '2020-07-27T18:59:30.000Z'
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4
+            hints:
+              allow:
+                - GET
+                - PUT
+          methods:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/methods
+            hints:
+              allow:
+                - GET
+          deactivate:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/lifecycle/deactivate
+            hints:
+              allow:
+                - POST
+          aaguids:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/aaguids
+            hints:
+              allow:
+                - GET
+                - POST
+    AuthenticatorResponseInactiveWebAuthn:
+      summary: Inactive WebAuthn authenticator
+      value:
+        type: security_key
+        id: aut1nd8PQhGcQtSxB0g4
+        key: webauthn
+        status: INACTIVE
+        name: Security Key or Biometric
+        created: '2020-07-26T21:16:37.000Z'
+        lastUpdated: '2020-07-27T18:59:30.000Z'
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4
+            hints:
+              allow:
+                - GET
+                - PUT
+          methods:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/methods
+            hints:
+              allow:
+                - GET
+          deactivate:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/lifecycle/deactivate
+            hints:
+              allow:
+                - POST
+    AuthenticatorRequestTac:
+      x-okta-lifecycle:
+        features:
+          - TEMPORARY_ACCESS_CODE
+      summary: Temporary Access Code
+      value:
+        key: tac
+        name: Temporary Access Code
+        provider:
+          type: tac
+          configuration:
+            minTtl: 10
+            maxTtl: 14400
+            defaultTtl: 120
+            length: 16
+            complexity:
+              numbers: true
+              letters: true
+              specialCharacters: true
+            multiUseAllowed: true
+    AuthenticatorResponseTac:
+      x-okta-lifecycle:
+        features:
+          - TEMPORARY_ACCESS_CODE
+      summary: Temporary Access Code
+      value:
+        type: tac
+        id: aut3l0cm6voCtVWK20g7
+        key: tac
+        status: ACTIVE
+        name: Temporary Access Code
+        created: '2022-07-15T21:14:02.000Z'
+        lastUpdated: '2022-07-15T21:14:02.000Z'
+        provider:
+          type: tac
+          configuration:
+            minTtl: 10
+            maxTtl: 14400
+            defaultTtl: 120
+            length: 16
+            complexity:
+              numbers: true
+              letters: true
+              specialCharacters: true
+            multiUseAllowed: true
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut3l0cm6voCtVWK20g7
+            hints:
+              allow:
+                - GET
+                - PUT
+          deactivate:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut3l0cm6voCtVWK20g7/lifecycle/deactivate
+            hints:
+              allow:
+                - POST
+          methods:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut3l0cm6voCtVWK20g7/methods
+            hints:
+              allow:
+                - GET
+    AuthenticatorRequestWebAuthnWithNameAndDescription:
+      value:
+        key: webauthn
+        name: Custom Passkeys name
+        description: Custom description for Passkeys authenticator
+      x-okta-lifecycle:
+        features:
+          - PASSKEYS_REBRAND
+    AuthenticatorResponseWebAuthnWithNameAndDescription:
+      value:
+        key: webauthn
+        name: Custom Passkeys name
+        description: Custom description for Passkeys authenticator
+        type: security_key
+        id: aut1nd8PQhGcQtSxB0g4
+        status: ACTIVE
+        created: '2020-07-26T21:16:37.000Z'
+        lastUpdated: '2020-07-27T18:59:30.000Z'
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4
+            hints:
+              allow:
+                - GET
+                - PUT
+          methods:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/methods
+            hints:
+              allow:
+                - GET
+          deactivate:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/lifecycle/deactivate
+            hints:
+              allow:
+                - POST
+          aaguids:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/aaguids
+            hints:
+              allow:
+                - GET
+                - POST
+      x-okta-lifecycle:
+        features:
+          - PASSKEYS_REBRAND
+    AuthenticatorsResponse:
+      summary: List of org's authenticators
+      value:
+        - type: email
+          id: aut1nbsPHh7jNjjyP0g4
+          key: okta_email
+          status: ACTIVE
+          name: Email
+          created: '2020-07-26T21:05:23.000Z'
+          lastUpdated: '2020-07-28T21:45:52.000Z'
+          settings:
+            allowedFor: any
+            tokenLifetimeInMinutes: 5
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbsPHh7jNjjyP0g4
+              hints:
+                allow:
+                  - GET
+                  - PUT
+            methods:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbsPHh7jNjjyP0g4/methods
+              hints:
+                allow:
+                  - GET
+            deactivate:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbsPHh7jNjjyP0g4/lifecycle/deactivate
+              hints:
+                allow:
+                  - POST
+        - type: password
+          id: aut1nbtrJKKA9m45a0g4
+          key: okta_password
+          status: ACTIVE
+          name: Password
+          created: '2020-07-26T21:05:23.000Z'
+          lastUpdated: '2020-07-26T21:05:23.000Z'
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbtrJKKA9m45a0g4
+              hints:
+                allow:
+                  - GET
+                  - PUT
+            methods:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbtrJKKA9m45a0g4/methods
+              hints:
+                allow:
+                  - GET
+        - type: phone
+          id: aut1nbuyD8m1ckAYc0g4
+          key: phone_number
+          status: INACTIVE
+          name: Phone
+          created: '2020-07-26T21:05:23.000Z'
+          lastUpdated: '2020-07-29T00:21:29.000Z'
+          settings:
+            allowedFor: none
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbuyD8m1ckAYc0g4
+              hints:
+                allow:
+                  - GET
+                  - PUT
+            methods:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbuyD8m1ckAYc0g4/methods
+              hints:
+                allow:
+                  - GET
+            activate:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbuyD8m1ckAYc0g4/lifecycle/activate
+              hints:
+                allow:
+                  - POST
+        - type: security_key
+          id: aut1nd8PQhGcQtSxB0g4
+          key: webauthn
+          status: ACTIVE
+          name: Security Key or Biometric
+          created: '2020-07-26T21:16:37.000Z'
+          lastUpdated: '2020-07-27T18:59:30.000Z'
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4
+              hints:
+                allow:
+                  - GET
+                  - PUT
+            methods:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/methods
+              hints:
+                allow:
+                  - GET
+            deactivate:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/lifecycle/deactivate
+              hints:
+                allow:
+                  - POST
+            aaguids:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/aaguids
+              hints:
+                allow:
+                  - GET
+                  - POST
+    AuthenticatorsResponseWithWebAuthnNameAndDescription:
+      x-okta-lifecycle:
+        features:
+          - PASSKEYS_REBRAND
+      summary: Org authenticators with Passkeys name and description
+      value:
+        - type: email
+          id: aut1nbsPHh7jNjjyP0g4
+          key: okta_email
+          status: ACTIVE
+          name: Email
+          created: '2020-07-26T21:05:23.000Z'
+          lastUpdated: '2020-07-28T21:45:52.000Z'
+          settings:
+            allowedFor: any
+            tokenLifetimeInMinutes: 5
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbsPHh7jNjjyP0g4
+              hints:
+                allow:
+                  - GET
+                  - PUT
+            methods:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbsPHh7jNjjyP0g4/methods
+              hints:
+                allow:
+                  - GET
+            deactivate:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbsPHh7jNjjyP0g4/lifecycle/deactivate
+              hints:
+                allow:
+                  - POST
+        - type: password
+          id: aut1nbtrJKKA9m45a0g4
+          key: okta_password
+          status: ACTIVE
+          name: Password
+          created: '2020-07-26T21:05:23.000Z'
+          lastUpdated: '2020-07-26T21:05:23.000Z'
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbtrJKKA9m45a0g4
+              hints:
+                allow:
+                  - GET
+                  - PUT
+            methods:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbtrJKKA9m45a0g4/methods
+              hints:
+                allow:
+                  - GET
+        - type: phone
+          id: aut1nbuyD8m1ckAYc0g4
+          key: phone_number
+          status: INACTIVE
+          name: Phone
+          created: '2020-07-26T21:05:23.000Z'
+          lastUpdated: '2020-07-29T00:21:29.000Z'
+          settings:
+            allowedFor: none
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbuyD8m1ckAYc0g4
+              hints:
+                allow:
+                  - GET
+                  - PUT
+            methods:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbuyD8m1ckAYc0g4/methods
+              hints:
+                allow:
+                  - GET
+            activate:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nbuyD8m1ckAYc0g4/lifecycle/activate
+              hints:
+                allow:
+                  - POST
+        - type: security_key
+          id: aut1nd8PQhGcQtSxB0g4
+          key: webauthn
+          status: ACTIVE
+          name: Custom Passkeys name
+          description: Custom description for Passkeys authenticator
+          created: '2020-07-26T21:16:37.000Z'
+          lastUpdated: '2020-07-27T18:59:30.000Z'
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4
+              hints:
+                allow:
+                  - GET
+                  - PUT
+            methods:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/methods
+              hints:
+                allow:
+                  - GET
+            deactivate:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/lifecycle/deactivate
+              hints:
+                allow:
+                  - POST
+            aaguids:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/aaguids
+              hints:
+                allow:
+                  - GET
+                  - POST
+    AuthenticatorMethodSms:
+      summary: Phone authenticator - SMS method
+      value:
+        type: sms
+        status: ACTIVE
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/methods/sms
+            hints:
+              allow:
+                - GET
+                - PUT
+          deactivate:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/methods/sms/lifecycle/deactivate
+            hints:
+              allow":
+                - POST
+    AuthenticatorMethodInactiveVoice:
+      summary: Phone authenticator - Voice method
+      value:
+        type: voice
+        status: INACTIVE
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/methods/voice
+            hints:
+              allow:
+                - GET
+                - PUT
+          activate:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/methods/voice/lifecycle/activate
+            hints:
+              allow:
+                - POST
+    AuthenticatorMethodPhone:
+      summary: List of phone authenticator methods
+      value:
+        - type: sms
+          status: ACTIVE
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/methods/sms
+              hints:
+                allow:
+                  - GET
+                  - PUT
+            deactivate:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/methods/sms/lifecycle/deactivate
+              hints:
+                allow:
+                  - POST
+        - type: voice
+          status: INACTIVE
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/methods/voice
+              hints:
+                allow:
+                  - GET
+                  - PUT
+            activate:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/methods/voice/lifecycle/activate
+              hints:
+                allow:
+                  - POST
+    AuthenticatorMethodWebAuthn:
+      summary: WebAuthn authenticator method
+      value:
+        type: webauthn
+        status: ACTIVE
+        settings:
+          userVerification: DISCOURAGED
+          attachment: ANY
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/methods/webauthn
+            hints:
+              allow:
+                - GET
+                - PUT
+    AuthenticatorMethodWebAuthnWithRpId:
+      x-okta-lifecycle:
+        features:
+          - WEBAUTHN_CUSTOM_RP_ID
+      summary: WebAuthn authenticator method with a custom RP ID
+      value:
+        type: webauthn
+        status: ACTIVE
+        settings:
+          userVerification: DISCOURAGED
+          attachment: ANY
+          rpId:
+            enabled: false
+            domain:
+              name: mycustomdomain.com
+              validationStatus: NOT_STARTED
+              dnsRecord:
+                recordType: TXT
+                fqdn: _oktaverification.mycustomdomain.com,
+                verificationValue: 5e2dc662c8ce4f4aa4cd1cd292490d35
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/methods/webauthn
+            hints:
+              allow:
+                - GET
+                - PUT
+          verify-rp-id-domain:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/methods/webauthn/verify-rp-id-domain
+            hints:
+              allow:
+                - POST
+    AuthenticatorMethodWebAuthnWithRebrandSettings:
+      x-okta-lifecycle:
+        features:
+          - PASSKEYS_REBRAND
+      summary: Passkeys method with rebranded and new settings
+      value:
+        type: webauthn
+        status: ACTIVE
+        settings:
+          userVerification: PREFERRED
+          userVerificationForVerify: PREFERRED
+          residentKeyRequirement: DISCOURAGED
+          showSignInWithAPasskeyButton: false
+          certBasedAttestationValidation: false
+          allowSyncablePasskeys: true
+          hardwareProtected: false
+          fipsCompliant: false
+          attachment: ANY
+          rpId:
+            enabled: false
+            domain:
+              name: mycustomdomain.com
+              validationStatus: NOT_STARTED
+              dnsRecord:
+                recordType: TXT
+                fqdn: _oktaverification.mycustomdomain.com,
+                verificationValue: 5e2dc662c8ce4f4aa4cd1cd292490d35
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/methods/webauthn
+            hints:
+              allow:
+                - GET
+                - PUT
+          verify-rp-id-domain:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/methods/webauthn/verify-rp-id-domain
+            hints:
+              allow:
+                - POST
+    AuthenticatorMethodTac:
+      x-okta-lifecycle:
+        features:
+          - TEMPORARY_ACCESS_CODE
+      summary: Temporary Access Code authenticator method
+      value:
+        type: tac
+        status: ACTIVE
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut3l0cm6voCtVWK20g7/methods/tac
+            hints:
+              allow:
+                - GET
+                - PUT
+          deactivate:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut3l0cm6voCtVWK20g7/methods/tac/lifecycle/deactivate
+            hints:
+              allow:
+                - POST
+    CustomAAGUIDRequest:
+      summary: Create a custom AAGUID
+      value:
+        aaguid: cb69481e-8ff7-4039-93ec-0a272911111
+        name: My Security Key
+        authenticatorCharacteristics:
+          platformAttached: false
+          fipsCompliant: false
+          hardwareProtected: false
+        attestationRootCertificates:
+          - x5c: X5C...
+    CustomAAGUIDUpdateRequest:
+      summary: Update a custom AAGUID
+      value:
+        name: My Security Key
+        authenticatorCharacteristics:
+          platformAttached: false
+          fipsCompliant: false
+          hardwareProtected: false
+        attestationRootCertificates:
+          - x5c: X5C...
+    CustomAAGUIDResponse:
+      summary: Custom AAGUID
+      value:
+        aaguid: cb69481e-8ff7-4039-93ec-0a272911111
+        name: My Security Key
+        authenticatorCharacteristics:
+          platformAttached: false
+          fipsCompliant: false
+          hardwareProtected: false
+        attestationRootCertificates:
+          - x5c: X5C...
+            x5t#S256: SHA-256 x5t of the X.509 root certificate
+            iss: Yubico U2F Root CA Serial 457200631
+            exp: 2035-05-26T16:04:58.000Z
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/aaguids/cb69481e-8ff7-4039-93ec-0a272911111
+            hints:
+              allow:
+                - GET
+                - PUT
+                - PATCH
+                - DELETE
+    AllCustomAAGUIDResponse:
+      summary: List of custom AAGUIDs
+      value:
+        - aaguid: cb69481e-8ff7-4039-93ec-0a272911111
+          name: My Security Key
+          authenticatorCharacteristics:
+            platformAttached: false
+            fipsCompliant: false
+            hardwareProtected: false
+          attestationRootCertificates:
+            - x5c: X5C...
+              x5t#S256: SHA-256 x5t of the X.509 root certificate
+              iss: Yubico U2F Root CA Serial 457200631
+              exp: 2035-05-26T16:04:58.000Z
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/authenticators/aut1nd8PQhGcQtSxB0g4/aaguids/cb69481e-8ff7-4039-93ec-0a272911111
+              hints:
+                allow:
+                  - GET
+                  - PUT
+                  - PATCH
+                  - DELETE
+  parameters:
+    pathAuthenticatorId:
+      name: authenticatorId
+      description: '`id` of the authenticator'
+      in: path
+      required: true
+      schema:
+        type: string
+        example: aut1nd8PQhGcQtSxB0g4
+    pathMethodType:
+      name: methodType
+      description: Type of authenticator method
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/AuthenticatorMethodType'
+    pathWebAuthnMethodType:
+      name: webAuthnMethodType
+      description: Type of authenticator method
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/AuthenticatorMethodTypeWebAuthn'
+    pathAAGUID:
+      name: aaguid
+      description: Unique ID of a custom AAGUID
+      in: path
+      required: true
+      schema:
+        type: string
+        example: cb69481e-8ff7-4039-93ec-0a272911111
+  requestBodies:
+    AuthenticatorRequestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthenticatorBase'
+          examples:
+            Duo:
+              $ref: '#/components/examples/AuthenticatorRequestDuo'
+            TAC:
+              $ref: '#/components/examples/AuthenticatorRequestTac'
+            Passkeys with custom name and description:
+              $ref: '#/components/examples/AuthenticatorRequestWebAuthnWithNameAndDescription'
+      required: true
+  responses:
+    AuthenticatorResponse:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthenticatorBase'
+          examples:
+            Duo:
+              $ref: '#/components/examples/AuthenticatorResponseDuo'
+            Email:
+              $ref: '#/components/examples/AuthenticatorResponseEmail'
+            Password:
+              $ref: '#/components/examples/AuthenticatorResponsePassword'
+            Phone:
+              $ref: '#/components/examples/AuthenticatorResponsePhone'
+            WebAuthn:
+              $ref: '#/components/examples/AuthenticatorResponseWebAuthn'
+            Passkeys with custom name and description:
+              $ref: '#/components/examples/AuthenticatorResponseWebAuthnWithNameAndDescription'
+            SecurityQuestion:
+              $ref: '#/components/examples/AuthenticatorResponseSecurityQuestion'
+            TAC:
+              $ref: '#/components/examples/AuthenticatorResponseTac'
+    AuthenticatorResponseInactiveWebAuthn:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthenticatorBase'
+          examples:
+            WebAuthn:
+              $ref: '#/components/examples/AuthenticatorResponseInactiveWebAuthn'
+  schemas:
+    AuthenticatorBase:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        _links:
+          description: Link relations for this object
+          $ref: '#/components/schemas/AuthenticatorLinks'
+        created:
+          description: Timestamp when the authenticator was created
+          format: date-time
+          readOnly: true
+          type: string
+        id:
+          description: A unique identifier for the authenticator
+          readOnly: true
+          type: string
+        key:
+          $ref: '#/components/schemas/AuthenticatorKeyEnum'
+        status:
+          allOf:
+            - $ref: ../Common.yaml#/components/schemas/LifecycleStatus
+            - description: Status of the authenticator
+        lastUpdated:
+          description: Timestamp when the authenticator was last modified
+          format: date-time
+          readOnly: true
+          type: string
+        name:
+          description: Display name of the authenticator
+          type: string
+        description:
+          x-okta-lifecycle:
+            features:
+              - PASSKEYS_REBRAND
+          description: The description of the authenticator. This setting is only available for the `webauthn` authenticator type (Passkeys).
+          type: string
+        type:
+          $ref: ../Common.yaml#/components/schemas/AuthenticatorType
+      discriminator:
+        propertyName: key
+        mapping:
+          custom_app: '#/components/schemas/AuthenticatorKeyCustomApp'
+          custom_otp: '#/components/schemas/AuthenticatorKeyCustomOtp'
+          duo: '#/components/schemas/AuthenticatorKeyDuo'
+          okta_email: '#/components/schemas/AuthenticatorKeyEmail'
+          google_otp: '#/components/schemas/AuthenticatorKeyGoogleOtp'
+          external_idp: '#/components/schemas/AuthenticatorKeyExternalIdp'
+          okta_password: '#/components/schemas/AuthenticatorKeyPassword'
+          okta_verify: '#/components/schemas/AuthenticatorKeyOktaVerify'
+          onprem_mfa: '#/components/schemas/AuthenticatorKeyOnprem'
+          phone_number: '#/components/schemas/AuthenticatorKeyPhone'
+          security_key: '#/components/schemas/AuthenticatorKeySecurityKey'
+          security_question: '#/components/schemas/AuthenticatorKeySecurityQuestion'
+          symantec_vip: '#/components/schemas/AuthenticatorKeySymantecVip'
+          smart_card_idp: '#/components/schemas/AuthenticatorKeySmartCard'
+          webauthn: '#/components/schemas/AuthenticatorKeyWebauthn'
+          yubikey_token: '#/components/schemas/AuthenticatorKeyYubikey'
+        x-okta-feature-flag-amends:
+          TEMPORARY_ACCESS_CODE:
+            mapping:
+              tac: '#/components/schemas/AuthenticatorKeyTac'
+    AuthenticatorSimple:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorBase'
+    AuthenticatorKeyCustomApp:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorSimple'
+        - type: object
+          properties:
+            agreeToTerms:
+              type: boolean
+              description: A value of `true` indicates that the administrator accepts the [terms](https://www.okta.com/privacy-policy/) for creating a new authenticator. Okta requires that you accept the terms when creating a new `custom_app` authenticator. Other authenticators don't require this field.
+            settings:
+              type: object
+              properties:
+                userVerification:
+                  $ref: '#/components/schemas/CustomAppUserVerificationEnum'
+                appInstanceId:
+                  type: string
+                  description: The application instance ID. For custom_app, you need to create an OIDC native app using the [Apps API](https://developer.okta.com/docs/reference/api/apps/) with `Authorization Code` and `Refresh Token` grant types. You can leave both `Sign-in redirect URIs` and `Sign-out redirect URIs` as the default values.
+            provider:
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: Provider type
+                  enum:
+                    - PUSH
+                configuration:
+                  type: object
+                  description: The configuration of the provider
+                  properties:
+                    apns:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: ID of the APNs (Apple Push Notification Service) [configurations](https://developer.okta.com/docs/reference/api/push-providers/)
+                        appBundleId:
+                          type: string
+                          description: AppBundleId of the APNs (Apple Push Notification Service) [configurations](https://developer.okta.com/docs/reference/api/push-providers/)
+                        debugAppBundleId:
+                          type: string
+                          description: DebugAppBundleId of the APNs (Apple Push Notification Service) [configurations](https://developer.okta.com/docs/reference/api/push-providers/)
+                    fcm:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: ID of the FCM (Firebase Cloud Messaging Service) [configurations](https://developer.okta.com/docs/reference/api/push-providers/)
+    AuthenticatorKeyCustomOtp:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorSimple'
+    AuthenticatorKeyDuo:
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorSimple'
+        - type: object
+          properties:
+            provider:
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: Provider type
+                  enum:
+                    - DUO
+                configuration:
+                  type: object
+                  properties:
+                    host:
+                      type: string
+                      description: The Duo Security API hostname
+                    integrationKey:
+                      type: string
+                      description: The Duo Security integration key
+                    secretKey:
+                      type: string
+                      description: The Duo Security secret key
+                    userNameTemplate:
+                      type: object
+                      properties:
+                        template:
+                          type: string
+                          description: The Duo Security user template name
+    AuthenticatorKeyEmail:
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorSimple'
+        - type: object
+          properties:
+            settings:
+              type: object
+              properties:
+                allowedFor:
+                  $ref: '#/components/schemas/AllowedForEnum'
+                tokenLifetimeInMinutes:
+                  description: Specifies the lifetime of an email token. Default value is 5 minutes.
+                  type: number
+                  default: 5
+    AuthenticatorKeyGoogleOtp:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorSimple'
+    AuthenticatorKeyExternalIdp:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorSimple'
+    AuthenticatorKeyPassword:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorSimple'
+    AuthenticatorKeyOktaVerify:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorSimple'
+        - type: object
+          properties:
+            settings:
+              type: object
+              properties:
+                channelBinding:
+                  $ref: '#/components/schemas/ChannelBinding'
+                compliance:
+                  $ref: '#/components/schemas/Compliance'
+                userVerification:
+                  $ref: '#/components/schemas/UserVerificationEnum'
+                appInstanceId:
+                  type: string
+                  description: The application instance ID
+    AuthenticatorKeyOnprem:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorSimple'
+    AuthenticatorKeyPhone:
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorSimple'
+        - type: object
+          properties:
+            settings:
+              type: object
+              properties:
+                allowedFor:
+                  $ref: '#/components/schemas/AllowedForEnum'
+    AuthenticatorKeySecurityKey:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorSimple'
+    AuthenticatorKeySecurityQuestion:
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorSimple'
+        - type: object
+          properties:
+            settings:
+              type: object
+              properties:
+                allowedFor:
+                  $ref: '#/components/schemas/AllowedForEnum'
+    AuthenticatorKeySymantecVip:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorSimple'
+    AuthenticatorKeySmartCard:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorSimple'
+    AuthenticatorKeyTac:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      x-okta-lifecycle:
+        features:
+          - TEMPORARY_ACCESS_CODE
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorSimple'
+        - type: object
+          properties:
+            provider:
+              type: object
+              description: Settings for the TAC authenticator
+              x-okta-lifecycle:
+                features:
+                  - TEMPORARY_ACCESS_CODE
+              properties:
+                type:
+                  type: string
+                  description: Provider type
+                  enum:
+                    - tac
+                configuration:
+                  type: object
+                  description: Define the configuration settings of the TAC
+                  required:
+                    - minTtl
+                    - maxTtl
+                    - defaultTtl
+                    - length
+                    - complexity
+                  properties:
+                    minTtl:
+                      type: number
+                      description: Minimum time-to-live (TTL) of the TAC in minutes. The `minTtl` indicates the minimum amount of time that a TAC is valid. The `minTtl` must be less than the `maxTtl`.
+                      minimum: 10
+                      maximum: 14400
+                    maxTtl:
+                      type: number
+                      description: Maximum TTL of the TAC in minutes. The `maxTtl` indicates the maximum amount of time that a TAC is valid. The `maxTtl` must be greater than the `minTtl`.
+                      minimum: 10
+                      maximum: 14400
+                    defaultTtl:
+                      type: number
+                      description: The default TTL in minutes when you create a TAC. The `defaultTtl` indicates the actual amount of time that a TAC is valid before it expires. The `defaultTtl` must be greater than the `minTtl` and less than the `maxTtl`.
+                      minimum: 10
+                      maximum: 14400
+                      default: 120
+                    length:
+                      type: number
+                      description: Defines the number of characters in a TAC. For example, a `length` of `16` means that the TAC is 16 characters.
+                      minimum: 8
+                      maximum: 64
+                    complexity:
+                      type: object
+                      description: Define the complexity of the TAC
+                      properties:
+                        numbers:
+                          type: boolean
+                          description: Use numbers in the TAC. `numbers` is always `true` for the TAC authenticator.
+                        letters:
+                          type: boolean
+                          description: Use letters in the TAC
+                        specialCharacters:
+                          type: boolean
+                          description: Use special characters in the TAC
+                    multiUseAllowed:
+                      type: boolean
+                      description: Indicates whether a TAC can be used multiple times. If set to `true`, the TAC can be used multiple times until it expires.
+    AuthenticatorKeyWebauthn:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorSimple'
+    AuthenticatorKeyYubikey:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorSimple'
+    AllowedForEnum:
+      type: string
+      description: The allowed types of uses for the authenticator
+      enum:
+        - any
+        - none
+        - recovery
+        - sso
+    AuthenticatorMethodAlgorithm:
+      type: string
+      enum:
+        - ES256
+        - RS256
+    AuthenticatorMethodBase:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        status:
+          allOf:
+            - description: The status of the authenticator method
+            - $ref: ../Common.yaml#/components/schemas/LifecycleStatus
+        type:
+          $ref: '#/components/schemas/AuthenticatorMethodType'
+        _links:
+          $ref: ../Common.yaml#/components/schemas/LinksSelfAndLifecycle
+      discriminator:
+        propertyName: type
+        mapping:
+          sms: '#/components/schemas/AuthenticatorMethodSimple'
+          voice: '#/components/schemas/AuthenticatorMethodSimple'
+          email: '#/components/schemas/AuthenticatorMethodSimple'
+          push: '#/components/schemas/AuthenticatorMethodPush'
+          signed_nonce: '#/components/schemas/AuthenticatorMethodSignedNonce'
+          totp: '#/components/schemas/AuthenticatorMethodTotp'
+          otp: '#/components/schemas/AuthenticatorMethodOtp'
+          password: '#/components/schemas/AuthenticatorMethodSimple'
+          webauthn: '#/components/schemas/AuthenticatorMethodWebAuthn'
+          security_question: '#/components/schemas/AuthenticatorMethodSimple'
+          idp: '#/components/schemas/AuthenticatorMethodWithVerifiableProperties'
+          duo: '#/components/schemas/AuthenticatorMethodWithVerifiableProperties'
+          cert: '#/components/schemas/AuthenticatorMethodWithVerifiableProperties'
+        x-okta-feature-flag-amends:
+          TEMPORARY_ACCESS_CODE:
+            mapping:
+              tac: '#/components/schemas/AuthenticatorMethodTac'
+    AuthenticatorMethodTac:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      x-okta-lifecycle:
+        features:
+          - TEMPORARY_ACCESS_CODE
+      type: object
+      properties:
+        status:
+          allOf:
+            - description: The status of the authenticator method
+            - $ref: ../Common.yaml#/components/schemas/LifecycleStatus
+        type:
+          $ref: '#/components/schemas/AuthenticatorMethodType'
+        _links:
+          $ref: ../Common.yaml#/components/schemas/LinksSelfAndLifecycle
+    AuthenticatorMethodOtp:
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorMethodWithVerifiableProperties'
+        - type: object
+          properties:
+            acceptableAdjacentIntervals:
+              type: integer
+              description: The number of acceptable adjacent intervals, also known as the clock drift interval. This setting allows you to build in tolerance for any time difference between the token and the server. For example, with a `timeIntervalInSeconds` of 60 seconds and an `acceptableAdjacentIntervals` value of 5, Okta accepts passcodes within 300 seconds (60 * 5) before or after the end user enters their code.
+              minimum: 0
+              maximum: 10
+            algorithm:
+              $ref: '#/components/schemas/OtpTotpAlgorithm'
+            encoding:
+              $ref: '#/components/schemas/OtpTotpEncoding'
+            factorProfileId:
+              type: string
+              description: The `id` value of the factor profile
+              example: aut1nd8PQhGcQtSxB0g4
+            passCodeLength:
+              $ref: '#/components/schemas/OtpTotpPassCodeLength'
+            protocol:
+              $ref: '#/components/schemas/OtpProtocol'
+            timeIntervalInSeconds:
+              $ref: '#/components/schemas/OtpTotpTimeIntervalInSeconds'
+    AuthenticatorMethodProperty:
+      type: string
+      enum:
+        - DEVICE_BOUND
+        - HARDWARE_PROTECTED
+        - PHISHING_RESISTANT
+        - USER_PRESENCE
+        - USER_VERIFYING
+    AuthenticatorMethodPush:
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorMethodBase'
+        - type: object
+          properties:
+            settings:
+              type: object
+              properties:
+                algorithms:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AuthenticatorMethodAlgorithm'
+                keyProtection:
+                  $ref: '#/components/schemas/PushMethodKeyProtection'
+                transactionTypes:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AuthenticatorMethodTransactionType'
+    AuthenticatorMethodSignedNonce:
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorMethodBase'
+        - type: object
+          properties:
+            settings:
+              type: object
+              properties:
+                algorithms:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AuthenticatorMethodAlgorithm'
+                keyProtection:
+                  $ref: '#/components/schemas/PushMethodKeyProtection'
+                showSignInWithOV:
+                  $ref: '#/components/schemas/ShowSignInWithOV'
+    AuthenticatorMethodSimple:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorMethodBase'
+    AuthenticatorMethodTotp:
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorMethodBase'
+        - type: object
+          properties:
+            settings:
+              type: object
+              properties:
+                timeIntervalInSeconds:
+                  $ref: '#/components/schemas/OtpTotpTimeIntervalInSeconds'
+                encoding:
+                  $ref: '#/components/schemas/OtpTotpEncoding'
+                algorithm:
+                  $ref: '#/components/schemas/OtpTotpAlgorithm'
+                passCodeLength:
+                  $ref: '#/components/schemas/OtpTotpPassCodeLength'
+    AuthenticatorMethodTransactionType:
+      type: string
+      enum:
+        - CIBA
+        - LOGIN
+    AuthenticatorMethodType:
+      type: string
+      description: The type of authenticator method
+      enum:
+        - cert
+        - duo
+        - email
+        - idp
+        - otp
+        - password
+        - push
+        - security_question
+        - signed_nonce
+        - sms
+        - totp
+        - voice
+        - webauthn
+      x-okta-feature-flag-amends:
+        TEMPORARY_ACCESS_CODE:
+          enum:
+            - tac
+    AuthenticatorMethodTypeWebAuthn:
+      type: string
+      description: The type of authenticator method
+      enum:
+        - webauthn
+    AuthenticatorMethodWebAuthn:
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorMethodBase'
+        - type: object
+          properties:
+            settings:
+              description: The settings for the WebAuthn authenticator method
+              type: object
+              properties:
+                aaguidGroups:
+                  description: The FIDO2 Authenticator Attestation Global Unique Identifiers (AAGUID) groups available to the WebAuthn authenticator
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AAGUIDGroupObject'
+                userVerification:
+                  $ref: '#/components/schemas/UserVerificationEnumEnrollment'
+                userVerificationForVerify:
+                  $ref: '#/components/schemas/UserVerificationEnumForVerify'
+                attachment:
+                  $ref: '#/components/schemas/WebAuthnAttachmentEnum'
+                rpId:
+                  $ref: '#/components/schemas/WebAuthnRpId'
+                enableAutofillUI:
+                  $ref: '#/components/schemas/WebAuthnSettingEnableAutofillUI'
+                residentKeyRequirement:
+                  $ref: '#/components/schemas/WebAuthnSettingResidentKeyRequirement'
+                showSignInWithAPasskeyButton:
+                  $ref: '#/components/schemas/WebAuthnSettingShowSignInWithAPasskeyButton'
+                certBasedAttestationValidation:
+                  $ref: '#/components/schemas/WebAuthnSettingCertBasedAttestationValidation'
+                hardwareProtected:
+                  $ref: '#/components/schemas/WebAuthnSettingHardwareProtected'
+                fipsCompliant:
+                  $ref: '#/components/schemas/WebAuthnSettingFipsCompliant'
+                allowSyncablePasskeys:
+                  $ref: '#/components/schemas/WebAuthnSettingAllowSyncablePasskeys'
+    AuthenticatorMethodWithVerifiableProperties:
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorMethodBase'
+        - type: object
+          properties:
+            verifiableProperties:
+              type: array
+              items:
+                $ref: '#/components/schemas/AuthenticatorMethodProperty'
+    AuthenticatorLinks:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: ../Common.yaml#/components/schemas/LinksSelfAndLifecycle
+        - type: object
+          properties:
+            methods:
+              description: Link to authenticator methods
+              allOf:
+                - $ref: ../Common.yaml#/components/schemas/HrefObject
+    ChannelBinding:
+      type: object
+      properties:
+        required:
+          $ref: '#/components/schemas/RequiredEnum'
+        style:
+          type: string
+          enum:
+            - NUMBER_CHALLENGE
+    Compliance:
+      type: object
+      properties:
+        fips:
+          $ref: '#/components/schemas/FipsEnum'
+    CustomAppUserVerificationEnum:
+      description: User verification setting
+      type: string
+      enum:
+        - PREFERRED
+        - REQUIRED
+    DNSRecordAuthenticators:
+      description: DNS TXT record that must be registered for an RP ID domain that requires verification. This is used to verify the domain ownership for the WebAuthn RP ID configuration. After the domain ownership is verified, the `DNSRecord` isn't returned in the response.
+      type: object
+      properties:
+        fqdn:
+          description: The DNS record name
+          type: string
+          example: _oktaverification.mycustomdomain.com
+        recordType:
+          $ref: '#/components/schemas/DNSRecordTypeAuthenticators'
+        verificationValue:
+          description: The DNS record verification value
+          type: string
+          example:
+            - 79496f234c814638b1cc44f51a782781
+    DNSRecordTypeAuthenticators:
+      example: TXT
+      type: string
+      enum:
+        - TXT
+    FipsEnum:
+      type: string
+      enum:
+        - OPTIONAL
+        - REQUIRED
+    OtpProtocol:
+      type: string
+      description: The protocol used
+      enum:
+        - SYMANTEC
+        - TOTP
+        - YUBICO
+    OtpTotpAlgorithm:
+      description: HMAC algorithm
+      type: string
+      enum:
+        - HMacSHA1
+        - HMacSHA256
+        - HMacSHA512
+    OtpTotpEncoding:
+      type: string
+      description: The shared secret encoding
+      enum:
+        - base32
+        - base64
+        - hexadecimal
+    OtpTotpPassCodeLength:
+      type: integer
+      description: Number of digits in an OTP value
+      minimum: 6
+      maximum: 10
+      multipleOf: 2
+    PushMethodKeyProtection:
+      type: string
+      description: Indicates whether you must use a hardware key store
+      enum:
+        - ANY
+        - HARDWARE
+    RequiredEnum:
+      type: string
+      enum:
+        - ALWAYS
+        - HIGH_RISK_ONLY
+        - NEVER
+    ShowSignInWithOV:
+      type: string
+      description: Controls whether to show the Sign in with Okta Verify button on the Sign-In Widget
+      enum:
+        - ALWAYS
+        - NEVER
+    OtpTotpTimeIntervalInSeconds:
+      type: integer
+      description: Time interval for TOTP in seconds
+    SupportedMethods:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      description: The supported methods of an authenticator
+      properties:
+        settings:
+          type: object
+          properties:
+            keyProtection:
+              $ref: '#/components/schemas/PushMethodKeyProtection'
+            algorithms:
+              description: The encryption algorithm for this authenticator method
+              type: array
+              items:
+                $ref: '#/components/schemas/AuthenticatorMethodAlgorithm'
+            transactionTypes:
+              type: array
+              description: The transaction type for this authenticator method
+              items:
+                $ref: '#/components/schemas/AuthenticatorMethodTransactionType'
+        status:
+          allOf:
+            - $ref: ../Common.yaml#/components/schemas/LifecycleStatus
+            - description: The status of the authenticator method
+        type:
+          type: string
+          description: The type of authenticator method
+          enum:
+            - push
+    UserVerificationEnum:
+      description: User verification settings. Possible values `DISCOURAGED` (the authenticator isn't asked to perform user verification, but may do so at its discretion), `PREFERRED` (the client uses an authenticator capable of user verification if possible), or `REQUIRED` (the client uses only an authenticator capable of user verification)
+      type: string
+      enum:
+        - DISCOURAGED
+        - PREFERRED
+        - REQUIRED
+    UserVerificationEnumEnrollment:
+      description: |-
+        User verification settings for enrollment.
+
+        This setting controls the user verification requirement during the enrollment of a new credential. It determines whether the authenticator requires verification when a user is registering their device or credential.
+      type: string
+      enum:
+        - DISCOURAGED
+        - PREFERRED
+        - REQUIRED
+      x-enumDescriptions:
+        DISCOURAGED: The authenticator isn't asked to perform user verification, but may do so at its discretion.
+        PREFERRED: The client uses an authenticator capable of user verification if possible.
+        REQUIRED: The client uses only an authenticator capable of user verification.
+    UserVerificationEnumForVerify:
+      x-okta-lifecycle:
+        features:
+          - PASSKEYS_REBRAND
+      description: |-
+        User verification settings for verification. This setting controls the user verification requirement during authentication (verification). It determines whether the authenticator requires user verification when a user signs in with an already-registered credential.
+
+        For verification, the value defaults to `PREFERRED`, unless the enrollment setting is `REQUIRED`. If the enrollment setting is `REQUIRED` for the authenticator, then the verification setting is also implicitly `REQUIRED`.
+
+        > **Note:** This setting is only available when you have enabled the **Passkeys Rebrand** feature. See [Enable self-service features](https://help.okta.com/okta_help.htm?id=ext_Manage_Early_Access_features).
+      type: string
+      enum:
+        - DISCOURAGED
+        - PREFERRED
+        - REQUIRED
+      x-enumDescriptions:
+        DISCOURAGED: The authenticator isn't asked to perform user verification, but may do so at its discretion.
+        PREFERRED: The client uses an authenticator capable of user verification if possible.
+        REQUIRED: The client uses only an authenticator capable of user verification.
+    WebAuthnAttachmentEnum:
+      type: string
+      description: Method attachment
+      enum:
+        - ANY
+        - BUILT_IN
+        - ROAMING
+    WebAuthnRpId:
+      type: object
+      description: |-
+        The [RP ID](https://www.w3.org/TR/webauthn/#relying-party-identifier) object for WebAuthn configuration
+
+        > **Note:** Changing the RP ID `domain` invalidates all existing passkeys for all users. You must notify your users that they need to re-enroll their passkeys if you replace an existing RP ID.
+      properties:
+        enabled:
+          type: boolean
+          description: Indicates whether the RP ID is active and is used for WebAuthn operations. It can only be set to `true` once the `validationStatus` of the `domain` object is `VERIFIED`. `enabled` can only be `true` for this same `domain`. Its value must be `false` to be able to configure the `domain`.
+          default: false
+        domain:
+          $ref: '#/components/schemas/WebAuthnRpIdDomain'
+      x-okta-lifecycle:
+        features:
+          - WEBAUTHN_CUSTOM_RP_ID
+    WebAuthnRpIdDomain:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      description: The RP domain object for the WebAuthn configuration
+      properties:
+        name:
+          type: string
+          description: |-
+            The [RP ID](https://www.w3.org/TR/webauthn/#relying-party-identifier) domain value to be used for all WebAuthn operations.
+
+            If it isn't specified, the `domain` object isn't included in the request, and the domain value defaults to the domain of the current page (the domain of your org or a custom domain, for example).
+
+            > **Note:** If you don't use a custom RP ID (the default behavior), the domain value defaults to the end user's current page. The domain value defaults to the full domain name of the page that the end user is on when they're attempting the WebAuthn credential operation (enrollment or verification).
+          example: mycustomdomain.com
+        validationStatus:
+          type: string
+          readOnly: true
+          enum:
+            - NOT_STARTED
+            - IN_PROGRESS
+            - VERIFIED
+            - ERROR
+          x-enumDescriptions:
+            NOT_STARTED: The domain hasn't been verified yet. When configuring a registrable domain name of an existing brand custom domain, the `validationStatus` is initially returned as `NOT_STARTED`. This indicates that verification is required.
+            IN_PROGRESS: The verification process is ongoing. This is a transient state that occurs only when the domain name is actively being checked by the server.
+            VERIFIED: The domain has been successfully verified. When configuring the domain name to the default Okta org domain or the fully qualified domain name of an existing custom brand domain, the `validationStatus` is immediately returned as `VERIFIED`. No additional verification is required.
+            ERROR: There was an error during the verification process. This isn't a terminal state and can be resolved by correcting the DNS record and retrying the verification.
+          description: Indicates the validation status of the domain
+        dnsRecord:
+          allOf:
+            - readOnly: true
+            - $ref: '#/components/schemas/DNSRecordAuthenticators'
+    WellKnownAppAuthenticatorConfiguration:
+      type: object
+      properties:
+        appAuthenticatorEnrollEndpoint:
+          type: string
+          description: The authenticator enrollment endpoint
+        authenticatorId:
+          type: string
+          description: The unique identifier of the app authenticator
+        createdDate:
+          type: string
+          description: Timestamp when the authenticator was created
+          format: date-time
+        key:
+          $ref: '#/components/schemas/AuthenticatorKeyEnum'
+        lastUpdated:
+          type: string
+          description: Timestamp when the authenticator was last modified
+          format: date-time
+        name:
+          type: string
+          description: The authenticator display name
+        orgId:
+          type: string
+          description: The `id` of the Okta Org
+        settings:
+          type: object
+          properties:
+            userVerification:
+              $ref: '#/components/schemas/CustomAppUserVerificationEnum'
+        supportedMethods:
+          type: array
+          items:
+            $ref: '#/components/schemas/SupportedMethods'
+        type:
+          type: string
+          description: The type of authenticator
+          enum:
+            - app
+    AuthenticatorKeyEnum:
+      type: string
+      description: A human-readable string that identifies the authenticator
+      enum:
+        - custom_app
+        - duo
+        - okta_email
+        - google_otp
+        - external_idp
+        - okta_password
+        - okta_verify
+        - onprem_mfa
+        - phone_number
+        - security_key
+        - security_question
+        - symantec_vip
+        - smart_card_idp
+        - webauthn
+        - yubikey_token
+      x-okta-feature-flag-amends:
+        TEMPORARY_ACCESS_CODE:
+          description: A human-readable string that identifies the authenticator
+          enum:
+            - tac
+    AAGUIDGroupObject:
+      type: object
+      properties:
+        aaguids:
+          description: A list of YubiKey hardware FIDO2 AAGUIDs. The available [AAGUIDs](https://support.yubico.com/hc/en-us/articles/360016648959-YubiKey-Hardware-FIDO2-AAGUIDs) are provided by the FIDO Alliance Metadata Service.
+          type: array
+          items:
+            type: string
+            description: AAGUID
+        name:
+          type: string
+          description: A name to identify the group of YubiKey hardware FIDO2 AAGUIDs
+    CustomAAGUIDCreateRequestObject:
+      type: object
+      properties:
+        aaguid:
+          description: An Authenticator Attestation Global Unique Identifier (AAGUID) is a 128-bit identifier indicating the model.
+          type: string
+        authenticatorCharacteristics:
+          $ref: '#/components/schemas/AAGUIDAuthenticatorCharacteristics'
+        attestationRootCertificates:
+          $ref: '#/components/schemas/AttestationRootCertificatesRequest'
+    CustomAAGUIDResponseObject:
+      type: object
+      properties:
+        name:
+          description: The product name associated with the AAGUID
+          type: string
+        aaguid:
+          description: A unique 128-bit identifier that's assigned to a specific model of security key or authenticator
+          type: string
+        authenticatorCharacteristics:
+          $ref: '#/components/schemas/AAGUIDAuthenticatorCharacteristics'
+        attestationRootCertificates:
+          $ref: '#/components/schemas/AttestationRootCertificatesResponse'
+        _links:
+          $ref: ../Common.yaml#/components/schemas/LinksSelf
+    AllCustomAAGUIDResponseObject:
+      type: array
+      items:
+        $ref: '#/components/schemas/CustomAAGUIDResponseObject'
+    CustomAAGUIDUpdateRequestObject:
+      type: object
+      properties:
+        name:
+          description: The product name associated with this AAGUID.
+          type: string
+        authenticatorCharacteristics:
+          $ref: '#/components/schemas/AAGUIDAuthenticatorCharacteristics'
+        attestationRootCertificates:
+          $ref: '#/components/schemas/AttestationRootCertificatesRequest'
+    AAGUIDAuthenticatorCharacteristics:
+      type: object
+      description: Contains additional properties about custom AAGUID.
+      properties:
+        platformAttached:
+          description: Indicates whether the custom AAGUID is built into the authenticator (`true`) or if it's a separate, external authenticator
+          type: boolean
+        fipsCompliant:
+          description: Indicates whether the authenticator meets Federal Information Processing Standards (FIPS) compliance requirements
+          type: boolean
+        hardwareProtected:
+          description: Indicates whether the authenticator stores the private key on a hardware component
+          type: boolean
+    AttestationRootCertificatesRequest:
+      type: array
+      description: Contains the certificate and information about it
+      items:
+        type: object
+        properties:
+          x5c:
+            description: X.509 certificate chain
+            type: string
+    AttestationRootCertificatesResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          x5c:
+            description: X.509 certificate chain
+            type: string
+          x5t#S256:
+            description: SHA-256 hash (thumbprint) of the X.509 certificate
+            type: string
+          iss:
+            description: Issuer of certificate
+            type: string
+          exp:
+            description: Expiry date of certificate
+            type: string
+    WebAuthnSettingEnableAutofillUI:
+      type: boolean
+      description: Enables the passkeys autofill UI to display available WebAuthn discoverable credentials ("resident key") from the Sign-In Widget username field
+      default: false
+      x-okta-lifecycle:
+        features:
+          - WEBAUTHN_AUTOFILL_UI
+          - PASSKEYS_REBRAND
+    WebAuthnSettingResidentKeyRequirement:
+      description: |-
+        Resident key requirement setting. Okta recommends using only `REQUIRED` or `DISCOURAGED` to make the requirement preference explicit. Using `PREFERRED` can sometimes lead to unpredictable behavior depending on the client platform and authenticator capabilities.
+
+        > **Note:** This setting is only available when you have enabled the **Passkeys Rebrand** feature. See [Enable self-service features](https://help.okta.com/okta_help.htm?id=ext_Manage_Early_Access_features).
+      type: string
+      enum:
+        - DISCOURAGED
+        - PREFERRED
+        - REQUIRED
+      x-enumDescriptions:
+        DISCOURAGED: The authenticator is requested to create a server-side credential, but may create a client-side discoverable credential at its discretion.
+        PREFERRED: The authenticator is requested to create a client-side discoverable credential, but may create a server-side non-discoverable credential at its discretion.
+        REQUIRED: The authenticator is required to create a client-side discoverable credential, and the operation fails if the authenticator is unable to do so.
+      x-okta-lifecycle:
+        features:
+          - PASSKEYS_REBRAND
+    WebAuthnSettingShowSignInWithAPasskeyButton:
+      type: boolean
+      description: |-
+        Indicates if the **Sign in with a Passkey** button on the Sign-In Widget is shown.
+
+         > **Note:** This setting is only available when you have enabled the **Passkeys Rebrand** feature. See [Enable self-service features](https://help.okta.com/okta_help.htm?id=ext_Manage_Early_Access_features).
+      default: false
+      x-okta-lifecycle:
+        features:
+          - PASSKEYS_REBRAND
+    WebAuthnSettingCertBasedAttestationValidation:
+      type: boolean
+      description: |-
+        Indicates whether certificate-based attestation validation is enabled. When enabled, the authenticator's attestation certificate is validated against known root certificates (custom AAGUIDs with associated certificates or the [FIDO Metadata Service](https://fidoalliance.org/metadata/)) to ensure its validity.
+
+        > **Note:** This setting is only available when you have enabled the **Passkeys Rebrand** feature. See [Enable self-service features](https://help.okta.com/okta_help.htm?id=ext_Manage_Early_Access_features).
+      default: false
+      x-okta-lifecycle:
+        features:
+          - PASSKEYS_REBRAND
+    WebAuthnSettingHardwareProtected:
+      type: boolean
+      description: |-
+        Indicates whether the authenticator is required to store the private key on a hardware component
+
+        > **Note:** This setting is only available when you have enabled the **Passkeys Rebrand** feature. See [Enable self-service features](https://help.okta.com/okta_help.htm?id=ext_Manage_Early_Access_features).
+      default: false
+      x-okta-lifecycle:
+        features:
+          - PASSKEYS_REBRAND
+    WebAuthnSettingFipsCompliant:
+      type: boolean
+      description: |-
+        Indicates whether the authenticator is required to be [Federal Information Processing Standards (FIPS)](https://csrc.nist.gov/glossary/term/federal_information_processing_standard) compliant
+
+        > **Note:** This setting is only available when you have enabled the **Passkeys Rebrand** feature. See [Enable self-service features](https://help.okta.com/okta_help.htm?id=ext_Manage_Early_Access_features).
+      default: false
+      x-okta-lifecycle:
+        features:
+          - PASSKEYS_REBRAND
+    WebAuthnSettingAllowSyncablePasskeys:
+      type: boolean
+      description: |-
+        Indicates whether syncable passkeys are allowed. When enabled, users can register passkeys that are synchronized across their devices by using platform-specific mechanisms (such as iCloud Keychain for Apple devices or Google Password Manager for Android devices).
+
+        > **Note:** This setting is only available when you have enabled the **Passkeys Rebrand** feature. See [Enable self-service features](https://help.okta.com/okta_help.htm?id=ext_Manage_Early_Access_features).
+      default: true
+      x-okta-lifecycle:
+        features:
+          - PASSKEYS_REBRAND
+  securitySchemes:
+    $ref: ../../base.yaml#/components/securitySchemes

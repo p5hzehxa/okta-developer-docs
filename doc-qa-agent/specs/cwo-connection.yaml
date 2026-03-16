@@ -1,0 +1,292 @@
+openapi: 3.0.3
+info:
+  title: Cross App Access Connections API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/apps/{appId}/cwo/connections:
+    parameters:
+      - $ref: ./Common.yaml#/components/parameters/pathAppId
+    get:
+      summary: Retrieve all Cross App Access connections
+      description: |
+        Retrieves inbound and outbound Cross App Access connections associated with an app
+      operationId: getAllCrossAppAccessConnections
+      parameters:
+        - name: after
+          in: query
+          required: false
+          description: Specifies the pagination cursor for the next page of connection results
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          description: |
+            Specifies the number of results to return per page. The values:
+              * -1: Return all results (up to system maximum)
+              * 0: Return an empty result set
+              * Positive integer: Return up to that many results (capped at system maximum)
+          schema:
+            type: integer
+            format: int32
+            default: -1
+            maximum: 200
+        - name: status
+          in: query
+          required: false
+          description: |
+            Filters connections by their lifecycle status. When specified, only connections that match the specified status are returned.
+          schema:
+            type: string
+            enum:
+              - ACTIVE
+              - INACTIVE
+          example: ACTIVE
+        - name: requestingAppId
+          in: query
+          required: false
+          description: Filters only connections where the app with the specified ID is the requesting app
+          schema:
+            type: string
+          example: 0oa8mm6ktyXqkcs5t0g7
+        - name: resourceAppId
+          in: query
+          required: false
+          description: Filters only connections where the app with the specified ID is the requesting app
+          schema:
+            type: string
+          example: 0oa8mmm7ruidxWhlf0g7
+        - name: activeAppsOnly
+          in: query
+          required: false
+          description: When set to true, filters the result to include only connections where both the requesting and resource app have a status of ACTIVE
+          schema:
+            type: boolean
+          example: true
+        - name: requestingAppName
+          in: query
+          required: false
+          description: Filters connections where the requesting app's name matches the provided search string
+          schema:
+            type: string
+          example: zoom
+        - name: resourceAppName
+          in: query
+          required: false
+          description: Filters connections where the resource app's name matches the provided search string
+          schema:
+            type: string
+          example: box
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrgCrossAppAccessConnection'
+        '401':
+          $ref: ./Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.apps.read
+      tags:
+        - ApplicationCrossAppAccessConnections
+    post:
+      summary: Create a Cross App Access connection
+      description: |
+        Creates a Cross App Access connection
+      operationId: createCrossAppAccessConnection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrgCrossAppAccessConnection'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgCrossAppAccessConnection'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '401':
+          $ref: ./Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.apps.manage
+      tags:
+        - ApplicationCrossAppAccessConnections
+    x-okta-team-detail:
+      x-team-slack: eng-cloudmaker
+  /api/v1/apps/{appId}/cwo/connections/{connectionId}:
+    parameters:
+      - $ref: ./Common.yaml#/components/parameters/pathAppId
+      - $ref: '#/components/parameters/connectionId'
+    get:
+      summary: Retrieve a Cross App Access connection
+      description: |
+        Retrieves the Cross App Access connection with the specified ID
+      operationId: getCrossAppAccessConnection
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgCrossAppAccessConnection'
+        '401':
+          $ref: ./Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.apps.read
+      tags:
+        - ApplicationCrossAppAccessConnections
+    patch:
+      summary: Update a Cross App Access connection
+      description: |
+        Updates the Cross App Access connection with the specified ID
+      operationId: updateCrossAppAccessConnection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrgCrossAppAccessConnectionPatchRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgCrossAppAccessConnection'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '401':
+          $ref: ./Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.apps.manage
+      tags:
+        - ApplicationCrossAppAccessConnections
+    delete:
+      summary: Delete a Cross App Access connection
+      description: |
+        Deletes a Cross App Access connection with the specified ID
+      operationId: deleteCrossAppAccessConnection
+      responses:
+        '204':
+          description: No Content
+        '401':
+          $ref: ./Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.apps.manage
+      tags:
+        - ApplicationCrossAppAccessConnections
+    x-okta-team-detail:
+      x-team-slack: eng-cloudmaker
+components:
+  parameters:
+    connectionId:
+      name: connectionId
+      description: Connection ID
+      in: path
+      required: true
+      schema:
+        type: string
+        example: 0oafxqCAJWWGELFTYASJ
+  schemas:
+    OrgCrossAppAccessConnection:
+      type: object
+      description: Connection object for Cross App Access connections
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the connection
+          readOnly: true
+          example: cwofxqCAJWWGELFTYASJ
+        requestingAppInstanceId:
+          type: string
+          description: ID of the requesting app instance
+          example: 0oafxqCAJWWGELFTYASJ
+        resourceAppInstanceId:
+          type: string
+          description: ID of the resource app instance
+          example: 0oafxqCBJWWGELFTYASK
+        status:
+          description: Indicates if the Cross App Access connection is active or inactive
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
+          example: ACTIVE
+        created:
+          type: string
+          description: The ISO 8601 formatted date and time when the connection was created
+          format: date-time
+          readOnly: true
+          example: '2024-10-15T10:30:00.000Z'
+        lastUpdated:
+          type: string
+          description: The ISO 8601 formatted date and time when the connection was last updated
+          format: date-time
+          readOnly: true
+          example: '2024-10-15T14:20:00.000Z'
+    OrgCrossAppAccessConnectionPatchRequest:
+      type: object
+      description: Patch request object for Cross App Access Connections
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          description: Requested value of Cross App Access connection status
+          enum:
+            - ACTIVE
+            - INACTIVE
+          example: ACTIVE
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

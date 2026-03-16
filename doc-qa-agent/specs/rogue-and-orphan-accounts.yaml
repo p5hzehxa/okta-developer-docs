@@ -1,0 +1,97 @@
+openapi: 3.0.3
+info:
+  title: Unconfirmed Users API
+  version: 1.0.0
+  description: API for managing unconfirmed users within the system
+servers:
+  - url: https://example.okta.com
+    description: Production server
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/apps/{appId}/unconfirmed-users:
+    parameters:
+      - $ref: './Common.yaml#/components/parameters/pathAppId'
+    get:
+      summary: List all unconfirmed users
+      description: Lists all unconfirmed users for an app
+      operationId: listUnconfirmedUsers
+      parameters:
+        - $ref: './apps.yaml#/components/parameters/queryAppAfter'
+        - $ref: './apps.yaml#/components/parameters/queryAppLimit'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnconfirmedUserResponseSchema'
+              examples:
+                userResponse:
+                  $ref: '#/components/examples/UnconfirmedUserResponse'
+        '400':
+          $ref: './Common.yaml#/components/responses/ErrorApiValidationFailed400'
+        '401':
+          $ref: './Common.yaml#/components/responses/ErrorInvalidToken401'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+        '500':
+          $ref: './Common.yaml#/components/responses/ErrorInternalServer500'
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.apps.read
+      tags:
+        - UnconfirmedUsers
+components:
+  examples:
+    UnconfirmedUserResponse:
+      summary: Example response for unconfirmed users
+      value:
+        users:
+          - externalId: "externalId-user-123"
+            credentials:
+              username: "isaac.i.brock@example.com"
+            profile:
+              firstName: "Isaac"
+              lastName: "Brock"
+              email: "isaac.i.brock@example.com"
+          - externalId: "externalId-user-456"
+            credentials:
+              username: "jenny.i.balm@example.com"
+            profile:
+              firstName: "Jenny"
+              lastName: "Balm"
+              email: "jenny.i.balm@example.com"
+  schemas:
+    UnconfirmedUserResponseSchema:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            type: object
+            properties:
+              externalId:
+                type: string
+                description: |-
+                  The ID of the user in the target app that's linked to the Okta application user object.
+                  This value is the native app-specific identifier or primary key for the user in the target app.
+
+                  The `externalId` is set during import when the user is confirmed (reconciled) or during provisioning when the user is created in the target app.
+                  This value isn't populated for SSO app assignments (for example, SAML or SWA) because it isn't synchronized with a target app.
+                readOnly: true
+                example: 70c14cc17d3745e8a9f98d599a68329c
+              credentials:
+                $ref: './apps.yaml#/components/schemas/AppUserCredentials'
+              profile:
+                $ref: './apps.yaml#/components/schemas/AppUserProfile'
+      required:
+        - users
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes
+

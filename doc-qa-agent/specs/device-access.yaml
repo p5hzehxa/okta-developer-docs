@@ -1,0 +1,150 @@
+openapi: 3.0.3
+info:
+  title: Device Access API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /device-access/api/v1/desktop-mfa/recovery-pin-settings:
+    get:
+      summary: Retrieve the Desktop MFA Recovery PIN org setting
+      description: Retrieves the status of the Desktop MFA Recovery PIN feature. That is, whether or not the feature is enabled for your org.
+      operationId: getDesktopMFARecoveryPinOrgSetting
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DesktopMFARecoveryPinOrgSetting'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.orgs.read
+      tags:
+        - DeviceAccess
+    put:
+      summary: Replace the Desktop MFA Recovery PIN org setting
+      description: Replaces the Desktop MFA Recovery PIN feature for your org
+      operationId: replaceDesktopMFARecoveryPinOrgSetting
+      x-codegen-request-body-name: DesktopMFARecoveryPinOrgSetting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DesktopMFARecoveryPinOrgSetting'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DesktopMFARecoveryPinOrgSetting'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+              examples:
+                Access Denied:
+                  $ref: ./Common.yaml#/components/examples/ErrorAccessDenied
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.orgs.manage
+      tags:
+        - DeviceAccess
+    x-okta-team-detail:
+      x-team-slack: dsr-device-access
+  /device-access/api/v1/desktop-mfa/enforce-number-matching-challenge-settings:
+    get:
+      summary: Retrieve the Desktop MFA Enforce Number Matching Challenge org setting
+      description: Retrieves the status of the Desktop MFA Enforce Number Matching Challenge push notifications feature. That is, whether or not the feature is enabled for your org.
+      operationId: getDesktopMFAEnforceNumberMatchingChallengeOrgSetting
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DesktopMFAEnforceNumberMatchingChallengeOrgSetting'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.orgs.read
+      tags:
+        - DeviceAccess
+    put:
+      summary: Replace the Desktop MFA Enforce Number Matching Challenge org setting
+      description: Replaces the status of the Desktop MFA Enforce Number Matching Challenge push notifications feature. That is, whether or not the feature is enabled for your org.
+      operationId: replaceDesktopMFAEnforceNumberMatchingChallengeOrgSetting
+      x-codegen-request-body-name: DesktopMFAEnforceNumberMatchingChallengeOrgSetting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DesktopMFAEnforceNumberMatchingChallengeOrgSetting'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DesktopMFAEnforceNumberMatchingChallengeOrgSetting'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+              examples:
+                Access Denied:
+                  $ref: ./Common.yaml#/components/examples/ErrorAccessDenied
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.orgs.manage
+      tags:
+        - DeviceAccess
+    x-okta-team-detail:
+      x-team-slack: dsr-device-access
+components:
+  parameters: {}
+  schemas:
+    DesktopMFARecoveryPinOrgSetting:
+      type: object
+      properties:
+        desktopMFARecoveryPinEnabled:
+          type: boolean
+          description: Indicates whether or not the Desktop MFA Recovery PIN feature is enabled
+          default: false
+    DesktopMFAEnforceNumberMatchingChallengeOrgSetting:
+      type: object
+      properties:
+        desktopMFAEnforceNumberMatchingChallengeEnabled:
+          type: boolean
+          description: Indicates whether or not the Desktop MFA Enforce Number Matching Challenge push notifications feature is enabled
+          default: false
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

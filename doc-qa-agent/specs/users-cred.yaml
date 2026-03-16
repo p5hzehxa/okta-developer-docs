@@ -1,0 +1,470 @@
+openapi: 3.0.3
+info:
+  title: User Credentials APIs
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/users/{userId}/credentials/change_password:
+    parameters:
+      - $ref: ./Common.yaml#/components/parameters/pathUserId
+    post:
+      summary: Update password
+      description: |-
+        Updates a user's password by validating the user's current password.
+
+        This operation provides an option to delete all the sessions of the specified user. However, if the request is made in the context of a session owned by the specified user, that session isn't cleared.
+
+        You can only perform this operation on users in `STAGED`, `ACTIVE`, `PASSWORD_EXPIRED`, or `RECOVERY` status that have a valid [password credential](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/User/#tag/User/operation/createUser!path=credentials/password&t=request).
+
+        The user transitions to `ACTIVE` status when successfully invoked in `RECOVERY` status.
+
+        > **Note:** The Okta account management policy doesn't support the `/users/{userId}/credentials/change_password` endpoint. See [Configure an Okta account management policy](https://developer.okta.com/docs/guides/okta-account-management-policy/main/).
+      operationId: changePassword
+      parameters:
+        - name: strict
+          in: query
+          description: If true, validates against the password minimum age policy
+          schema:
+            type: boolean
+            default: false
+          x-okta-added-version: 1.10.0
+      x-codegen-request-body-name: changePasswordRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: ./users.yaml#/components/schemas/ChangePasswordRequest
+            examples:
+              Change password request:
+                $ref: '#/components/examples/ChangePwdRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: ./users.yaml#/components/schemas/UserCredentials
+              examples:
+                Change password response:
+                  $ref: '#/components/examples/ChangePwdResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserCred
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+  /api/v1/users/{userId}/credentials/change_recovery_question:
+    parameters:
+      - $ref: ./Common.yaml#/components/parameters/pathUserId
+    post:
+      summary: Update recovery question
+      description: |-
+        Updates a user's recovery question and answer credential by validating the user's current password.
+        You can only perform this operation on users in `STAGED`, `ACTIVE`, or `RECOVERY` status that have a valid [password credential](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/User/#tag/User/operation/createUser!path=credentials/password&t=request).
+      operationId: changeRecoveryQuestion
+      x-codegen-request-body-name: userCredentials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: ./users.yaml#/components/schemas/UserCredentials
+            examples:
+              Update recovery question request:
+                $ref: '#/components/examples/UpdateRecQuestionRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: ./users.yaml#/components/schemas/UserCredentials
+              examples:
+                Update recovery question response:
+                  $ref: '#/components/examples/UpdateRecQuestionResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserCred
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+  /api/v1/users/{userId}/credentials/forgot_password:
+    parameters:
+      - $ref: ./Common.yaml#/components/parameters/pathUserId
+    post:
+      summary: Start forgot password flow
+      description: |-
+        Starts the forgot password flow.
+
+        Generates a one-time token (OTT) that you can use to reset a user's password.
+
+        The user must validate their security question's answer when visiting the reset link. Perform this operation only on users with an `ACTIVE` status and
+        a valid [recovery question credential](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/User/#tag/User/operation/createUser!path=credentials/recovery_question&t=request).
+
+        > **Note:** If you have migrated to Identity Engine, you can allow users to recover passwords with any enrolled MFA authenticator. See [Self-service account recovery](https://help.okta.com/oie/en-us/content/topics/identity-engine/authenticators/configure-sspr.htm?cshid=ext-config-sspr).
+
+        If an email address is associated with multiple users, keep in mind the following to ensure a successful password recovery lookup:
+          * Okta no longer includes deactivated users in the lookup.
+          * The lookup searches sign-in IDs first, then primary email addresses, and then secondary email addresses.
+
+        If `sendEmail` is `false`, returns a link for the user to reset their password. This operation doesn't affect the status of the user.
+      operationId: forgotPassword
+      parameters:
+        - name: sendEmail
+          in: query
+          description: Sends a forgot password email to the user if `true`
+          required: false
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: Reset URL
+          content:
+            application/json:
+              schema:
+                $ref: ./users.yaml#/components/schemas/ForgotPasswordResponse
+              examples:
+                Forgot password response:
+                  $ref: '#/components/examples/ForgotPwdResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserCred
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+  /api/v1/users/{userId}/credentials/forgot_password_recovery_question:
+    parameters:
+      - $ref: ./Common.yaml#/components/parameters/pathUserId
+    post:
+      summary: Reset password with recovery question
+      description: |-
+        Resets the user's password to the specified password if the provided answer to the recovery question is correct.
+        You must include the recovery question answer with the submission.
+      operationId: forgotPasswordSetNewPassword
+      parameters:
+        - name: sendEmail
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+      x-codegen-request-body-name: userCredentials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: ./users.yaml#/components/schemas/UserCredentials
+            examples:
+              Forgot password recovery question request:
+                $ref: '#/components/examples/ForgotPwdRecoveryQuestionRequest'
+        required: true
+      responses:
+        '200':
+          description: Credentials
+          content:
+            application/json:
+              schema:
+                $ref: ./users.yaml#/components/schemas/UserCredentials
+              examples:
+                Forgot password recovery question response:
+                  $ref: '#/components/examples/ForgotPwdRecoveryQuestionResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserCred
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+  /api/v1/users/{id}/lifecycle/expire_password:
+    parameters:
+      - $ref: ./users.yaml#/components/parameters/pathId
+    post:
+      summary: Expire the password
+      description: |-
+        Expires the password. This operation transitions the user status to `PASSWORD_EXPIRED` so that the user must change their password the next time that they sign in.
+        <br>
+        If you have integrated Okta with your on-premises Active Directory (AD), then setting a user's password as expired in Okta also expires the password in AD.
+        When the user tries to sign in to Okta, delegated authentication finds the password-expired status in AD,
+        and the user is presented with the password-expired page where they can change their password.
+
+        > **Note:** The Okta account management policy doesn't support the `/users/{id}/lifecycle/expire_password` endpoint. See [Configure an Okta account management policy](https://developer.okta.com/docs/guides/okta-account-management-policy/main/).
+      operationId: expirePassword
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: ./users.yaml#/components/schemas/User
+              examples:
+                Expire password response:
+                  $ref: '#/components/examples/ExpirePwdResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserCred
+    x-okta-team-detail:
+      x-team-slack: amp-eng-passwordless
+  /api/v1/users/{id}/lifecycle/expire_password_with_temp_password:
+    parameters:
+      - $ref: ./users.yaml#/components/parameters/pathId
+    post:
+      summary: Expire the password with a temporary password
+      description: |-
+        Expires the password and resets the user's password to a temporary password. This operation transitions the user status to `PASSWORD_EXPIRED` so that the user must change their password the next time that they sign in.
+        The user's password is reset to a temporary password that's returned, and then the user's password is expired.
+        If `revokeSessions` is included in the request with a value of `true`, the user's current outstanding sessions are revoked and require re-authentication.
+
+        If you have integrated Okta with your on-premises Active Directory (AD), then setting a user's password as expired in Okta also expires the password in AD.
+        When the user tries to sign in to Okta, delegated authentication finds the password-expired status in AD, and the user is presented with the password-expired page where they can change their password.
+      operationId: expirePasswordWithTempPassword
+      parameters:
+        - name: revokeSessions
+          in: query
+          description: Revokes the user's existing sessions if `true`
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tempPassword'
+              examples:
+                Expire password with temp password response:
+                  $ref: '#/components/examples/ExpirePwdWithTempPwdResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserCred
+    x-okta-team-detail:
+      x-team-slack: amp-eng-passwordless
+  /api/v1/users/{id}/lifecycle/reset_password:
+    parameters:
+      - $ref: ./users.yaml#/components/parameters/pathId
+    post:
+      summary: Reset a password
+      description: |-
+        Resets a password. Generates a one-time token (OTT) that you can use to reset a user's password. You can automatically email the OTT link to the user or return the OTT to the API caller and distribute using a custom flow.
+
+        This operation transitions the user to the `RECOVERY` status. The user is then not able to sign in or initiate a forgot password flow until they complete the reset flow.
+
+        This operation provides an option to delete all the user's sessions. However, if the request is made in the context of a session owned by the specified user, that session isn't cleared.
+        > **Note:** You can also use this API to convert a user with the Okta credential provider to use a federated provider. After this conversion, the user can't directly sign in with a password.
+        > To convert a federated user back to an Okta user, use the default API call.
+
+        If an email address is associated with multiple users, keep in mind the following to ensure a successful password recovery lookup:
+          * Okta no longer includes deactivated users in the lookup.
+          * The lookup searches sign-in IDs first, then primary email addresses, and then secondary email addresses.
+          If `sendEmail` is `false`, returns a link for the user to reset their password.
+      operationId: resetPassword
+      parameters:
+        - name: sendEmail
+          in: query
+          required: true
+          schema:
+            type: boolean
+        - name: revokeSessions
+          description: Revokes all user sessions, except for the current session, if set to `true`
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResetPasswordToken'
+              examples:
+                Reset password without sending email response:
+                  $ref: '#/components/examples/ResetPwdWithoutSendingEmailResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserCred
+    x-okta-team-detail:
+      x-team-slack: eng-ud-core
+components:
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes
+  schemas:
+    ResetPasswordToken:
+      type: object
+      properties:
+        resetPasswordUrl:
+          type: string
+          readOnly: true
+          example: https://{yourOktaDomain}/signin/reset-password/XE6wE17zmphl3KqAPFxO
+    tempPassword:
+      type: object
+      properties:
+        tempPassword:
+          type: string
+          description: |-
+            A temporary password that the user can sign in with. This is only returned when expiring a password with a temporary password.
+          readOnly: true
+  examples:
+    ChangePwdRequest:
+      value:
+        oldPassword:
+          value: tlpWENT2m
+        newPassword:
+          value: uTVM,TPw55
+        revokeSessions: true
+    ChangePwdResponse:
+      value:
+        password: {}
+        recovery_question:
+          question: Who's a major player in the cowboy scene?
+        provider:
+          type: OKTA
+          name: OKTA
+    UpdateRecQuestionRequest:
+      value:
+        password:
+          value: tlpWENT2m
+        recovery_question:
+          question: How many roads must a man walk down?
+          answer: forty two
+    UpdateRecQuestionResponse:
+      value:
+        password: {}
+        recovery_question:
+          question: How many roads must a man walk down?
+        provider:
+          type: OKTA
+          name: OKTA
+    ForgotPwdResponse:
+      value:
+        resetPasswordUrl: https://{yourOktaDomain}/signin/reset-password/XE6wE17zmphl3KqAPFxO
+    ForgotPwdRecoveryQuestionRequest:
+      value:
+        password:
+          value: uTVM,TPw55
+        recovery_question:
+          answer: Annie Oakley
+    ForgotPwdRecoveryQuestionResponse:
+      value:
+        password: {}
+        recovery_question:
+          question: Who's a major player in the cowboy scene?
+        provider:
+          type: OKTA
+          name: OKTA
+    ExpirePwdResponse:
+      value:
+        id: 00ub0oNGTSWTBKOLGLNR
+        status: PASSWORD_EXPIRED
+        created: '2013-06-24T16:39:18.000Z'
+        activated: '2013-06-24T16:39:19.000Z'
+        statusChanged: '2013-06-24T16:39:19.000Z'
+        lastLogin: '2013-06-24T17:39:19.000Z'
+        lastUpdated: '2013-06-27T16:35:28.000Z'
+        passwordChanged: '2013-06-24T16:39:19.000Z'
+        profile:
+          firstName: Isaac
+          lastName: Brock
+          email: isaac.brock@example.com
+          login: isaac.brock@example.com
+          mobilePhone: 555-415-1337
+        credentials:
+          password: {}
+          recovery_question:
+            question: Who's a major player in the cowboy scene?
+          provider:
+            type: OKTA
+            name: OKTA
+        _links:
+          resetPassword:
+            href: https://{yourOktaDomain}/api/v1/users/00ub0oNGTSWTBKOLGLNR/lifecycle/reset_password
+          resetFactors:
+            href: https://{yourOktaDomain}/api/v1/users/00ub0oNGTSWTBKOLGLNR/lifecycle/reset_factors
+          expirePassword:
+            href: https://{yourOktaDomain}/api/v1/users/00ub0oNGTSWTBKOLGLNR/lifecycle/expire_password
+          forgotPassword:
+            href: https://{yourOktaDomain}/api/v1/users/00ub0oNGTSWTBKOLGLNR/credentials/forgot_password
+          changeRecoveryQuestion:
+            href: https://{yourOktaDomain}/api/v1/users/00ub0oNGTSWTBKOLGLNR/credentials/change_recovery_question
+          deactivate:
+            href: https://{yourOktaDomain}/api/v1/users/00ub0oNGTSWTBKOLGLNR/lifecycle/deactivate
+          changePassword:
+            href: https://{yourOktaDomain}/api/v1/users/00ub0oNGTSWTBKOLGLNR/credentials/change_password
+    ExpirePwdWithTempPwdResponse:
+      value:
+        tempPassword: F46gy7X4
+    ResetPwdWithoutSendingEmailResponse:
+      value:
+        summary: Reset password without sending email
+        resetPasswordUrl: https://{yourOktaDomain}/reset_password/XE6wE17zmphl3KqAPFxO

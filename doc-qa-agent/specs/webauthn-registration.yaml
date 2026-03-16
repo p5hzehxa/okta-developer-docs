@@ -1,0 +1,592 @@
+openapi: 3.0.3
+info:
+  title: WebAuthn Preregistration API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../../base.yaml#/tags
+paths:
+  /webauthn-registration/api/v1/initiate-fulfillment-request:
+    post:
+      summary: Generate a fulfillment request
+      description: Generates a fulfillment request by sending a WebAuthn preregistration event to start the flow. The WebAuthn preregistration integration for Okta Workflows uses a preregistration event to populate the fulfillment request.
+      operationId: generateFulfillmentRequest
+      x-codegen-request-body-name: body
+      requestBody:
+        description: Fulfillment request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FulfillmentRequest'
+            examples:
+              Generate Fulfillment Request:
+                $ref: '#/components/examples/GenerateFulfillmentRequestExample'
+      responses:
+        '204':
+          description: No Content
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - WebAuthnPreregistration
+    x-okta-team-detail:
+      x-team-slack: amp-eng-workforce-authenticators
+  /webauthn-registration/api/v1/enroll:
+    post:
+      summary: Enroll a preregistered WebAuthn factor
+      description: Enrolls a preregistered WebAuthn factor. This WebAuthn factor has a longer challenge timeout period to accommodate the fulfillment request process. As part of this operation, Okta generates elliptic curve (EC) key-pairs used to encrypt the factor PIN and enrollment data sent by the fulfillment provider.
+      operationId: enrollPreregistrationEnrollment
+      x-codegen-request-body-name: body
+      requestBody:
+        description: Enrollment initialization request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrollmentInitializationRequest'
+            examples:
+              Initialize Preregistration Enrollment Request:
+                $ref: '#/components/examples/EnrollmentInitializationRequestExample'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollmentInitializationResponse'
+              examples:
+                Initialize Preregistration Enrollment Response:
+                  $ref: '#/components/examples/EnrollmentInitializationResponseExample'
+        '400':
+          description: PIN or cred requests generation failed
+          content:
+            application/json:
+              schema:
+                $ref: ../Common.yaml#/components/schemas/Error
+              examples:
+                NoDisable:
+                  $ref: '#/components/examples/ErrorPinOrCredRequestsGenerationFailure'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - WebAuthnPreregistration
+    x-okta-team-detail:
+      x-team-slack: amp-eng-workforce-authenticators
+  /webauthn-registration/api/v1/activate:
+    post:
+      summary: Activate a preregistered WebAuthn factor
+      description: Activates a preregistered WebAuthn factor. As part of this operation, Okta first decrypts and verifies the factor PIN and enrollment data sent by the fulfillment provider.
+      operationId: activatePreregistrationEnrollment
+      x-codegen-request-body-name: body
+      requestBody:
+        description: Enrollment activation request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrollmentActivationRequest'
+            examples:
+              Activate Preregistration Enrollment Request:
+                $ref: '#/components/examples/EnrollmentActivationRequestExample'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollmentActivationResponse'
+              examples:
+                Activate Preregistration Enrollment Response:
+                  $ref: '#/components/examples/EnrollmentActivationResponseExample'
+        '400':
+          description: PIN or cred requests generation failed
+          content:
+            application/json:
+              schema:
+                $ref: ../Common.yaml#/components/schemas/Error
+              examples:
+                NoDisable:
+                  $ref: '#/components/examples/ErrorPinOrCredResponsesProcessingFailure'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - WebAuthnPreregistration
+    x-okta-team-detail:
+      x-team-slack: amp-eng-workforce-authenticators
+  /webauthn-registration/api/v1/send-pin:
+    post:
+      summary: Send a PIN to user
+      description: Sends the decoded PIN for the specified WebAuthn preregistration enrollment. PINs are sent to the user's email. To resend the PIN, call this operation again.
+      operationId: sendPin
+      x-codegen-request-body-name: body
+      requestBody:
+        description: Send PIN request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PinRequest'
+            examples:
+              Send PIN Request:
+                $ref: '#/components/examples/SendPinRequestExample'
+      responses:
+        '204':
+          description: No Content
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - WebAuthnPreregistration
+    x-okta-team-detail:
+      x-team-slack: amp-eng-workforce-authenticators
+  /webauthn-registration/api/v1/users/{userId}/enrollments:
+    parameters:
+      - $ref: ../Common.yaml#/components/parameters/pathUserId
+    get:
+      summary: List all WebAuthn preregistration factors
+      description: Lists all WebAuthn preregistration factors for the specified user
+      operationId: listWebAuthnPreregistrationFactors
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WebAuthnPreregistrationFactor'
+              example:
+                - id: fwf23789dfs9asdf782
+                  factorType: webauthn
+                  provider: FIDO
+                  vendorName: FIDO
+                  fulfillmentProvider: yubico
+                  status: ACTIVE
+                  created: '2018-05-24T20:43:19.000Z'
+                  lastUpdated: '2018-05-24T21:43:32.000Z'
+                  profile:
+                    credentialId: l3Br0n-7H3g047NqESqJynFtIgf3Ix9OfaRoNwLoloso99Xl2zS_O7EXUkmPeAIzTVtEL4dYjicJWBz7NpqhGA
+                    authenticatorName: YubiKey 5C
+                    presetPinAvailable: true
+                  _links:
+                    self:
+                      href: https://example.okta.com/webauthn-registration/api/v1/users/00u15s1KDETTQMQYABRL/enrollments/fwf23789dfs9asdf782
+                      hints:
+                        allow:
+                          - DELETE
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.read
+      tags:
+        - WebAuthnPreregistration
+    x-okta-team-detail:
+      x-team-slack: amp-eng-workforce-authenticators
+  /webauthn-registration/api/v1/users/{userId}/enrollments/{authenticatorEnrollmentId}:
+    parameters:
+      - $ref: ../Common.yaml#/components/parameters/pathUserId
+      - $ref: '#/components/parameters/authenticatorEnrollmentId'
+    delete:
+      summary: Delete a WebAuthn preregistration factor
+      description: Deletes a specific WebAuthn preregistration factor for a user
+      operationId: deleteWebAuthnPreregistrationFactor
+      responses:
+        '204':
+          description: No Content
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - WebAuthnPreregistration
+    x-okta-team-detail:
+      x-team-slack: amp-eng-workforce-authenticators
+  /webauthn-registration/api/v1/users/{userId}/enrollments/{authenticatorEnrollmentId}/mark-error:
+    parameters:
+      - $ref: ../Common.yaml#/components/parameters/pathUserId
+      - $ref: '#/components/parameters/authenticatorEnrollmentId'
+    post:
+      summary: Assign the fulfillment error status to a WebAuthn preregistration factor
+      description: Assigns the fulfillment error status to a WebAuthn preregistration factor for a user. The `/mark-error` path indicates that the specific `FULFILLMENT_ERRORED` AuthFactor status is set on the enrollment.
+      operationId: assignFulfillmentErrorWebAuthnPreregistrationFactor
+      responses:
+        '204':
+          description: No Content
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - WebAuthnPreregistration
+    x-okta-team-detail:
+      x-team-slack: amp-eng-workforce-authenticators
+components:
+  parameters:
+    authenticatorEnrollmentId:
+      name: authenticatorEnrollmentId
+      in: path
+      required: true
+      description: ID for a WebAuthn preregistration factor in Okta
+      schema:
+        type: string
+  schemas:
+    WebAuthnPreregistrationFactor:
+      description: User factor variant used for WebAuthn preregistration factors
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        created:
+          description: Timestamp indicating when the factor was enrolled
+          type: string
+          format: date-time
+          readOnly: true
+        factorType:
+          $ref: ./factors.yaml#/components/schemas/UserFactorType
+        id:
+          description: ID of the factor
+          type: string
+          readOnly: true
+        lastUpdated:
+          description: Timestamp indicating when the factor was last updated
+          type: string
+          format: date-time
+          readOnly: true
+        profile:
+          type: object
+          description: Specific attributes related to the factor
+        provider:
+          $ref: ./factors.yaml#/components/schemas/UserFactorProvider
+        status:
+          $ref: ./factors.yaml#/components/schemas/UserFactorStatus
+        vendorName:
+          description: Name of the factor vendor. This is usually the same as the provider.
+          type: string
+          example: OKTA
+          readOnly: true
+        _links:
+          $ref: ../Common.yaml#/components/schemas/LinksSelf
+    FulfillmentRequest:
+      description: Fulfillment request
+      type: object
+      properties:
+        userId:
+          description: ID of an existing Okta user
+          type: string
+        fulfillmentProvider:
+          description: Name of the fulfillment provider for the WebAuthn preregistration factor
+          type: string
+          enum:
+            - yubico
+        fulfillmentData:
+          $ref: '#/components/schemas/FulfillmentData'
+    FulfillmentData:
+      description: List of fulfillment order details
+      type: array
+      items:
+        $ref: '#/components/schemas/FulfillmentDataOrderDetails'
+    FulfillmentDataOrderDetails:
+      type: object
+      description: Information about the fulfillment order that includes the factor’s make and model, the custom configuration of the factor, and inventory details.
+      properties:
+        productId:
+          description: ID for the make and model of the requested factor
+          type: string
+        customizationId:
+          description: ID for the set of custom configurations of the requested factor
+          type: string
+        inventoryProductId:
+          description: ID for the specific inventory bucket of the requested factor
+          type: string
+    EnrollmentInitializationRequest:
+      type: object
+      description: Enrollment initialization request
+      properties:
+        userId:
+          description: ID of an existing Okta user
+          type: string
+        fulfillmentProvider:
+          description: Name of the fulfillment provider for the WebAuthn preregistration factor
+          type: string
+          enum:
+            - yubico
+        yubicoTransportKeyJWK:
+          description: Transport public key in JWK (JSON Web Key) format used to encrypt fulfillment requests to Yubico
+          $ref: '#/components/schemas/ECKeyJWK'
+        enrollmentRpIds:
+          description: List of relying party hostnames to register on the YubiKey
+          type: array
+          items:
+            type: string
+    ECKeyJWK:
+      description: Elliptic curve key in JSON Web Key (JWK) format. It's used during enrollment to encrypt fulfillment requests to Yubico, or during activation to verify Yubico's JWS (JSON Web Signature) objects in fulfillment responses. The currently agreed protocol uses P-384.
+      type: object
+      properties:
+        kty:
+          type: string
+          enum:
+            - EC
+          description: The type of public key
+        crv:
+          type: string
+          description: The elliptic curve protocol
+          enum:
+            - P-384
+        x:
+          type: string
+          description: The public x coordinate for the elliptic curve point
+        'y':
+          type: string
+          description: The public y coordinate for the elliptic curve point
+        use:
+          type: string
+          description: The intended use for the key. This value is either `enc` (encryption) during enrollment, when Okta uses the ECKeyJWK to encrypt requests to Yubico. Or it's `sig` (signature) during activation, when Okta uses the ECKeyJWK to verify the responses from Yubico.
+          enum:
+            - enc
+            - sig
+        kid:
+          type: string
+          description: The unique identifier of the key
+      required:
+        - x
+        - 'y'
+        - kty
+        - crv
+        - use
+        - kid
+    EnrollmentInitializationResponse:
+      description: Yubico transport key in the form of a JSON Web Token (JWK), used to encrypt our fulfillment request to Yubico. The currently agreed protocol uses P-384.
+      type: object
+      properties:
+        userId:
+          description: ID of an existing Okta user
+          type: string
+        fulfillmentProvider:
+          description: Name of the fulfillment provider for the WebAuthn preregistration factor
+          type: string
+          enum:
+            - yubico
+        pinRequestJwe:
+          description: Encrypted JWE of PIN request for the fulfillment provider
+          type: string
+        credRequests:
+          description: List of credential requests for the fulfillment provider
+          type: array
+          items:
+            $ref: '#/components/schemas/WebAuthnCredRequest'
+    WebAuthnCredRequest:
+      description: Credential request object for the initialized credential, along with the enrollment and key identifiers to associate with the credential
+      type: object
+      properties:
+        authenticatorEnrollmentId:
+          description: ID for a WebAuthn preregistration factor in Okta
+          type: string
+        keyId:
+          description: ID for the Okta response key-pair used to encrypt and decrypt credential requests and responses
+          type: string
+        credRequestJwe:
+          description: Encrypted JWE of credential request for the fulfillment provider
+          type: string
+    EnrollmentActivationRequest:
+      type: object
+      description: Enrollment Initialization Request
+      properties:
+        userId:
+          description: ID of an existing Okta user
+          type: string
+        fulfillmentProvider:
+          description: Name of the fulfillment provider for the WebAuthn preregistration factor
+          type: string
+          enum:
+            - yubico
+        serial:
+          description: Serial number of the YubiKey
+          type: string
+        version:
+          description: Firmware version of the YubiKey
+          type: string
+        yubicoSigningJwks:
+          description: List of usable signing keys from Yubico (in JSON Web Key Sets (JWKS) format). The signing keys are used to verify the JSON Web Signature (JWS) inside the JWE.
+          type: array
+          items:
+            $ref: '#/components/schemas/ECKeyJWK'
+        pinResponseJwe:
+          description: Encrypted JWE of the PIN response from the fulfillment provider
+          type: string
+        credResponses:
+          description: List of credential responses from the fulfillment provider
+          type: array
+          items:
+            $ref: '#/components/schemas/WebAuthnCredResponse'
+    WebAuthnCredResponse:
+      description: Credential response object for enrolled credential details, along with enrollment and key identifiers to associate the credential
+      type: object
+      properties:
+        authenticatorEnrollmentId:
+          description: ID for a WebAuthn preregistration factor in Okta
+          type: string
+        credResponseJwe:
+          description: Encrypted JSON Web Encryption (JWE) of the credential response from the fulfillment provider
+          type: string
+    EnrollmentActivationResponse:
+      type: object
+      description: Enrollment initialization response
+      properties:
+        userId:
+          description: ID of an existing Okta user
+          type: string
+        fulfillmentProvider:
+          description: Name of the fulfillment provider for the WebAuthn preregistration factor
+          type: string
+          enum:
+            - yubico
+        authenticatorEnrollmentIds:
+          description: List of IDs for preregistered WebAuthn factors in Okta
+          type: array
+          items:
+            type: string
+    PinRequest:
+      description: Pin request
+      type: object
+      properties:
+        userId:
+          description: ID of an existing Okta user
+          type: string
+        fulfillmentProvider:
+          description: Name of the fulfillment provider for the WebAuthn preregistration factor
+          type: string
+          enum:
+            - yubico
+        authenticatorEnrollmentId:
+          description: ID for a WebAuthn preregistration factor in Okta
+          type: string
+  securitySchemes:
+    $ref: ../../base.yaml#/components/securitySchemes
+  examples:
+    ErrorPinOrCredRequestsGenerationFailure:
+      summary: PIN or cred requests generation failed
+      value:
+        errorCode: E0000001
+        errorSummary: 'Api validation failed: webAuthnPreregistrationPinRequest|webAuthnPreregistrationCredentialRequest'
+        errorLink: E0000001
+        errorId: oaehk3rssXQmOWDRsaFfxe8A
+        errorCauses:
+          errorSummary: There was an unexpected internal error. Please try again.
+    ErrorPinOrCredResponsesProcessingFailure:
+      summary: PIN or cred response processing failed
+      value:
+        errorCode: E0000001
+        errorSummary: 'Api validation failed: pinResponseJwe|webAuthnCredResponse'
+        errorLink: E0000001
+        errorId: oaehk3rssXQmOWDRsaFfxe8B
+        errorCauses:
+          errorSummary: There was an unexpected internal error. Please try again.
+    EnrollmentActivationRequestExample:
+      summary: Enrollment activation request
+      value:
+        credResponses:
+          - authenticatorEnrollmentId: fwf5ajzJEWqknX6lk0g4
+            credResponseJwe: eyJlcGsiOnsia3R5IjoiRUM...
+        fulfillmentProvider: yubico
+        pinResponseJwe: eyJl5IjoiRUMiLCJjcnYcGsiOnsia3...
+        serial: '3632071'
+        userId: 00us2hPODQncCkxef0g3
+        version: 5.4.3
+        yubicoSigningJwks:
+          - crv: P-384
+            kid: APCS-Tsgnkey-C19881-H0027616953
+            kty: EC
+            use: sig
+            x: tJc-j5osUCP-75ihCOKsswTOj3XsekayG3x79K2ndyOIXu08gDMkvL8rks06tEAa
+            'y': hfVGbQeG4l2orqenn-GATWwTm8tLqHFHuwfJp33CCNOMtYYsgkAEnW60ORzt4YV-
+    EnrollmentActivationResponseExample:
+      summary: Enrollment activation response
+      value:
+        authenticatorEnrollmentIds:
+          - fwf5ajzJEWqknX6lk0g4
+        fulfillmentProvider: yubico
+        userId: 00us2hPODQncCkxef0g3
+    GenerateFulfillmentRequestExample:
+      summary: Generate fulfillment request
+      value:
+        userId: 00us2hPODQncCkxef0g3
+        fulfillmentProvider: yubico
+        fulfillmentData:
+          - productId: '55'
+            customizationId: RXJN83
+            inventoryProductId: '106'
+    EnrollmentInitializationRequestExample:
+      summary: Initialize preregistration enrollment request
+      value:
+        enrollmentRpIds:
+          - myorg.okta.com
+        fulfillmentProvider: yubico
+        userId: 00us2hPODQncCkxef0g3
+        yubicoTransportKeyJWK:
+          crv: P-384
+          kid: APCS-Ttrans-C19881-I009
+          kty: EC
+          use: enc
+          x: r6AzcX3OSiJk1yQaBVYiBOtzFS9gNSpMDPvnVvl0CAX7el1ZyzmPG_BZ7u8sqTmF
+          'y': RxPyGH1Xg74E2f5AQGkkddzsvTNY1R3R7mXTEM5wQtr1Y7C4XHlvITNZfU6G
+    EnrollmentInitializationResponseExample:
+      summary: Initialize preregistration enrollment request
+      value:
+        credRequests:
+          - authenticatorEnrollmentId: fwf5ajzJEWqknX6lk0g4
+            credRequestJwe: eyJlcGsiOnsia3R5IjoiRUMiLCJ...
+            keyId: h2r91gconqiai1vs0psg
+        fulfillmentProvider: yubico
+        pinRequestJwe: eyJlcGsa3R5IjoiRUMiLA...
+        userId: 00us2hPODQncCkxef0g3
+    SendPinRequestExample:
+      summary: Send PIN request
+      value:
+        authenticatorEnrollmentId: fwf5ajzJEWqknX6lk0g4
+        fulfillmentProvider: yubico
+        userId: 00us2hPODQncCkxef0g3

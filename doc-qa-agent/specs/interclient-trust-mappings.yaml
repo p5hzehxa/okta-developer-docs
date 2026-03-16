@@ -1,0 +1,266 @@
+openapi: 3.0.3
+info:
+  title: Application Interclient Trust Mappings Management API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: '../base.yaml#/tags'
+
+paths:
+  /api/v1/apps/{appId}/interclient-allowed-apps:
+    parameters:
+      - $ref: './Common.yaml#/components/parameters/pathAppId'
+    get:
+      summary: List all allowed apps for a target app
+      description: Lists all apps allowed by this app to request interclient SSO using the interclient token
+      operationId: listInterclientAllowedApplications
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                description: A list of allowed app IDs
+                items:
+                  type: string
+                  description: The ID of an allowed app
+              examples:
+                ListInterclientAllowedAppsResponse:
+                  $ref: '#/components/examples/ListInterclientAllowedAppsResponse'
+        '401':
+          $ref: './Common.yaml#/components/responses/ErrorInvalidToken401'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: [ ]
+        - oauth2:
+            - okta.apps.interclientTrust.read
+      tags:
+        - ApplicationInterclientTrustMappings
+    post:
+      summary: Create an allowed app mapping for a target app
+      description: Creates a mapping between the target app and an allowed app for interclient SSO using the interclient token
+      operationId: createInterclientTrustMapping
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InterclientTrustMappingRequestBody'
+            examples:
+              createInterclientTrustMappingRequest:
+                $ref: '#/components/examples/createInterclientTrustMappingRequestBody'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InterclientTrustMapping'
+              examples:
+                createInterclientTrustMappingResponse:
+                  $ref: '#/components/examples/InterclientTrustMappingResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: './Common.yaml#/components/schemas/Error'
+              examples:
+                ErrorTargetAppType:
+                  $ref: '#/components/examples/ErrorTargetAppType'
+                ErrorTooManyAllowedApps:
+                  $ref: '#/components/examples/ErrorTooManyAllowedApps'
+        '401':
+          $ref: './Common.yaml#/components/responses/ErrorInvalidToken401'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: [ ]
+        - oauth2:
+            - okta.apps.interclientTrust.manage
+      tags:
+        - ApplicationInterclientTrustMappings
+  /api/v1/apps/{appId}/interclient-allowed-apps/{allowedAppId}:
+    parameters:
+      - $ref: './Common.yaml#/components/parameters/pathAppId'
+      - $ref: '#/components/parameters/appIdToDelete'
+    delete:
+      summary: Delete an interclient trust mapping
+      description: Deletes the mapping between the target app and an allowed app
+      operationId: deleteInterclientTrustMapping
+      responses:
+        '204':
+          description: No Content
+        '401':
+          $ref: './Common.yaml#/components/responses/ErrorInvalidToken401'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: [ ]
+        - oauth2:
+            - okta.apps.interclientTrust.manage
+      tags:
+        - ApplicationInterclientTrustMappings
+  /api/v1/apps/{appId}/interclient-target-apps:
+    parameters:
+      - $ref: './Common.yaml#/components/parameters/pathAppId'
+    get:
+      summary: List all target apps for an allowed app
+      description: Lists all the target apps that allow this app to request interclient SSO using an interclient token
+      operationId: listInterclientTargetApplications
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                description: A list of target app IDs
+                items:
+                  type: string
+                  description: The ID of the target app
+              examples:
+                ListInterclientTargetAppsResponse:
+                  $ref: '#/components/examples/ListInterclientTargetAppsResponse'
+        '401':
+          $ref: './Common.yaml#/components/responses/ErrorInvalidToken401'
+        '403':
+          $ref: './Common.yaml#/components/responses/ErrorAccessDenied403'
+        '404':
+          $ref: './Common.yaml#/components/responses/ErrorResourceNotFound404'
+        '429':
+          $ref: './Common.yaml#/components/responses/ErrorTooManyRequests429'
+      security:
+        - apiToken: [ ]
+        - oauth2:
+            - okta.apps.interclientTrust.read
+      tags:
+        - ApplicationInterclientTrustMappings
+components:
+  parameters:
+    appIdToDelete:
+      name: allowedAppId
+      in: path
+      schema:
+        type: string
+      required: true
+      description: 'App ID of the allowed app instance to delete mapping from the target app.'
+      example: 0oa1elyw9EAkUNUrW0g5
+  examples:
+    ListInterclientAllowedAppsResponse:
+      summary: List interclient allowed apps example
+      value:
+        - 0oa1elyw9EAkUNUrW0g5
+        - 0oa5mihmA6vMpXcm50g5
+        - 0oa89ks1irGAcYwXw0g5
+    createInterclientTrustMappingRequestBody:
+      summary: Create an interclient target and allowed app mapping
+      value:
+        id: '0oa89ks1irGAcYwXw0g5'
+    InterclientTrustMappingResponse:
+      summary: Create an interclient target and allowed app mapping response
+      value:
+        - id: itmahqusSr3v8Kk3B0g5
+          orgId: 00o102n9p4vX126Gp0g5
+          appInstanceId: 0oa8ghelqWXs70qD80g5
+          trustedAppInstanceId: 0oa5kw6q51dFckBE70g5
+          created: '2025-11-25T22:44:06.000Z'
+          lastUpdated: '2025-11-25T22:44:06.000Z'
+          lastUpdatedBy: 00u102rhXmxEGFKiB0g5
+    ListInterclientTargetAppsResponse:
+      summary: List interclient target apps
+      value:
+        - 0oa1elyw9EAkUNUrW0g5
+        - 0oa5mihmA6vMpXcm50g5
+        - 0oa89ks1irGAcYwXw0g5
+    ErrorTargetAppType:
+      value:
+        errorCode: E0000001
+        errorSummary: 'Api validation failed: Interclient Trust Mappings'
+        errorLink: E0000001
+        errorId: oae7oXKyr41R7yW8Q-gMZsTrA
+        errorCauses: [
+          {
+            "errorSummary": "The target application must be an OIDC or SAML app."
+          }
+        ]
+    ErrorTooManyAllowedApps:
+      value:
+        errorCode: E0000001
+        errorSummary: 'Api validation failed: Interclient Trust Mappings'
+        errorLink: E0000001
+        errorId: oae7oXKyr41R7yW8Q-gMZsTrA
+        errorCauses: [
+          {
+            "errorSummary": "The target application cannot have more than 5 trusted apps."
+          }
+        ]
+  schemas:
+    InterclientTrustMappingRequestBody:
+      type: object
+      properties:
+        id:
+          type: string
+          description: App ID of the allowed app
+          example: 0oa1elyw9EAkUNUrW0g5
+          nullable: false
+    InterclientTrustMapping:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique ID of the interclient trust mapping
+          example: itmahqusSr3v8Kk3B0g5
+          readOnly: true
+          nullable: false
+        orgId:
+          type: string
+          description: ID of the org
+          example: 00o102n9p4vX126Gp0g5
+          readOnly: true
+          nullable: false
+        appInstanceId:
+          type: string
+          description: The app ID of the target app
+          example: 0oa8ghelqWXs70qD80g5
+          readOnly: true
+          nullable: false
+        trustedAppInstanceId:
+          type: string
+          description: The app ID of the allowed app
+          example: 0oa5kw6q51dFckBE70g5
+          readOnly: true
+          nullable: false
+        created:
+          type: string
+          description: Timestamp when the interclient trust mapping was created
+          example: '2025-11-25T22:44:06.000Z'
+          readOnly: true
+          nullable: false
+        lastUpdated:
+          type: string
+          description: Timestamp when the interclient trust mapping was updated
+          example: '2025-11-25T22:44:06.000Z'
+          readOnly: true
+          nullable: false
+        lastUpdatedBy:
+          type: string
+          description: ID of the user who created the interclient trust mapping
+          example: 00u102rhXmxEGFKiB0g5
+          readOnly: true
+          nullable: false
+  securitySchemes:
+    $ref: '../base.yaml#/components/securitySchemes'

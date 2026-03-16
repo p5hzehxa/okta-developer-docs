@@ -1,0 +1,119 @@
+openapi: 3.0.3
+info:
+  title: Okta Application Settings API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/first-party-app-settings/{appName}:
+    parameters:
+      - $ref: '#/components/parameters/pathFirstPartyAppName'
+    get:
+      summary: Retrieve the Okta application settings
+      description: Retrieves the settings for an Okta app (also known as an Okta first-party app)
+      operationId: getFirstPartyAppSettings
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminConsoleSettings'
+              examples:
+                exampleSettings:
+                  $ref: '#/components/examples/AdminConsoleSettingsExample'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.apps.read
+      tags:
+        - OktaApplicationSettings
+    put:
+      summary: Replace the Okta application settings
+      description: Replaces the settings for an Okta app (also known as an Okta first-party app)
+      operationId: replaceFirstPartyAppSettings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminConsoleSettings'
+            examples:
+              exampleSettings:
+                $ref: '#/components/examples/AdminConsoleSettingsExample'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminConsoleSettings'
+              examples:
+                exampleSettings:
+                  $ref: '#/components/examples/AdminConsoleSettingsExample'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+              examples:
+                Access Denied:
+                  $ref: ./Common.yaml#/components/examples/ErrorAccessDenied
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.apps.manage
+      tags:
+        - OktaApplicationSettings
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authn-platform
+components:
+  parameters:
+    pathFirstPartyAppName:
+      name: appName
+      description: |
+        The key name for the Okta app.<br>
+        Supported apps:
+          * Okta Admin Console (`admin-console`)
+      in: path
+      required: true
+      schema:
+        type: string
+        example: admin-console
+  examples:
+    AdminConsoleSettingsExample:
+      summary: Default Okta Admin Console settings
+      value:
+        sessionMaxLifetimeMinutes: 720
+        sessionIdleTimeoutMinutes: 15
+  schemas:
+    AdminConsoleSettings:
+      title: Okta Admin Console Settings
+      description: Settings specific to the Okta Admin Console
+      type: object
+      properties:
+        sessionMaxLifetimeMinutes:
+          description: The absolute maximum session lifetime of the Okta Admin Console. Must be no more than 7 days.
+          type: integer
+          minimum: 5
+          maximum: 10080
+          default: 720
+        sessionIdleTimeoutMinutes:
+          description: The maximum idle time before the Okta Admin Console session expires. Must be no more than 12 hours.
+          type: integer
+          minimum: 5
+          maximum: 720
+          default: 15
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

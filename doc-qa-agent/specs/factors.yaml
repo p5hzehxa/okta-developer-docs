@@ -1,0 +1,3312 @@
+openapi: 3.0.3
+info:
+  title: Factors API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../../base.yaml#/tags
+paths:
+  /api/v1/users/{userId}/factors:
+    parameters:
+      - $ref: ../Common.yaml#/components/parameters/pathUserId
+    get:
+      summary: List all enrolled factors
+      description: |-
+        Lists all enrolled factors for the specified user that are included in the highest priority [authenticator enrollment policy](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/policy/) that applies to the user.
+
+        Only enrolled factors that are `REQUIRED` or `OPTIONAL` in the highest priority authenticator enrollment policy can be returned.
+
+        > **Note:** When admins use this endpoint for other users, the authenticator enrollment policy that's evaluated can vary depending on how client-specific conditions are configured in the rules of an authenticator enrollment policy. The client-specific conditions of the admin's client are used during policy evaluation instead of the client-specific conditions of the user. This can affect which authenticator enrollment policy is evaluated and which factors are returned.
+        >
+        > For example, an admin in Europe lists all enrolled factors for a user in North America. The network zone of the admin's client (in Europe) is used during policy evaluation instead of the network zone of the user (in North America).
+      operationId: listFactors
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserFactor'
+              examples:
+                ListFactorsResponse:
+                  $ref: '#/components/examples/ListFactorsResults'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.read
+      tags:
+        - UserFactor
+    post:
+      summary: Enroll a factor
+      operationId: enrollFactor
+      description: |-
+        Enrolls a supported factor for the specified user
+
+        > **Notes:** 
+        >   * All responses return the enrolled factor with a status of either `PENDING_ACTIVATION` or `ACTIVE`.
+        >   * You can't use the Factors API to enroll Okta Fastpass (`signed_nonce`) for a user. See [Configure Okta Fastpass](https://help.okta.com/okta_help.htm?type=oie&id=ext-fp-configure).
+
+        #### Additional SMS/Call factor information
+
+        * **Rate limits**: Okta may return a `429 Too Many Requests` status code if you attempt to resend an SMS or a voice call challenge (OTP) within the same time window. The current [rate limit](https://developer.okta.com/docs/reference/rate-limits/) is one SMS/CALL challenge per phone number every 30 seconds.
+
+        * **Existing phone numbers**: Okta may return a `400 Bad Request` status code if a user attempts to enroll with a different phone number when the user has an existing mobile phone or has an existing phone with voice call capability. A user can enroll only one mobile phone for `sms` and enroll only one voice call capable phone for `call` factor.
+
+        #### Additional WebAuthn factor information
+
+        * For detailed information on the WebAuthn standard, including an up-to-date list of supported browsers, see [webauthn.me](https://a0.to/webauthnme-okta-docs).
+
+        * When you enroll a WebAuthn factor, the `activation` object in `_embedded` contains properties used to help the client to create a new WebAuthn credential for use with Okta. See the [WebAuthn spec for PublicKeyCredentialCreationOptions](https://www.w3.org/TR/webauthn/#dictionary-makecredentialoptions).
+
+        #### Additional Custom TOTP factor information
+
+        * The enrollment process involves passing both the `factorProfileId` and `sharedSecret` properties for a token.
+
+        * A factor profile represents a particular configuration of the Custom TOTP factor. It includes certain properties that match the hardware token that end users possess, such as the HMAC algorithm, passcode length, and time interval. There can be multiple Custom TOTP factor profiles per org, but users can only enroll in one Custom TOTP factor. Admins can [create Custom TOTP factor profiles](https://help.okta.com/okta_help.htm?id=ext-mfa-totp) in the Admin Console. Then, copy the `factorProfileId` from the Admin Console into the API request.
+
+        * <x-lifecycle class="oie"></x-lifecycle>
+        For Custom TOTP enrollment, Okta automaticaly enrolls a user with a `token:software:totp` factor and the `push` factor if the user isn't currently enrolled with these factors.
+      parameters:
+        - name: updatePhone
+          description: If `true`, indicates that you are replacing the currently registered phone number for the specified user. This parameter is ignored if the existing phone number is used by an activated factor.
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: templateId
+          in: query
+          description: ID of an existing custom SMS template. See the [SMS Templates API](../Template). This parameter is only used by `sms` factors. If the provided ID doesn't exist, the default template is used instead.
+          schema:
+            type: string
+            example: cstk2flOtuCMDJK4b0g3
+        - name: tokenLifetimeSeconds
+          description: Defines how long the token remains valid
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 86400
+            default: 300
+          x-okta-added-version: 1.3.0
+        - name: activate
+          description: If `true`, the factor is immediately activated as part of the enrollment. An activation process isn't required. Currently auto-activation is supported by `sms`, `call`, `email` and `token:hotp` (Custom TOTP) factors.
+          in: query
+          schema:
+            type: boolean
+            default: false
+          x-okta-added-version: 1.3.0
+        - name: Accept-Language
+          description: An ISO 639-1 two-letter language code that defines a localized message to send. This parameter is only used by `sms` factors. If a localized message doesn't exist or the `templateId` is incorrect, the default template is used instead.
+          in: header
+          schema:
+            type: string
+            example: fr
+      x-codegen-request-body-name: body
+      requestBody:
+        description: Factor
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserFactor'
+            examples:
+              question:
+                $ref: '#/components/examples/EnrollFactorQuestionRequest'
+              sms:
+                $ref: '#/components/examples/EnrollFactorSmsRequest'
+              call:
+                $ref: '#/components/examples/EnrollFactorCallRequest'
+              token:software:totp:
+                $ref: '#/components/examples/EnrollFactorOVTotpRequest'
+              push:
+                $ref: '#/components/examples/EnrollFactorOVPushRequest'
+              google:
+                $ref: '#/components/examples/EnrollFactorGoogleRequest'
+              rsa_securId:
+                $ref: '#/components/examples/EnrollFactorRsaSecurIdRequest'
+              symantec_vip:
+                $ref: '#/components/examples/EnrollFactorSymantecVipRequest'
+              yubikey:
+                $ref: '#/components/examples/EnrollFactorYubikeyRequest'
+              email:
+                $ref: '#/components/examples/EnrollFactorEmailRequest'
+              u2f:
+                $ref: '#/components/examples/EnrollFactorU2fRequest'
+              webAuthn:
+                $ref: '#/components/examples/EnrollFactorWebauthnRequest'
+              customTotp:
+                $ref: '#/components/examples/EnrollFactorCustomTotpRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserFactor'
+              examples:
+                question:
+                  $ref: '#/components/examples/EnrollFactorQuestionResponse'
+                sms:
+                  $ref: '#/components/examples/EnrollFactorSmsResponse'
+                call:
+                  $ref: '#/components/examples/EnrollFactorCallResponse'
+                token:software:totp:
+                  $ref: '#/components/examples/EnrollFactorOVTotpResponse'
+                push:
+                  $ref: '#/components/examples/EnrollFactorOVPushResponse'
+                google:
+                  $ref: '#/components/examples/EnrollFactorGoogleResponse'
+                rsa_securId:
+                  $ref: '#/components/examples/EnrollFactorRsaSecurIdResponse'
+                symantec_vip:
+                  $ref: '#/components/examples/EnrollFactorSymantecVipResponse'
+                yubikey:
+                  $ref: '#/components/examples/EnrollFactorYubikeyResponse'
+                email:
+                  $ref: '#/components/examples/EnrollFactorEmailResponse'
+                u2f:
+                  $ref: '#/components/examples/EnrollFactorU2fResponse'
+                webAuthn:
+                  $ref: '#/components/examples/EnrollFactorWebauthnResponse'
+                customTotp:
+                  $ref: '#/components/examples/EnrollFactorCustomTotpResponse'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserFactor
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authenticator-platform
+  /api/v1/users/{userId}/factors/catalog:
+    parameters:
+      - $ref: ../Common.yaml#/components/parameters/pathUserId
+    get:
+      summary: List all supported factors
+      description: |-
+        Lists all the supported factors that can be enrolled for the specified user that are included in the highest priority [authenticator enrollment policy](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/policy/) that applies to the user.
+
+        Only factors that are `REQUIRED` or `OPTIONAL` in the highest priority authenticator enrollment policy can be returned.
+
+        > **Note:** When admins use this endpoint for other users, the authenticator enrollment policy that's evaluated can vary depending on how client-specific conditions are configured in the rules of an authenticator enrollment policy. The client-specific conditions of the admin's client are used during policy evaluation instead of the client-specific conditions of the user. This can affect which authenticator enrollment policy is evaluated and which factors are returned.
+        >
+        > For example, an admin in Europe lists all supported factors for a user in North America. The network zone of the admin's client (in Europe) is used during policy evaluation instead of the network zone of the user (in North America).
+      operationId: listSupportedFactors
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserFactorSupported'
+              examples:
+                List of supported factors:
+                  $ref: '#/components/examples/SupportedFactorResults'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.read
+      tags:
+        - UserFactor
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authenticator-platform
+  /api/v1/users/{userId}/factors/questions:
+    parameters:
+      - $ref: ../Common.yaml#/components/parameters/pathUserId
+    get:
+      summary: List all supported security questions
+      description: Lists all available security questions for the specified user
+      operationId: listSupportedSecurityQuestions
+      x-okta-no-scope-required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              example:
+                - question: disliked_food
+                  questionText: What is the food you least liked as a child?
+                - question: name_of_first_plush_toy
+                  questionText: What is the name of your first stuffed animal?
+                - question: first_award
+                  questionText: What did you earn your first medal or award for?
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserFactorSecurityQuestionProfile'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+      tags:
+        - UserFactor
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authenticator-platform
+  /api/v1/org/factors/yubikey_token/tokens:
+    parameters:
+      - name: after
+        in: query
+        description: Specifies the pagination cursor for the next page of tokens
+        schema:
+          type: string
+      - name: expand
+        in: query
+        description: Embeds the [user](/openapi/okta-management/management/tags/user) resource if the YubiKey token is assigned to a user and `expand` is set to `user`
+        schema:
+          type: string
+      - name: filter
+        in: query
+        description: The expression used to filter tokens
+        schema:
+          type: string
+          enum:
+            - profile.email
+            - profile.serial
+            - activated
+            - user.id
+            - created
+            - status
+            - lastVerified
+      - name: forDownload
+        in: query
+        description: Returns tokens in a CSV to download instead of in the response. When you use this query parameter, the `limit` default changes to 1000.
+        schema:
+          type: boolean
+          default: false
+      - name: limit
+        in: query
+        description: Specifies the number of results per page
+        schema:
+          type: integer
+          default: 20
+          maximum: 200
+      - name: sortBy
+        in: query
+        description: The value of how the tokens are sorted
+        schema:
+          type: string
+          enum:
+            - profile.email
+            - profile.serial
+            - activated
+            - user.id
+            - created
+            - status
+            - lastVerified
+      - name: sortOrder
+        in: query
+        description: Specifies the sort order, either `ASC` or `DESC`
+        schema:
+          type: string
+          enum:
+            - ASC
+            - DESC
+    get:
+      summary: List all YubiKey OTP tokens
+      description: Lists all YubiKey OTP tokens
+      operationId: listYubikeyOtpTokens
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserFactorYubikeyOtpToken'
+              examples:
+                ListYubikeyOptTokensResponse:
+                  $ref: '#/components/examples/ListYubikeyOptTokensResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.read
+      tags:
+        - UserFactor
+    post:
+      summary: Upload a YubiKey OTP seed
+      description: Uploads a seed for a user to enroll a YubiKey OTP
+      operationId: uploadYubikeyOtpTokenSeed
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serialNumber:
+                  type: string
+                  description: The unique identifier assigned to each YubiKey device
+                publicId:
+                  type: string
+                  description: The YubiKey's public ID
+                privateId:
+                  type: string
+                  description: The YubiKey's private ID
+                aesKey:
+                  type: string
+                  description: The cryptographic key used in the AES (Advanced Encryption Standard) algorithm to encrypt and decrypt the YubiKey OTP
+            examples:
+              uploadYubikeyOtpSeedRequest:
+                $ref: '#/components/examples/UploadYubikeyTokenSeedRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserFactorYubikeyOtpToken'
+              examples:
+                yubikeyToken:
+                  $ref: '#/components/examples/UploadYubikeyTokenSeedResponse'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserFactor
+    x-okta-team-detail:
+      x-team-slack: amp-eng-workforce-authenticators
+  /api/v1/org/factors/yubikey_token/tokens/{tokenId}:
+    parameters:
+      - $ref: '#/components/parameters/yubikeyTokenId'
+    get:
+      summary: Retrieve a YubiKey OTP token
+      description: Retrieves the specified YubiKey OTP token by `id`
+      operationId: getYubikeyOtpTokenById
+      parameters:
+        - name: tokenId
+          in: path
+          required: true
+          description: The YubiKey OTP token ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserFactorYubikeyOtpToken'
+              examples:
+                Token:
+                  $ref: '#/components/examples/GetYubikeyOptTokenResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.read
+      tags:
+        - UserFactor
+    x-okta-team-detail:
+      x-team-slack: amp-eng-workforce-authenticators
+  /api/v1/users/{userId}/factors/{factorId}/resend:
+    parameters:
+      - $ref: ../Common.yaml#/components/parameters/pathUserId
+      - $ref: '#/components/parameters/pathFactorId'
+    post:
+      summary: Resend a factor enrollment
+      description: |-
+        Resends an `sms`, `call`, or `email` factor challenge as part of an enrollment flow.
+
+        For `call` and `sms` factors, Okta enforces a rate limit of one OTP challenge per device every 30 seconds. You can configure your `sms` and `call` factors to use a third-party telephony provider. See the [Telephony inline hook reference](https://developer.okta.com/docs/reference/telephony-hook/). Okta alternates between SMS providers with every resend request to ensure delivery of SMS and Call OTPs across different carriers.
+
+        > **Note:** Resend operations aren't allowed after a factor exceeds the activation rate limit. See [Activate a factor](./#tag/UserFactor/operation/activateFactor).
+      operationId: resendEnrollFactor
+      parameters:
+        - name: templateId
+          in: query
+          description: ID of an existing custom SMS template. See the [SMS Templates API](../Template). This parameter is only used by `sms` factors.
+          schema:
+            example: cstk2flOtuCMDJK4b0g3
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResendUserFactor'
+            examples:
+              sms:
+                value:
+                  factorType: sms
+                  provider: OKTA
+                  profile:
+                    phoneNumber: +1-555-415-1337
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResendUserFactor'
+              examples:
+                sms:
+                  $ref: '#/components/examples/EnrollFactorSmsResponse'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserFactor
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authenticator-platform
+  /api/v1/users/{userId}/factors/{factorId}:
+    parameters:
+      - $ref: ../Common.yaml#/components/parameters/pathUserId
+      - $ref: '#/components/parameters/pathFactorId'
+    get:
+      summary: Retrieve a factor
+      description: Retrieves an existing factor for the specified user
+      operationId: getFactor
+      responses:
+        '200':
+          $ref: '#/components/responses/GetFactorResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.read
+      tags:
+        - UserFactor
+    delete:
+      summary: Unenroll a factor
+      description: |-
+        Unenrolls an existing factor for the specified user. You can't unenroll a factor from a deactivated user. Unenrolling a factor allows the user to enroll a new factor.
+
+        > **Note:** If you unenroll the `push` or the `signed_nonce` factors, Okta also unenrolls any other `totp`, `signed_nonce`, or Okta Verify `push` factors associated with the user.
+      operationId: unenrollFactor
+      parameters:
+        - name: removeRecoveryEnrollment
+          description: If `true`, removes the phone number as both a recovery method and a factor. This parameter is only used for the `sms` and `call` factors.
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserFactor
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authenticator-platform
+  /api/v1/users/{userId}/factors/{factorId}/lifecycle/activate:
+    parameters:
+      - $ref: ../Common.yaml#/components/parameters/pathUserId
+      - $ref: '#/components/parameters/pathFactorId'
+    post:
+      summary: Activate a factor
+      description: |-
+        Activates a factor. Some factors (`call`, `email`, `push`, `sms`, `token:software:totp`, `u2f`, and `webauthn`) require activation to complete the enrollment process.
+
+        Okta enforces a rate limit of five activation attempts within five minutes. After a user exceeds the rate limit, Okta returns an error message.
+
+        > **Notes:** 
+        > * If the user exceeds their SMS, call, or email factor activation rate limit, then an [OTP resend request](./#tag/UserFactor/operation/resendEnrollFactor) isn't allowed for the same factor.
+        > * You can't use the Factors API to activate Okta Fastpass (`signed_nonce`) for a user. See [Configure Okta Fastpass](https://help.okta.com/okta_help.htm?type=oie&id=ext-fp-configure).
+      operationId: activateFactor
+      x-codegen-request-body-name: body
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserFactorActivateRequest'
+            examples:
+              token:software:totp:
+                $ref: '#/components/examples/FactorPasscodeRequest'
+              sms:
+                $ref: '#/components/examples/FactorPasscodeRequest'
+              call:
+                $ref: '#/components/examples/FactorPasscodeRequest'
+              email:
+                $ref: '#/components/examples/FactorPasscodeRequest'
+              u2f:
+                $ref: '#/components/examples/ActivateFactorU2fRequest'
+              webauthn:
+                $ref: '#/components/examples/ActivateFactorWebauthnRequest'
+        required: false
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserFactorActivateResponse'
+              examples:
+                token:software:totp:
+                  $ref: '#/components/examples/ActivateFactorTotpResponse'
+                sms:
+                  $ref: '#/components/examples/ActivateFactorSmsResponse'
+                call:
+                  $ref: '#/components/examples/ActivateFactorCallResponse'
+                push:
+                  $ref: '#/components/examples/ActivateFactorPushResponse'
+                email:
+                  $ref: '#/components/examples/ActivateFactorEmailResponse'
+                u2f:
+                  $ref: '#/components/examples/ActivateFactorU2fResponse'
+                webauthn:
+                  $ref: '#/components/examples/ActivateFactorWebauthnResponse'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserFactor
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authenticator-platform
+  /api/v1/users/{userId}/factors/{factorId}/transactions/{transactionId}:
+    parameters:
+      - $ref: ../Common.yaml#/components/parameters/pathUserId
+      - $ref: '#/components/parameters/pathFactorId'
+      - $ref: '#/components/parameters/pathTransactionId'
+    get:
+      summary: Retrieve a factor transaction status
+      description: |-
+        Retrieves the status of a `push` factor verification transaction
+
+         > **Note:**
+         > The response body for a number matching push challenge to an Okta Verify `push` factor enrollment is different from the response body of a standard push challenge. 
+         > The number matching push challenge [response body](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/userfactor/other/getfactortransactionstatus!c=200&path=1/_embedded&t=response) contains the correct answer for the challenge.
+         > Use [Verify a factor](/openapi/okta-management/management/userfactor/verifyfactor) to configure which challenge is sent.
+      operationId: getFactorTransactionStatus
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserFactorPushTransaction'
+              examples:
+                WAITING (with number matching challenge):
+                  $ref: '#/components/examples/UserFactorVerifyPushTransactionWaitingNMC'
+                WAITING:
+                  $ref: '#/components/examples/UserFactorVerifyPushTransactionWaiting'
+                SUCCESS:
+                  $ref: '#/components/examples/UserFactorVerifyPushTransactionApproved'
+                REJECTED:
+                  $ref: '#/components/examples/UserFactorVerifyPushTransactionRejected'
+                TIMEOUT:
+                  $ref: '#/components/examples/UserFactorVerifyPushTransactionTimeout'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.read
+      tags:
+        - UserFactor
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authenticator-platform
+  /api/v1/users/{userId}/factors/{factorId}/verify:
+    parameters:
+      - $ref: ../Common.yaml#/components/parameters/pathUserId
+      - $ref: '#/components/parameters/pathFactorId'
+    post:
+      summary: Verify a factor
+      description: |-
+        Verifies an OTP for a factor. Some factors (`call`, `email`, `push`, `sms`, `u2f`, and `webauthn`) must first issue a challenge before you can verify the factor. Do this by making a request without a body. After a challenge is issued, make another request to verify the factor.
+
+        > **Notes:**
+        > - You can send standard push challenges or number matching push challenges to Okta Verify `push` factor enrollments. Use a [request body](https://developer.okta.com/docs/api/openapi/okta-management/management/userfactor/verifyfactor!path=2/useNumberMatchingChallenge&t=request) for number matching push challenges. 
+        > - To verify a `push` factor, use the **poll** link returned when you issue the challenge. See [Retrieve a factor transaction status](/openapi/okta-management/management/tags/userfactor/other/getfactortransactionstatus).
+      operationId: verifyFactor
+      parameters:
+        - name: templateId
+          description: ID of an existing custom SMS template. See the [SMS Templates API](../Template). This parameter is only used by `sms` factors.
+          in: query
+          schema:
+            type: string
+            example: cstk2flOtuCMDJK4b0g3
+        - name: tokenLifetimeSeconds
+          description: Defines how long the token remains valid
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 86400
+            default: 300
+          x-okta-added-version: 1.3.0
+        - name: X-Forwarded-For
+          description: Public IP address for the user agent
+          in: header
+          schema:
+            type: string
+          x-okta-added-version: 1.11.0
+        - name: User-Agent
+          description: Type of user agent detected when the request is made. Required to verify `push` factors.
+          in: header
+          schema:
+            type: string
+          x-okta-added-version: 1.11.0
+        - name: Accept-Language
+          description: An ISO 639-1 two-letter language code that defines a localized message to send. This parameter is only used by `sms` factors. If a localized message doesn't exist or the `templateId` is incorrect, the default template is used instead.
+          in: header
+          schema:
+            type: string
+            example: fr
+      x-codegen-request-body-name: body
+      requestBody:
+        description: |-
+          Verifies an OTP for a factor. Some factors (`call`, `email`, `push`, `sms`, `u2f`, and `webauthn`) must first issue a challenge before you can verify the factor. Do this by making a request without a body. After a challenge is issued, make another request to verify the factor.
+
+          > **Note:**
+          > Unlike standard push challenges that don't require a request body, a number matching [`push`](https://developer.okta.com/docs/api/openapi/okta-management/management/userfactor/verifyfactor!path=2/useNumberMatchingChallenge&t=request) challenge requires a request body. `useNumberMatchingChallenge` must be set to `true`.
+          > When a number matching challenge is issued for an Okta Verify `push` factor enrollment, a `correctAnswer` challenge object is returned in the [`_embedded`](https://developer.okta.com/docs/api/openapi/okta-management/management/userfactor/verifyfactor!c=200&path=_embedded&t=response) object.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserFactorVerifyRequest'
+            examples:
+              sms verify:
+                $ref: '#/components/examples/FactorPasscodeRequest'
+              call verify:
+                $ref: '#/components/examples/FactorPasscodeRequest'
+              push challenge with number matching:
+                $ref: '#/components/examples/NumberMatchingChallengeRequest'
+              email verify:
+                $ref: '#/components/examples/FactorPasscodeRequest'
+              u2f verify:
+                $ref: '#/components/examples/UserFactorVerifyU2fRequest'
+              webAuthn verify:
+                $ref: '#/components/examples/UserFactorVerifyWebauthnRequest'
+              security question verify:
+                $ref: '#/components/examples/UserFactorVerifySecurityQuestionRequest'
+              totp verify:
+                $ref: '#/components/examples/FactorPasscodeRequest'
+              token verify:
+                $ref: '#/components/examples/FactorPasscodeRequest'
+              yubikey verify:
+                $ref: '#/components/examples/FactorPasscodeRequest'
+        required: false
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserFactorVerifyResponse'
+              examples:
+                sms challenge:
+                  $ref: '#/components/examples/UserFactorChallengeSmsResponse'
+                sms verify:
+                  $ref: '#/components/examples/UserFactorVerifySuccessSmsResponse'
+                call challenge:
+                  $ref: '#/components/examples/UserFactorChallengeCallResponse'
+                call verify:
+                  $ref: '#/components/examples/UserFactorVerifyCallSuccessResponse'
+                email challenge:
+                  $ref: '#/components/examples/UserFactorChallengeEmailResponse'
+                email verify:
+                  $ref: '#/components/examples/UserFactorVerifyEmailSuccessResponse'
+                u2f challenge:
+                  $ref: '#/components/examples/UserFactorChallengeU2fResponse'
+                u2f verify:
+                  $ref: '#/components/examples/UserFactorVerifyU2fResponse'
+                webAuthn challenge:
+                  $ref: '#/components/examples/UserFactorChallengeWebauthnResponse'
+                webAuthn verify:
+                  $ref: '#/components/examples/UserFactorVerifyWebauthnResponse'
+                security question verify:
+                  $ref: '#/components/examples/UserFactorVerifySuccessSqResponse'
+                totp verify:
+                  $ref: '#/components/examples/UserFactorVerifySuccessTotpResponse'
+                token verify:
+                  $ref: '#/components/examples/UserFactorVerifySuccessTokenResponse'
+                yubikey verify:
+                  $ref: '#/components/examples/UserFactorVerifySuccessYubikeyResponse'
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserFactorVerifyResponseWaiting'
+              examples:
+                push challenge with number matching:
+                  $ref: '#/components/examples/UserFactorChallengePushResponseWithNumberMatchingChallenge'
+                push challenge:
+                  $ref: '#/components/examples/UserFactorChallengePushResponse'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserFactor
+    x-okta-team-detail:
+      x-team-slack: amp-eng-authenticator-platform
+components:
+  parameters:
+    pathFactorId:
+      name: factorId
+      description: ID of an existing user factor
+      in: path
+      required: true
+      schema:
+        type: string
+        example: zAgrsaBe0wVGRugDYtdv
+    pathTransactionId:
+      name: transactionId
+      description: ID of an existing factor verification transaction
+      in: path
+      required: true
+      schema:
+        type: string
+        example: gPAQcN3NDjSGOCAeG2Jv
+    yubikeyTokenId:
+      name: tokenId
+      description: ID of a YubiKey token
+      in: path
+      required: true
+      schema:
+        type: string
+        example: ykkxdtCA1fKVxyu6R0g3
+  schemas:
+    ResendUserFactor:
+      type: object
+      properties:
+        factorType:
+          description: Type of the factor
+          type: string
+          enum:
+            - call
+            - email
+            - sms
+      discriminator:
+        propertyName: factorType
+        mapping:
+          call: '#/components/schemas/UserFactorCall'
+          email: '#/components/schemas/UserFactorEmail'
+          sms: '#/components/schemas/UserFactorSMS'
+    UserFactor:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        factorType:
+          $ref: '#/components/schemas/UserFactorType'
+        created:
+          description: Timestamp when the factor was enrolled
+          type: string
+          format: date-time
+          example: 2022-08-25T00:31:00.000Z
+          readOnly: true
+        id:
+          description: ID of the factor
+          type: string
+          example: caf8m6jbcvUH8mAep1d7
+          readOnly: true
+        lastUpdated:
+          description: Timestamp when the factor was last updated
+          type: string
+          format: date-time
+          example: 2022-08-25T00:31:00.000Z
+          readOnly: true
+        provider:
+          description: Provider for the factor. Each provider can support a subset of factor types.
+          type: string
+        profile:
+          type: object
+          x-okta-ignore-redocly-rules-for-sdk: true
+          description: Specific attributes related to the factor
+        status:
+          $ref: '#/components/schemas/UserFactorStatus'
+        vendorName:
+          description: Name of the factor vendor. This is usually the same as the provider except for On-Prem MFA, which depends on admin settings.
+          type: string
+          example: OKTA
+          readOnly: true
+        _embedded:
+          type: object
+          additionalProperties:
+            type: object
+            properties: {}
+          readOnly: true
+        _links:
+          $ref: '#/components/schemas/UserFactorLinks'
+      discriminator:
+        propertyName: factorType
+        mapping:
+          call: '#/components/schemas/UserFactorCall'
+          email: '#/components/schemas/UserFactorEmail'
+          push: '#/components/schemas/UserFactorPush'
+          question: '#/components/schemas/UserFactorSecurityQuestion'
+          sms: '#/components/schemas/UserFactorSMS'
+          token: '#/components/schemas/UserFactorToken'
+          token:hardware: '#/components/schemas/UserFactorTokenHardware'
+          token:hotp: '#/components/schemas/UserFactorTokenHOTP'
+          token:software:totp: '#/components/schemas/UserFactorTokenSoftwareTOTP'
+          u2f: '#/components/schemas/UserFactorU2F'
+          web: '#/components/schemas/UserFactorWeb'
+          webauthn: '#/components/schemas/UserFactorWebAuthn'
+    UserFactorProvider:
+      type: string
+      enum:
+        - CUSTOM
+        - DUO
+        - FIDO
+        - GOOGLE
+        - OKTA
+        - RSA
+        - SYMANTEC
+        - YUBICO
+    UserFactorResultType:
+      description: Result of a factor verification attempt
+      type: string
+      readOnly: true
+      enum:
+        - CANCELLED
+        - CHALLENGE
+        - ERROR
+        - FAILED
+        - PASSCODE_REPLAYED
+        - REJECTED
+        - SUCCESS
+        - TIMEOUT
+        - TIME_WINDOW_EXCEEDED
+        - WAITING
+    UserFactorStatus:
+      example: ACTIVE
+      description: Status of the factor
+      type: string
+      readOnly: true
+      enum:
+        - ACTIVE
+        - DISABLED
+        - ENROLLED
+        - EXPIRED
+        - INACTIVE
+        - NOT_SETUP
+        - PENDING_ACTIVATION
+    UserFactorSupported:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        enrollment:
+          type: string
+          description: Indicates if the factor is required for the specified user
+          example: OPTIONAL
+          enum:
+            - OPTIONAL
+            - REQUIRED
+        factorType:
+          $ref: '#/components/schemas/UserFactorType'
+        provider:
+          $ref: '#/components/schemas/UserFactorProvider'
+        vendorName:
+          description: Name of the factor vendor. This is usually the same as the provider except for On-Prem MFA, which depends on admin settings.
+          type: string
+          example: OKTA
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/UserFactorStatus'
+        _links:
+          $ref: '#/components/schemas/UserFactorLinks'
+        _embedded:
+          type: object
+          description: Embedded resources related to the factor
+          additionalProperties:
+            type: object
+            properties: {}
+          readOnly: true
+    UserFactorType:
+      description: Type of factor
+      type: string
+      enum:
+        - call
+        - sms
+        - email
+        - question
+        - push
+        - token
+        - token:hardware
+        - token:hotp
+        - token:software:totp
+        - u2f
+        - web
+        - webauthn
+        - signed_nonce
+    UserFactorCall:
+      title: call
+      allOf:
+        - $ref: '#/components/schemas/UserFactor'
+        - type: object
+          properties:
+            factorType:
+              example: call
+            profile:
+              $ref: '#/components/schemas/UserFactorCallProfile'
+            provider:
+              enum:
+                - OKTA
+    UserFactorCallProfile:
+      type: object
+      properties:
+        phoneExtension:
+          description: Extension of the associated `phoneNumber`
+          type: string
+          example: 1234
+          nullable: true
+          maxLength: 15
+        phoneNumber:
+          description: Phone number of the factor. Format phone numbers to use the [E.164 standard](https://www.itu.int/rec/T-REC-E.164/).
+          example: '+15554151337'
+          type: string
+          pattern: ^\+[1-9]\d{1,14}$
+          maxLength: 15
+    UserFactorTokenHOTP:
+      title: token:hotp
+      allOf:
+        - $ref: '#/components/schemas/UserFactor'
+        - type: object
+          properties:
+            factorType:
+              example: token:hotp
+            factorProfileId:
+              description: ID of an existing Custom TOTP factor profile. To create this, see [Custom TOTP factor](https://help.okta.com/okta_help.htm?id=ext-mfa-totp).
+              type: string
+            profile:
+              $ref: '#/components/schemas/UserFactorTokenHOTPProfile'
+            provider:
+              enum:
+                - CUSTOM
+    UserFactorTokenHOTPProfile:
+      type: object
+      properties:
+        sharedSecret:
+          description: Unique secret key used to generate the OTP
+          type: string
+          example: 484f97be3213b117e3a20438e291540a
+    UserFactorEmail:
+      title: email
+      allOf:
+        - $ref: '#/components/schemas/UserFactor'
+        - type: object
+          properties:
+            factorType:
+              example: email
+            profile:
+              $ref: '#/components/schemas/UserFactorEmailProfile'
+            provider:
+              enum:
+                - OKTA
+    UserFactorEmailProfile:
+      type: object
+      properties:
+        email:
+          description: |-
+            Email address of the user. This must be either the primary or secondary email address associated with the Okta user account.
+
+            > **Note:** For Identity Engine orgs, you can only enroll the primary email address of the user.
+          maxLength: 100
+          example: z.cool@example.com
+          type: string
+    UserFactorTokenHardware:
+      title: token:hardware
+      allOf:
+        - $ref: '#/components/schemas/UserFactor'
+        - type: object
+          properties:
+            factorType:
+              example: token:hardware
+            profile:
+              $ref: '#/components/schemas/UserFactorTokenProfile'
+            provider:
+              enum:
+                - YUBICO
+            verify:
+              type: object
+              properties:
+                passCode:
+                  description: OTP for the current time window
+                  type: string
+                  example: cccccceukngdfgkukfctkcvfidnetljjiknckkcjulji
+    UserFactorPush:
+      title: push
+      allOf:
+        - $ref: '#/components/schemas/UserFactor'
+        - type: object
+          properties:
+            profile:
+              $ref: '#/components/schemas/UserFactorPushProfile'
+            provider:
+              enum:
+                - OKTA
+    UserFactorPushProfile:
+      type: object
+      properties:
+        credentialId:
+          description: ID for the factor credential
+          example: dade.murphy@example.com
+          type: string
+        deviceToken:
+          description: Token used to identify the device
+          example: fwf7ku6bsiSCieh6y1d7
+          type: string
+        deviceType:
+          description: Type of device
+          example: SmartPhone_IPhone
+          type: string
+        name:
+          description: Name of the device
+          example: My Phone
+          type: string
+        platform:
+          description: OS version of the associated device
+          example: IOS
+          type: string
+        version:
+          description: Installed version of Okta Verify
+          example: '9.0'
+          type: string
+    UserFactorPushTransaction:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        factorResult:
+          description: Result of the verification transaction
+          type: string
+          enum:
+            - WAITING (with number matching challenge)
+            - WAITING
+            - SUCCESS
+            - REJECTED
+            - TIMEOUT
+      discriminator:
+        propertyName: factorResult
+        mapping:
+          WAITING: '#/components/schemas/UserFactorPushTransactionWaitingNoNMC'
+          WAITING (with number matching challenge): '#/components/schemas/UserFactorPushTransactionWaitingNMC'
+          SUCCESS: '#/components/schemas/UserFactorPushTransactionSuccess'
+          REJECTED: '#/components/schemas/UserFactorPushTransactionRejected'
+          TIMEOUT: '#/components/schemas/UserFactorPushTransactionTimeout'
+    UserFactorPushTransactionRejected:
+      allOf:
+        - $ref: '#/components/schemas/UserFactorPushTransaction'
+        - type: object
+          properties:
+            profile:
+              type: object
+              properties:
+                credentialId:
+                  description: ID for the factor credential
+                  example: dade.murphy@example.com
+                  type: string
+            _links:
+              allOf:
+                - $ref: '#/components/schemas/LinksVerify'
+                - type: object
+                  properties:
+                    factor:
+                      $ref: '#/components/schemas/UserFactor'
+    UserFactorPushTransactionSuccess:
+      $ref: '#/components/schemas/UserFactorPushTransaction'
+    UserFactorPushTransactionTimeout:
+      allOf:
+        - $ref: '#/components/schemas/UserFactorPushTransaction'
+        - type: object
+          properties:
+            profile:
+              type: object
+              properties:
+                credentialId:
+                  description: ID for the factor credential
+                  example: dade.murphy@example.com
+                  type: string
+            _links:
+              allOf:
+                - $ref: '#/components/schemas/LinksVerify'
+                - type: object
+                  properties:
+                    factor:
+                      $ref: '#/components/schemas/UserFactor'
+    UserFactorPushTransactionWaitingNoNMC:
+      allOf:
+        - $ref: '#/components/schemas/UserFactorPushTransaction'
+        - type: object
+          properties:
+            profile:
+              type: object
+              properties:
+                credentialId:
+                  description: ID for the factor credential
+                  example: dade.murphy@example.com
+                  type: string
+            _links:
+              allOf:
+                - $ref: '#/components/schemas/LinksPoll'
+                - $ref: '#/components/schemas/LinksCancel'
+    UserFactorPushTransactionWaitingNMC:
+      allOf:
+        - $ref: '#/components/schemas/UserFactorPushTransaction'
+        - type: object
+          properties:
+            profile:
+              type: object
+              properties:
+                credentialId:
+                  description: ID for the factor credential
+                  example: dade.murphy@example.com
+                  type: string
+            _links:
+              allOf:
+                - $ref: '#/components/schemas/LinksPoll'
+                - $ref: '#/components/schemas/LinksCancel'
+            _embedded:
+              $ref: '#/components/schemas/NumberFactorChallengeEmbeddedLinks'
+    UserFactorSecurityQuestion:
+      title: question
+      allOf:
+        - $ref: '#/components/schemas/UserFactor'
+        - type: object
+          properties:
+            factorType:
+              example: question
+            profile:
+              $ref: '#/components/schemas/UserFactorSecurityQuestionProfile'
+            provider:
+              enum:
+                - OKTA
+    UserFactorSecurityQuestionProfile:
+      type: object
+      properties:
+        answer:
+          description: Answer to the question
+          minLength: 4
+          type: string
+          writeOnly: true
+        question:
+          description: Unique key for the question
+          example: disliked_food
+          enum:
+            - disliked_food
+            - name_of_first_plush_toy
+            - first_award
+            - favorite_security_question
+            - favorite_toy
+            - first_computer_game
+            - favorite_movie_quote
+            - first_sports_team_mascot
+            - first_music_purchase
+            - favorite_art_piece
+            - grandmother_favorite_desert
+            - first_thing_cooked
+            - childhood_dream_job
+            - first_kiss_location
+            - place_where_significant_other_was_met
+            - favorite_vacation_location
+            - new_years_two_thousand
+            - favorite_speaker_actor
+            - favorite_book_movie_character
+            - favorite_sports_player
+          type: string
+        questionText:
+          description: Human-readable text that's displayed to the user
+          example: What is the food you least liked as a child?
+          type: string
+          readOnly: true
+    UserFactorSMS:
+      title: sms
+      allOf:
+        - $ref: '#/components/schemas/UserFactor'
+        - type: object
+          properties:
+            factorType:
+              example: sms
+            profile:
+              $ref: '#/components/schemas/UserFactorSMSProfile'
+            provider:
+              enum:
+                - OKTA
+    UserFactorSMSProfile:
+      type: object
+      properties:
+        phoneNumber:
+          description: Phone number of the factor. You should format phone numbers to use the [E.164 standard](https://www.itu.int/rec/T-REC-E.164/).
+          example: '+15554151337'
+          type: string
+          pattern: ^\+[1-9]\d{1,14}$
+          maxLength: 15
+    UserFactorToken:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      title: token
+      allOf:
+        - $ref: '#/components/schemas/UserFactor'
+        - type: object
+          properties:
+            factorType:
+              example: token
+            profile:
+              $ref: '#/components/schemas/UserFactorTokenProfile'
+            provider:
+              enum:
+                - RSA
+                - SYMANTEC
+            verify:
+              oneOf:
+                - $ref: '#/components/schemas/UserFactorTokenVerifyRSA'
+                - $ref: '#/components/schemas/UserFactorTokenVerifySymantec'
+    UserFactorTokenProfile:
+      type: object
+      properties:
+        credentialId:
+          description: ID for the factor credential
+          example: dade.murphy@example.com
+          type: string
+    UserFactorTokenVerifyRSA:
+      title: RSA SecurID
+      type: object
+      properties:
+        passCode:
+          description: OTP for the current time window
+          type: string
+          example: 5275875498
+    UserFactorTokenVerifySymantec:
+      title: Symantec VIP
+      type: object
+      properties:
+        nextPassCode:
+          description: OTP for the next time window
+          type: integer
+          example: 3956685498
+        passCode:
+          description: OTP for the current time window
+          type: string
+          example: 5275875498
+    UserFactorTokenSoftwareTOTP:
+      title: token:software:totp
+      allOf:
+        - $ref: '#/components/schemas/UserFactor'
+        - type: object
+          properties:
+            factorType:
+              example: token:software:totp
+            profile:
+              $ref: '#/components/schemas/UserFactorTokenProfile'
+            provider:
+              enum:
+                - OKTA
+                - GOOGLE
+    UserFactorU2F:
+      title: u2f
+      allOf:
+        - $ref: '#/components/schemas/UserFactor'
+        - type: object
+          properties:
+            factorType:
+              example: u2f
+            profile:
+              $ref: '#/components/schemas/UserFactorU2FProfile'
+            provider:
+              enum:
+                - FIDO
+    UserFactorU2FProfile:
+      type: object
+      properties:
+        credentialId:
+          description: ID for the factor credential
+          example: dade.murphy@example.com
+          type: string
+    UserFactorWebAuthn:
+      title: webauthn
+      allOf:
+        - $ref: '#/components/schemas/UserFactor'
+        - type: object
+          properties:
+            factorType:
+              example: webauthn
+            profile:
+              $ref: '#/components/schemas/UserFactorWebAuthnProfile'
+            provider:
+              enum:
+                - FIDO
+    UserFactorWebAuthnProfile:
+      type: object
+      readOnly: true
+      properties:
+        authenticatorName:
+          description: |-
+            Human-readable name of the authenticator
+
+            > **Note:** This name is set from the AAGUID metadata during enrollment. It can't be changed in the Admin Console or by using any Okta APIs.
+          example: MacBook Touch ID
+          type: string
+        credentialId:
+          description: ID for the factor credential
+          example: AHoOEhwvYiMv6SSwLp7KYRNttXtg_kYgQoQiEIWPFH_T3Ztp5Vj3bQ5H0LypIFR8ka8kfiCJ3I5qVpxrsd6JTMWKcE3xNh_U2QVF0Kwlan8Fiw
+          type: string
+    UserFactorWeb:
+      title: web
+      allOf:
+        - $ref: '#/components/schemas/UserFactor'
+        - type: object
+          properties:
+            factorType:
+              example: web
+            profile:
+              $ref: '#/components/schemas/UserFactorWebProfile'
+            provider:
+              enum:
+                - DUO
+    UserFactorWebProfile:
+      type: object
+      properties:
+        credentialId:
+          description: ID for the factor credential
+          example: dade.murphy@example.com
+          type: string
+    UserFactorActivateRequest:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      oneOf:
+        - title: call
+          description: Attempts to activate a `call` factor with the specified passcode
+          properties:
+            passCode:
+              $ref: '#/components/schemas/UserFactorPassCode'
+        - title: email
+          description: Attempts to activate an `email` factor with the specified passcode
+          properties:
+            passCode:
+              $ref: '#/components/schemas/UserFactorPassCode'
+        - title: push
+          type: object
+          nullable: true
+          description: |-
+            Sends an asynchronous push notification to the device for approval by the user. You must poll the transaction to determine the state of the verification. See [Retrieve a factor transaction status](./#tag/UserFactor/operation/getFactorTransactionStatus).
+
+            Activations have a short lifetime of several minutes and return a `TIMEOUT` if not completed before the timestamp specified in the `expiresAt` param. Use the published activate link to restart the activation process if the activation expires.
+          properties:
+            useNumberMatchingChallenge:
+              $ref: '#/components/schemas/useNumberMatchingChallenge'
+        - title: sms
+          description: Attempts to activate an `sms` factor with the specified passcode
+          properties:
+            passCode:
+              $ref: '#/components/schemas/UserFactorPassCode'
+        - title: token:software:totp
+          description: Attempts to activate a `token:software:totp` factor with the specified passcode
+          properties:
+            passCode:
+              $ref: '#/components/schemas/UserFactorPassCode'
+        - title: u2f
+          description: Activates a `u2f` factor with the specified client and registration information from the U2F token
+          properties:
+            clientData:
+              type: string
+              description: Base64-encoded client data from the U2F token
+              example: eyJ0eXAiOiJuYXZpZ2F0b3IuaWQuZmluaXNoRW5yb2xsbWVudCIsImNoYWxsZW5nZSI6IlhxR0h0RTBoUkxuVEoxYUF5U1oyIiwib3JpZ2luIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6MzAwMCIsImNpZF9wdWJrZXkiOiJ1bnVzZWQifQ
+            registrationData:
+              type: string
+              description: Base64-encoded registration data from the U2F token
+              example: BQTEMUyOM8h1TiZG4DL-RdMr-tYgTYSf62Y52AmwEFTiSYWIRVO5L-MwWdRJOthmV3J3JrqpmGfmFb820-awx1YIQFlTvkMhxItHlpkzahEqicpw7SIH9yMfTn2kaDcC6JaLKPfV5ds0vzuxF1JJj3gCM01bRC-HWI4nCVgc-zaaoRgwggEcMIHDoAMCAQICCwD52fCSMoNczORdMAoGCCqGSM49BAMCMBUxEzARBgNVBAMTClUyRiBJc3N1ZXIwGhcLMDAwMTAxMDAwMFoXCzAwMDEwMTAwMDBaMBUxEzARBgNVBAMTClUyRiBEZXZpY2UwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQFKJupuUgPQcRHUphaW5JPfLvkkwlEwlHKk_ntSp7MS4aTHJyGnpziqncrjiTC_oUVtb-wN-y_t_IMIjueGkhxMAoGCCqGSM49BAMCA0gAMEUCIQDBo6aOLxanIUYnBX9iu3KMngPnobpi0EZSTkVtLC8_cwIgC1945RGqGBKfbyNtkhMifZK05n7fU-gW37Bdnci5D94wRQIhAJv3VvclbRkHAQhaUR8rr8qFTg9iF-GtHoXU95vWaQdyAiAbEr-440U4dQAZF-Sj8G2fxgh5DkgkkWpyUHZhz7N9ew
+        - title: webauthn
+          description: Activates a `webauthn` factor with the specified attestation and registration information from the WebAuthn authenticator
+          properties:
+            attestation:
+              type: string
+              description: Base64-encoded attestation from the WebAuthn authenticator
+              example: o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEgwRgIhAMvf2+dzXlHZN1um38Y8aFzrKvX0k5dt/hnDu9lahbR4AiEAuwtMg3IoaElWMp00QrP/+3Po/6LwXfmYQVfsnsQ+da1oYXV0aERhdGFYxkgb9OHGifjS2dG03qLRqvXrDIRyfGAuc+GzF1z20/eVRV2wvl6tzgACNbzGCmSLCyXx8FUDAEIBvWNHOcE3QDUkDP/HB1kRbrIOoZ1dR874ZaGbMuvaSVHVWN2kfNiO4D+HlAzUEFaqlNi5FPqKw+mF8f0XwdpEBlClAQIDJiABIVgg0a6oo3W0JdYPu6+eBrbr0WyB3uJLI3ODVgDfQnpgafgiWCB4fFo/5iiVrFhB8pNH2tbBtKewyAHuDkRolcCnVaCcmQ==
+            clientData:
+              type: string
+              description: Base64-encoded client data from the WebAuthn authenticator
+              example: eyJjaGFsbGVuZ2UiOiJVSk5wYW9sVWt0dF9vcEZPNXJMYyIsIm9yaWdpbiI6Imh0dHBzOi8vcmFpbi5va3RhMS5jb20iLCJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIn0
+    UserFactorActivateResponse:
+      type: object
+      properties:
+        factorType:
+          description: Type of the factor
+          type: string
+          enum:
+            - call
+            - email
+            - sms
+            - push
+            - token:software:totp
+            - u2f
+            - webauthn
+        _links:
+          allOf:
+            - $ref: ../Common.yaml#/components/schemas/LinksSelf
+            - $ref: '#/components/schemas/LinksUserFactors'
+            - $ref: '#/components/schemas/LinksVerify'
+      discriminator:
+        propertyName: factorType
+        mapping:
+          call: '#/components/schemas/UserFactorCall'
+          email: '#/components/schemas/UserFactorEmail'
+          sms: '#/components/schemas/UserFactorSMS'
+          push: '#/components/schemas/UserFactorPush'
+          token:software:totp: '#/components/schemas/UserFactorTokenSoftwareTOTP'
+          u2f: '#/components/schemas/UserFactorU2F'
+          webauthn: '#/components/schemas/UserFactorWebAuthn'
+    UserFactorActivatePush:
+      type: object
+      description: Activation requests have a short lifetime and expire if the activation isn't completed before the indicated timestamp. If the activation expires, use the returned `activate` link to restart the process.
+      properties:
+        expiresAt:
+          description: Timestamp when the factor verification attempt expires
+          type: string
+          format: date-time
+          example: 2022-08-25T00:31:00.000Z
+          readOnly: true
+        factorResult:
+          $ref: '#/components/schemas/UserFactorActivatePushResult'
+          readOnly: true
+    UserFactorActivatePushResult:
+      description: Result of a factor activation
+      type: string
+      enum:
+        - WAITING
+        - CANCELLED
+        - TIMEOUT
+        - ERROR
+    UserFactorVerifyRequest:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      oneOf:
+        - title: call
+          description: Verifies an OTP sent by a `call` factor challenge. If you omit `passCode` in the request, a new OTP is sent to the phone.
+          properties:
+            passCode:
+              $ref: '#/components/schemas/UserFactorPassCode'
+        - title: sms
+          description: Verifies an OTP sent by an `sms` factor challenge. If you omit `passCode` in the request, a new OTP is sent to the phone.
+          properties:
+            passCode:
+              $ref: '#/components/schemas/UserFactorPassCode'
+        - title: push
+          type: object
+          nullable: true
+          description: Sends an asynchronous push notification to the device for approval by the user. A successful request returns an HTTP 201 response, unlike other factors. You must poll the transaction to determine the state of the verification. See [Retrieve a factor transaction status](./#tag/UserFactor/operation/getFactorTransactionStatus).
+          properties:
+            useNumberMatchingChallenge:
+              $ref: '#/components/schemas/useNumberMatchingChallenge'
+        - title: email
+          description: Verifies an OTP sent by an `email` factor challenge. If you omit `passCode` in the request, a new OTP is sent to the phone.
+          properties:
+            passCode:
+              $ref: '#/components/schemas/UserFactorPassCode'
+        - title: question
+          description: Verifies an answer to a `question` factor
+          properties:
+            answer:
+              description: Answer to the question
+              minLength: 4
+              type: string
+              writeOnly: true
+        - title: token:software:totp
+          description: Verifies an OTP for a `token:software:totp` factor
+          properties:
+            passCode:
+              $ref: '#/components/schemas/UserFactorPassCode'
+        - title: token:hotp
+          description: Verifies an OTP for a `token:hotp` factor
+          properties:
+            passCode:
+              $ref: '#/components/schemas/UserFactorPassCode'
+        - title: token:hardware
+          description: Verifies an OTP for a `token:hardware` factor
+          properties:
+            passCode:
+              $ref: '#/components/schemas/UserFactorPassCode'
+        - title: token
+          description: Verifies an OTP for a `token` factor
+          properties:
+            passCode:
+              $ref: '#/components/schemas/UserFactorPassCode'
+        - title: u2f
+          description: Verifies a `u2f` factor challenge by posting a signed assertion using the challenge `nonce`
+          properties:
+            clientData:
+              type: string
+              description: Base64-encoded client data from the U2F token
+              example: eyJ0eXAiOiJuYXZpZ2F0b3IuaWQuZmluaXNoRW5yb2xsbWVudCIsImNoYWxsZW5nZSI6IlhxR0h0RTBoUkxuVEoxYUF5U1oyIiwib3JpZ2luIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6MzAwMCIsImNpZF9wdWJrZXkiOiJ1bnVzZWQifQ
+            signatureData:
+              description: Base64-encoded signature data from the U2F token
+        - title: webauthn
+          description: Verifies a `webauthn` factor challenge by posting a signed assertion using the challenge `nonce`
+          properties:
+            authenticatorData:
+              description: Base64-encoded authenticator data from the WebAuthn authenticator
+              type: string
+            clientData:
+              type: string
+              description: Base64-encoded client data from the WebAuthn authenticator
+              example: eyJjaGFsbGVuZ2UiOiJVSk5wYW9sVWt0dF9vcEZPNXJMYyIsIm9yaWdpbiI6Imh0dHBzOi8vcmFpbi5va3RhMS5jb20iLCJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIn0
+            signatureData:
+              type: string
+              description: Base64-encoded signature data from the WebAuthn authenticator
+    UserFactorPassCode:
+      type: string
+      description: OTP for the current time window
+      example: 1234567890
+    useNumberMatchingChallenge:
+      type: boolean
+      description: |-
+        Select whether to use a number matching challenge for a `push` factor.
+
+        > **Note:** Sending a request with a body is required when you verify a `push` factor with a number matching challenge.
+      example: true
+      x-okta-lifecycle:
+        features:
+          - ENABLE_FACTORS_API_NUMBER_MATCHING_CHALLENGE
+    UserFactorSignatureData:
+      type: string
+      description: Base64-encoded signature data from the WebAuthn authenticator
+    UserFactorVerifyResponse:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        expiresAt:
+          description: Timestamp when the verification expires
+          type: string
+          format: date-time
+          example: 2022-08-25T00:31:00.000Z
+          readOnly: true
+        factorResult:
+          $ref: '#/components/schemas/UserFactorVerifyResult'
+          readOnly: true
+        factorMessage:
+          description: Optional display message for factor verification
+          type: string
+          readOnly: true
+          nullable: true
+        profile:
+          type: object
+          additionalProperties:
+            type: object
+            properties: {}
+          readOnly: true
+        _embedded:
+          allOf:
+            - additionalProperties:
+                type: object
+                nullable: true
+                readOnly: true
+        _links:
+          $ref: '#/components/schemas/UserFactorLinks'
+    UserFactorVerifyResponseWaiting:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        expiresAt:
+          description: Timestamp when the verification expires
+          type: string
+          format: date-time
+          example: 2022-08-25T00:31:00.000Z
+          readOnly: true
+        factorResult:
+          $ref: '#/components/schemas/UserFactorVerifyResultWaiting'
+          readOnly: true
+        factorMessage:
+          description: Optional display message for factor verification
+          type: string
+          readOnly: true
+          nullable: true
+        profile:
+          type: object
+          additionalProperties:
+            type: object
+            properties: {}
+          readOnly: true
+        _embedded:
+          allOf:
+            - $ref: '#/components/schemas/NumberFactorChallengeEmbeddedLinks'
+            - additionalProperties:
+                type: object
+                nullable: true
+                readOnly: true
+        _links:
+          $ref: '#/components/schemas/UserFactorLinks'
+    UserFactorVerifyResult:
+      description: Result of a factor verification
+      type: string
+      enum:
+        - CHALLENGE
+        - ERROR
+        - EXPIRED
+        - FAILED
+        - PASSCODE_REPLAYED
+        - REJECTED
+        - SUCCESS
+        - TIMEOUT
+        - TIME_WINDOW_EXCEEDED
+      x-enumDescriptions:
+        CANCELED: User cancelled the verification
+        CHALLENGE: Okta issued a verification challenge
+        ERROR: Verification encountered an unexpected server error
+        EXPIRED: User didn't complete the verification within the allowed time window
+        FAILED: Verification failed
+        PASSCODE_REPLAYED: User previously verified the factor within the same time window. Another verification is required during another time window.
+        REJECTED: User rejected the verification
+        SUCCESS: User completed the verification
+        TIMEOUT: Okta didn't complete the verification within the allowed time window
+        TIME_WINDOW_EXCEEDED: User completed the verification outside of the allowed time window. Another verification is required.
+    UserFactorVerifyResultWaiting:
+      description: Result of a factor verification
+      type: string
+      enum:
+        - WAITING
+      x-enumDescriptions:
+        WAITING: Verification is in progress
+    UserFactorLinks:
+      readOnly: true
+      allOf:
+        - $ref: '#/components/schemas/LinksActivate'
+        - $ref: '#/components/schemas/LinksCancel'
+        - $ref: '#/components/schemas/LinksDeactivate'
+        - $ref: '#/components/schemas/LinksEnroll'
+        - $ref: '#/components/schemas/LinksFactor'
+        - $ref: '#/components/schemas/LinksPoll'
+        - $ref: '#/components/schemas/LinksQrcode'
+        - $ref: '#/components/schemas/LinksQuestions'
+        - $ref: '#/components/schemas/LinksResend'
+        - $ref: '#/components/schemas/LinksSend'
+        - $ref: ../Common.yaml#/components/schemas/LinksSelf
+        - $ref: '#/components/schemas/LinksUserFactors'
+        - $ref: '#/components/schemas/LinksVerify'
+    LinksActivate:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        activate:
+          allOf:
+            - description: Activates an enrolled factor. See [Activate a factor](/openapi/okta-management/management/userfactor/activatefactor).
+            - $ref: ../Common.yaml#/components/schemas/HrefObject
+      readOnly: true
+    LinksCancel:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        cancel:
+          allOf:
+            - description: Cancels a `push` factor challenge with a `WAITING` status
+            - $ref: ../Common.yaml#/components/schemas/HrefObject
+      readOnly: true
+    LinksDeactivate:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        deactivate:
+          allOf:
+            - description: Deactivates the factor. See [Unenroll a factor](/openapi/okta-management/management/userfactor/unenrollfactor).
+            - $ref: ../Common.yaml#/components/schemas/HrefObject
+      readOnly: true
+    LinksEnroll:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        enroll:
+          allOf:
+            - description: Enrolls a supported factor. See [Enroll a factor](/openapi/okta-management/management/userfactor/enrollfactor).
+            - $ref: ../Common.yaml#/components/schemas/HrefObject
+      readOnly: true
+    LinksFactor:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        factor:
+          allOf:
+            - description: Link to the factor resource
+            - $ref: ../Common.yaml#/components/schemas/HrefObject
+      readOnly: true
+    LinksPoll:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        poll:
+          allOf:
+            - description: Polls the factor resource for status information. Always use the `poll` link instead of manually constructing your own URL.
+            - $ref: ../Common.yaml#/components/schemas/HrefObject
+      readOnly: true
+    LinksQrcode:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        qrcode:
+          allOf:
+            - description: QR code that encodes the push activation code needed for enrollment on the device
+            - $ref: ../Common.yaml#/components/schemas/HrefObject
+      readOnly: true
+    LinksQuestions:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        question:
+          allOf:
+            - description: Lists all supported security questions. See [List all supported security questions](/openapi/okta-management/management/userfactor/listsupportedsecurityquestions).
+            - $ref: ../Common.yaml#/components/schemas/HrefObject
+      readOnly: true
+    LinksResend:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        resend:
+          allOf:
+            - description: Resends the factor enrollment challenge. See [Resend a factor enrollment](/openapi/okta-management/management/userfactor/resendenrollfactor).
+            - $ref: ../Common.yaml#/components/schemas/HrefObject
+      readOnly: true
+    LinksSend:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        send:
+          allOf:
+            - description: Sends an activation link through email or sms for users who can't scan the QR code
+            - $ref: ../Common.yaml#/components/schemas/HrefObject
+      readOnly: true
+    LinksUserFactors:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        user:
+          allOf:
+            - description: Returns information on the specified user
+            - $ref: ../Common.yaml#/components/schemas/HrefObject
+      readOnly: true
+    LinksVerify:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        verify:
+          allOf:
+            - description: Verifies the factor resource. See [Verify a factor](/openapi/okta-management/management/userfactor/verifyfactor).
+            - $ref: ../Common.yaml#/components/schemas/HrefObject
+      readOnly: true
+    UserFactorTokenFactorVerificationObject:
+      type: object
+      properties:
+        nextPassCode:
+          description: OTP for the next time window
+          type: string
+          example: 678195
+        passCode:
+          description: OTP for the current time window
+          type: string
+          example: 875498
+    UserFactorYubikeyOtpToken:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        id:
+          description: ID of the token
+          type: string
+          example: ykkwcx13nrDq8g4oy0g3
+          readOnly: true
+        created:
+          description: Timestamp when the token was created
+          type: string
+          format: date-time
+          example: 2022-08-25T00:31:00.000Z
+          readOnly: true
+        lastVerified:
+          description: Timestamp when the token was last verified
+          type: string
+          format: date-time
+          example: 2022-08-25T00:31:00.000Z
+          readOnly: true
+        lastUpdated:
+          description: Timestamp when the token was last updated
+          type: string
+          format: date-time
+          example: 2022-08-25T00:31:00.000Z
+          readOnly: true
+        status:
+          description: Token status
+          type: string
+          enum:
+            - BLOCKED
+            - UNASSIGNED
+            - ACTIVE
+            - REVOKED
+            - DELETED
+            - INACTIVE
+        profile:
+          type: object
+          description: Specified profile information for token
+          additionalProperties:
+            type: object
+            properties: {}
+        _embedded:
+          type: object
+          additionalProperties:
+            type: object
+            properties: {}
+        _links:
+          $ref: '#/components/schemas/UserFactorLinks'
+    NumberFactorChallengeEmbeddedLinks:
+      type: object
+      description: Contains the `challenge` and `correctAnswer` objects for `push` factors that use a number matching challenge
+      properties:
+        challenge:
+          type: object
+          description: Number matching challenge for a `push` factor
+          properties:
+            correctAnswer:
+              description: The correct answer for a `push` factor that uses a number matching challenge
+              type: integer
+              example: 72
+          nullable: true
+      x-okta-lifecycle:
+        features:
+          - ENABLE_FACTORS_API_NUMBER_MATCHING_CHALLENGE
+  responses:
+    GetFactorResponse:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserFactor'
+          examples:
+            SMS:
+              $ref: '#/components/examples/FactorResponseSms'
+            Email:
+              $ref: '#/components/examples/FactorEmail'
+  examples:
+    FactorResponseSms:
+      value:
+        id: sms2gt8gzgEBPUWBIFHN
+        factorType: sms
+        provider: OKTA
+        vendorName: OKTA
+        status: ACTIVE
+        created: '2014-06-27T20:27:26.000Z'
+        lastUpdated: '2014-06-27T20:27:26.000Z'
+        profile:
+          phoneNumber: +1-555-415-1337
+        _links:
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/sms2gt8gzgEBPUWBIFHN/verify
+            hints:
+              allow:
+                - POST
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/sms2gt8gzgEBPUWBIFHN
+            hints:
+              allow:
+                - GET
+                - DELETE
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+            hints:
+              allow:
+                - GET
+    FactorEmail:
+      value:
+        id: emfnf3gSScB8xXoXK0g3
+        factorType: email
+        provider: OKTA
+        vendorName: OKTA
+        status: ACTIVE
+        profile:
+          email: changed@clouditude.net
+        _links:
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00umvfJKwXOQ1mEL50g3/factors/emfnf3gSScB8xXoXK0g3/verify
+            hints:
+              allow:
+                - POST
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00umvfJKwXOQ1mEL50g3/factors/emfnf3gSScB8xXoXK0g3
+            hints:
+              allow:
+                - GET
+                - DELETE
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00umvfJKwXOQ1mEL50g3
+            hints:
+              allow:
+                - GET
+    ListFactorsResults:
+      summary: List of enrolled factors for the specified user
+      value:
+        - id: ufs2bysphxKODSZKWVCT
+          factorType: question
+          provider: OKTA
+          vendorName: OKTA
+          status: ACTIVE
+          created: '2014-04-15T18:10:06.000Z'
+          lastUpdated: '2014-04-15T18:10:06.000Z'
+          profile:
+            question: favorite_art_piece
+            questionText: What is your favorite piece of art?
+          _links:
+            questions:
+              href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/questions
+              hints:
+                allow:
+                  - GET
+            self:
+              href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/ufs2bysphxKODSZKWVCT
+              hints:
+                allow:
+                  - GET
+                  - DELETE
+            user:
+              href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+              hints:
+                allow:
+                  - GET
+        - id: ostf2gsyictRQDSGTDZE
+          factorType: token:software:totp
+          provider: OKTA
+          status: PENDING_ACTIVATION
+          created: '2014-06-27T20:27:33.000Z'
+          lastUpdated: '2014-06-27T20:27:33.000Z'
+          profile:
+            credentialId: dade.murphy@example.com
+          _links:
+            next:
+              name: activate
+              href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/ostf2gsyictRQDSGTDZE/lifecycle/activate
+              hints:
+                allow:
+                  - POST
+            self:
+              href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/ostf2gsyictRQDSGTDZE
+              hints:
+                allow:
+                  - GET
+            user:
+              href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+              hints:
+                allow:
+                  - GET
+          _embedded:
+            activation:
+              timeStep: 30
+              sharedSecret: HE64TMLL2IUZW2ZLB
+              encoding: base32
+              keyLength: 16
+        - id: sms2gt8gzgEBPUWBIFHN
+          factorType: sms
+          provider: OKTA
+          status: ACTIVE
+          created: '2014-06-27T20:27:26.000Z'
+          lastUpdated: '2014-06-27T20:27:26.000Z'
+          profile:
+            phoneNumber: +1-555-415-1337
+          _links:
+            verify:
+              href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/sms2gt8gzgEBPUWBIFHN/verify
+              hints:
+                allow:
+                  - POST
+            self:
+              href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/sms2gt8gzgEBPUWBIFHN
+              hints:
+                allow:
+                  - GET
+                  - DELETE
+            user:
+              href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+              hints:
+                allow:
+                  - GET
+    SupportedFactorResults:
+      value:
+        - factorType: question
+          provider: OKTA
+          vendorName: OKTA
+          _links:
+            questions:
+              href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/questions
+              hints:
+                allow:
+                  - GET
+            enroll:
+              href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors
+              hints:
+                allow:
+                  - POST
+        - factorType: token:software:totp
+          provider: OKTA
+          _links:
+            enroll:
+              href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors
+              hints:
+                allow:
+                  - POST
+        - factorType: token:software:totp
+          provider: GOOGLE
+          _links:
+            enroll:
+              href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors
+              hints:
+                allow:
+                  - POST
+        - factorType: sms
+          provider: OKTA
+          vendorName: OKTA
+          _links:
+            enroll:
+              href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors
+              hints:
+                allow:
+                  - POST
+          _embedded:
+            phones:
+              - id: mblldntFJevYKbyQQ0g3
+                profile:
+                  phoneNumber: '+14081234567'
+                status: ACTIVE
+        - factorType: call
+          provider: OKTA
+          _links:
+            enroll:
+              href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors
+              hints:
+                allow:
+                  - POST
+        - factorType: token
+          provider: RSA
+          _links:
+            enroll:
+              href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors
+              hints:
+                allow:
+                  - POST
+        - factorType: token
+          provider: SYMANTEC
+          _links:
+            enroll:
+              href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors
+              hints:
+                allow:
+                  - POST
+    ListYubikeyOptTokensResponse:
+      summary: List YubiKey OTP token response
+      value:
+        - id: ykkwcx13nrDq8g4oy0g3
+          created: '2020-01-14T21:53:09.000Z'
+          lastVerified: '2020-01-14T21:53:06.000Z'
+          lastUpdated: '2020-01-14T21:53:09.000Z'
+          status: UNASSIGNED
+          profile:
+            serial: '000003632071'
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/org/factors/yubikey_token/tokens/ykkwcx13nrDq8g4oy0g3
+              hints:
+                allow:
+                  - GET
+                  - DELETE
+        - id: ykkxdtCA1fKVxyu6R0g3
+          created: '2020-06-09T23:42:05.000Z'
+          activated: '2020-06-09T23:47:29.000Z'
+          lastVerified: '2020-06-09T23:47:29.000Z'
+          lastUpdated: '2020-06-09T23:47:29.000Z'
+          status: ACTIVE
+          profile:
+            serial: '000009508427'
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/org/factors/yubikey_token/tokens/ykkxdtCA1fKVxyu6R0g3
+              hints:
+                allow:
+                  - GET
+            user:
+              href: https://{yourOktaDomain}/api/v1/users/00uu0x8sxTr9HcHOo0g3
+              hints:
+                allow:
+                  - GET
+            deactivate:
+              href: https://{yourOktaDomain}/api/v1/users/00uu0x8sxTr9HcHOo0g3/factors/ykfxduQAhl89YyPrV0g3
+              hints:
+                allow:
+                  - DELETE
+    GetYubikeyOptTokenResponse:
+      summary: Get YubiKey OTP token response
+      value:
+        id: ykkxdtCA1fKVxyu6R0g3
+        created: '2020-06-09T23:42:05.000Z'
+        activated: '2020-06-09T23:47:29.000Z'
+        lastVerified: '2020-06-09T23:47:29.000Z'
+        lastUpdated: '2020-06-09T23:47:29.000Z'
+        status: ACTIVE
+        profile:
+          serial: '000009508427'
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/org/factors/yubikey_token/tokens/ykkxdtCA1fKVxyu6R0g3
+            hints:
+              allow:
+                - GET
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00uu0x8sxTr9HcHOo0g3
+            hints:
+              allow:
+                - GET
+          deactivate:
+            href: https://{yourOktaDomain}/api/v1/users/00uu0x8sxTr9HcHOo0g3/factors/ykfxduQAhl89YyPrV0g3
+            hints:
+              allow:
+                - DELETE
+    EnrollFactorQuestionRequest:
+      summary: question
+      value:
+        question:
+          summary: question factor
+          value:
+            factorType: question
+            provider: OKTA
+            profile:
+              question: disliked_food
+              answer: mayonnaise
+    EnrollFactorQuestionResponse:
+      summary: question
+      value:
+        id: ufs1o01OTMGHLAJPVHDZ
+        factorType: question
+        provider: OKTA
+        vendorName: OKTA
+        status: ACTIVE
+        created: '2014-08-05T22:58:49.000Z'
+        lastUpdated: '2014-08-05T22:58:49.000Z'
+        profile:
+          question: disliked_food
+          questionText: What is the food you least liked as a child?
+        _links:
+          questions:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/questions
+            hints:
+              allow:
+                - GET
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/ufs1o01OTMGHLAJPVHDZ
+            hints:
+              allow:
+                - GET
+                - DELETE
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+            hints:
+              allow:
+                - GET
+    EnrollFactorSmsRequest:
+      summary: sms
+      value:
+        factorType: sms
+        provider: OKTA
+        profile:
+          phoneNumber: +1-555-415-1337
+    EnrollFactorSmsResponse:
+      summary: sms
+      value:
+        id: mbl1nz9JHJGHWRKMTLHP
+        factorType: sms
+        provider: OKTA
+        vendorName: OKTA
+        status: PENDING_ACTIVATION
+        created: '2014-08-05T20:59:49.000Z'
+        lastUpdated: '2014-08-06T03:59:49.000Z'
+        profile:
+          phoneNumber: +1-555-415-1337
+        _links:
+          activate:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/mbl1nz9JHJGHWRKMTLHP/lifecycle/activate
+            hints:
+              allow:
+                - POST
+          resend:
+            - name: sms
+              href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/mbl1nz9JHJGHWRKMTLHP/resend
+              hints:
+                allow:
+                  - POST
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/mbl1nz9JHJGHWRKMTLHP
+            hints:
+              allow:
+                - GET
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+            hints:
+              allow:
+                - GET
+    EnrollFactorCallRequest:
+      summary: call
+      value:
+        factorType: call
+        provider: OKTA
+        profile:
+          phoneNumber: +1-555-415-1337
+          phoneExtension: '1234'
+    EnrollFactorCallResponse:
+      summary: call
+      value:
+        id: clf1nz9JHJGHWRKMTLHP
+        factorType: call
+        provider: OKTA
+        vendorName: OKTA
+        status: PENDING_ACTIVATION
+        created: '2014-08-05T20:59:49.000Z'
+        lastUpdated: '2014-08-06T03:59:49.000Z'
+        profile:
+          phoneNumber: +1-555-415-1337
+          phoneExtension: '1234'
+        _links:
+          activate:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/clf1nz9JHJGHWRKMTLHP/lifecycle/activate
+            hints:
+              allow:
+                - POST
+          resend:
+            - name: call
+              href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/clf1nz9JHJGHWRKMTLHP/resend
+              hints:
+                allow:
+                  - POST
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/clf1nz9JHJGHWRKMTLHP
+            hints:
+              allow:
+                - GET
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+            hints:
+              allow:
+                - GET
+    EnrollFactorOVTotpRequest:
+      summary: token:software:totp
+      value:
+        factorType: token:software:totp
+        provider: OKTA
+    EnrollFactorOVTotpResponse:
+      summary: token:software:totp
+      value:
+        id: ostf1fmaMGJLMNGNLIVG
+        factorType: token:software:totp
+        provider: OKTA
+        vendorName: OKTA
+        status: PENDING_ACTIVATION
+        created: '2014-07-16T16:13:56.000Z'
+        lastUpdated: '2014-07-16T16:13:56.000Z'
+        profile:
+          credentialId: dade.murphy@example.com
+        _links:
+          activate:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/ostf1fmaMGJLMNGNLIVG/lifecycle/activate
+            hints:
+              allow:
+                - POST
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/ostf1fmaMGJLMNGNLIVG
+            hints:
+              allow:
+                - GET
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+            hints:
+              allow:
+                - GET
+        _embedded:
+          activation:
+            timeStep: 30
+            sharedSecret: JBTWGV22G4ZGKV3N
+            encoding: base32
+            keyLength: 6
+          _links:
+            qrcode:
+              href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/ostf1fmaMGJLMNGNLIVG/qr/00fukNElRS_Tz6k-CFhg3pH4KO2dj2guhmaapXWbc4
+              type: image/png
+    EnrollFactorOVPushRequest:
+      summary: token:software:totp push
+      value:
+        factorType: push
+        provider: OKTA
+    EnrollFactorOVPushResponse:
+      summary: token:software:totp
+      value:
+        id: opfbtzzrjgwauUsxO0g4
+        factorType: push
+        provider: OKTA
+        vendorName: OKTA
+        status: PENDING_ACTIVATION
+        created: '2015-11-13T07:34:22.000Z'
+        lastUpdated: '2015-11-13T07:34:22.000Z'
+        _links:
+          poll:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opfbtzzrjgwauUsxO0g4/lifecycle/activate/poll
+            hints:
+              allow:
+                - POST
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opfbtzzrjgwauUsxO0g4
+            hints:
+              allow:
+                - GET
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+            hints:
+              allow:
+                - GET
+        _embedded:
+          activation:
+            expiresAt: '2015-11-13T07:44:22.000Z'
+            factorResult: WAITING
+            _links:
+              send:
+                - name: email
+                  href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opfbtzzrjgwauUsxO0g4/lifecycle/activate/email
+                  hints:
+                    allow:
+                      - POST
+                - name: sms
+                  href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opfbtzzrjgwauUsxO0g4/lifecycle/activate/sms
+                  hints:
+                    allow:
+                      - POST
+              qrcode:
+                href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opfbtzzrjgwauUsxO0g4/qr/00Ji8qVBNJD4LmjYy1WZO2VbNqvvPdaCVua-1qjypa
+                type: image/png
+    EnrollFactorGoogleRequest:
+      summary: google token:software:totp
+      value:
+        factorType: token:software:totp
+        provider: GOOGLE
+    EnrollFactorGoogleResponse:
+      value:
+        id: ostf1fmaMGJLMNGNLIVG
+        factorType: token:software:totp
+        provider: GOOGLE
+        vendorName: GOOGLE
+        status: PENDING_ACTIVATION
+        created: '2014-07-16T16:13:56.000Z'
+        lastUpdated: '2014-07-16T16:13:56.000Z'
+        profile:
+          credentialId: dade.murphy@example.com
+        _links:
+          activate:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/ostf1fmaMGJLMNGNLIVG/lifecycle/activate
+            hints:
+              allow:
+                - POST
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/ostf1fmaMGJLMNGNLIVG
+            hints:
+              allow:
+                - GET
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+            hints:
+              allow:
+                - GET
+        _embedded:
+          activation:
+            timeStep: 30
+            sharedSecret: JBTWGV22G4ZGKV3N
+            encoding: base32
+            keyLength: 16
+            _links:
+              qrcode:
+                href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/ostf1fmaMGJLMNGNLIVG/qr/00fukNElRS_Tz6k-CFhg3pH4KO2dj2guhmaapXWbc4
+                type: image/png
+    EnrollFactorRsaSecurIdRequest:
+      summary: RSA SecurID
+      value:
+        factorType: token
+        provider: RSA
+        profile:
+          credentialId: dade.murphy@example.com
+        verify:
+          passCode: '5275875498'
+    EnrollFactorRsaSecurIdResponse:
+      summary: RSA SecurID
+      value:
+        id: rsabtznMn6cp94ez20g4
+        factorType: token
+        provider: RSA
+        vendorName: RSA
+        status: ACTIVE
+        created: '2015-11-13T07:05:53.000Z'
+        lastUpdated: '2015-11-13T07:05:53.000Z'
+        profile:
+          credentialId: dade.murphy@example.com
+        _links:
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/rsabtznMn6cp94ez20g4/verify
+            hints:
+              allow:
+                - POST
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/rsabtznMn6cp94ez20g4
+            hints:
+              allow:
+                - GET
+                - DELETE
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+            hints:
+              allow:
+                - GET
+    EnrollFactorSymantecVipRequest:
+      summary: Symantec VIP
+      value:
+        factorType: token
+        provider: SYMANTEC
+        profile:
+          credentialId: VSMT14393584
+        verify:
+          passCode: '875498'
+          nextPassCode: '678195'
+    EnrollFactorSymantecVipResponse:
+      summary: Symantec VIP
+      value:
+        id: ufvbtzgkYaA7zTKdQ0g4
+        factorType: token
+        provider: SYMANTEC
+        vendorName: SYMANTEC
+        status: ACTIVE
+        created: '2015-11-13T06:52:08.000Z'
+        lastUpdated: '2015-11-13T06:52:08.000Z'
+        profile:
+          credentialId: VSMT14393584
+        _links:
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/ufvbtzgkYaA7zTKdQ0g4/verify
+            hints:
+              allow:
+                - POST
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/ufvbtzgkYaA7zTKdQ0g4
+            hints:
+              allow:
+                - GET
+                - DELETE
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+            hints:
+              allow:
+                - GET
+    UploadYubikeyTokenSeedRequest:
+      summary: YubiKey OTP seed
+      value:
+        serialNumber: '7886622'
+        publicId: ccccccijgibu
+        privateId: b74be6169486
+        aesKey: 1fcc6d8ce39bf1604e0b17f3e0a11067
+    UploadYubikeyTokenSeedResponse:
+      value:
+        id: ykkut4G6ti62DD8Dy0g3
+        created: '2020-01-10T23:04:10.000Z'
+        lastVerified: '2020-01-10T23:04:10.000Z'
+        lastUpdated: '2020-01-10T23:04:10.000Z'
+        status: UNASSIGNED
+        profile:
+          serial: '000007886622'
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/org/factors/yubikey_token/tokens/ykkut4G6ti62DD8Dy0g3
+            hints:
+              allow:
+                - GET
+                - DELETE
+    EnrollFactorYubikeyRequest:
+      summary: yubikey
+      value:
+        factorType: token:hardware
+        provider: YUBICO
+        verify:
+          passCode: cccccceukngdfgkukfctkcvfidnetljjiknckkcjulji
+    EnrollFactorYubikeyResponse:
+      value:
+        id: ykfbty3BJeBgUi3750g4
+        factorType: token:hardware
+        provider: YUBICO
+        vendorName: YUBICO
+        status: ACTIVE
+        created: '2015-11-13T05:27:49.000Z'
+        lastUpdated: '2015-11-13T05:27:49.000Z'
+        profile:
+          credentialId: '000004102994'
+        _links:
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/ykfbty3BJeBgUi3750g4/verify
+            hints:
+              allow:
+                - POST
+          self:
+            href: hhttps://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/ykfbty3BJeBgUi3750g4
+            hints:
+              allow:
+                - GET
+                - DELETE
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+            hints:
+              allow:
+                - GET
+    EnrollFactorEmailRequest:
+      summary: email
+      value:
+        factorType: email
+        provider: OKTA
+        profile:
+          email: test@gmail.com
+    EnrollFactorEmailResponse:
+      summary: email
+      value:
+        id: emfnf3gSScB8xXoXK0g3
+        factorType: email
+        provider: OKTA
+        vendorName: OKTA
+        status: PENDING_ACTIVATION
+        _links:
+          activate:
+            href: https://{yourOktaDomain}/api/v1/users/00umvfJKwXOQ1mEL50g3/factors/emfnf3gSScB8xXoXK0g3/lifecycle/activate
+            hints:
+              allow:
+                - POST
+          resend:
+            - name: email
+              href: https://{yourOktaDomain}/api/v1/users/00umvfJKwXOQ1mEL50g3/factors/emfnf3gSScB8xXoXK0g3/resend
+              hints:
+                allow:
+                  - POST
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00umvfJKwXOQ1mEL50g3/factors/emfnf3gSScB8xXoXK0g3
+            hints:
+              allow:
+                - GET
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00umvfJKwXOQ1mEL50g3
+            hints:
+              allow:
+                - GET
+    EnrollFactorU2fRequest:
+      summary: u2f
+      value:
+        factorType: u2f
+        provider: FIDO
+    EnrollFactorU2fResponse:
+      summary: u2f
+      value:
+        id: fuf2rovRxogXJ0nDy0g4
+        factorType: u2f
+        provider: FIDO
+        vendorName: FIDO
+        status: PENDING_ACTIVATION
+        created: '2018-05-24T20:43:19.000Z'
+        lastUpdated: '2018-05-24T20:43:19.000Z'
+        _links:
+          activate:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/fuf2rovRxogXJ0nDy0g4/lifecycle/activate
+            hints:
+              allow:
+                - POST
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/fuf2rovRxogXJ0nDy0g4
+            hints:
+              allow:
+                - GET
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+            hints:
+              allow:
+                - GET
+        _embedded:
+          activation:
+            version: U2F_V2
+            nonce: 9DmGJDLvaU6KWxJbfrZ0
+            timeoutSeconds: 20
+    EnrollFactorWebauthnRequest:
+      summary: webAuthn
+      value:
+        factorType: webauthn
+        provider: FIDO
+    EnrollFactorWebauthnResponse:
+      summary: webAuthn
+      value:
+        id: fwf2rovRxogXJ0nDy0g4
+        factorType: webauthn
+        provider: FIDO
+        vendorName: FIDO
+        status: PENDING_ACTIVATION
+        created: '2018-05-24T20:43:19.000Z'
+        lastUpdated: '2018-05-24T20:43:19.000Z'
+        _links:
+          activate:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/fwf2rovRxogXJ0nDy0g4/lifecycle/activate
+            hints:
+              allow:
+                - POST
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/fwf2rovRxogXJ0nDy0g4
+            hints:
+              allow:
+                - GET
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+            hints:
+              allow:
+                - GET
+        _embedded:
+          activation:
+            attestation: direct
+            authenticatorSelection:
+              userVerification: preferred
+              requireResidentKey: false
+            challenge: cdsZ1V10E0BGE4GcG3IK
+            excludeCredentials: []
+            pubKeyCredParams:
+              - type: public-key
+                alg: -7
+              - type: public-key
+                alg: -257
+            rp:
+              name: Rain-Cloud59
+            user:
+              displayName: First Last
+              name: first.last@gmail.com
+              id: 00u15s1KDETTQMQYABRL
+    EnrollFactorCustomTotpRequest:
+      summary: custom totp
+      value:
+        factorType: token:hotp
+        provider: CUSTOM
+        factorProfileId: fpr20l2mDyaUGWGCa0g4
+        profile:
+          sharedSecret: 484f97be3213b117e3a20438e291540a
+    EnrollFactorCustomTotpResponse:
+      summary: custom totp
+      value:
+        id: chf20l33Ks8U2Zjba0g4
+        factorType: token:hotp
+        provider: CUSTOM
+        vendorName: Entrust Datacard
+        status: ACTIVE
+        created: '2019-07-22T23:22:36.000Z'
+        lastUpdated: '2019-07-22T23:22:36.000Z'
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00utf43LCCmTJVcsK0g3/factors/chf20l33Ks8U2Zjba0g4
+            hints:
+              allow:
+                - GET
+                - DELETE
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00utf43LCCmTJVcsK0g3/factors/chf20l33Ks8U2Zjba0g4/verify
+            hints:
+              allow:
+                - POST
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00utf43LCCmTJVcsK0g3
+            hints:
+              allow:
+                - GET
+    FactorPasscodeRequest:
+      value:
+        passCode: '123456'
+    NumberMatchingChallengeRequest:
+      x-okta-lifecycle:
+        features:
+          - ENABLE_FACTORS_API_NUMBER_MATCHING_CHALLENGE
+      value:
+        useNumberMatchingChallenge: true
+    ActivateFactorTotpResponse:
+      summary: token:software:totp
+      value:
+        id: ostf1fmaMGJLMNGNLIVG
+        factorType: token:software:totp
+        provider: OKTA
+        vendorName: OKTA
+        status: ACTIVE
+        created: '2014-07-16T16:13:56.000Z'
+        lastUpdated: '2014-08-06T00:31:07.000Z'
+        profile:
+          credentialId: dade.murphy@example.com
+        _links:
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/ostf1fmaMGJLMNGNLIVG/verify
+            hints:
+              allow:
+                - POST
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/ostf1fmaMGJLMNGNLIVG
+            hints:
+              allow:
+                - GET
+                - DELETE
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+            hints:
+              allow:
+                - GET
+    ActivateFactorSmsResponse:
+      summary: sms
+      value:
+        id: sms1o51EADOTFXHHBXBP
+        factorType: sms
+        provider: OKTA
+        vendorName: OKTA
+        status: ACTIVE
+        created: '2014-08-06T16:56:31.000Z'
+        lastUpdated: '2014-08-06T16:56:31.000Z'
+        profile:
+          phoneNumber: +1-555-415-1337
+        _links:
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/sms1o51EADOTFXHHBXBP/verify
+            hints:
+              allow:
+                - POST
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/sms1o51EADOTFXHHBXBP
+            hints:
+              allow:
+                - GET
+                - DELETE
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+            hints:
+              allow:
+                - GET
+    ActivateFactorCallResponse:
+      summary: call
+      value:
+        id: clf1o51EADOTFXHHBXBP
+        factorType: call
+        provider: OKTA
+        vendorName: OKTA
+        status: ACTIVE
+        created: '2014-08-06T16:56:31.000Z'
+        lastUpdated: '2014-08-06T16:56:31.000Z'
+        profile:
+          phoneNumber: +1-555-415-1337
+          phoneExtension: '1234'
+        _links:
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/clf1o51EADOTFXHHBXBP/verify
+            hints:
+              allow:
+                - POST
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/clf1o51EADOTFXHHBXBP
+            hints:
+              allow:
+                - GET
+                - DELETE
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+            hints:
+              allow:
+                - GET
+    ActivateFactorPushResponse:
+      summary: push
+      value:
+        id: opf3hkfocI4JTLAju0g4
+        factorType: push
+        provider: OKTA
+        vendorName: OKTA
+        status: ACTIVE
+        created: '2015-03-16T18:01:28.000Z'
+        lastUpdated: '2015-08-27T14:25:17.000Z'
+        profile:
+          credentialId: dade.murphy@example.com
+          deviceType: SmartPhone_IPhone
+          name: Gibson
+          platform: IOS
+          version: '9.0'
+        _links:
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opf3hkfocI4JTLAju0g4/verify
+            hints:
+              allow:
+                - POST
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opf3hkfocI4JTLAju0g4
+            hints:
+              allow:
+                - GET
+                - DELETE
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+            hints:
+              allow:
+                - GET
+    ActivateFactorEmailResponse:
+      summary: email
+      value:
+        id: emfnf3gSScB8xXoXK0g3
+        factorType: email
+        provider: OKTA
+        vendorName: OKTA
+        status: ACTIVE
+        profile:
+          email: changed@clouditude.net
+        _links:
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00umvfJKwXOQ1mEL50g3/factors/emfnf3gSScB8xXoXK0g3/verify
+            hints:
+              allow:
+                - POST
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00umvfJKwXOQ1mEL50g3/factors/emfnf3gSScB8xXoXK0g3
+            hints:
+              allow:
+                - GET
+                - DELETE
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00umvfJKwXOQ1mEL50g3
+            hints:
+              allow:
+                - GET
+    ActivateFactorU2fRequest:
+      summary: u2f
+      value:
+        registrationData: BQTEMUyOM8h1TiZG4DL-RdMr-tYgTYSf62Y52AmwEFTiSYWIRVO5L-MwWdRJOthmV3J3JrqpmGfmFb820-awx1YIQFlTvkMhxItHlpkzahEqicpw7SIH9yMfTn2kaDcC6JaLKPfV5ds0vzuxF1JJj3gCM01bRC-HWI4nCVgc-zaaoRgwggEcMIHDoAMCAQICCwD52fCSMoNczORdMAoGCCqGSM49BAMCMBUxEzARBgNVBAMTClUyRiBJc3N1ZXIwGhcLMDAwMTAxMDAwMFoXCzAwMDEwMTAwMDBaMBUxEzARBgNVBAMTClUyRiBEZXZpY2UwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQFKJupuUgPQcRHUphaW5JPfLvkkwlEwlHKk_ntSp7MS4aTHJyGnpziqncrjiTC_oUVtb-wN-y_t_IMIjueGkhxMAoGCCqGSM49BAMCA0gAMEUCIQDBo6aOLxanIUYnBX9iu3KMngPnobpi0EZSTkVtLC8_cwIgC1945RGqGBKfbyNtkhMifZK05n7fU-gW37Bdnci5D94wRQIhAJv3VvclbRkHAQhaUR8rr8qFTg9iF-GtHoXU95vWaQdyAiAbEr-440U4dQAZF-Sj8G2fxgh5DkgkkWpyUHZhz7N9ew
+        clientData: eyJ0eXAiOiJuYXZpZ2F0b3IuaWQuZmluaXNoRW5yb2xsbWVudCIsImNoYWxsZW5nZSI6IlhxR0h0RTBoUkxuVEoxYUF5U1oyIiwib3JpZ2luIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6MzAwMCIsImNpZF9wdWJrZXkiOiJ1bnVzZWQifQ
+    ActivateFactorU2fResponse:
+      summary: u2f
+      value:
+        id: fuf2rovRxogXJ0nDy0g4
+        factorType: u2f
+        provider: FIDO
+        vendorName: FIDO
+        status: ACTIVE
+        created: '2018-05-24T20:43:19.000Z'
+        lastUpdated: '2018-05-24T21:43:32.000Z'
+        profile:
+          credentialId: WVO-QyHEi0eWmTNqESqJynDtIgf3Ix9OfaRoNwLoloso99Xl2zS_O7EXUkmPeAIzTVtEL4dYjicJWBz7NpqhGA
+          version: U2F_V2
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/fuf2rovRxogXJ0nDy0g4
+            hints:
+              allow:
+                - GET
+                - DELETE
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/fuf2rovRxogXJ0nDy0g4/verify
+            hints:
+              allow:
+                - POST
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+            hints:
+              allow:
+                - GET
+    ActivateFactorWebauthnRequest:
+      summary: webAuthn
+      value:
+        attestation: o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEgwRgIhAMvf2+dzXlHZN1um38Y8aFzrKvX0k5dt/hnDu9lahbR4AiEAuwtMg3IoaElWMp00QrP/+3Po/6LwXfmYQVfsnsQ+da1oYXV0aERhdGFYxkgb9OHGifjS2dG03qLRqvXrDIRyfGAuc+GzF1z20/eVRV2wvl6tzgACNbzGCmSLCyXx8FUDAEIBvWNHOcE3QDUkDP/HB1kRbrIOoZ1dR874ZaGbMuvaSVHVWN2kfNiO4D+HlAzUEFaqlNi5FPqKw+mF8f0XwdpEBlClAQIDJiABIVgg0a6oo3W0JdYPu6+eBrbr0WyB3uJLI3ODVgDfQnpgafgiWCB4fFo/5iiVrFhB8pNH2tbBtKewyAHuDkRolcCnVaCcmQ==
+        clientData: eyJjaGFsbGVuZ2UiOiJVSk5wYW9sVWt0dF9vcEZPNXJMYyIsIm9yaWdpbiI6Imh0dHBzOi8vcmFpbi5va3RhMS5jb20iLCJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIn0=
+    ActivateFactorWebauthnResponse:
+      summary: webAuthn
+      value:
+        id: fwf2rovRxogXJ0nDy0g4
+        factorType: webauthn
+        provider: FIDO
+        vendorName: FIDO
+        status: ACTIVE
+        created: '2018-05-24T20:43:19.000Z'
+        lastUpdated: '2018-05-24T21:43:32.000Z'
+        profile:
+          credentialId: l3Br0n-7H3g047NqESqJynFtIgf3Ix9OfaRoNwLoloso99Xl2zS_O7EXUkmPeAIzTVtEL4dYjicJWBz7NpqhGA
+          authenticatorName: MacBook Touch ID
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/fwf2rovRxogXJ0nDy0g4
+            hints:
+              allow:
+                - GET
+                - DELETE
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/fwf2rovRxogXJ0nDy0g4/verify
+            hints:
+              allow:
+                - POST
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL
+            hints:
+              allow:
+                - GET
+    UserFactorVerifySuccessSmsResponse:
+      summary: sms verify
+      value:
+        factorResult: SUCCESS
+    UserFactorVerifyCallSuccessResponse:
+      summary: call verify
+      value:
+        factorResult: SUCCESS
+    UserFactorVerifyEmailSuccessResponse:
+      summary: email verify
+      value:
+        factorResult: SUCCESS
+    UserFactorVerifySuccessSqResponse:
+      summary: security question verify
+      value:
+        factorResult: SUCCESS
+    UserFactorVerifySuccessTotpResponse:
+      summary: totp verify
+      value:
+        factorResult: SUCCESS
+    UserFactorVerifySuccessTokenResponse:
+      summary: token verify
+      value:
+        factorResult: SUCCESS
+    UserFactorVerifySuccessYubikeyResponse:
+      summary: yubikey verify
+      value:
+        factorResult: SUCCESS
+    UserFactorChallengeSmsResponse:
+      summary: sms challenge
+      value:
+        factorResult: CHALLENGE
+        profile:
+          phoneNumber: '+12532236986'
+        _links:
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/smsszf1YNUtGWTx4j0g3/verify
+            hints:
+              allow:
+                - POST
+          factor:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/smsszf1YNUtGWTx4j0g3
+            hints:
+              allow:
+                - GET
+                - DELETE
+    UserFactorChallengeCallResponse:
+      summary: call challenge
+      value:
+        factorResult: CHALLENGE
+        profile:
+          phoneNumber: '+12532236986'
+          phoneExtension: '1234'
+        _links:
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/clff17zuKEUMYQAQGCOV/verify
+            hints:
+              allow:
+                - POST
+          factor:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/clff17zuKEUMYQAQGCOV
+            hints:
+              allow:
+                - GET
+                - DELETE
+    UserFactorChallengePushResponseWithNumberMatchingChallenge:
+      summary: Push challenge with number matching
+      value:
+        expiresAt: '2015-04-01T15:57:32.000Z'
+        factorResult: WAITING
+        _links:
+          poll:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opfh52xcuft3J4uZc0g3/transactions/mst1eiHghhPxf0yhp0g
+            hints:
+              allow:
+                - GET
+          cancel:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opfh52xcuft3J4uZc0g3/transactions/mst1eiHghhPxf0yhp0g
+            hints:
+              allow:
+                - DELETE
+        _embedded:
+          challenge:
+            correctAnswer: 72
+      x-okta-lifecycle:
+        features:
+          - ENABLE_FACTORS_API_NUMBER_MATCHING_CHALLENGE
+    UserFactorChallengePushResponse:
+      summary: push challenge
+      value:
+        expiresAt: '2015-04-01T15:57:32.000Z'
+        factorResult: WAITING
+        _links:
+          poll:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opfh52xcuft3J4uZc0g3/transactions/mst1eiHghhPxf0yhp0g
+            hints:
+              allow:
+                - GET
+          cancel:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opfh52xcuft3J4uZc0g3/transactions/mst1eiHghhPxf0yhp0g
+            hints:
+              allow:
+                - DELETE
+    UserFactorVerifyPushRejectedResponse:
+      summary: push verification rejected
+      value:
+        factorResult: REJECTED
+        profile:
+          credentialId: jane.doe@example.com
+        _links:
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opfh52xcuft3J4uZc0g3/verify
+            hints:
+              allow:
+                - POST
+          factor:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opfh52xcuft3J4uZc0g3
+            hints:
+              allow:
+                - GET
+                - DELETE
+    UserFactorChallengeEmailResponse:
+      summary: email challenge
+      value:
+        factorResult: CHALLENGE
+        _links:
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/emfnf3gSScB8xXoXK0g3/verify
+            hints:
+              allow:
+                - POST
+          factor:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/emfnf3gSScB8xXoXK0g3
+            hints:
+              allow:
+                - GET
+                - DELETE
+    UserFactorChallengeU2fResponse:
+      summary: u2f challenge
+      value:
+        factorResult: CHALLENGE
+        profile:
+          credentialId: GAiiLsVab2m3-zL1Fi3bVtNrM9G6_MntUITHKjxkV24ktGKjLSCRnz72wCEdHCe18IvC69Aia0sE4UpsO0HpFQ
+          version: U2F_V2
+        _links:
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/fuf2rovRxogXJ0nDy0g4/verify
+            hints:
+              allow:
+                - POST
+          factor:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/fuf2rovRxogXJ0nDy0g4
+            hints:
+              allow:
+                - GET
+                - DELETE
+        _embedded:
+          challenge:
+            nonce: vQFwTt6zKzMV7HFPzjS2
+            timeoutSeconds: 20
+    UserFactorVerifyU2fRequest:
+      summary: u2f verify
+      value:
+        clientData: eyJ0eXAiOiJuYXZpZ2F0b3IuaWQuZ2V0QXNzZXJ0aW9uIiwiY2hhbGxlbmdlIjoiS2NCLXRqUFU0NDY0ZThuVFBudXIiLCJvcmlnaW4iOiJodHRwczovL2xvY2FsaG9zdDozMDAwIiwiY2lkX3B1YmtleSI6InVudXNlZCJ9
+        signatureData: AQAAACYwRgIhAKPktdpH0T5mlPSm_9uGW5w-VaUy-LhI9tIacexpgItkAiEAncRVZURVPOq7zDwIw-OM5LtSkdAxOkfv0ZDVUx3UFHc
+    UserFactorVerifyU2fResponse:
+      summary: u2f verify response
+      value:
+        factorResult: SUCCESS
+        profile:
+          credentialId: h1bFwJFU9wnelYkexJuQfoUHZ5lX3CgQMTZk4H3I8kM9Nn6XALiQ-BIab4P5EE0GQrA7VD-kAwgnG950aXkhBw
+          version: U2F_V2
+    UserFactorChallengeWebauthnResponse:
+      summary: webAuthn challenge
+      value:
+        factorResult: CHALLENGE
+        profile:
+          credentialId: l3Br0n-7H3g047NqESqJynFtIgf3Ix9OfaRoNwLoloso99Xl2zS_O7EXUkmPeAIzTVtEL4dYjicJWBz7NpqhGA
+          authenticatorName: MacBook Touch ID
+        _links:
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/fwf2rovRxogXJ0nDy0g4/verify
+            hints:
+              allow:
+                - POST
+          factor:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/fwf2rovRxogXJ0nDy0g4
+            hints:
+              allow:
+                - GET
+                - DELETE
+        _embedded:
+          challenge:
+            challenge: vQFwTt6zKzMV7HFPzjS2
+            extensions: {}
+    UserFactorVerifyWebauthnRequest:
+      summary: WebAuthn verify challenge
+      value:
+        clientData: eyJ0eXAiOiJuYXZpZ2F0b3IuaWQuZ2V0QXNzZXJ0aW9uIiwiY2hhbGxlbmdlIjoiS2NCLXRqUFU0NDY0ZThuVFBudXIiLCJvcmlnaW4iOiJodHRwczovL2xvY2FsaG9zdDozMDAwIiwiY2lkX3B1YmtleSI6InVudXNlZCJ9
+        authenticatorData: SBv04caJ+NLZ0bTeotGq9esMhHJ8YC5z4bMXXPbT95UFXbDsOg==
+        signatureData: AQAAACYwRgIhAKPktdpH0T5mlPSm_9uGW5w-VaUy-LhI9tIacexpgItkAiEAncRVZURVPOq7zDwIw-OM5LtSkdAxOkfv0ZDVUx3UFHc
+    UserFactorVerifyWebauthnResponse:
+      summary: WebAuthn verify
+      value:
+        factorResult: SUCCESS
+        profile:
+          credentialId: l3Br0n-7H3g047NqESqJynFtIgf3Ix9OfaRoNwLoloso99Xl2zS_O7EXUkmPeAIzTVtEL4dYjicJWBz7NpqhGA
+          authenticatorName: MacBook Touch ID
+    UserFactorVerifySecurityQuestionRequest:
+      summary: security question verify
+      value:
+        answer: mayonnaise
+    UserFactorVerifyPushTransactionWaitingNMC:
+      summary: WAITING (with number matching challenge)
+      value:
+        expiresAt: '2015-04-01T15:57:32.000Z'
+        factorResult: WAITING
+        profile:
+          credentialId: jane.doe@example.com
+        _links:
+          poll:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opfh52xcuft3J4uZc0g3/transactions/v2mst.GldKV5VxTrifyeZmWSQguA
+            hints:
+              allow:
+                - GET
+          cancel:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opfh52xcuft3J4uZc0g3/transactions/v2mst.GldKV5VxTrifyeZmWSQguA
+            hints:
+              allow:
+                - DELETE
+        _embedded:
+          challenge:
+            correctAnswer: 72
+      x-okta-lifecycle:
+        features:
+          - ENABLE_FACTORS_API_NUMBER_MATCHING_CHALLENGE
+    UserFactorVerifyPushTransactionWaiting:
+      summary: WAITING
+      value:
+        expiresAt: '2015-04-01T15:57:32.000Z'
+        factorResult: WAITING
+        profile:
+          credentialId: jane.doe@example.com
+        _links:
+          poll:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opfh52xcuft3J4uZc0g3/transactions/v2mst.GldKV5VxTrifyeZmWSQguA
+            hints:
+              allow:
+                - GET
+          cancel:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opfh52xcuft3J4uZc0g3/transactions/v2mst.GldKV5VxTrifyeZmWSQguA
+            hints:
+              allow:
+                - DELETE
+    UserFactorVerifyPushTransactionApproved:
+      summary: SUCCESS
+      value:
+        factorResult: SUCCESS
+    UserFactorVerifyPushTransactionRejected:
+      summary: REJECTED
+      value:
+        factorResult: REJECTED
+        profile:
+          credentialId: jane.doe@example.com
+        _links:
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opfh52xcuft3J4uZc0g3/verify
+            hints:
+              allow:
+                - POST
+          factor:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opfh52xcuft3J4uZc0g3
+            hints:
+              allow:
+                - GET
+                - DELETE
+    UserFactorVerifyPushTransactionTimeout:
+      summary: TIMEOUT
+      value:
+        factorResult: TIMEOUT
+        profile:
+          credentialId: jane.doe@example.com
+        _links:
+          verify:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opfh52xcuft3J4uZc0g3/verify
+            hints:
+              allow:
+                - POST
+          factor:
+            href: https://{yourOktaDomain}/api/v1/users/00u15s1KDETTQMQYABRL/factors/opfh52xcuft3J4uZc0g3
+            hints:
+              allow:
+                - GET
+                - DELETE
+  securitySchemes:
+    $ref: ../../base.yaml#/components/securitySchemes

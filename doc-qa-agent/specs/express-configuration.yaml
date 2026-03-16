@@ -1,0 +1,102 @@
+openapi: 3.0.3
+info:
+  title: Application Express Configuration API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/apps/{appId}/express-configure/{capabilityType}:
+    parameters:
+      - $ref: ./Common.yaml#/components/parameters/pathAppId
+      - $ref: '#/components/parameters/capabilityType'
+    post:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        isGenerallyAvailable: false
+      summary: Configure a capability in the app instance
+      description: |
+        Configures a capability (`SSO` or `PROVISIONING`) in the app instance by automatically exchanging configuration information.
+      operationId: configureCapabilityApplication
+      responses:
+        '204':
+          description: No Content
+        '401':
+          $ref: ./Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.apps.manage
+      tags:
+        - ApplicationExpressConfiguration
+    x-okta-team-detail:
+      x-team-slack: eng-cloudmaker
+  /api/v1/apps/{appId}/express-configure/oauth2/authorize:
+    parameters:
+      - $ref: ./Common.yaml#/components/parameters/pathAppId
+    get:
+      x-okta-lifecycle:
+        lifecycle: PRODUCT_DEV
+        isGenerallyAvailable: false
+      summary: Retrieve the OAuth 2.0 authorization code for Express Configuration.
+      description: |
+        Retrieves the OAuth 2.0 authorization code from the app's authorization server.
+        Use this authorization code to exchange for an access token through another endpoint to enable Express Configuration on behalf of the user.
+      operationId: getOAuth2AccessTokenForExpressConfiguration
+      parameters:
+        - name: token
+          in: query
+          description: XSRF token
+          schema:
+            type: string
+        - name: capabilityType
+          in: query
+          description: The capability type (for example, `SSO`) for which the user intends to perform Express Configuration.
+          schema:
+            $ref: '#/components/schemas/CapabilityType'
+      responses:
+        '302':
+          description: Redirects to the app's authorization server.
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.apps.manage
+      tags:
+        - ApplicationExpressConfiguration
+    x-okta-team-detail:
+      x-team-slack: eng-cloudmaker
+components:
+  parameters:
+    capabilityType:
+      name: capabilityType
+      description: Capability type
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/CapabilityType'
+        example: SSO
+  schemas:
+    CapabilityType:
+      type: string
+      description: Capability type
+      enum:
+        - SSO
+        - PROVISIONING
+      x-enumDescriptions:
+        SSO: Express setup enabled for SSO
+        PROVISIONING: Express setup enabled for provisioning
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

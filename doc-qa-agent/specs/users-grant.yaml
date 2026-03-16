@@ -1,0 +1,215 @@
+openapi: 3.0.3
+info:
+  title: User Grant APIs
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/users/{userId}/grants:
+    parameters:
+      - $ref: ./Common.yaml#/components/parameters/pathUserId
+    get:
+      summary: List all user grants
+      description: Lists all grants for the specified user
+      operationId: listUserGrants
+      parameters:
+        - name: scopeId
+          in: query
+          description: The scope ID to filter on
+          schema:
+            type: string
+        - name: expand
+          in: query
+          description: 'Valid value: `scope`. If specified, scope details are included in the `_embedded` attribute.'
+          schema:
+            type: string
+            example: scope
+        - name: after
+          in: query
+          description: The cursor to use for pagination. It is an opaque string that specifies your current location in the list and is obtained from the `Link` response header. See [Pagination](https://developer.okta.com/docs/api/#pagination).
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Specifies the number of grants to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 200
+            default: 20
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ./apps.yaml#/components/schemas/OAuth2ScopeConsentGrant
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.read
+      tags:
+        - UserGrant
+    delete:
+      summary: Revoke all user grants
+      description: Revokes all grants for a specified user
+      operationId: revokeUserGrants
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserGrant
+    x-okta-team-detail:
+      x-team-slack: amp-eng-outbound-fed
+  /api/v1/users/{userId}/grants/{grantId}:
+    parameters:
+      - $ref: ./Common.yaml#/components/parameters/pathUserId
+      - $ref: ./apps.yaml#/components/parameters/pathGrantId
+    get:
+      summary: Retrieve a user grant
+      description: Retrieves a grant for the specified user
+      operationId: getUserGrant
+      parameters:
+        - name: expand
+          in: query
+          description: 'Valid value: `scope`. If specified, scope details are included in the `_embedded` attribute.'
+          schema:
+            type: string
+            example: scope
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: ./apps.yaml#/components/schemas/OAuth2ScopeConsentGrant
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.read
+      tags:
+        - UserGrant
+    delete:
+      summary: Revoke a user grant
+      description: Revokes one grant for a specified user
+      operationId: revokeUserGrant
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserGrant
+    x-okta-team-detail:
+      x-team-slack: amp-eng-outbound-fed
+  /api/v1/users/{userId}/clients/{clientId}/grants:
+    parameters:
+      - $ref: ./Common.yaml#/components/parameters/pathUserId
+      - $ref: ./oauth.yaml#/components/parameters/pathClientId
+    get:
+      summary: List all grants for a client
+      description: Lists all grants for a specified user and client
+      operationId: listGrantsForUserAndClient
+      parameters:
+        - name: expand
+          in: query
+          description: 'Valid value: `scope`. If specified, scope details are included in the `_embedded` attribute.'
+          schema:
+            type: string
+        - name: after
+          in: query
+          description: The cursor to use for pagination. It is an opaque string that specifies your current location in the list and is obtained from the `Link` response header. See [Pagination](https://developer.okta.com/docs/api/#pagination).
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Specifies the number of tokens to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 200
+            default: 20
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ./apps.yaml#/components/schemas/OAuth2ScopeConsentGrant
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.read
+      tags:
+        - UserGrant
+    delete:
+      summary: Revoke all grants for a client
+      description: Revokes all grants for the specified user and client
+      operationId: revokeGrantsForUserAndClient
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserGrant
+    x-okta-team-detail:
+      x-team-slack: amp-eng-outbound-fed
+components:
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

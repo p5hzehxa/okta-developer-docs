@@ -1,0 +1,444 @@
+openapi: 3.0.3
+info:
+  title: Email domains API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/email-domains:
+    parameters:
+      - $ref: '#/components/parameters/queryExpandEmailDomain'
+    get:
+      summary: List all email domains
+      description: Lists all the Email Domains in your org
+      operationId: listEmailDomains
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EmailDomainResponseWithEmbedded'
+              examples:
+                List email domain response:
+                  $ref: '#/components/examples/EmailDomainResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.emailDomains.read
+      tags:
+        - EmailDomain
+    post:
+      summary: Create an email domain
+      description: Creates an Email Domain in your org
+      operationId: createEmailDomain
+      x-codegen-request-body-name: emailDomain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailDomain'
+            examples:
+              Create email domain request:
+                $ref: '#/components/examples/CreateEmailDomainRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailDomainResponse'
+              examples:
+                Create email domain response:
+                  $ref: '#/components/examples/EmailDomainResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+              examples:
+                Email domain already exists:
+                  $ref: '#/components/examples/ErrorEmailDomainAlreadyExists'
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.emailDomains.manage
+      tags:
+        - EmailDomain
+    x-okta-team-detail:
+      x-team-slack: amp-eng-auth-experience
+  /api/v1/email-domains/{emailDomainId}:
+    parameters:
+      - $ref: '#/components/parameters/pathEmailDomainId'
+      - $ref: '#/components/parameters/queryExpandEmailDomain'
+    get:
+      summary: Retrieve an email domain
+      description: Retrieves an Email Domain by `emailDomainId`
+      operationId: getEmailDomain
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailDomainResponseWithEmbedded'
+              examples:
+                Retrieve email domain response:
+                  $ref: '#/components/examples/EmailDomainResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.emailDomains.read
+      tags:
+        - EmailDomain
+    put:
+      summary: Replace an email domain
+      description: Replaces associated username and sender display name by `emailDomainId`
+      operationId: replaceEmailDomain
+      x-codegen-request-body-name: updateEmailDomain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEmailDomain'
+            examples:
+              Update email domain request:
+                $ref: '#/components/examples/UpdateEmailDomainRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailDomainResponse'
+              examples:
+                Update email domain response:
+                  $ref: '#/components/examples/UpdatedEmailDomainResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.emailDomains.manage
+      tags:
+        - EmailDomain
+    delete:
+      summary: Delete an email domain
+      description: Deletes an Email Domain by `emailDomainId`
+      operationId: deleteEmailDomain
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '400':
+          description: Unable to delete custom email domain due to mail provider specific restrictions
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+              examples:
+                Email domain in use:
+                  $ref: '#/components/examples/ErrorEmailDomainInUse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.emailDomains.manage
+      tags:
+        - EmailDomain
+    x-okta-team-detail:
+      x-team-slack: amp-eng-auth-experience
+  /api/v1/email-domains/{emailDomainId}/verify:
+    parameters:
+      - $ref: '#/components/parameters/pathEmailDomainId'
+    post:
+      summary: Verify an email domain
+      description: Verifies an Email Domain by `emailDomainId`
+      operationId: verifyEmailDomain
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailDomainResponse'
+              examples:
+                Verified email domain response:
+                  $ref: '#/components/examples/VerifiedEmailDomainResponse'
+        '400':
+          description: Email domain could not be verified by mail provider
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+              examples:
+                Email domain could not be verified:
+                  $ref: '#/components/examples/ErrorEmailDomainNotVerified'
+                Email domain invalid status:
+                  $ref: '#/components/examples/ErrorEmailDomainInvalidStatus'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.emailDomains.manage
+      tags:
+        - EmailDomain
+    x-okta-team-detail:
+      x-team-slack: amp-eng-auth-experience
+components:
+  examples:
+    CreateEmailDomainRequest:
+      value:
+        displayName: Admin
+        userName: admin
+        domain: example.com
+        brandId: bnd100iSrkcN6aR680g1
+        validationSubdomain: mail
+    EmailDomainResponse:
+      value:
+        id: OeD114iNkrcN6aR680g4
+        validationStatus: NOT_STARTED
+        displayName: Admin
+        userName: admin
+        domain: example.com
+        validationSubdomain: mail
+        dnsValidationRecords:
+          - recordType: TXT
+            fqdn: _oktaverification.example.com
+            verificationValue: 759080212bda43e3bc825a7d73b4bb64
+          - recordType: CNAME
+            fqdn: mail.example.com
+            verificationValue: u22224444.wl024.sendgrid.net
+          - recordType: CNAME
+            fqdn: t02._domainkey.example.com
+            verificationValue: t02.domainkey.u22224444.wl024.sendgrid.net
+          - recordType: CNAME
+            fqdn: t022._domainkey.example.com
+            verificationValue: t02.domainkey.u22224444.wl024.sendgrid.net
+    ErrorEmailDomainAlreadyExists:
+      value:
+        errorCode: E0000197
+        errorSummary: Email domain already exists.
+        errorLink: E0000197
+        errorId: oaeEdRqprFuTyKokyYPbURJkA
+        errorCauses: []
+    ErrorEmailDomainInUse:
+      value:
+        errorCode: E0000216
+        errorSummary: Email domain can't be deleted due to mail provider restrictions.
+        errorLink: E0000216
+        errorId: oaeEdRqprFuTyKokyYPbURJkB
+        errorCauses: []
+    ErrorEmailDomainInvalidStatus:
+      value:
+        errorCode: E0000217
+        errorSummary: Invalid status. Can't validate email domain with current status.
+        errorLink: E0000217
+        errorId: oaeEdRqprFuTyKokyYPbURJkD
+        errorCauses: []
+    ErrorEmailDomainNotVerified:
+      value:
+        errorCode: E0000218
+        errorSummary: Email domain couldn't be verified by mail provider.
+        errorLink: E0000218
+        errorId: oaeEdRqprFuTyKokyYPbURJkC
+        errorCauses: []
+    UpdateEmailDomainRequest:
+      value:
+        displayName: IT Admin
+        userName: noreply
+    UpdatedEmailDomainResponse:
+      value:
+        id: OeD114iNkrcN6aR680g4
+        validationStatus: NOT_STARTED
+        displayName: IT Admin
+        userName: noreply
+        domain: example.com
+        validationSubdomain: mail
+        dnsValidationRecords:
+          - recordType: TXT
+            fqdn: _oktaverification.example.com
+            verificationValue: 759080212bda43e3bc825a7d73b4bb64
+          - recordType: CNAME
+            fqdn: mail.example.com
+            verificationValue: u22224444.wl024.sendgrid.net
+          - recordType: CNAME
+            fqdn: t02._domainkey.example.com
+            verificationValue: t02.domainkey.u22224444.wl024.sendgrid.net
+          - recordType: CNAME
+            fqdn: t022._domainkey.example.com
+            verificationValue: t02.domainkey.u22224444.wl024.sendgrid.net
+    VerifiedEmailDomainResponse:
+      value:
+        id: OeD114iNkrcN6aR680g4
+        validationStatus: VERIFIED
+        displayName: IT Admin
+        userName: noreply
+        domain: example.com
+        validationSubdomain: mail
+        dnsValidationRecords:
+          - recordType: TXT
+            fqdn: _oktaverification.example.com
+            verificationValue: 759080212bda43e3bc825a7d73b4bb64
+          - recordType: CNAME
+            fqdn: mail.example.com
+            verificationValue: u22224444.wl024.sendgrid.net
+          - recordType: CNAME
+            fqdn: t02._domainkey.example.com
+            verificationValue: t02.domainkey.u22224444.wl024.sendgrid.net
+          - recordType: CNAME
+            fqdn: t022._domainkey.example.com
+            verificationValue: t02.domainkey.u22224444.wl024.sendgrid.net
+  parameters:
+    pathEmailDomainId:
+      name: emailDomainId
+      in: path
+      required: true
+      schema:
+        type: string
+        description: The ID of the email domain.
+    queryExpandEmailDomain:
+      name: expand
+      in: query
+      style: form
+      explode: false
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - brands
+      description: Specifies additional metadata to be included in the response
+  schemas:
+    BaseEmailDomain:
+      type: object
+      properties:
+        displayName:
+          type: string
+        userName:
+          type: string
+      required:
+        - displayName
+        - userName
+    EmailDomainDNSRecord:
+      type: object
+      properties:
+        fqdn:
+          type: string
+        recordType:
+          $ref: '#/components/schemas/EmailDomainDNSRecordType'
+        verificationValue:
+          type: string
+    EmailDomainDNSRecordType:
+      type: string
+      enum:
+        - CNAME
+        - TXT
+    EmailDomain:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/BaseEmailDomain'
+      type: object
+      properties:
+        brandId:
+          type: string
+        domain:
+          type: string
+        validationSubdomain:
+          type: string
+          description: Subdomain for the email sender's custom mail domain. Specify your subdomain when you configure a custom mail domain.
+          default: mail
+      required:
+        - domain
+        - brandId
+    EmailDomainResponse:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/BaseEmailDomain'
+      type: object
+      properties:
+        dnsValidationRecords:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailDomainDNSRecord'
+        domain:
+          type: string
+        validationSubdomain:
+          type: string
+          description: The subdomain for the email sender's custom mail domain
+          default: mail
+        id:
+          type: string
+        validationStatus:
+          $ref: '#/components/schemas/EmailDomainStatus'
+    EmailDomainResponseWithEmbedded:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/EmailDomainResponse'
+      type: object
+      properties:
+        _embedded:
+          type: object
+          properties:
+            brands:
+              type: array
+              items:
+                $ref: ./customizations.yaml#/components/schemas/Brand
+          readOnly: true
+    EmailDomainStatus:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      type: string
+      enum:
+        - DELETED
+        - ERROR
+        - NOT_STARTED
+        - POLLING
+        - VERIFIED
+    UpdateEmailDomain:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/BaseEmailDomain'
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

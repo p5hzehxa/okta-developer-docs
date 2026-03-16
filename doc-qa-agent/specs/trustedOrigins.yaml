@@ -1,0 +1,595 @@
+openapi: 3.0.3
+info:
+  title: Trusted origins API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../../base.yaml#/tags
+paths:
+  /api/v1/trustedOrigins:
+    get:
+      summary: List all trusted origins
+      description: Lists all trusted origins
+      operationId: listTrustedOrigins
+      parameters:
+        - name: q
+          description: A search string that prefix matches against the `name` and `origin`
+          in: query
+          schema:
+            type: string
+        - name: filter
+          description: |
+            [Filter](https://developer.okta.com/docs/api/#filter) trusted origins with a supported expression for a subset of properties. You can filter on the following properties: `name`, `origin`, `status`, and `type` (type of scopes).
+          in: query
+          schema:
+            type: string
+          examples:
+            By name:
+              value: name eq "Example trusted origin"
+        - name: after
+          description: After cursor provided by a prior request
+          in: query
+          schema:
+            type: string
+        - name: limit
+          description: Specifies the number of results
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 20
+            maximum: 200
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrustedOrigin'
+              examples:
+                TrustedOriginsResponse:
+                  $ref: '#/components/examples/TrustedOriginsResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.trustedOrigins.read
+      tags:
+        - TrustedOrigin
+    post:
+      summary: Create a trusted origin
+      description: Creates a trusted origin
+      operationId: createTrustedOrigin
+      x-codegen-request-body-name: trustedOrigin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrustedOriginWrite'
+            examples:
+              TrustedOriginBody:
+                $ref: '#/components/examples/TrustedOriginBody'
+              TrustedOriginBodyWithIframeEmbedding:
+                $ref: '#/components/examples/TrustedOriginBodyWithIframeEmbedding'
+              TrustedOriginBodyWithIframeEmbeddingSignIn:
+                $ref: '#/components/examples/TrustedOriginBodyWithIframeEmbeddingSignIn'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrustedOrigin'
+              examples:
+                TrustedOriginResponse:
+                  $ref: '#/components/examples/TrustedOriginResponse'
+                TrustedOriginResponseWithIframeEmbedding:
+                  $ref: '#/components/examples/TrustedOriginResponseWithIframeEmbedding'
+                TrustedOriginResponseWithIframeEmbeddingSignIn:
+                  $ref: '#/components/examples/TrustedOriginResponseWithIframeEmbeddingSignIn'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.trustedOrigins.manage
+      tags:
+        - TrustedOrigin
+    x-okta-team-detail:
+      x-team-slack: amp-eng-resource-insights
+  /api/v1/trustedOrigins/{trustedOriginId}:
+    parameters:
+      - $ref: '#/components/parameters/pathTrustedOriginId'
+    get:
+      summary: Retrieve a trusted origin
+      description: Retrieves a trusted origin
+      operationId: getTrustedOrigin
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrustedOrigin'
+              examples:
+                TrustedOriginResponse:
+                  $ref: '#/components/examples/TrustedOriginResponse'
+                TrustedOriginResponseWithIframeEmbedding:
+                  $ref: '#/components/examples/TrustedOriginResponseWithIframeEmbedding'
+                TrustedOriginResponseWithIframeEmbeddingSignIn:
+                  $ref: '#/components/examples/TrustedOriginResponseWithIframeEmbeddingSignIn'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.trustedOrigins.read
+      tags:
+        - TrustedOrigin
+    put:
+      summary: Replace a trusted origin
+      description: Replaces a trusted origin
+      operationId: replaceTrustedOrigin
+      x-codegen-request-body-name: trustedOrigin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrustedOrigin'
+            examples:
+              TrustedOriginPutBody:
+                $ref: '#/components/examples/TrustedOriginPutBody'
+              TrustedOriginPutBodyWithIframeEmbedding:
+                $ref: '#/components/examples/TrustedOriginPutBodyWithIframeEmbedding'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrustedOrigin'
+              examples:
+                TrustedOriginPutResponse:
+                  $ref: '#/components/examples/TrustedOriginPutResponse'
+                TrustedOriginPutResponseWithIFrameEmbedding:
+                  $ref: '#/components/examples/TrustedOriginPutResponseWithIframeEmbedding'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.trustedOrigins.manage
+      tags:
+        - TrustedOrigin
+    delete:
+      summary: Delete a trusted origin
+      description: Deletes a trusted origin
+      operationId: deleteTrustedOrigin
+      responses:
+        '204':
+          description: Success
+          content: {}
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.trustedOrigins.manage
+      tags:
+        - TrustedOrigin
+    x-okta-team-detail:
+      x-team-slack: amp-eng-resource-insights
+  /api/v1/trustedOrigins/{trustedOriginId}/lifecycle/activate:
+    parameters:
+      - $ref: '#/components/parameters/pathTrustedOriginId'
+    post:
+      summary: Activate a trusted origin
+      description: Activates a trusted origin. Sets the `status` to `ACTIVE`.
+      operationId: activateTrustedOrigin
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrustedOrigin'
+              examples:
+                TrustedOriginResponse:
+                  $ref: '#/components/examples/TrustedOriginResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.trustedOrigins.manage
+      tags:
+        - TrustedOrigin
+    x-okta-team-detail:
+      x-team-slack: amp-eng-resource-insights
+  /api/v1/trustedOrigins/{trustedOriginId}/lifecycle/deactivate:
+    parameters:
+      - $ref: '#/components/parameters/pathTrustedOriginId'
+    post:
+      summary: Deactivate a trusted origin
+      description: Deactivates a trusted origin. Sets the `status` to `INACTIVE`.
+      operationId: deactivateTrustedOrigin
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrustedOrigin'
+              examples:
+                TrustedOriginInactiveResponse:
+                  $ref: '#/components/examples/TrustedOriginInactiveResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.trustedOrigins.manage
+      tags:
+        - TrustedOrigin
+    x-okta-team-detail:
+      x-team-slack: amp-eng-resource-insights
+components:
+  examples:
+    TrustedOriginBody:
+      summary: Trusted origin request body
+      value:
+        name: New trusted origin
+        origin: http://example.com
+        scopes:
+          - type: CORS
+          - type: REDIRECT
+    TrustedOriginBodyWithIframeEmbedding:
+      summary: Trusted origin request body with iFrame embedding (Okta End-User Dashboard and Okta sign-in page)
+      description: |
+        Creates a new trusted origin for iFrame embedding of an Okta resource within that origin. In this example, the type of Okta resource is both the Okta End-User Dashboard and the Okta sign-in page.
+      value:
+        name: New trusted origin
+        origin: http://example.com
+        scopes:
+          - type: IFRAME_EMBED
+            allowedOktaApps:
+              - OKTA_ENDUSER
+    TrustedOriginBodyWithIframeEmbeddingSignIn:
+      summary: Trusted origin request body with iFrame embedding (Okta sign-in page)
+      description: |
+        Creates a new trusted origin for iFrame embedding of an Okta resource within that origin. In this example, the Okta resource is the Okta sign-in page.
+      value:
+        name: New trusted origin
+        origin: http://example.com
+        scopes:
+          - type: IFRAME_EMBED
+            allowedOktaApps: []
+    TrustedOriginPutBody:
+      summary: Trusted origin request body
+      value:
+        $ref: '#/components/examples/TrustedOriginPut'
+    TrustedOriginPutBodyWithIframeEmbedding:
+      summary: Trusted origin request body with iFrame embedding
+      value:
+        $ref: '#/components/examples/TrustedOriginPutWithIframeEmbedding'
+    TrustedOriginPut:
+      value:
+        id: tosue7JvguwJ7U6kz0g3
+        name: Updated Example trusted origin
+        origin: http://updated.example.com
+        scopes:
+          - type: CORS
+          - type: REDIRECT
+        status: ACTIVE
+        created: '2017-12-16T05:01:12.000Z'
+        createdBy: 00ut5t92p6IEOi4bu0g3
+        lastUpdated: '2017-12-16T05:01:12.000Z'
+        lastUpdatedBy: 00ut5t92p6IEOi4bu0g3
+        _links:
+          self:
+            href: https://${yourOktaDomain}/api/v1/trustedOrigins/tosue7JvguwJ7U6kz0g3
+            hints:
+              allow:
+                - GET
+                - PUT
+                - DELETE
+          deactivate:
+            href: https://${yourOktaDomain}/api/v1/trustedOrigins/tosue7JvguwJ7U6kz0g3/lifecycle/deactivate
+            hints:
+              allow:
+                - POST
+    TrustedOriginPutWithIframeEmbedding:
+      value:
+        id: tosue7JvguwJ7U6kz0g3
+        name: Updated trusted origin example
+        origin: http://updated.example.com
+        scopes:
+          - type: IFRAME_EMBED
+            allowedOktaApps:
+              - OKTA_ENDUSER
+        status: ACTIVE
+        created: '2017-12-16T05:01:12.000Z'
+        createdBy: 00ut5t92p6IEOi4bu0g3
+        lastUpdated: '2017-12-16T05:01:12.000Z'
+        lastUpdatedBy: 00ut5t92p6IEOi4bu0g3
+        _links:
+          self:
+            href: https://${yourOktaDomain}/api/v1/trustedOrigins/tosue7JvguwJ7U6kz0g3
+            hints:
+              allow:
+                - GET
+                - PUT
+                - DELETE
+          deactivate:
+            href: https://${yourOktaDomain}/api/v1/trustedOrigins/tosue7JvguwJ7U6kz0g3/lifecycle/deactivate
+            hints:
+              allow:
+                - POST
+    TrustedOriginResponse:
+      summary: Trusted origin response
+      value:
+        id: tos10hu7rkbtrFt1M0g4
+        name: New trusted origin
+        origin: http://example.com
+        status: ACTIVE
+        scopes:
+          - type: CORS
+          - type: REDIRECT
+        created: 2018-01-13T01:11:44.000Z
+        createdBy: 00ut5t92p6IEOi4bu0g3
+        lastedUpdated: 2018-01-13T01:11:44.000Z
+        lastedUpdatedBy: 00ut5t92p6IEOi4bu0g3
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/trustedOrigins/tos10hu7rkbtrFt1M0g4
+            hints:
+              allow:
+                - GET
+                - PUT
+                - DELETE
+          deactivate:
+            href: https://{yourOktaDomain}/api/v1/trustedOrigins/tos10hu7rkbtrFt1M0g4/lifecycle/deactivate
+            hints:
+              allow:
+                - POST
+    TrustedOriginInactiveResponse:
+      summary: Trusted origin response
+      value:
+        id: tos10hu7rkbtrFt1M0g4
+        name: New trusted origin
+        origin: http://example.com
+        status: INACTIVE
+        scopes:
+          - type: CORS
+          - type: REDIRECT
+        created: 2018-01-13T01:11:44.000Z
+        createdBy: 00ut5t92p6IEOi4bu0g3
+        lastedUpdated: 2018-01-13T01:11:44.000Z
+        lastedUpdatedBy: 00ut5t92p6IEOi4bu0g3
+        _links:
+          activate:
+            href: https://{yourOktaDomain}/api/v1/trustedOrigins/tos10hu7rkbtrFt1M0g4/lifecycle/activate
+            hints:
+              allow:
+                - POST
+          self:
+            href: https://{yourOktaDomain}/api/v1/trustedOrigins/tos10hu7rkbtrFt1M0g4
+            hints:
+              allow:
+                - GET
+                - PUT
+                - DELETE
+    TrustedOriginsResponse:
+      summary: Trusted origins response
+      value:
+        - id: tos10hu7rkbtrFt1M0g4
+          name: New trusted origin
+          origin: http://example.com
+          status: ACTIVE
+          scopes:
+            - type: CORS
+            - type: REDIRECT
+          created: '2018-01-13T01:11:44.000Z'
+          createdBy: 00ut5t92p6IEOi4bu0g3
+          lastedUpdated: '2018-01-13T01:11:44.000Z'
+          lastedUpdatedBy: 00ut5t92p6IEOi4bu0g3
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/trustedOrigins/tos10hu7rkbtrFt1M0g4
+              hints:
+                allow:
+                  - GET
+                  - PUT
+                  - DELETE
+            deactivate:
+              href: https://{yourOktaDomain}/api/v1/trustedOrigins/tos10hu7rkbtrFt1M0g4/lifecycle/deactivate
+              hints:
+                allow:
+                  - POST
+    TrustedOriginResponseWithIframeEmbedding:
+      summary: Trusted origin response with iFrame embedding (End-User Dashboard and Okta sign-in page)
+      value:
+        id: tos10hu7rkbtrFt1M0g4
+        name: New trusted origin
+        origin: http://example.com
+        status: ACTIVE
+        scopes:
+          - type: IFRAME_EMBED
+            allowedOktaApps:
+              - OKTA_ENDUSER
+        created: 2018-01-13T01:11:44.000Z
+        createdBy: 00ut5t92p6IEOi4bu0g3
+        lastedUpdated: 2018-01-13T01:11:44.000Z
+        lastedUpdatedBy: 00ut5t92p6IEOi4bu0g3
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/trustedOrigins/tos10hu7rkbtrFt1M0g4
+            hints:
+              allow:
+                - GET
+                - PUT
+                - DELETE
+          deactivate:
+            href: https://{yourOktaDomain}/api/v1/trustedOrigins/tos10hu7rkbtrFt1M0g4/lifecycle/deactivate
+            hints:
+              allow:
+                - POST
+    TrustedOriginResponseWithIframeEmbeddingSignIn:
+      summary: Trusted origin response with iFrame embedding (Okta sign-in page)
+      value:
+        id: tos10hu7rkbtrFt1M0g4
+        name: New trusted origin
+        origin: http://example.com
+        status: ACTIVE
+        scopes:
+          - type: IFRAME_EMBED
+            allowedOktaApps: []
+        created: 2018-01-13T01:11:44.000Z
+        createdBy: 00ut5t92p6IEOi4bu0g3
+        lastedUpdated: 2018-01-13T01:11:44.000Z
+        lastedUpdatedBy: 00ut5t92p6IEOi4bu0g3
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/trustedOrigins/tos10hu7rkbtrFt1M0g4
+            hints:
+              allow:
+                - GET
+                - PUT
+                - DELETE
+          deactivate:
+            href: https://{yourOktaDomain}/api/v1/trustedOrigins/tos10hu7rkbtrFt1M0g4/lifecycle/deactivate
+            hints:
+              allow:
+                - POST
+    TrustedOriginPutResponse:
+      summary: Trusted origin response body
+      value:
+        $ref: '#/components/examples/TrustedOriginPut'
+    TrustedOriginPutResponseWithIframeEmbedding:
+      summary: Trusted origin response body with iFrame embedding
+      value:
+        $ref: '#/components/examples/TrustedOriginPutWithIframeEmbedding'
+  parameters:
+    pathTrustedOriginId:
+      name: trustedOriginId
+      description: '`id` of the trusted origin'
+      in: path
+      required: true
+      schema:
+        type: string
+        example: 7j2PkU1nyNIDe26ZNufR
+  schemas:
+    IframeEmbedScopeAllowedApps:
+      type: string
+      enum:
+        - OKTA_ENDUSER
+    TrustedOrigin:
+      type: object
+      properties:
+        created:
+          description: Timestamp when the trusted origin was created
+          type: string
+          format: date-time
+          readOnly: true
+        createdBy:
+          description: The ID of the user who created the trusted origin
+          type: string
+        id:
+          description: Unique identifier for the trusted origin
+          type: string
+          readOnly: true
+        lastUpdated:
+          description: Timestamp when the trusted origin was last updated
+          type: string
+          format: date-time
+          readOnly: true
+        lastUpdatedBy:
+          description: The ID of the user who last updated the trusted origin
+          type: string
+        name:
+          $ref: '#/components/schemas/TrustedOriginName'
+        origin:
+          $ref: '#/components/schemas/TrustedOriginOrigin'
+        scopes:
+          $ref: '#/components/schemas/TrustedOriginScopes'
+        status:
+          $ref: ../Common.yaml#/components/schemas/LifecycleStatus
+        _links:
+          $ref: ../Common.yaml#/components/schemas/LinksSelfAndLifecycle
+    TrustedOriginWrite:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/TrustedOriginName'
+        origin:
+          $ref: '#/components/schemas/TrustedOriginOrigin'
+        scopes:
+          $ref: '#/components/schemas/TrustedOriginScopes'
+    TrustedOriginScope:
+      type: object
+      properties:
+        allowedOktaApps:
+          type: array
+          description: The allowed Okta apps for the trusted origin scope
+          items:
+            $ref: '#/components/schemas/IframeEmbedScopeAllowedApps'
+        type:
+          $ref: '#/components/schemas/TrustedOriginScopeType'
+    TrustedOriginScopeType:
+      type: string
+      description: |
+        The scope type. Supported values: When you use `IFRAME_EMBED` as the scope type, leave the `allowedOktaApps` property empty to allow iFrame embedding of only Okta sign-in pages. Include `OKTA_ENDUSER` as a value for the `allowedOktaApps` property to allow iFrame embedding of both Okta sign-in pages and the Okta End-User Dashboard.
+      enum:
+        - CORS
+        - IFRAME_EMBED
+        - REDIRECT
+    TrustedOriginName:
+      type: string
+      maximum: 255
+      description: Unique name for the trusted origin
+    TrustedOriginOrigin:
+      type: string
+      maximum: 255
+      description: Unique origin URL for the trusted origin. The supported schemes for this attribute are HTTP, HTTPS, FTP, Ionic 2, and Capacitor.
+    TrustedOriginScopes:
+      type: array
+      maximum: 3
+      description: Array of scope types that this trusted origin is used for
+      items:
+        $ref: '#/components/schemas/TrustedOriginScope'
+  securitySchemes:
+    $ref: ../../base.yaml#/components/securitySchemes

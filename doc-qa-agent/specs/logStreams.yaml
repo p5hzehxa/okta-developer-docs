@@ -1,0 +1,639 @@
+openapi: 3.0.3
+info:
+  title: Log Streaming API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/logStreams:
+    get:
+      summary: List all log streams
+      description: Lists all log stream objects in your org. You can request a paginated list or a subset of log streams that match a supported filter expression.
+      operationId: listLogStreams
+      parameters:
+        - $ref: ./Common.yaml#/components/parameters/queryAfter
+        - $ref: ./Common.yaml#/components/parameters/queryLimit
+        - name: filter
+          in: query
+          description: An expression that [filters](/#filter) the returned objects. You can only use the `eq` operator on either the `status` or `type` properties in the filter expression.
+          schema:
+            type: string
+            example: type eq "aws_eventbridge"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LogStream'
+              examples:
+                ExampleGetAllResponse:
+                  $ref: '#/components/examples/LogStreamGetAllResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.logStreams.read
+      tags:
+        - LogStream
+    post:
+      summary: Create a log stream
+      description: Creates a new log stream object
+      operationId: createLogStream
+      x-codegen-request-body-name: instance
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogStream'
+            examples:
+              LogStreamPostRequestExample:
+                $ref: '#/components/examples/LogStreamPostRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogStream'
+              examples:
+                LogStreamPostResponseExample:
+                  $ref: '#/components/examples/LogStreamPostResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+              examples:
+                Access Denied:
+                  $ref: ./Common.yaml#/components/examples/ErrorAccessDenied
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.logStreams.manage
+      tags:
+        - LogStream
+    x-okta-team-detail:
+      x-team-slack: eng-data-platform-foundations
+  /api/v1/logStreams/{logStreamId}:
+    parameters:
+      - $ref: '#/components/parameters/pathLogStreamId'
+    get:
+      summary: Retrieve a log stream
+      description: Retrieves a log stream object by ID
+      operationId: getLogStream
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogStream'
+              examples:
+                LogStreamGetRequestExample:
+                  $ref: '#/components/examples/LogStreamPostResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.logStreams.read
+      tags:
+        - LogStream
+    put:
+      summary: Replace a log stream
+      description: |-
+        Replaces the log stream object properties for a given ID.
+
+        This operation is typically used to update the configuration of a log stream.
+        Depending on the type of log stream you want to update, certain properties can't be modified after the log stream is initially created.
+        Use the [Retrieve the log stream schema for the schema type](/openapi/okta-management/management/schema/getlogstreamschema) request to determine which properties you can update for the specific log stream type.
+        Log stream properties with the `"writeOnce" : true` attribute can't be updated after creation.
+        You must still specify these `writeOnce` properties in the request body with the original values in the PUT request.
+
+        > **Note:** You don't have to specify properties that have both the `"writeOnce": true` and the `"writeOnly": true` attributes in the PUT request body. These property values are ignored even if you add them in the PUT request body.
+      operationId: replaceLogStream
+      x-codegen-request-body-name: instance
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogStreamPutSchema'
+            examples:
+              LogStreamPutRequestExample:
+                $ref: '#/components/examples/LogStreamPutRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogStream'
+              examples:
+                LogStreamPostResponseExample:
+                  $ref: '#/components/examples/LogStreamPutResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.logStreams.manage
+      tags:
+        - LogStream
+    delete:
+      summary: Delete a log stream
+      description: Deletes a log stream object from your org by ID
+      operationId: deleteLogStream
+      responses:
+        '204':
+          description: No Content
+        '403':
+          description: Forbidden
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+              examples:
+                Access Denied:
+                  $ref: ./Common.yaml#/components/examples/ErrorAccessDenied
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.logStreams.manage
+      tags:
+        - LogStream
+    x-okta-team-detail:
+      x-team-slack: eng-data-platform-foundations
+  /api/v1/logStreams/{logStreamId}/lifecycle/activate:
+    parameters:
+      - $ref: '#/components/parameters/pathLogStreamId'
+    post:
+      summary: Activate a log stream
+      description: Activates a log stream by `logStreamId`
+      operationId: activateLogStream
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogStream'
+              examples:
+                LogStreamActivateResponseExample:
+                  $ref: '#/components/examples/LogStreamActivateResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.logStreams.manage
+      tags:
+        - LogStream
+    x-okta-team-detail:
+      x-team-slack: eng-data-platform-foundations
+  /api/v1/logStreams/{logStreamId}/lifecycle/deactivate:
+    parameters:
+      - $ref: '#/components/parameters/pathLogStreamId'
+    post:
+      summary: Deactivate a log stream
+      description: Deactivates a log stream by `logStreamId`
+      operationId: deactivateLogStream
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogStream'
+              examples:
+                LogStreamDeactivateResponseExample:
+                  $ref: '#/components/examples/LogStreamDeactivateResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.logStreams.manage
+      tags:
+        - LogStream
+    x-okta-team-detail:
+      x-team-slack: eng-data-platform-foundations
+components:
+  examples:
+    LogStreamGetAllResponse:
+      summary: Lists all log streams
+      value:
+        - id: 0oa1orqUGCIoCGNxf0g4
+          type: aws_eventbridge
+          name: Example AWS EventBridge
+          lastUpdated: '2023-03-24T21:02:43.000Z'
+          created: '2023-03-24T21:02:43.000Z'
+          status: ACTIVE
+          settings:
+            accountId: '123456789012'
+            eventSourceName: your-event-source-name
+            region: us-east-2
+          _links:
+            self:
+              href: http://{yourOktaDomain}/api/v1/logStreams/0oa1orqUGCIoCGNxf0g4
+              method: GET
+            deactivate:
+              href: http://{yourOktaDomain}/api/v1/logStreams/0oa1orqUGCIoCGNxf0g4/lifecycle/deactivate
+              method: POST
+    LogStreamPostRequest:
+      summary: Create an AWS EventBridge log stream
+      value:
+        type: aws_eventbridge
+        name: Example AWS EventBridge
+        settings:
+          eventSourceName: your-event-source-name
+          accountId: '123456789012'
+          region: us-east-2
+    LogStreamPutRequest:
+      summary: Replace AWS EventBridge name
+      value:
+        type: aws_eventbridge
+        name: Updated AWS EventBridge
+        settings:
+          eventSourceName: your-event-source-name
+          accountId: '123456789012'
+          region: us-east-2
+    LogStreamPostResponse:
+      summary: AWS EventBridge log stream response
+      value:
+        id: 0oa1orqUGCIoCGNxf0g4
+        type: aws_eventbridge
+        name: Example AWS EventBridge
+        lastUpdated: '2023-03-24T21:02:43.000Z'
+        created: '2023-03-24T21:02:43.000Z'
+        status: ACTIVE
+        settings:
+          accountId: '123456789012'
+          eventSourceName: your-event-source-name
+          region: us-east-2
+        _links:
+          self:
+            href: http://{yourOktaDomain}/api/v1/logStreams/0oa1orqUGCIoCGNxf0g4
+            method: GET
+          deactivate:
+            href: http://{yourOktaDomain}/api/v1/logStreams/0oa1orqUGCIoCGNxf0g4/lifecycle/deactivate
+            method: POST
+    LogStreamPutResponse:
+      summary: Replace AWS EventBridge name response
+      value:
+        id: 0oa1orqUGCIoCGNxf0g4
+        type: aws_eventbridge
+        name: Updated AWS EventBridge
+        lastUpdated: '2023-03-24T21:12:43.000Z'
+        created: '2023-03-24T21:02:43.000Z'
+        status: ACTIVE
+        settings:
+          accountId: '123456789012'
+          eventSourceName: your-event-source-name
+          region: us-east-2
+        _links:
+          self:
+            href: http://{yourOktaDomain}/api/v1/logStreams/0oa1orqUGCIoCGNxf0g4
+            method: GET
+          deactivate:
+            href: http://{yourOktaDomain}/api/v1/logStreams/0oa1orqUGCIoCGNxf0g4/lifecycle/deactivate
+            method: POST
+    LogStreamActivateResponse:
+      summary: Activate log stream response
+      value:
+        id: 0oa1orqUGCIoCGNxf0g4
+        type: aws_eventbridge
+        name: Example AWS EventBridge
+        lastUpdated: '2023-03-24T21:22:43.000Z'
+        created: '2023-03-24T21:02:43.000Z'
+        status: ACTIVE
+        settings:
+          accountId: '123456789012'
+          eventSourceName: your-event-source-name
+          region: us-east-2
+        _links:
+          self:
+            href: http://{yourOktaDomain}/api/v1/logStreams/0oa1orqUGCIoCGNxf0g4
+            method: GET
+          deactivate:
+            href: http://{yourOktaDomain}/api/v1/logStreams/0oa1orqUGCIoCGNxf0g4/lifecycle/deactivate
+            method: POST
+    LogStreamDeactivateResponse:
+      summary: Deactivate log stream response
+      value:
+        id: 0oa7agphh5FT7H521d7
+        type: splunk_cloud_logstreaming
+        name: Splunk Cloud Example
+        lastUpdated: '2023-03-24T21:23:00.000Z'
+        created: '2023-03-24T21:15:13.000Z'
+        status: INACTIVE
+        settings:
+          edition: aws
+          host: okexample.splunkcloud.com
+        _links:
+          self:
+            href: http://{yourOktaDomain}/api/v1/logStreams/0oa7agphh5FT7H521d7
+            method: GET
+          activate:
+            href: http://{yourOktaDomain}/api/v1/logStreams/0oa7agphh5FT7H521d7/lifecycle/activate
+            method: POST
+  parameters:
+    pathLogStreamId:
+      name: logStreamId
+      in: path
+      schema:
+        type: string
+        example: 0oa1orzg0CHSgPcjZ0g4
+      required: true
+      description: Unique identifier for the log stream
+  schemas:
+    LogStreamLinkObject:
+      title: Log stream link object
+      type: object
+      properties:
+        method:
+          type: string
+          description: HTTP method allowed for the resource
+          enum:
+            - GET
+            - POST
+        href:
+          type: string
+          description: The URI of the resource
+      required:
+        - href
+      readOnly: true
+    LogStreamActivateLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/LogStreamLinkObject'
+        - description: Link to activate the resource
+    LogStreamDeactivateLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/LogStreamLinkObject'
+        - description: Link to deactivate the resource
+    LogStreamSelfLink:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/LogStreamLinkObject'
+        - description: Link to the resource (self)
+    LogStreamLinksSelfAndLifecycle:
+      type: object
+      description: Specifies link relations (see [Web Linking](https://www.rfc-editor.org/rfc/rfc8288)) available for the current status of an application using the [JSON Hypertext Application Language](https://datatracker.ietf.org/doc/html/draft-kelly-json-hal-06) specification. This object is used for dynamic discovery of related resources and lifecycle operations.
+      properties:
+        self:
+          $ref: '#/components/schemas/LogStreamSelfLink'
+        activate:
+          $ref: '#/components/schemas/LogStreamActivateLink'
+        deactivate:
+          $ref: '#/components/schemas/LogStreamDeactivateLink'
+      readOnly: true
+      required:
+        - self
+    AwsRegion:
+      type: string
+      description: The destination AWS region where your event source is located
+      enum:
+        - ap-northeast-1
+        - ap-northeast-2
+        - ap-northeast-3
+        - ap-south-1
+        - ap-southeast-1
+        - ap-southeast-2
+        - ca-central-1
+        - eu-central-1
+        - eu-north-1
+        - eu-west-1
+        - eu-west-2
+        - eu-west-3
+        - us-east-1
+        - us-east-2
+        - us-west-1
+        - us-west-2
+        - sa-east-1
+    AwsEventSourceName:
+      type: string
+      description: An alphanumeric name (no spaces) to identify this event source in AWS EventBridge
+      pattern: ^[a-zA-Z0-9.\-_]$
+      minLength: 1
+      maxLength: 75
+      example: your-event-source-name
+    AwsAccountId:
+      type: string
+      description: Your AWS account ID
+      minLength: 12
+      maxLength: 12
+      example: 123456789012
+    SplunkEdition:
+      type: string
+      description: Edition of the Splunk Cloud instance
+      example: aws
+      enum:
+        - aws
+        - gcp
+        - aws_govcloud
+    SplunkHost:
+      type: string
+      description: 'The domain name for your Splunk Cloud instance. Don''t include `http` or `https` in the string. For example: `acme.splunkcloud.com`'
+      minLength: 17
+      maxLength: 116
+      example: acme.splunkcloud.com
+    SplunkToken:
+      type: string
+      description: The HEC token for your Splunk Cloud HTTP Event Collector. The token value is set at object creation, but isn't returned.
+      pattern: (?i)^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      example: 11111111-1111-2222-2222-222222222222
+      writeOnly: true
+    LogStreamName:
+      type: string
+      description: Unique name for the log stream object
+      example: My AWS EventBridge log stream
+    LogStreamType:
+      description: |-
+        Specifies the streaming provider used
+
+        Supported providers:
+          * `aws_eventbridge` ([AWS EventBridge](https://aws.amazon.com/eventbridge))
+          * `splunk_cloud_logstreaming` ([Splunk Cloud](https://www.splunk.com/en_us/software/splunk-cloud-platform.html))
+
+        Select the provider type to see provider-specific configurations in the `settings` property:
+      type: string
+      enum:
+        - aws_eventbridge
+        - splunk_cloud_logstreaming
+    LogStream:
+      type: object
+      properties:
+        created:
+          type: string
+          format: date-time
+          description: Timestamp when the log stream object was created
+          readOnly: true
+          example: '2022-10-21T16:59:59.000Z'
+        id:
+          type: string
+          description: Unique identifier for the log stream
+          readOnly: true
+          example: 0oa1orzg0CHSgPcjZ0g4
+        lastUpdated:
+          type: string
+          format: date-time
+          description: Timestamp when the log stream object was last updated
+          readOnly: true
+          example: '2022-10-21T17:15:10.000Z'
+        name:
+          $ref: '#/components/schemas/LogStreamName'
+        status:
+          type: string
+          description: Lifecycle status of the log stream object
+          enum:
+            - ACTIVE
+            - INACTIVE
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/LogStreamType'
+        _links:
+          $ref: '#/components/schemas/LogStreamLinksSelfAndLifecycle'
+      discriminator:
+        propertyName: type
+        mapping:
+          aws_eventbridge: '#/components/schemas/LogStreamAws'
+          splunk_cloud_logstreaming: '#/components/schemas/LogStreamSplunk'
+      required:
+        - created
+        - id
+        - lastUpdated
+        - name
+        - status
+        - type
+        - _links
+    LogStreamAws:
+      allOf:
+        - $ref: '#/components/schemas/LogStream'
+        - type: object
+          properties:
+            settings:
+              $ref: '#/components/schemas/LogStreamSettingsAws'
+          required:
+            - settings
+    LogStreamAwsPutSchema:
+      allOf:
+        - $ref: '#/components/schemas/LogStreamPutSchema'
+        - type: object
+          properties:
+            settings:
+              $ref: '#/components/schemas/LogStreamSettingsAws'
+          required:
+            - settings
+    LogStreamSettingsAws:
+      type: object
+      description: Specifies the configuration for the `aws_eventbridge` log stream type. This configuration can't be modified after creation.
+      properties:
+        accountId:
+          $ref: '#/components/schemas/AwsAccountId'
+        eventSourceName:
+          $ref: '#/components/schemas/AwsEventSourceName'
+        region:
+          $ref: '#/components/schemas/AwsRegion'
+      required:
+        - accountId
+        - eventSourceName
+        - region
+    LogStreamSettingsSplunk:
+      type: object
+      description: Specifies the configuration for the `splunk_cloud_logstreaming` log stream type.
+      properties:
+        edition:
+          $ref: '#/components/schemas/SplunkEdition'
+        host:
+          $ref: '#/components/schemas/SplunkHost'
+        token:
+          $ref: '#/components/schemas/SplunkToken'
+      required:
+        - edition
+        - host
+        - token
+    LogStreamSettingsSplunkPut:
+      type: object
+      description: Specifies the configuration for the `splunk_cloud_logstreaming` log stream type.
+      properties:
+        edition:
+          $ref: '#/components/schemas/SplunkEdition'
+        host:
+          $ref: '#/components/schemas/SplunkHost'
+      required:
+        - edition
+        - host
+    LogStreamSplunk:
+      allOf:
+        - $ref: '#/components/schemas/LogStream'
+        - type: object
+          properties:
+            settings:
+              $ref: '#/components/schemas/LogStreamSettingsSplunk'
+          required:
+            - settings
+    LogStreamSplunkPutSchema:
+      allOf:
+        - $ref: '#/components/schemas/LogStreamPutSchema'
+        - type: object
+          properties:
+            settings:
+              $ref: '#/components/schemas/LogStreamSettingsSplunkPut'
+          required:
+            - settings
+    LogStreamPutSchema:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/LogStreamName'
+        type:
+          $ref: '#/components/schemas/LogStreamType'
+      discriminator:
+        propertyName: type
+        mapping:
+          aws_eventbridge: '#/components/schemas/LogStreamAwsPutSchema'
+          splunk_cloud_logstreaming: '#/components/schemas/LogStreamSplunkPutSchema'
+      required:
+        - name
+        - type
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

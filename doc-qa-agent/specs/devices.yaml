@@ -1,0 +1,1169 @@
+openapi: 3.0.3
+info:
+  title: Devices API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/devices:
+    get:
+      summary: List all devices
+      description: |-
+        Lists all devices with pagination support.
+
+        >**Note:** To list all devices enrolled by a user, use the [List all devices endpoint in the User Resources API](/openapi/okta-management/management/userresources/listuserdevices).
+
+        You can return a subset of devices that match a supported search criteria using the `search` query parameter.
+        Searches for devices based on the properties specified in the `search` parameter conforming SCIM filter specifications (case-insensitive). This data is eventually consistent. The API returns different results depending on specified queries in the request. Empty list is returned if no objects match `search` request.
+
+        > **Note:** The `search` parameter results are sourced from an eventually consistent datasource and may not reflect the latest information.
+
+        Don't use search results directly for record updates, as the data might be stale and therefore overwrite newer data, resulting in data loss. 
+
+        Use an `id` lookup for records that you update to ensure your results contain the latest data.
+
+        This operation requires [URL encoding](https://www.w3.org/TR/html4/interact/forms.html#h-17.13.4.1). For example, `search=profile.displayName eq "Bob"` is encoded as `search=profile.displayName%20eq%20%22Bob%22`.
+      operationId: listDevices
+      parameters:
+        - name: after
+          in: query
+          schema:
+            type: string
+            description: The cursor to use for pagination. It is an opaque string that specifies your current location in the list and is obtained from the `Link` response header. See [Pagination](/#pagination) for more information.
+            example: 200u3des4afA47rYJu1d7
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 200
+            example: 20
+          description: A limit on the number of objects to return (recommend `20`)
+        - name: search
+          in: query
+          description: |-
+            A SCIM filter expression that filters the results. Searches include all device `profile` properties and the device `id`, `status`, and `lastUpdated` properties.
+
+            Searches for devices can be filtered by the contains (`co`) operator. You can only use `co` with these select device profile attributes: `profile.displayName`, `profile.serialNumber`, `profile.imei`, `profile.meid`, `profile.udid`, and `profile.sid`. See [Operators](https://developer.okta.com/docs/api/#operators).
+          schema:
+            type: string
+            example: lastUpdated gt "2019-06-01T09:00:00.000Z"
+          examples:
+            FilterByDeviceStatus:
+              summary: Filter by device status
+              value: status%20eq%20%22ACTIVE%22
+            FilterByLastUpdatedTime:
+              summary: Filter by last updated time
+              value: lastUpdated%20gt%20%222024-12-23'T'00%3A00%3A00.000Z%22
+            FilterByDeviceId:
+              summary: Filter by device ID
+              value: id%20eq%20%22guo4a5u7JHHhjXrMK0g4%22
+            FilterByDeviceDisplayName:
+              summary: Filter by device display name
+              value: profile.displayName%20eq%20%22Bob%22
+            FilterByDevicePlatform:
+              summary: Filter by device platform
+              value: profile.platform%20eq%20%22WINDOWS%22
+            FilterBySID:
+              summary: Filter by device security identifier (SID)
+              value: profile.sid%20sw%20%22S-1%22
+        - name: expand
+          in: query
+          description: Includes associated user details and management status for the device in the `_embedded` attribute
+          schema:
+            type: string
+            example: userSummary
+            enum:
+              - user
+              - userSummary
+            x-enumDescriptions:
+              user: Lists full details for associated users
+              userSummary: Lists summaries for associated users
+          examples:
+            UserFullDetails:
+              summary: Get a detailed list of associated users
+              value: user
+            UserSummaries:
+              summary: Get the list of associated user summaries
+              value: userSummary
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceList'
+              examples:
+                APIDevicesResponseUserSummaryExample:
+                  type: array
+                  $ref: '#/components/examples/APIDevicesListAllUserSummaryResponse'
+                APIDevicesResponseExample:
+                  type: array
+                  $ref: '#/components/examples/APIDevicesListAllResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.devices.read
+      tags:
+        - Device
+  /api/v1/devices/{deviceId}:
+    parameters:
+      - $ref: '#/components/parameters/pathDeviceId'
+    get:
+      summary: Retrieve a device
+      description: Retrieves a device by `deviceId`
+      operationId: getDevice
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+              examples:
+                APIDevicesResponseExample:
+                  $ref: '#/components/examples/DeviceResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.devices.read
+      tags:
+        - Device
+    delete:
+      summary: Delete a device
+      description: |-
+        Deletes (permanently) a device by `deviceId` if it has a status of `DEACTIVATED`. You can transition the device to `DEACTIVATED` status using the [Deactivate a Device](/openapi/okta-management/management/device/deactivatedevice) endpoint.
+        This request is destructive and deletes all of the profile data related to the device. Once deleted, device data can't be recovered. However, reenrollment creates a new device record.
+        > **Note:** Attempts to delete a device that isn't in a `DEACTIVATED` state raise an error.
+      operationId: deleteDevice
+      responses:
+        '204':
+          description: No Content
+        '403':
+          description: Forbidden
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: ./Common.yaml#/components/schemas/Error
+              examples:
+                Access Denied:
+                  $ref: ./Common.yaml#/components/examples/ErrorAccessDenied
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.devices.manage
+      tags:
+        - Device
+  /api/v1/devices/{deviceId}/users:
+    parameters:
+      - $ref: '#/components/parameters/pathDeviceId'
+    get:
+      summary: List all users for a device
+      description: Lists all Users for a device by `deviceId`
+      operationId: listDeviceUsers
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceUser'
+              examples:
+                APIDevicesListAllUsersResponseExample:
+                  summary: List all users for a specific device
+                  $ref: '#/components/examples/APIDevicesListAllUsersResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.devices.read
+      tags:
+        - Device
+  /api/v1/devices/{deviceId}/os-accounts:
+    parameters:
+      - $ref: '#/components/parameters/pathDeviceId'
+    get:
+      summary: List all OS accounts for a device
+      description: Lists all OS accounts for a device by `deviceId`
+      operationId: listDeviceOSAccounts
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/OSAccountWindows'
+                    - $ref: '#/components/schemas/OSAccountMacOS'
+                  discriminator:
+                    propertyName: platform
+                    mapping:
+                      WINDOWS: '#/components/schemas/OSAccountWindows'
+                      MACOS: '#/components/schemas/OSAccountMacOS'
+              examples:
+                WindowsOSAccountListResponseExample:
+                  summary: List all Windows OS accounts for a specific device
+                  $ref: '#/components/examples/WindowsOSAccountListResponse'
+                MacOSOSAccountListResponseExample:
+                  summary: List all macOS accounts for a specific device
+                  $ref: '#/components/examples/MacOSOSAccountListResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.devices.read
+      tags:
+        - Device
+  /api/v1/devices/{deviceId}/os-accounts/{osAccountId}:
+    parameters:
+      - $ref: '#/components/parameters/pathDeviceId'
+      - $ref: '#/components/parameters/pathOsAccountId'
+    get:
+      summary: Retrieve an OS account
+      description: Retrieves an OS account by `osAccountId` for a device
+      operationId: getDeviceOSAccount
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/OSAccountWindows'
+                  - $ref: '#/components/schemas/OSAccountMacOS'
+                discriminator:
+                  propertyName: platform
+                  mapping:
+                    WINDOWS: '#/components/schemas/OSAccountWindows'
+                    MACOS: '#/components/schemas/OSAccountMacOS'
+              examples:
+                WindowsOSAccountResponseExample:
+                  summary: Windows OS account
+                  $ref: '#/components/examples/WindowsOSAccountResponse'
+                MacOSOSAccountResponseExample:
+                  summary: macOS account
+                  $ref: '#/components/examples/MacOSOSAccountResponse'
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.devices.read
+      tags:
+        - Device
+  /api/v1/devices/{deviceId}/lifecycle/activate:
+    parameters:
+      - $ref: '#/components/parameters/pathDeviceId'
+    post:
+      summary: Activate a device
+      description: |-
+        Activates a device by setting its status to `ACTIVE` by `deviceId`.
+        Activated devices are used to create and delete device user links.
+      operationId: activateDevice
+      responses:
+        '204':
+          description: No Content
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.devices.manage
+      tags:
+        - Device
+  /api/v1/devices/{deviceId}/lifecycle/deactivate:
+    parameters:
+      - $ref: '#/components/parameters/pathDeviceId'
+    post:
+      summary: Deactivate a device
+      description: |-
+        Deactivates a device by setting its status to `DEACTIVATED` by `deviceId`.
+        Deactivation causes a device to lose all device user links. Set the device status to `DEACTIVATED` before deleting it.
+        > **Note:** When deactivating a Device, keep in mind the following:
+          - Device deactivation is a destructive operation for device factors and client certificates. Device reenrollment using Okta Verify allows end users to set up new factors on the device.
+          - Device deletion removes the device record from Okta. Reenrollment creates a new device record.
+      operationId: deactivateDevice
+      responses:
+        '204':
+          description: No Content
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.devices.manage
+      tags:
+        - Device
+  /api/v1/devices/{deviceId}/lifecycle/suspend:
+    parameters:
+      - $ref: '#/components/parameters/pathDeviceId'
+    post:
+      summary: Suspend a Device
+      description: |-
+        Suspends a device by setting its status to `SUSPENDED`.
+        Use suspended devices to create and delete device user links. You can only unsuspend or deactivate suspended devices.
+        > **Note:** `SUSPENDED` status is meant to be temporary, so it isn't destructive.
+      operationId: suspendDevice
+      responses:
+        '204':
+          description: No Content
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.devices.manage
+      tags:
+        - Device
+  /api/v1/devices/{deviceId}/lifecycle/unsuspend:
+    parameters:
+      - $ref: '#/components/parameters/pathDeviceId'
+    post:
+      summary: Unsuspend a Device
+      description: |-
+        Unsuspends a device by returning its `status` to `ACTIVE`.
+        >**Note:** Only devices with a `SUSPENDED` status can be unsuspended.
+      operationId: unsuspendDevice
+      responses:
+        '204':
+          description: No Content
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ./Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.devices.manage
+      tags:
+        - Device
+components:
+  examples:
+    APIDevicesListAllResponse:
+      summary: List all devices with embedded users
+      value:
+        - id: guo4a5u7YAHhjXrMK0g4
+          status: CREATED
+          created: '2019-10-02T18:03:07.000Z'
+          lastUpdated: '2019-10-02T18:03:07.000Z'
+          profile:
+            displayName: Example device name 1
+            platform: WINDOWS
+            serialNumber: XXDDRFCFRGF3M8MD6D
+            sid: S-1-11-111
+            registered: true
+            secureHardwarePresent: false
+            diskEncryptionType: ALL_INTERNAL_VOLUMES
+          resourceType: UDDevice
+          resourceDisplayName:
+            value: Example device name 1
+            sensitive: false
+          resourceAlternateId: null
+          resourceId: guo4a5u7YAHhjXrMK0g4
+          _links:
+            activate:
+              href: https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g4/lifecycle/activate
+              hints:
+                allow:
+                  - POST
+            self:
+              href: https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g4
+              hints:
+                allow:
+                  - GET
+                  - PATCH
+                  - PUT
+            users:
+              href: https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g4/users
+              hints:
+                allow:
+                  - GET
+          _embedded:
+            users: []
+        - id: guo4a5u7YAHhjXrMK0g5
+          status: ACTIVE
+          created: '2023-06-21T23:24:02.000Z'
+          lastUpdated: '2023-06-21T23:24:02.000Z'
+          profile:
+            displayName: Example device name 2
+            platform: ANDROID
+            manufacturer: Google
+            model: Pixel 6
+            osVersion: 13:2023-05-05
+            registered: true
+            secureHardwarePresent: true
+            diskEncryptionType: USER
+          resourceType: UDDevice
+          resourceDisplayName:
+            value: Example device name 2
+            sensitive: false
+          resourceAlternateId: null
+          resourceId: guo4a5u7YAHhjXrMK0g5
+          _links:
+            activate:
+              href: https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g5/lifecycle/activate
+              hints:
+                allow:
+                  - POST
+            self:
+              href: https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g5
+              hints:
+                allow:
+                  - GET
+                  - PATCH
+                  - PUT
+            users:
+              href: https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g5/users
+              hints:
+                allow:
+                  - GET
+          _embedded:
+            users:
+              - managementStatus: MANAGED
+                created: '2021-10-01T16:52:41.000Z'
+                screenLockType: BIOMETRIC
+                user:
+                  id: 00u17vh0q8ov8IU881d7
+                  status: ACTIVE
+                  created: '2020-08-12T06:46:50.000Z'
+                  activated: '2020-08-12T06:46:50.000Z'
+                  statusChanged: '2021-01-27T21:05:32.000Z'
+                  lastLogin: '2021-10-14T09:04:48.000Z'
+                  lastUpdated: '2021-01-27T21:05:32.000Z'
+                  passwordChanged: '2020-08-12T06:46:50.000Z'
+                  type:
+                    id: oty7ut9Uu76oHVUZc0w4
+                  profile:
+                    firstName: fname
+                    lastName: lname
+                    mobilePhone: null
+                    secondEmail: null
+                    login: email@email.com
+                    email: email@email.com
+                  credentials:
+                    password: {}
+                    recovery_question:
+                      question: What is the food you least liked as a child?
+                    provider:
+                      type: OKTA
+                      name: OKTA
+                  _links:
+                    suspend:
+                      href: https://{yourOktaDomain}/api/v1/users/00u17vh0q8ov8IU881d7/lifecycle/suspend
+                      method: POST
+                    schema:
+                      href: https://{yourOktaDomain}/api/v1/meta/schemas/user/osc7ut9Uu76oHVUZc0w4
+                    resetPassword:
+                      href: https://{yourOktaDomain}/api/v1/users/00u17vh0q8ov8IU881d7/lifecycle/reset_password
+                      method: POST
+                    forgotPassword:
+                      href: https://{yourOktaDomain}/api/v1/users/00u17vh0q8ov8IU881d7/credentials/forgot_password
+                      method: POST
+                    expirePassword:
+                      href: https://{yourOktaDomain}/api/v1/users/00u17vh0q8ov8IU881d7/lifecycle/expire_password
+                      method: POST
+                    changeRecoveryQuestion:
+                      href: https://{yourOktaDomain}/api/v1/users/00u17vh0q8ov8IU881d7/credentials/change_recovery_question
+                      method: POST
+                    self:
+                      href: https://{yourOktaDomain}/api/v1/users/00u17vh0q8ov8IU881d7
+                    type:
+                      href: https://{yourOktaDomain}/api/v1/meta/types/user/oty7ut9Uu76oHVUZc0w4
+                    changePassword:
+                      href: https://{yourOktaDomain}/api/v1/users/00u17vh0q8ov8IU881d7/credentials/change_password
+                    deactivate:
+                      href: https://{yourOktaDomain}/api/v1/users/00u17vh0q8ov8IU881d7/lifecycle/deactivate
+    APIDevicesListAllUserSummaryResponse:
+      summary: List all devices with embedded user summaries
+      value:
+        - id: guo4a5u7YAHhjXrMK0g4
+          status: CREATED
+          created: '2019-10-02T18:03:07.000Z'
+          lastUpdated: '2019-10-02T18:03:07.000Z'
+          profile:
+            displayName: Example device name 1
+            platform: WINDOWS
+            serialNumber: XXDDRFCFRGF3M8MD6D
+            sid: S-1-11-111
+            registered: true
+            secureHardwarePresent: false
+            diskEncryptionType: ALL_INTERNAL_VOLUMES
+          resourceType: UDDevice
+          resourceDisplayName:
+            value: Example device name 1
+            sensitive: false
+          resourceAlternateId: null
+          resourceId: guo4a5u7YAHhjXrMK0g4
+          _links:
+            activate:
+              href: https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g4/lifecycle/activate
+              hints:
+                allow:
+                  - POST
+            self:
+              href: https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g4
+              hints:
+                allow:
+                  - GET
+                  - PATCH
+                  - PUT
+            users:
+              href: https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g4/users
+              hints:
+                allow:
+                  - GET
+          _embedded:
+            users: []
+        - id: guo4a5u7YAHhjXrMK0g5
+          status: ACTIVE
+          created: '2023-06-21T23:24:02.000Z'
+          lastUpdated: '2023-06-21T23:24:02.000Z'
+          profile:
+            displayName: Example device name 2
+            platform: ANDROID
+            manufacturer: Google
+            model: Pixel 6
+            osVersion: 13:2023-05-05
+            registered: true
+            secureHardwarePresent: true
+            diskEncryptionType: USER
+          resourceType: UDDevice
+          resourceDisplayName:
+            value: Example device name 2
+            sensitive: false
+          resourceAlternateId: null
+          resourceId: guo4a5u7YAHhjXrMK0g5
+          _links:
+            activate:
+              href: https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g5/lifecycle/activate
+              hints:
+                allow:
+                  - POST
+            self:
+              href: https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g5
+              hints:
+                allow:
+                  - GET
+                  - PATCH
+                  - PUT
+            users:
+              href: https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g5/users
+              hints:
+                allow:
+                  - GET
+          _embedded:
+            users:
+              - managementStatus: MANAGED
+                created: '2021-10-01T16:52:41.000Z'
+                screenLockType: BIOMETRIC
+                user:
+                  id: 00u17vh0q8ov8IU881d7
+                  realmId: 00u17vh0q8ov8IU8T0g5
+                  profile:
+                    firstName: fname
+                    lastName: lname
+                    login: email@email.com
+                    email: email@email.com
+                  _links:
+                    self:
+                      href: https://{yourOktaDomain}/api/v1/users/00u17vh0q8ov8IU881d7
+    APIDevicesListAllUsersResponse:
+      summary: Response example
+      value:
+        - created: '2021-08-20T17:13:35.000Z'
+          managementStatus: NOT_MANAGED
+          screenLockType: BIOMETRIC
+          user:
+            id: 00u17vh0q8ov8IU881d7
+            status: ACTIVE
+            created: '2021-08-20T16:08:25.000Z'
+            activated: null
+            statusChanged: '2021-08-20T16:39:41.000Z'
+            lastLogin: '2023-04-18T17:54:12.000Z'
+            lastUpdated: '2021-12-20T18:27:30.000Z'
+            passwordChanged: '2021-12-20T18:27:30.000Z'
+            type:
+              id: oty17vh0n2EHVnbYF1d7
+            profile:
+              firstName: Bunk
+              lastName: Moreland
+              mobilePhone: null
+              secondEmail: null
+              login: bunk.moreland@example.com
+              email: bunk.moreland@example.com
+            credentials:
+              password: null
+              provider:
+                type: OKTA
+                name: OKTA
+            _links:
+              suspend:
+                href: https://{yourOktaDomain}/api/v1/users/00u17vh0q8ov8IU881d7/lifecycle/suspend
+                method: POST
+              schema:
+                href: https://{yourOktaDomain}/api/v1/meta/schemas/user/osc17vh0n2EHVnbYF1d7
+              resetPassword:
+                href: https://{yourOktaDomain}/api/v1/users/00u17vh0q8ov8IU881d7/lifecycle/reset_password
+                method: POST
+              forgotPassword:
+                href: https://{yourOktaDomain}/api/v1/users/00u17vh0q8ov8IU881d7/credentials/forgot_password
+                method: POST
+              expirePassword:
+                href: https://{yourOktaDomain}/api/v1/users/00u17vh0q8ov8IU881d7/lifecycle/expire_password
+                method: POST
+              changeRecoveryQuestion:
+                href: https://{yourOktaDomain}/api/v1/users/00u17vh0q8ov8IU881d7/credentials/change_recovery_question
+                method: POST
+              self:
+                href: https://{yourOktaDomain}/api/v1/users/00u17vh0q8ov8IU881d7
+              resetFactors:
+                href: https://{yourOktaDomain}/api/v1/users/00u17vh0q8ov8IU881d7/lifecycle/reset_factors
+                method: POST
+              type:
+                href: https://{yourOktaDomain}/api/v1/meta/types/user/oty17vh0n2EHVnbYF1d7
+              changePassword:
+                href: https://{yourOktaDomain}/api/v1/users/00u17vh0q8ov8IU881d7/credentials/change_password
+                method: POST
+              deactivate:
+                href: https://{yourOktaDomain}/api/v1/users/00u17vh0q8ov8IU881d7/lifecycle/deactivate
+                method: POST
+    DeviceResponse:
+      value:
+        id: guo8jx5vVoxfvJeLb0w4
+        status: ACTIVE
+        created: '2020-11-03T21:47:01.000Z'
+        lastUpdated: '2020-11-03T23:46:27.000Z'
+        profile:
+          displayName: DESKTOP-EHAD3IE
+          platform: WINDOWS
+          manufacturer: International Corp
+          model: VMware7,1
+          osVersion: 10.0.18362
+          serialNumber: 56 4d 4f 95 74 c5 d3 e7-fc 3a 57 9c c2 f8 5d ce
+          udid: 954F4D56-C574-E7D3-FC3A-579CC2F85DCE
+          sid: S-1-5-21-3992267483-1860856704-2413701314-500
+          registered: true
+          secureHardwarePresent: false
+          diskEncryptionType: NONE
+        resourceId: guo8jx5vVoxfvJeLb0w4
+        resourceDisplayName:
+          value: DESKTOP-EHAD3IE
+          sensitive: false
+        resourceType: UDDevice
+        resourceAlternateId: null
+        _links:
+          suspend:
+            href: https://{yourOktaDomain}/api/v1/devices/guo8jx5vVoxfvJeLb0w4/lifecycle/suspend
+            hints:
+              allow:
+                - POST
+          self:
+            href: https://{yourOktaDomain}/api/v1/devices/guo8jx5vVoxfvJeLb0w4
+            hints:
+              allow:
+                - GET
+                - PATCH
+                - PUT
+          users:
+            href: https://{yourOktaDomain}/api/v1/devices/guo8jx5vVoxfvJeLb0w4/users
+            hints:
+              allow:
+                - GET
+          deactivate:
+            href: https://{yourOktaDomain}/api/v1/devices/guo8jx5vVoxfvJeLb0w4/lifecycle/deactivate
+            hints:
+              allow:
+                - POST
+    WindowsOSAccountResponse:
+      summary: Windows OS account
+      value:
+        id: dao3qgkIEKjhNZudR0g4
+        deviceId: guo4a5u7JHHhjXrMK0g4
+        created: "2026-01-19T17:22:30.000Z"
+        lastUpdated: "2026-01-19T17:22:30.000Z"
+        platform: WINDOWS
+        profile:
+          securityId: S-1-5-21-1004336348-1177238915-682003330-512
+          GUID: 4ac29c85-d847-4492-96cb-46e337170c33
+          directoryJoinStatus: AD
+          fullName: Carmel Sonne
+          downLevelUsername: okta\carmel.sonne
+          upn: carmel.sonne@okta.com
+          qualifiedUsername: okta\carmel.sonne
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/devices/guo4a5u7JHHhjXrMK0g4/os-accounts/dao3qgkIEKjhNZudR0g4
+            hints:
+              allow:
+                - GET
+          device:
+            href: https://{yourOktaDomain}/api/v1/devices/guo4a5u7JHHhjXrMK0g4
+            hints:
+              allow:
+                - GET
+    MacOSOSAccountResponse:
+      summary: macOS account
+      value:
+        id: dao3qgkIEKjhNZudR0g4
+        deviceId: guo4a5u7JHHhjXrMK0g4
+        created: "2026-01-19T17:22:30.000Z"
+        lastUpdated: "2026-01-19T17:22:30.000Z"
+        platform: MACOS
+        profile:
+          accountUUID: 4ac29c85-d847-4492-96cb-46e337170c33
+          username: carmel.sonne
+          fullName: Carmel Sonne
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/devices/guo4a5u7JHHhjXrMK0g4/os-accounts/dao3qgkIEKjhNZudR0g4
+            hints:
+              allow:
+                - GET
+          device:
+            href: https://{yourOktaDomain}/api/v1/devices/guo4a5u7JHHhjXrMK0g4
+            hints:
+              allow:
+                - GET
+    WindowsOSAccountListResponse:
+      summary: List of Windows OS accounts
+      value:
+        - id: dao3qgkIEKjhNZudR0g4
+          deviceId: guo4a5u7JHHhjXrMK0g4
+          created: "2026-01-19T17:22:30.000Z"
+          lastUpdated: "2026-01-19T17:22:30.000Z"
+          platform: WINDOWS
+          profile:
+            securityId: S-1-5-21-1004336348-1177238915-682003330-512
+            GUID: 4ac29c85-d847-4492-96cb-46e337170c33
+            directoryJoinStatus: AD
+            fullName: Carmel Sonne
+            downLevelUsername: okta\carmel.sonne
+            upn: carmel.sonne@okta.com
+            qualifiedUsername: okta\carmel.sonne
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/devices/guo4a5u7JHHhjXrMK0g4/os-accounts/dao3qgkIEKjhNZudR0g4
+              hints:
+                allow:
+                  - GET
+            device:
+              href: https://{yourOktaDomain}/api/v1/devices/guo4a5u7JHHhjXrMK0g4
+              hints:
+                allow:
+                  - GET
+    MacOSOSAccountListResponse:
+      summary: List of macOS accounts
+      value:
+        - id: dao3qgkIEKjhNZudR0g4
+          deviceId: guo4a5u7JHHhjXrMK0g4
+          created: "2026-01-19T17:22:30.000Z"
+          lastUpdated: "2026-01-19T17:22:30.000Z"
+          platform: MACOS
+          profile:
+            accountUUID: 4ac29c85-d847-4492-96cb-46e337170c33
+            username: carmel.sonne
+            fullName: Carmel Sonne
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/devices/guo4a5u7JHHhjXrMK0g4/os-accounts/dao3qgkIEKjhNZudR0g4
+              hints:
+                allow:
+                  - GET
+            device:
+              href: https://{yourOktaDomain}/api/v1/devices/guo4a5u7JHHhjXrMK0g4
+              hints:
+                allow:
+                  - GET
+  parameters:
+    pathDeviceId:
+      name: deviceId
+      in: path
+      schema:
+        type: string
+        example: guo4a5u7JHHhjXrMK0g4
+      required: true
+      description: '`id` of the device'
+    pathOsAccountId:
+      name: osAccountId
+      in: path
+      description: The unique identifier for the OS account
+      required: true
+      schema:
+        type: string
+      example: dao3qgkIEKjhNZudR0g4
+  schemas:
+    Device:
+      type: object
+      properties:
+        created:
+          type: string
+          format: date-time
+          description: Timestamp when the device was created
+          readOnly: true
+        id:
+          type: string
+          description: Unique key for the device
+          readOnly: true
+        lastUpdated:
+          type: string
+          format: date-time
+          description: Timestamp when the device record was last updated. Updates occur when Okta collects and saves device signals during authentication, and when the lifecycle state of the device changes.
+          readOnly: true
+        profile:
+          $ref: '#/components/schemas/DeviceProfile'
+        resourceAlternateId:
+          type: string
+          readOnly: true
+        resourceDisplayName:
+          $ref: '#/components/schemas/DeviceDisplayName'
+        resourceId:
+          type: string
+          description: Alternate key for the `id`
+          readOnly: true
+        resourceType:
+          type: string
+          default: UDDevice
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/DeviceStatus'
+        _links:
+          $ref: '#/components/schemas/LinksSelfAndFullUsersLifecycle'
+    DeviceList:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: '#/components/schemas/Device'
+        - properties:
+            _embedded:
+              type: object
+              description: List of associated users for the device if the `expand=user` query parameter is specified in the request. Use `expand=userSummary` to get only a summary of each associated user for the device.
+              properties:
+                users:
+                  description: Users for the device
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/DeviceUser'
+              readOnly: true
+    LinksSelfAndFullUsersLifecycle:
+      x-okta-ignore-redocly-rules-for-sdk: true
+      allOf:
+        - $ref: ./Common.yaml#/components/schemas/LinksSelfAndLifecycle
+        - type: object
+          properties:
+            suspend:
+              $ref: ./Common.yaml#/components/schemas/HrefObjectSuspendLink
+            unsuspend:
+              $ref: ./Common.yaml#/components/schemas/HrefObjectUnsuspendLink
+            users:
+              description: Link to device users
+              allOf:
+                - $ref: ./Common.yaml#/components/schemas/HrefObject
+    DeviceDisplayName:
+      type: object
+      description: Display name of the device
+      properties:
+        sensitive:
+          type: boolean
+          description: Indicates whether the associated value is Personal Identifiable Information (PII) and requires masking
+          default: false
+        value:
+          type: string
+          description: Display name of the device
+    DevicePlatform:
+      description: OS platform of the device
+      type: string
+      enum:
+        - ANDROID
+        - IOS
+        - MACOS
+        - WINDOWS
+    OSAccountPlatform:
+      description: OS platform for OS accounts (desktop platforms only)
+      type: string
+      enum:
+        - MACOS
+        - WINDOWS
+      x-enumDescriptions:
+        MACOS: macOS operating system
+        WINDOWS: Windows operating system
+    DiskEncryptionTypeDef:
+      description: |-
+        Type of encryption used on the device
+        > **Note:** The following values map to Disk Encryption ON: `FULL`, `USER`, `ALL_INTERNAL_VOLUMES`. All other values map to Disk Encryption OFF.
+      type: string
+      enum:
+        - NONE
+        - FULL
+        - USER
+        - ALL_INTERNAL_VOLUMES
+        - SYSTEM_VOLUME
+      x-enumDescriptions:
+        NONE: No encryption has been set.
+        FULL: Disk is fully encrypted. Only applicable to `IOS` and `ANDROID` platforms.
+        USER: Encryption key is tied to the user or profile. Only applicable to `ANDROID` platform.
+        ALL_INTERNAL_VOLUMES: All internal disks are encrypted. Only applicable to `WINDOWS` and `MACOS` platforms.
+        SYSTEM_VOLUME: Only the system volume is encrypted. Only applicable to `WINDOWS` and `MACOS` platforms.
+    DeviceUser:
+      type: object
+      properties:
+        created:
+          type: string
+          description: Timestamp when device was created
+        managementStatus:
+          type: string
+          description: The management status of the device
+          enum:
+            - MANAGED
+            - NOT_MANAGED
+          x-enumDescriptions:
+            MANAGED: The device has management software installed
+            NOT_MANAGED: The device doesn't have management software installed
+        screenLockType:
+          type: string
+          description: Screen lock type of the device
+          enum:
+            - NONE
+            - PASSCODE
+            - BIOMETRIC
+        user:
+          $ref: ./users.yaml#/components/schemas/User
+    DeviceProfile:
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Display name of the device
+          minLength: 1
+          maxLength: 255
+        imei:
+          type: string
+          description: International Mobile Equipment Identity (IMEI) of the device
+          minLength: 14
+          maxLength: 17
+        manufacturer:
+          type: string
+          description: Name of the manufacturer of the device
+          maxLength: 127
+        managed:
+          type: boolean
+          description: Indicates if the device is managed by mobile device management (MDM) software
+        meid:
+          type: string
+          description: Mobile equipment identifier of the device
+          maxLength: 14
+        model:
+          type: string
+          description: Model of the device
+          maxLength: 127
+        osVersion:
+          type: string
+          description: Version of the device OS
+          maxLength: 127
+        platform:
+          $ref: '#/components/schemas/DevicePlatform'
+        registered:
+          type: boolean
+          description: Indicates if the device is registered at Okta
+        secureHardwarePresent:
+          type: boolean
+          description: Indicates if the device contains a secure hardware functionality
+        serialNumber:
+          type: string
+          description: Serial number of the device
+          maxLength: 127
+        sid:
+          type: string
+          description: Windows Security identifier of the device
+          maxLength: 256
+        tpmPublicKeyHash:
+          type: string
+          description: Windows Trusted Platform Module hash value
+        udid:
+          type: string
+          description: macOS Unique device identifier of the device
+          maxLength: 47
+        diskEncryptionType:
+          $ref: '#/components/schemas/DiskEncryptionTypeDef'
+        integrityJailbreak:
+          type: boolean
+          description: Indicates if the device is jailbroken or rooted. Only applicable to `IOS` and `ANDROID` platforms
+      required:
+        - displayName
+        - platform
+        - registered
+    DeviceStatus:
+      type: string
+      description: The state object of the device
+      enum:
+        - ACTIVE
+        - DEACTIVATED
+        - SUSPENDED
+        - UNSUSPENDED
+      x-enumDescriptions:
+        ACTIVE: Use activated devices to create and delete device user links
+        DEACTIVATED: Deactivation causes a device to lose all device user links. Set the device status to `DEACTIVATED` before deleting it.
+        SUSPENDED: Use suspended devices to create and delete device user links. You can only unsuspend or deactivate suspended devices.
+        UNSUSPENDED: Returns a suspended device to `ACTIVE`.
+    OSAccount:
+      type: object
+      required:
+        - id
+        - deviceId
+        - created
+        - lastUpdated
+        - platform
+        - _links
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the OS account
+          readOnly: true
+        deviceId:
+          type: string
+          description: Unique identifier of the device this OS account belongs to
+          readOnly: true
+        created:
+          type: string
+          format: date-time
+          description: Timestamp when the OS account was created
+          readOnly: true
+        lastUpdated:
+          type: string
+          format: date-time
+          description: Timestamp when the OS account was last updated
+          readOnly: true
+        platform:
+          $ref: '#/components/schemas/OSAccountPlatform'
+        _links:
+          $ref: '#/components/schemas/OSAccountLinks'
+      discriminator:
+        propertyName: platform
+        mapping:
+          WINDOWS: '#/components/schemas/OSAccountWindows'
+          MACOS: '#/components/schemas/OSAccountMacOS'
+    OSAccountWindows:
+      allOf:
+        - $ref: '#/components/schemas/OSAccount'
+        - type: object
+          required:
+            - profile
+          properties:
+            profile:
+              $ref: '#/components/schemas/WindowsOSAccountProfile'
+    OSAccountMacOS:
+      allOf:
+        - $ref: '#/components/schemas/OSAccount'
+        - type: object
+          required:
+            - profile
+          properties:
+            profile:
+              $ref: '#/components/schemas/MacOSAccountProfile'
+    WindowsOSAccountProfile:
+      type: object
+      properties:
+        securityId:
+          type: string
+          description: Windows Security Identifier (SID)
+          example: S-1-5-21-1004336348-1177238915-682003330-512
+        GUID:
+          type: string
+          format: uuid
+          description: Globally Unique Identifier for the account
+          example: 4ac29c85-d847-4492-96cb-46e337170c33
+        directoryJoinStatus:
+          type: string
+          description: Active Directory join status
+          example: AD
+        fullName:
+          type: string
+          description: Full name of the account user
+          example: Carmel Sonne
+        downLevelUsername:
+          type: string
+          description: Domain\username format (down-level logon name)
+          example: okta\carmel.sonne
+        upn:
+          type: string
+          description: User principal name
+          example: carmel.sonne@okta.com
+        qualifiedUsername:
+          type: string
+          description: Fully qualified username
+          example: okta\carmel.sonne
+    MacOSAccountProfile:
+      type: object
+      properties:
+        accountUUID:
+          type: string
+          format: uuid
+          description: Unique identifier for the macOS account
+          example: 4ac29c85-d847-4492-96cb-46e337170c33
+        username:
+          type: string
+          description: Username of the account
+          example: carmel.sonne
+        fullName:
+          type: string
+          description: Full name of the account user
+          example: Carmel Sonne
+    OSAccountLinks:
+      type: object
+      properties:
+        self:
+          $ref: './Common.yaml#/components/schemas/HrefObject'
+        device:
+          $ref: './Common.yaml#/components/schemas/HrefObject'
+  securitySchemes:
+    $ref: ../base.yaml#/components/securitySchemes

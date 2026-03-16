@@ -1,0 +1,589 @@
+openapi: 3.0.3
+info:
+  title: User Authenticator Enrollments API
+  version: 1.0.0
+servers:
+  - url: https://example.okta.com
+tags:
+  $ref: ../../base.yaml#/tags
+paths:
+  /api/v1/users/{userId}/authenticator-enrollments:
+    parameters:
+        - $ref: '../Common.yaml#/components/parameters/pathUserId'
+        - $ref: '#/components/parameters/queryDiscloseIdentifiers'
+    get:
+      summary: List all authenticator enrollments
+      description: |-
+        Lists all authenticator enrollments of the specified user
+      operationId: listAuthenticatorEnrollments
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticatorEnrollment'
+              examples:
+                AuthenticatorEnrollmentsListAllEx:
+                  $ref: '#/components/examples/AuthenticatorEnrollmentResponseListAll'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.read
+      tags:
+        - UserAuthenticatorEnrollments
+  /api/v1/users/{userId}/authenticator-enrollments/phone:
+    parameters:
+      - $ref: '../Common.yaml#/components/parameters/pathUserId'
+    post:
+      x-okta-lifecycle:
+        features:
+          - AUTHENTICATOR_ENROLLMENTS_ADMIN_MANAGEMENT
+      summary: Create an auto-activated Phone authenticator enrollment
+      description: Creates a Phone authenticator enrollment that's automatically activated
+      operationId: createAuthenticatorEnrollment
+      parameters:
+        - $ref: '../Common.yaml#/components/parameters/pathUserId'
+      x-codegen-request-body-name: authenticator
+      requestBody:
+        $ref: '#/components/requestBodies/PhoneAuthenticatorEnrollmentRequestBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/PhoneAuthenticatorCreateEnrollmentResponse'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserAuthenticatorEnrollments
+  /api/v1/users/{userId}/authenticator-enrollments/tac:
+    parameters:
+      - $ref: '../Common.yaml#/components/parameters/pathUserId'
+    post:
+      x-okta-lifecycle:
+        features:
+          - TEMPORARY_ACCESS_CODE
+      x-okta-iam-permissions:
+        - okta.users.credentials.manageTemporaryAccessCode
+      summary: Create an auto-activated TAC authenticator enrollment
+      description: Creates an auto-activated Temporary access code (TAC) authenticator enrollment
+      operationId: createTacAuthenticatorEnrollment
+      parameters:
+        - $ref: '../Common.yaml#/components/parameters/pathUserId'
+      x-codegen-request-body-name: authenticator
+      requestBody:
+        $ref: '#/components/requestBodies/TacAuthenticatorEnrollmentRequestBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/TacAuthenticatorCreateEnrollmentResponse'
+        '400':
+          $ref: ../Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserAuthenticatorEnrollments
+  /api/v1/users/{userId}/authenticator-enrollments/{enrollmentId}:
+    parameters:
+      - $ref: '../Common.yaml#/components/parameters/pathUserId'
+      - $ref: '#/components/parameters/pathEnrollmentId'
+    get:
+      summary: Retrieve an authenticator enrollment
+      description: Retrieves a user's authenticator enrollment by `enrollmentId`
+      operationId: getAuthenticatorEnrollment
+      parameters: 
+        - $ref: '#/components/parameters/queryDiscloseIdentifiers'
+      responses:
+        '200':
+          $ref: '#/components/responses/AuthenticatorEnrollmentResponse'
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.read
+      tags:
+        - UserAuthenticatorEnrollments
+    delete:
+      summary: Delete an authenticator enrollment
+      description: |-
+        Deletes an existing enrollment for the specified user. The user can enroll the authenticator again.
+      operationId: deleteAuthenticatorEnrollment
+      responses:
+        '204':
+          description: No Content
+          content: {}
+        '403':
+          $ref: ../Common.yaml#/components/responses/ErrorAccessDenied403
+        '404':
+          $ref: ../Common.yaml#/components/responses/ErrorResourceNotFound404
+        '429':
+          $ref: ../Common.yaml#/components/responses/ErrorTooManyRequests429
+      security:
+        - apiToken: []
+        - oauth2:
+            - okta.users.manage
+      tags:
+        - UserAuthenticatorEnrollments
+components:
+  examples:
+    AuthenticatorEnrollmentCreateRequestPhone:
+      summary: Enroll phone - SMS authenticator request
+      value:
+        authenticatorId: aut5l4ttFyGEWdy6V0k7
+        profile:
+          phoneNumber: '+14086673418'
+    AuthenticatorEnrollmentCreateRequestTac:
+      summary: Enroll TAC authenticator request
+      value:
+        authenticatorId: autnmtl4xbt8RQVzA0g4
+        profile:
+          ttl: 11
+          multiUse: false
+    AuthenticatorEnrollmentResponseTac:
+      summary: TAC authenticator enrollment response
+      value:
+        type: tac
+        id: tac8evhwh0Ne35iPR0g7
+        key: tac
+        status: ACTIVE
+        name: Temporary Access Code
+        created: '2025-05-28T17:21:14.000Z'
+        lastUpdated: '2025-05-28T17:21:14.000Z'
+        profile:
+          tac: 'n@C*bU26'
+          multiUse: true
+          expiresAt: '2025-05-28T19:21:14'
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u4za57vqNsQAN8S0g7/authenticator-enrollments/clf8evhwh0Ne35iPR0g7
+            hints:
+              allow:
+                - GET
+                - DELETE
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u4za57vqNsQAN8S0g7
+            hints:
+              allow:
+                - GET
+    AuthenticatorEnrollmentResponseListAll:
+      summary: List of authenticator enrollments
+      value:
+        - type: email
+          id: eae4za57woixzodEK0g7
+          key: okta_email
+          status: ACTIVE
+          name: Email
+          profile:
+            email: joe@example.com
+          nickname:
+          created: '2020-07-26T21:05:23.000Z'
+          lastUpdated: '2020-07-28T21:45:52.000Z'
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/users/00u4za57vqNsQAN8S0g7/authenticator-enrollments/eae4za57woixzodEK0g7
+              hints:
+                allow:
+                  - GET
+                  - DELETE
+            user:
+              href: https://{yourOktaDomain}/api/v1/users/00u4za57vqNsQAN8S0g7
+              hints:
+                allow:
+                  - GET
+            authenticator:
+              href: https://{yourOktaDomain}/api/v1/authenticators/auth60xfl7VbebsFr0g6
+              hints:
+                allow:
+                  - GET
+        - type: password
+          id: laeh60xfl7VbebsFr0g6
+          key: okta_password
+          status: ACTIVE
+          name: Password
+          nickname:
+          created: '2020-07-26T21:05:23.000Z'
+          lastUpdated: '2020-07-26T21:05:23.000Z'
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/users/00u4za57vqNsQAN8S0g7/authenticator-enrollments/laeh60xfl7VbebsFr0g6
+              hints:
+                allow:
+                  - GET
+                  - DELETE
+            user:
+              href: https://{yourOktaDomain}/api/v1/users/00u4za57vqNsQAN8S0g7
+              hints:
+                allow:
+                  - GET
+            authenticator:
+              href: https://{yourOktaDomain}/api/v1/authenticators/auth60xfl7VbebsFr0g6
+              hints:
+                allow:
+                  - GET
+        - type: phone
+          id: sms8evhwh0Ne35iPR0g7
+          key: phone_number
+          status: ACTIVE
+          name: Phone
+          created: '2020-07-26T21:05:23.000Z'
+          lastUpdated: '2020-07-29T00:21:29.000Z'
+          profile:
+            phoneNumber: +1 XXX-XXX-6065
+          nickname: Joe's Work Phone
+          _links:
+            self:
+              href: https://{yourOktaDomain}/api/v1/users/00u4za57vqNsQAN8S0g7/authenticator-enrollments/laeh60xfl7VbebsFr0g6
+              hints:
+                allow:
+                  - GET
+                  - DELETE
+            user:
+              href: https://{yourOktaDomain}/api/v1/users/00u4za57vqNsQAN8S0g7
+              hints:
+                allow:
+                  - GET
+            authenticator:
+              href: https://{yourOktaDomain}/api/v1/authenticators/auth60xfl7VbebsFr0g6
+              hints:
+                allow:
+                  - GET
+    AuthenticatorEnrollmentResponsePhoneSms:
+      summary: phone - SMS authenticator enrollment response
+      value:
+        type: phone
+        id: sms8evhwh0Ne35iPR0g7
+        key: phone_number
+        status: ACTIVE
+        name: Phone
+        created: '2020-07-26T21:05:23.000Z'
+        lastUpdated: '2020-07-29T00:21:29.000Z'
+        profile:
+          phoneNumber: +1 XXX-XXX-6065
+        nickname: Joe's Work Phone
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u4za57vqNsQAN8S0g7/authenticator-enrollments/sms8evhwh0Ne35iPR0g7
+            hints:
+              allow:
+                - GET
+                - DELETE
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u4za57vqNsQAN8S0g7
+            hints:
+              allow:
+                - GET
+          authenticator:
+            href: https://{yourOktaDomain}/api/v1/authenticators/auth60xfl7VbebsFr0g6
+            hints:
+              allow:
+                - GET
+    AuthenticatorEnrollmentResponsePhoneVoice:
+      summary: phone - voice authenticator enrollment response
+      value:
+        type: phone
+        id: clf8evhwh0Ne35iPR0g7
+        key: phone_number
+        status: ACTIVE
+        name: Phone
+        created: '2020-07-26T21:05:23.000Z'
+        lastUpdated: '2020-07-29T00:21:29.000Z'
+        profile:
+          phoneNumber: +1 XXX-XXX-6065
+        nickname: Joe's Work Phone
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u4za57vqNsQAN8S0g7/authenticator-enrollments/clf8evhwh0Ne35iPR0g7
+            hints:
+              allow:
+                - GET
+                - DELETE
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u4za57vqNsQAN8S0g7
+            hints:
+              allow:
+                - GET
+          authenticator:
+            href: https://{yourOktaDomain}/api/v1/authenticators/auth60xfl7VbebsFr0g6
+            hints:
+              allow:
+                - GET
+    AuthenticatorEnrollmentResponsePhoneDisclosed:
+      summary: Phone number disclosed - SMS authenticator enrollment response
+      value:
+        type: phone
+        id: sms8evhwh0Ne35iPR0g7
+        key: phone_number
+        status: ACTIVE
+        name: Phone
+        created: '2020-07-26T21:05:23.000Z'
+        lastUpdated: '2020-07-29T00:21:29.000Z'
+        profile:
+          phoneNumber: +14085551235
+        nickname: Ann's Home Phone
+        _links:
+          self:
+            href: https://{yourOktaDomain}/api/v1/users/00u4za57vqNsQAN8S0g7/authenticator-enrollments/sms8evhwh0Ne35iPR0g7
+            hints:
+              allow:
+                - GET
+                - DELETE
+          user:
+            href: https://{yourOktaDomain}/api/v1/users/00u4za57vqNsQAN8S0g7
+            hints:
+              allow:
+                - GET
+          authenticator:
+            href: https://{yourOktaDomain}/api/v1/authenticators/auth60xfl7VbebsFr0g6
+            hints:
+              allow:
+                - GET
+  parameters:
+    pathEnrollmentId:
+      name: enrollmentId
+      description: Unique identifier of an enrollment
+      in: path
+      required: true
+      schema:
+        type: string
+        example: sms8lqwuzSpWT4kVs0g4
+    queryDiscloseIdentifiers:
+      name: discloseIdentifiers
+      description: Indicates whether or not the identifier of an authenticator enrollment is disclosed or anonymized. If it's included in the operation query, then the identifier of the authenticator enrollment (the actual phone number, for example) is included in the response.
+      in: query
+      schema:
+        type: array
+        items:
+          type: string
+          enum: [phone]
+  requestBodies:
+    PhoneAuthenticatorEnrollmentRequestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthenticatorEnrollmentCreateRequest'
+          examples:
+            PhoneSmsEx:
+              $ref: '#/components/examples/AuthenticatorEnrollmentCreateRequestPhone'
+      required: true
+    TacAuthenticatorEnrollmentRequestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthenticatorEnrollmentCreateRequestTac'
+          examples:
+            TacEx:
+              $ref: '#/components/examples/AuthenticatorEnrollmentCreateRequestTac'
+      required: true
+  responses:
+    AuthenticatorEnrollmentResponse:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthenticatorEnrollment'
+          examples:
+            PhoneSmsEx:
+              $ref: '#/components/examples/AuthenticatorEnrollmentResponsePhoneSms'
+            PhoneCallEx:
+              $ref: '#/components/examples/AuthenticatorEnrollmentResponsePhoneVoice'
+            PhoneDisclosedEx:
+              $ref: '#/components/examples/AuthenticatorEnrollmentResponsePhoneDisclosed'
+    PhoneAuthenticatorCreateEnrollmentResponse:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthenticatorEnrollment'
+          examples:
+            PhoneSmsEx:
+              $ref: '#/components/examples/AuthenticatorEnrollmentResponsePhoneSms'
+            PhoneCallEx:
+              $ref: '#/components/examples/AuthenticatorEnrollmentResponsePhoneVoice'
+    TacAuthenticatorCreateEnrollmentResponse:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TacAuthenticatorEnrollment'
+          examples:
+            TacEx:
+              $ref: '#/components/examples/AuthenticatorEnrollmentResponseTac'
+  schemas:
+    LinksAuthenticator:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        authenticator:
+          allOf:
+            - description: Returns information about a specific authenticator. See [Retrieve an authenticator](/openapi/okta-management/management/authenticator/getauthenticator).
+            - $ref: '../Common.yaml#/components/schemas/HrefObject'
+      readOnly: true
+    LinksUserAuthenticators:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      properties:
+        user:
+          allOf:
+            - description: Returns information about the specified user
+            - $ref: '../Common.yaml#/components/schemas/HrefObject'
+    AuthenticatorEnrollmentLinks:
+      readOnly: true
+      allOf:
+        - $ref: '../Common.yaml#/components/schemas/LinksSelf'
+        - $ref: '#/components/schemas/LinksUserAuthenticators'
+        - $ref: '#/components/schemas/LinksAuthenticator'
+    AuthenticatorEnrollmentCreateRequest:
+      type: object
+      properties:
+        authenticatorId:
+          type: string
+          description: |-
+            Unique identifier of the `phone` authenticator
+        profile:
+          $ref: '#/components/schemas/AuthenticatorProfile'
+      required:
+        - authenticatorId
+        - profile
+    AuthenticatorEnrollmentCreateRequestTac:
+      type: object
+      properties:
+        authenticatorId:
+          type: string
+          description: |-
+            Unique identifier of the TAC authenticator
+        profile:
+          $ref: '#/components/schemas/AuthenticatorProfileTacRequest'
+      required:
+        - authenticatorId
+    TacAuthenticatorEnrollment:
+      type: object
+      properties:
+        id:
+          description: A unique identifier of the authenticator enrollment
+          type: string
+        type:
+          $ref: '../Common.yaml#/components/schemas/AuthenticatorType'
+        key:
+          description: A human-readable string that identifies the authenticator
+          type: string
+        name:
+          description: The authenticator display name
+          type: string
+        status:
+          type: string
+          description: Status of the enrollment
+        profile:
+          $ref: '#/components/schemas/AuthenticatorProfileTacResponsePost'
+        nickname:
+          type: string
+          description: A user-friendly name for the authenticator enrollment
+        created:
+          type: string
+          description: Timestamp when the authenticator enrollment was created
+          format: date-time
+        lastUpdated:
+          type: string
+          description: Timestamp when the authenticator enrollment was last updated
+          format: date-time
+        _links:
+          $ref: '#/components/schemas/AuthenticatorEnrollmentLinks'
+    AuthenticatorEnrollment:
+      type: object
+      properties:
+        id:
+          description: The unique identifier of the authenticator enrollment
+          type: string
+        type:
+          $ref: '../Common.yaml#/components/schemas/AuthenticatorType'
+        key:
+          description: A human-readable string that identifies the authenticator
+          type: string
+        name:
+          description: The authenticator display name
+          type: string
+        status:
+          type: string
+          description: Status of the enrollment
+        profile:
+          $ref: '#/components/schemas/AuthenticatorProfile'
+        created:
+          type: string
+          description: Timestamp when the authenticator enrollment was created
+          format: date-time
+        lastUpdated:
+          type: string
+          description: Timestamp when the authenticator enrollment was last updated
+          format: date-time
+        _links:
+          $ref: '#/components/schemas/AuthenticatorEnrollmentLinks'
+    AuthenticatorProfile:
+      type: object
+      description: Defines the authenticator specific parameters
+      properties:
+        phoneNumber:
+          type: string
+          description: |-
+            The phone number for a `call` or `sms` authenticator enrollment.
+      required:
+        - phoneNumber
+    AuthenticatorProfileTacRequest:
+      type: object
+      description: Defines the authenticator specific parameters
+      properties:
+        ttl:
+          type: string
+          description: |-
+            Time-to-live (TTL) in minutes.
+
+            Specifies how long the TAC enrollment is valid after it's created and activated.
+            The configured value must be between 10 minutes (`10`) and 10 days (`14400`), inclusive.
+            The actual allowed range depends on the org-level authenticator configuration.
+          writeOnly: true
+        multiUse:
+          type: boolean
+          description: |-
+            Determines whether the enrollment can be used more than once. To enable multi-use, the org-level authenticator’s configuration must allow multi-use.
+          writeOnly: true
+    AuthenticatorProfileTacResponsePost:
+      type: object
+      description: Defines the authenticator specific parameters
+      properties:
+        tac:
+          type: string
+          description: |-
+            A temporary access code used for authentication. It can be used one or more times and is valid for a defined period specified by the `ttl` property.
+            The `tac` is returned in the response when the enrollment is created. It is not returned when the enrollment is retrieved.
+            Issuing a new TAC invalidates any existing TAC for this user.
+        multiUse:
+          type: boolean
+          description: |-
+            Determines whether an enrollment can be used more than once
+        expiresAt:
+          type: string
+          description: |-
+            The time when the TAC enrollment expires in the UTC timezone
+          format: date-time
+  securitySchemes:
+    $ref: ../../base.yaml#/components/securitySchemes

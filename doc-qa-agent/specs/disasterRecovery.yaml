@@ -1,0 +1,288 @@
+openapi: 3.0.3
+info:
+  title: Enhanced Disaster Recovery API
+  version: 1.0.0
+servers:
+  - url: https://drapp.yourOrgSubDomain.okta.com
+security:
+  - oauth2:
+      - okta.dr.manage
+      - okta.dr.read
+tags:
+  $ref: ../base.yaml#/tags
+paths:
+  /api/v1/dr/failover:
+    post:
+      x-okta-lifecycle:
+        lifecycle: EA
+      servers:
+        - url: https://drapp.yourOrgSubDomain.okta.com
+      tags:
+        - DisasterRecovery
+      summary: Start the failover of your org
+      description: Starts the failover of your org
+      operationId: startOrgFailover
+      requestBody:
+        required: false
+        description: The request body is optional. You can specify a domain to failover, an empty object (`{}`), or no payload.
+        content:
+          application/json:
+            schema:
+              x-okta-ignore-redocly-rules-for-sdk: true
+              oneOf:
+                - $ref: '#/components/schemas/FailoverRequestSchema'
+                - $ref: '#/components/schemas/EmptyRequestSchema'
+            examples:
+              example1:
+                summary: A sample Okta domain to failover
+                value:
+                  domains:
+                    - yourOktaDomain.okta.com
+              example2:
+                summary: An empty object
+                value: {}
+      responses:
+        '200':
+          $ref: '#/components/responses/FailoverResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '401':
+          $ref: ./Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+        '500':
+          $ref: ./Common.yaml#/components/responses/ErrorInternalServer500
+      security:
+        - oauth2:
+            - okta.dr.manage
+    x-okta-team-detail:
+      x-team-slack: eng-honeybadgers
+  /api/v1/dr/failback:
+    post:
+      x-okta-lifecycle:
+        lifecycle: EA
+      servers:
+        - url: https://drapp.yourOrgSubDomain.okta.com
+      tags:
+        - DisasterRecovery
+      summary: Start the failback of your org
+      description: Starts the failback of your org
+      operationId: startOrgFailback
+      requestBody:
+        required: false
+        description: The request body is optional. You can specify a domain to failback, an empty object (`{}`), or no payload.
+        content:
+          application/json:
+            schema:
+              x-okta-ignore-redocly-rules-for-sdk: true
+              oneOf:
+                - $ref: '#/components/schemas/FailbackRequestSchema'
+                - $ref: '#/components/schemas/EmptyRequestSchema'
+            examples:
+              example1:
+                summary: A sample Okta domain to failback
+                value:
+                  domains:
+                    - yourOktaDomain.okta.com
+              example2:
+                summary: An empty object
+                value: {}
+      responses:
+        '200':
+          $ref: '#/components/responses/FailbackResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '401':
+          $ref: ./Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+        '500':
+          $ref: ./Common.yaml#/components/responses/ErrorInternalServer500
+      security:
+        - oauth2:
+            - okta.dr.manage
+    x-okta-team-detail:
+      x-team-slack: eng-honeybadgers
+  /api/v1/dr/status:
+    get:
+      x-okta-lifecycle:
+        lifecycle: EA
+      servers:
+        - url: https://drapp.yourOrgSubDomain.okta.com
+      operationId: getDRStatus
+      summary: Retrieve the disaster recovery status for all domains
+      description: Retrieves the failover or failback status for all the domains for your org
+      tags:
+        - DisasterRecovery
+      security:
+        - oauth2:
+            - okta.dr.read
+      responses:
+        '200':
+          $ref: '#/components/responses/DRStatusResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '401':
+          $ref: ./Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+        '500':
+          $ref: ./Common.yaml#/components/responses/ErrorInternalServer500
+    x-okta-team-detail:
+      x-team-slack: eng-honeybadgers
+  /api/v1/dr/status/{domain}:
+    parameters:
+      - $ref: '#/components/parameters/domain'
+    get:
+      x-okta-lifecycle:
+        lifecycle: EA
+      servers:
+        - url: https://drapp.yourOktaDomain.okta.com
+      operationId: getDRStatusForDomain
+      summary: Retrieve the disaster recovery status for a domain
+      description: Retrieves the failover or failback status for the domain specified in the request path
+      tags:
+        - DisasterRecovery
+      security:
+        - oauth2:
+            - okta.dr.read
+      responses:
+        '200':
+          $ref: '#/components/responses/DRStatusResponse'
+        '400':
+          $ref: ./Common.yaml#/components/responses/ErrorApiValidationFailed400
+        '401':
+          $ref: ./Common.yaml#/components/responses/ErrorInvalidToken401
+        '403':
+          $ref: ./Common.yaml#/components/responses/ErrorAccessDenied403
+        '429':
+          $ref: ./Common.yaml#/components/responses/ErrorTooManyRequests429
+        '500':
+          $ref: ./Common.yaml#/components/responses/ErrorInternalServer500
+    x-okta-team-detail:
+      x-team-slack: eng-honeybadgers
+components:
+  responses:
+    FailoverResponse:
+      description: OK
+      content:
+        application/json:
+          schema:
+            properties:
+              results:
+                type: array
+                description: Results of the failover operation
+                items:
+                  properties:
+                    domain:
+                      type: string
+                      description: Domain for your org
+                      example: yourOktaDomain.okta.com
+                    message:
+                      type: string
+                      description: Domain failover message
+                      example: Failover was successful
+    FailbackResponse:
+      description: OK
+      content:
+        application/json:
+          schema:
+            properties:
+              results:
+                type: array
+                description: Results of the failback operation
+                items:
+                  properties:
+                    domain:
+                      type: string
+                      description: Domain for your org
+                      example: yourOktaDomain.okta.com
+                    message:
+                      type: string
+                      description: Domain failback message
+                      example: Failback was successful
+    DRStatusResponse:
+      description: OK
+      content:
+        application/json:
+          schema:
+            properties:
+              status:
+                type: array
+                description: List of domains and their disaster recovery status
+                items:
+                  $ref: '#/components/schemas/DRStatusItem'
+          example:
+            status:
+              - domain: yourOktaDomain.okta.com
+                isFailedOver: true
+      headers:
+        Link:
+          description: A link to the next page of responses
+          schema:
+            type: string
+  schemas:
+    FailoverRequestSchema:
+      type: object
+      title: Domains
+      properties:
+        domains:
+          type: array
+          description: The Okta domain to failover
+          items:
+            type: string
+            description: Okta domain to failover
+            example: yourOktaDomain.okta.com
+    FailbackRequestSchema:
+      type: object
+      title: Domains
+      properties:
+        domains:
+          type: array
+          description: The Okta domain to failback
+          items:
+            type: string
+            description: Okta domain to failback
+            example: yourOktaDomain.okta.com
+    EmptyRequestSchema:
+      type: object
+      x-okta-ignore-redocly-rules-for-sdk: true
+      title: Empty
+      description: Empty object payload
+      additionalProperties: false
+    DRStatusItem:
+      description: Status whether a domain has been failed over or not
+      type: object
+      properties:
+        domain:
+          type: string
+          description: Domain for your org
+        isFailedOver:
+          type: boolean
+          description: Indicates if the domain has been failed over
+          nullable: false
+  parameters:
+    domain:
+      name: domain
+      in: path
+      description: The Okta domain name of your org or one of your custom domains
+      required: true
+      schema:
+        type: string
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      description: 'Pass the access_token as the value of the Authorization header: `Authorization: Bearer {access_token}`'
+      flows:
+        authorizationCode:
+          authorizationUrl: /oauth2/v1/authorize
+          tokenUrl: /oauth2/v1/token
+          scopes:
+            okta.dr.read: Allows the app to read the disaster recovery status
+            okta.dr.manage: Allows the app to manage disaster recovery
