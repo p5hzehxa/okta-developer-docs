@@ -81,18 +81,18 @@ Choose the authentication method that best fits your environment.
       },
       {
         "type": "promptString",
-        "description": "Okta Scopes (separated by whitespace)",
+        "description": "Okta scopes (separated by whitespace)",
         "id": "OKTA_SCOPES"
       },
       {
         "type": "promptString",
-        "description": "Okta Private Key (for browserless auth)",
+        "description": "Okta private key (for browserless authentication)",
         "id": "OKTA_PRIVATE_KEY",
         "password": true
       },
       {
         "type": "promptString",
-        "description": "Okta Key ID (for browserless auth)",
+        "description": "Okta key ID (for browserless authentication)",
         "id": "OKTA_KEY_ID",
         "password": true
       }
@@ -125,18 +125,18 @@ Choose the authentication method that best fits your environment.
     "inputs": [
       {
         "type": "promptString",
-        "description": "Okta Organization URL (e.g., https://dev-123456.okta.com)",
+        "description": "Okta org URL (for example, https://dev-123456.okta.com)",
         "id": "OKTA_ORG_URL"
       },
       {
         "type": "promptString",
-        "description": "Okta Client ID",
+        "description": "Okta client ID",
         "id": "OKTA_CLIENT_ID",
         "password": true
       },
       {
         "type": "promptString",
-        "description": "Okta Scopes (separated by whitespace)",
+        "description": "Okta scopes (separated by whitespace)",
         "id": "OKTA_SCOPES"
       }
     ],
@@ -220,7 +220,7 @@ Ensure that you replace `/path/to/okta-mcp-server` with the absolute path to you
          },
          {
             "type": "promptString",
-            "description": "Okta scopes (separated by whitespace, e.g., 'okta.users.read okta.groups.manage')",
+            "description": "Okta scopes (separated by whitespace). For example, 'okta.users.read okta.groups.manage',",
             "id": "OKTA_SCOPES"
          },
          {
@@ -231,7 +231,7 @@ Ensure that you replace `/path/to/okta-mcp-server` with the absolute path to you
          },
          {
             "type": "promptString",
-            "description": "Okta key ID (KID) for the private key. Required for 'browserless' auth.",
+            "description": "Okta key ID (KID) for the private key. This is required for browserless authentication.",
             "id": "OKTA_KEY_ID",
             "password": true
          }
@@ -302,7 +302,7 @@ This method is ideal for containerized environments because it requires no brows
 
 **Device Authorization Grant**
 
-Use this method if you prefer browser-based authentication. When the server starts, it displays an authentication URL in the logs. Copy and paste this URL into your browser to complete the authentication.
+Use this method if you prefer browser-based authentication. When the Okta MCP server starts, it displays an authentication URL in the server logs. Copy and paste this URL into your browser to complete the authentication.
 
 >**Note:** Docker containers can’t open a browser on the host automatically. You must manually copy the URL from the Docker logs `okta-mcp-server` and paste it into your browser.
 
