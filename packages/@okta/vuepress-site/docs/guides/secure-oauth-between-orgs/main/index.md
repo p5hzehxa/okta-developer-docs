@@ -470,7 +470,7 @@ curl -X PUT \
             "dpop_bound_access_tokens": true
         }
     }
- }' "https://{yourHubOktaDomain}/v1/apps/{yourServiceAppId}"
+ }' "https://{yourHubOktaDomain}/api/v1/apps/{yourServiceAppId}"
 ```
 
 ### Enable provisioning in the Org2Org app
