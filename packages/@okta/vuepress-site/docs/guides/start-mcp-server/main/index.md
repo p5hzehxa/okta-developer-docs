@@ -54,12 +54,12 @@ The Okta MCP server works with any MCP-compatible client. While this guide focus
 1. Define the connection parameters for the Okta MCP server:
    * Create a folder named `.vscode` in your project directory.
    * Create a file named `mcp.json` in the `.vscode` folder.
-1. Add the required configuration to your `mcp.json` file by copying the appropriate JSON file and save it using one of the following options:
-   * [Option 1: Configure using docker](#option-1-configure-using-docker)
+1. Add the required configuration to your `mcp.json` file by copying the appropriate JSON file. Save it using one of the following options:
+   * [Option 1: Configure using Docker](#option-1-configure-using-docker)
    * [Option 2: Configure using uv](#option-2-configure-using-uv)
 1. Replace `/path/to/okta-mcp-server` in the following configuration with the actual path to your cloned repository.
 
-#### Option 1: Configure using docker
+#### Option 1: Configure using Docker
 
 Choose the authentication method that best fits your environment.
 
@@ -115,9 +115,9 @@ Choose the authentication method that best fits your environment.
 }
 ```
 
-**Device Authorization Grant:**
+**Device authorization grant:**
 
->**Note:** Device Authorization requires manual browser interaction. When the server starts, check the MCP output panel for the authentication URL, and then copy and paste it into your browser.
+>**Note:** Device authorization requires manual browser interaction. When the server starts, check the MCP output panel for the authentication URL, and then copy and paste it into your browser.
 
 ```json
 {
@@ -158,7 +158,7 @@ Choose the authentication method that best fits your environment.
 }
 ```
 
-**Alternatively, use docker-compose:**
+**Alternatively, use Docker Compose for this task:**
 
 This method requires an `.env` file in your repository. Use the following configuration:
 
@@ -181,7 +181,7 @@ This method requires an `.env` file in your repository. Use the following config
 }
 ```
 
-**Alternatively, build and run directly:**
+**Alternatively, you can choose to build and run the MCP server directly:**
 
 Build the image
 
@@ -199,7 +199,7 @@ docker run -i --rm \
   okta-mcp-server
 ```
 
-#### Option 2: Configure using UV
+#### Option 2: Configure using uv
 
 Ensure that you replace `/path/to/okta-mcp-server` with the absolute path to your cloned repository.
 
@@ -261,12 +261,12 @@ Ensure that you replace `/path/to/okta-mcp-server` with the absolute path to you
 ### Configure Claude Desktop
 
 1. Open your Claude Desktop configuration file.
-1. Update the settings file with the following configuration and replace the placeholder values with your Okta credentials. You can do this configuration settings update using one of the following options:
+1. Update the file with the following configuration. Replace the placeholder values with your Okta credentials. You can do this in one of the following ways:
 
-* [Option 1: Configure using docker](#option-1-configure-using-docker-2)
+* [Option 1: Configure using Docker](#option-1-configure-using-docker-2)
 * [Option 2: Configure using uv](#option-2-configure-using-uv-2)
 
-#### Option 1: Configure using docker
+#### Option 1: Configure using Docker
 
 Choose the authentication method that best fits your environment.
 
@@ -300,11 +300,11 @@ This method is ideal for containerized environments because it requires no brows
 }
 ```
 
-**Device Authorization Grant:**
+**Device Authorization Grant**
 
 Use this method if you prefer browser-based authentication. When the server starts, it displays an authentication URL in the logs. Copy and paste this URL into your browser to complete the authentication.
 
->**Note:** Docker containers can’t open a browser on the host automatically. You must manually copy the URL from docker logs `okta-mcp-server` and paste it into your browser.
+>**Note:** Docker containers can’t open a browser on the host automatically. You must manually copy the URL from the Docker logs `okta-mcp-server` and paste it into your browser.
 
 ```json
 {
@@ -330,11 +330,11 @@ Use this method if you prefer browser-based authentication. When the server star
 }
 ```
 
-The `-v okta-keyring:/home/appuser/.local/share/python_keyring` volume persists tokens between container restarts.
+The `-v okta-keyring:/home/appuser/.local/share/python_keyring` volume ensures that tokens remain available even after the container restarts.
 
 #### Option 2: Configure using uv
 
-Use this configuration for local python-based execution. Replace `/path/to/okta-mcp-server` with the actual absolute path to your cloned repository.
+Use this configuration for a local Python-based execution. Replace `/path/to/okta-mcp-server` with the absolute path to your cloned repository.
 
 ```json
 {

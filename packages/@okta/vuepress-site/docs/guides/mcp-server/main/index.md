@@ -19,7 +19,7 @@ Get started with the Okta Model Context Protocol (MCP) server setup and prerequi
 #### What you need
 
 * An [Okta Integrator Free Plan org](https://developer.okta.com/signup) with admin permissions.
-* Select an admin role. See [Learn about administrators](https://help.okta.com/okta_help.htm?type=oie&id=administrators-learn-about-admins).
+* Select an Okta admin role. See [Learn about administrators](https://help.okta.com/okta_help.htm?type=oie&id=administrators-learn-about-admins).
 * The [uv](https://docs.astral.sh/uv/getting-started/installation/) package manager.
 * [Python 3.8](https://python.org/downloads) or higher.
 
@@ -35,10 +35,10 @@ This guide explains how to initialize the Okta MCP server project and install th
 
 You can install the Okta MCP server using one of the following two methods:
 
-* [Method 1: Using docker](#method-1-using-docker)
+* [Method 1: Using Docker](#method-1-using-docker)
 * [Method 2: Using uv](#method-2-using-uv)
 
-### Method 1: Using docker
+### Method 1: Using Docker
 
 Docker provides a consistent environment without needing to install Python or uv locally.
 
@@ -60,14 +60,14 @@ Docker provides a consistent environment without needing to install Python or uv
 
 1. Edit .env and add your Okta credentials.
 
-1. Build and run with docker compose:
+1. Build and run the environment with Docker Compose:
     ```
     docker-compose up -d
     ```
 
 ### Method 2: Using uv
 
-Use this method for local development or if you prefer a lightweight Python environment.
+Use this method for local development or if you prefer to use a lightweight Python environment.
 
 1. Initialize the Okta MCP server project:
 
