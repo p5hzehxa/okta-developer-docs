@@ -198,7 +198,7 @@ Use the following request body parameters to define your OIDC Okta Integration I
 | `protocol.credentials.client.token_endpoint_auth_method`  |  `private_key_jwt` |
 | `protocol.credentials.client.client_id`  |  Add a placeholder value for the Org2Org ID, which you create in the next step. Update this value using the procedure [Update the IdP in the hub org](#update-the-idp-in-the-hub-org). |
 
->**Note:** OIDC federation has a known limitation in Classic Okta orgs when using Org2Org apps. When a user logs into a Service Provider (SP) app or the Okta dashboard through an OIDC-based Org2Org app from the Identity Provider (IDP) org, the MFA challenge configured in the SP org isn’t enforced.
+>**Note:** OIDC federation has a known limitation in Classic Okta orgs when using Org2Org apps. When a user signs in to a service provider (SP) app or the End-User Dashboard through an OIDC-based Org2Org app from the identity provider (IdP) org, the MFA challenge configured in the SP org isn’t enforced.
 
 ##### Request example
 
