@@ -53,7 +53,7 @@ To run the IdP flow test:
 
     The incognito browser closes and you're redirected to the OIN Submission Tester. The OIN Submission Tester records the test run result and time stamp.
 
-1. Click the **IdP flow** expand icon (![chevron-down expand icon](/img/icons/odyssey/chevron-down.svg)) to view the test steps and network traffic details for the test run.
+1. Click the **IdP flow** expand icon <span>(<img style="display: inline-block; margin-bottom: 0;" src="/img/icons/odyssey/chevron-down.svg" alt="more icon"/>)</span> to view the test steps and network traffic details for the test run.
 
     If your test run wasn't successful, this is a useful tool to troubleshoot the issues and correct your integration, instance, or submission details.
 
@@ -72,11 +72,11 @@ To run the SP flow test:
 
     The incognito browser closes and you're redirected to the OIN Submission Tester. The OIN Submission Tester records the test run result and time stamp.
 
-1. Click the **SP flow** expand icon (![chevron-down expand icon](/img/icons/odyssey/chevron-down.svg)) to view the test steps and network traffic details for the test run.
+1. Click the **SP flow** expand icon <span>(<img style="display: inline-block; margin-bottom: 0;" src="/img/icons/odyssey/chevron-down.svg" alt="more icon"/>)</span> to view the test steps and network traffic details for the test run.
 
 ##### Run the JIT provisioning with IdP flow test
 
-or the JIT provisioning test, the OIN Submission Tester creates a temporary Okta test user account for you to verify that JIT provisioning is successful. The OIN Submission Tester then removes the test user account from Okta to complete the test.
+For the JIT provisioning test, the OIN Submission Tester creates a temporary Okta test user account for you to verify that JIT provisioning is successful. The OIN Submission Tester then removes the test user account from Okta to complete the test.
 
 > **Notes:**
 > * Ensure that your app integration supports JIT provisioning before you run the JIT provisioning test.
@@ -110,7 +110,7 @@ To run the JIT provisioning with IdP flow test:
     1. Records the test run result and time stamp in the OIN Submission Tester.
     1. Redirects you to the OIN Submission Tester.
 
-1. Click the **JIT provisioning (w/ IdP flow)** expand icon (![chevron-down expand icon](/img/icons/odyssey/chevron-down.svg)) to view the test steps and network traffic details for the test run.
+1. Click the **JIT provisioning (w/ IdP flow)** expand icon <span>(<img style="display: inline-block; margin-bottom: 0;" src="/img/icons/odyssey/chevron-down.svg" alt="more icon"/>)</span> to view the test steps and network traffic details for the test run.
 
 > **Note:** The test user account created in your app from JIT provisioning persists after the JIT provisioning test. The OIN Submission Tester only removes the temporary test user account from your Okta org. It's your responsibility to manage the JIT test user accounts in your app.
 
