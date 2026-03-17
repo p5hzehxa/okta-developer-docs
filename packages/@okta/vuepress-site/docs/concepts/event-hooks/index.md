@@ -39,7 +39,7 @@ You can reduce the number of event hook calls by defining filters on specific in
 
 ## Okta Workflows and event hooks
 
-Okta Workflows is a no-code automation platform that enables you to solve complex identity challenges by automating data and actions. Okta event hooks can extend the capabilities of Okta Workflows by automating flows that run when an Okta event occurs. For further information on Okta Workflows, see [Okta Workflows](https://help.okta.com/okta_help.htm?type=wf&id=ext-okta-workflows). See also:
+Okta Workflows is a no-code automation platform that enables you to solve complex identity challenges by automating data and actions. Okta event hooks can extend the capabilities of Okta Workflows by automating flows that run when an Okta event occurs. For further information on Okta Workflows, see [Okta Workflows](https://help.okta.com/okta_help.htm?type=wf&id=ext-okta-workflows). See the following posts for implementations of event hooks with Okta Workflows:
 
 * [Understanding Okta Workflows Events](https://www.okta.com/blog/product-innovation/okta-workflows-events/)
 
