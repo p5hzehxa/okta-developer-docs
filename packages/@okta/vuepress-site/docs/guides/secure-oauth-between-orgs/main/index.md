@@ -376,7 +376,7 @@ Assign admin roles for every OAuth 2.0 service app that you create in the hub or
 
 You can assign a [standard admin role](https://help.okta.com/okta_help.htm?type=oie&id=ext-administrators-admin-comparison) or a [custom admin role](https://help.okta.com/okta_help.htm?type=oie&id=csh-best-practice-cstm-admin-roles) with permissions to specific resource sets.
 
-For the basic OAuth 2.0 Org2Org provisioning connection, you can assign the following [standard admin roles](https://developer.okta.com/docs/api/openapi/okta-management/guides/roles#standard-roles) to manage the provisioning of users:
+For the basic OAuth 2.0 Org2Org provisioning connection, you can assign the following [standard admin roles](https://developer.okta.com/docs/api/openapi/okta-management/guides/roles#standard-roles) to manage user provisioning:
 
 * `USER_ADMIN` (Group administrator)
 * `GROUP_MEMBERSHIP_ADMIN` (Group membership administrator)
