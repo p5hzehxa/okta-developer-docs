@@ -208,4 +208,5 @@ To run a test of your event hook:
 
 ## See also
 
-See [Event hooks](/docs/concepts/event-hooks/) for background conceptual information on event hooks.
+* See [Event hooks](/docs/concepts/event-hooks/) for background conceptual information on event hooks.
+* For information on using event hooks with Okta Workflows, see [Understanding Okta Workflows Events](https://www.okta.com/blog/product-innovation/okta-workflows-events/).

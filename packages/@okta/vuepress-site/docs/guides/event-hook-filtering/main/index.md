@@ -151,6 +151,11 @@ Review the following guides to implement other inline hook examples:
 * [SAML assertion inline hook](/docs/guides/saml-inline-hook)
 * [Telephony inline hook](/docs/guides/telephony-inline-hook)
 
+Review the following posts to implement event hook filters with Okta Workflows:
+
+* [Okta Workflows Tutorial: Notify When a User is Added to a Group (with Event Hook filter)](https://www.okta.com/blog/product-innovation/workflows-event-hook-tutorial/)
+* [User Event Hook Filtering with Okta Workflows](https://www.youtube.com/watch?v=eBUJ_aKDmZU)
+
 ## See also
 
 For background conceptual information on event hooks, see [Event hooks](/docs/concepts/event-hooks/).
