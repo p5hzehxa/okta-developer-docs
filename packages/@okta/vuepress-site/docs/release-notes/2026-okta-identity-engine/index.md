@@ -18,11 +18,19 @@ title: Okta Identity Engine API release notes 2026
 
 | Change | Expected in Preview Orgs |
 |--------|--------------------------|
-| [Bugs fixed in 2026.03.2](#bugs-fixed-in-2026-03-2)| March 18, 2026 |
+| [Bugs fixed in 2026.03.2](#bugs-fixed-in-2026-03-2) | March 18, 2026 |
 
 #### Bugs fixed in 2026.03.2
 
+* The Agent Pools API returned a generic illegal argument exception when invalid parameters were provided. (OKTA-1112681)
 
+* Agent Pool update requests didn't verify that the provided pool ID was a valid app instance ID. (OKTA-890681)
+
+* When you used the Create an org [endpoint](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/orgcreator/other/createchildorg) to create a child org and then enabled Identity Engine for the org, `POST_AUTH_SESSION` and `ENTITY_RISK` policies and policy rules were sometimes deleted. (OKTA-1111235)
+
+* You sometimes weren’t able to [deactivate an Okta Integration IdP](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/identityprovider/other/deactivateidentityprovider) that had `trustClaims: true`, even when all your authentication policies didn’t require trusted claims. (OKTA-1088872)
+
+* An [update a user schema](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/schema/other/updateuserprofile) request failed with a timeout error when it included a large number of identity providers. (OKTA-1010509)
 
 ### Weekly release 2026.03.1
 <!-- Published on: 2026-03-11T12:00:00Z -->
