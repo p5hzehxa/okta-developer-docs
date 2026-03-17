@@ -383,7 +383,7 @@ For the basic OAuth 2.0 Org2Org provisioning connection, you can assign the foll
 
 Or you can create a custom role to manage provisioning. For example, to create a custom role:
 
-* Create a resource set that includes the Users and Groups resources. See [Create a resource set](https://help.okta.com/okta_help.htm?type=oie&id=csh-create-resource-set).
+* Create a resource set that includes the users and groups resources. See [Create a resource set](https://help.okta.com/okta_help.htm?type=oie&id=csh-create-resource-set).
 * Create the custom role including the appropriate permissions (for example, **Manage users** and **Manage groups**). See [Create a role](https://help.okta.com/okta_help.htm?type=oie&id=csh-create-role).
 
 See also [Roles in Okta](https://developer.okta.com/docs/api/openapi/okta-management/guides/roles).
