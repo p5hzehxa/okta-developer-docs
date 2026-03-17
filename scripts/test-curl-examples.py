@@ -36,38 +36,62 @@ def extract_curl_commands(md_path):
     with open(md_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    curl_commands = []
+    curl_commands = []  # List of tuples: (line_number, command)
+    lines_list = content.split('\n')
 
-    # Find all bash/sh code blocks
-    code_blocks = re.findall(r'```(?:bash|sh)\n(.*?)```', content, re.DOTALL)
-
-    for block in code_blocks:
-        # Skip JSON blocks and other non-curl blocks
-        if 'curl' not in block:
-            continue
-
-        # Split into lines
-        lines = block.strip().split('\n')
-
-        # Extract each curl command from the block
-        i = 0
-        while i < len(lines):
-            line = lines[i].rstrip()
-
-            # Look for curl command start
-            if line.strip().startswith('curl'):
-                command_lines = [line.rstrip('\\').strip()]
-
-                # Collect continuation lines (those ending with \)
-                while line.rstrip().endswith('\\') and i + 1 < len(lines):
+    # Find all bash/sh code blocks with their positions
+    i = 0
+    while i < len(lines_list):
+        line = lines_list[i]
+        
+        # Look for start of bash/sh code block
+        if re.match(r'^```(?:bash|sh)$', line.strip()):
+            block_start_line = i
+            i += 1
+            
+            # Process lines until end of code block
+            while i < len(lines_list) and not lines_list[i].strip().startswith('```'):
+                current_line = lines_list[i].rstrip()
+                
+                # Look for curl command start
+                if current_line.strip().startswith('curl'):
+                    command_lines = [current_line.rstrip('\\').strip()]
+                    line_number = i + 1  # 1-indexed line number
+                    original_i = i
                     i += 1
-                    line = lines[i].rstrip()
-                    command_lines.append(line.rstrip('\\').strip())
-
-                # Join all parts with space
-                full_command = ' '.join(command_lines)
-                curl_commands.append(full_command)
-
+                    
+                    # Collect continuation lines until we hit end of code block or a line that looks like end of command
+                    while i < len(lines_list) and not lines_list[i].strip().startswith('```'):
+                        next_line = lines_list[i].rstrip()
+                        
+                        # Check if this line ends the command (contains URL or looks like end of JSON body)
+                        if next_line.endswith('```'):
+                            break
+                        
+                        # Add line to command
+                        command_lines.append(next_line.rstrip('\\').strip())
+                        
+                        # Stop if we find a URL/domain - it's usually at the end
+                        if re.search(r'(?:https?://|\\b[a-zA-Z0-9][a-zA-Z0-9-]*\\.[a-zA-Z]{2,})', next_line):
+                            i += 1
+                            break
+                        
+                        # Stop if line doesn't end with backslash AND we have a URL already in the command
+                        if not next_line.endswith('\\'):
+                            full_command_so_far = ' '.join(command_lines)
+                            if re.search(r'(?:https?://|localhost|127\.0\.0\.1)', full_command_so_far):
+                                i += 1
+                                break
+                        
+                        i += 1
+                    
+                    # Join all parts with space
+                    full_command = ' '.join(command_lines)
+                    curl_commands.append((line_number, full_command))
+                    continue
+                
+                i += 1
+        else:
             i += 1
 
     return curl_commands
@@ -83,11 +107,19 @@ def validate_curl_syntax(command):
     if not any(opt in command for opt in ['-X', '--request']):
         return False, "No HTTP method specified (-X)"
 
-    # Check for URL
-    if not any(proto in command for proto in ['http://', 'https://']):
-        return False, "No valid URL found (http:// or https://)"
+    # Check for URL - look for protocol, domain pattern, or localhost
+    has_url = False
+    if any(proto in command for proto in ['http://', 'https://']):
+        has_url = True
+    elif re.search(r'\\b[a-zA-Z0-9][a-zA-Z0-9-]*\\.[a-zA-Z]{2,}', command):  # Domain pattern
+        has_url = True
+    elif 'localhost' in command or '127.0.0.1' in command:
+        has_url = True
+    
+    if not has_url:
+        return False, "No valid URL or domain found"
 
-    return True, "Syntax valid"
+    return True, "✅ Syntax valid"
 
 
 def test_curl_commands(commands, dry_run=True, substitute_vars=None):
@@ -179,7 +211,7 @@ def print_test_results(results, verbose=False):
             if result['error']:
                 print(f"  Error: {result['error']}")
         else:
-            if verbose or result['syntax_message'] != 'Syntax valid':
+            if verbose or result['syntax_message'] != '✅ Syntax valid':
                 print(f"  {result['output']}")
 
         print()
@@ -217,12 +249,13 @@ if __name__ == "__main__":
         print(f"❌ Error: File not found: {md_file}")
         sys.exit(1)
 
-    commands = extract_curl_commands(md_file)
+    commands_with_lines = extract_curl_commands(md_file)
+    commands = [cmd for _, cmd in commands_with_lines]  # Extract just commands for testing
 
     print(f"📄 Analyzing: {md_file}")
     print(f"Found {len(commands)} curl command(s):\n")
-    for i, cmd in enumerate(commands, 1):
-        print(f"--- Command {i} ---")
+    for i, (line_num, cmd) in enumerate(commands_with_lines, 1):
+        print(f"--- Command {i} (Line {line_num}) ---")
         print(cmd)
         print()
 
