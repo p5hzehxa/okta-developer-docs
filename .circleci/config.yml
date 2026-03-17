@@ -130,7 +130,7 @@ jobs:
 
   netlify_manual:
     docker:
-      - image: cimg/node:14.21.3-browsers
+      - image: cimg/node:16.20.0-browsers
     resource_class: xlarge
     steps:
       - run:
