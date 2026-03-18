@@ -37,6 +37,16 @@ You can reduce the number of event hook calls by defining filters on specific in
 
 <EventHookEANote/>
 
+## Okta Workflows and event hooks
+
+Okta Workflows is a no-code automation platform that enables you to solve complex identity challenges by automating data and actions. Okta event hooks can extend the capabilities of Okta Workflows by automating flows that run when an Okta event occurs. See [Okta Workflows](https://help.okta.com/okta_help.htm?type=wf&id=ext-okta-workflows). For implementations of event hooks with Okta Workflows, see the following posts:
+
+* [Understanding Okta Workflows Events](https://www.okta.com/blog/product-innovation/okta-workflows-events/)
+
+* [Okta Workflows Tutorial: Notify When a User is Added to a Group (with Event Hook filter)](https://www.okta.com/blog/product-innovation/workflows-event-hook-tutorial/)
+
+* [User Event Hook Filtering with Okta Workflows](https://www.youtube.com/watch?v=eBUJ_aKDmZU)
+
 ## Requests sent by Okta
 
 When events occur in your org that match an event type monitored by your event hook, the event hook is automatically triggered. It then sends a request to your external service. The JSON payload of the request provides information on the event. A sample JSON payload is provided in [Sample event delivery payload](#sample-event-delivery-payload).

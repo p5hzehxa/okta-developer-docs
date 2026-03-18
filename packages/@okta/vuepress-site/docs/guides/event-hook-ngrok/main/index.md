@@ -185,4 +185,5 @@ See also [ngrok Documentation](https://ngrok.com/docs#inspect-replay).
 
 ## See also
 
-For background conceptual information on event hooks, see [Event hooks](/docs/concepts/event-hooks/).
+* For background conceptual information on event hooks, see [Event hooks](/docs/concepts/event-hooks/).
+* For information on using event hooks with Okta Workflows, see [Understanding Okta Workflows Events](https://www.okta.com/blog/product-innovation/okta-workflows-events/).

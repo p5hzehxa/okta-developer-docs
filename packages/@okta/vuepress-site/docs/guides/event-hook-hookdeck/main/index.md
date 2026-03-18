@@ -41,7 +41,7 @@ If you already have Hookdeck installed, move on to [Run Hookdeck](#run-hookdeck)
 Some installation notes:
 
 * You don't need to have an account to install and run Hookdeck. However, a free account provides more features in the Hookdeck dashboard and API authentication.
-* If you choose not to create an account, you'll use the Hookdeck Console rather than the dashboard.
+* If you choose not to create an account, you use the Hookdeck console rather than the dashboard.
 
 ### Run Hookdeck
 
@@ -85,7 +85,7 @@ See [Hookdeck](https://hookdeck.com/) or their [Product docs](https://hookdeck.c
 
 ### Review Hookdeck dashboard
 
-The Hookdeck dashboard provides an opportunity to review all calls to your local app. Use the dashboard link provided by the Hookdeck utility to access details on your hook calls. For example, `http://dashboard..hookdeck.com?team_id=tm_DzF5wrNULyBG`. If you've not logged in to Hookdeck previously, you'll get a guest URL to Hookdeck Console instead.
+The Hookdeck dashboard provides an opportunity to review all calls to your local app. Use the dashboard link provided by the Hookdeck utility to access details on your hook calls. For example, `http://dashboard..hookdeck.com?team_id=tm_DzF5wrNULyBG`. If you've not signed in to Hookdeck previously, you get a guest URL to Hookdeck console instead.
 
 Each call to your local app appears in the dashboard and includes the response body, header, and other details:
 
@@ -163,7 +163,7 @@ To run a preview call of your event hook:
 1. In the **Configure Event Hook request** section, select an event from the **Event Type** dropdown menu. In this example, there’s only `User Created (user.lifecycle.create)`.
 1. The most recent event populates the **Preview & Deliver Event Hook** section with the JSON body of the event hook if there’s one. If no event is available, the JSON body populates with sample data.
 1. Ensure that both your Hookdeck session and local sample app are running.
-1. Click **Deliver Request**. The Event Hook Preview displays the status request as either successful or a failure. Review your local app console to view the output of the event hook body. For example:
+1. Click **Deliver Request**. The Event Hook preview displays the status request as either successful or a failure. Review your local app console to view the output of the event hook body. For example:
 
    <div class="three-quarter">
 
@@ -208,4 +208,5 @@ To run a test of your event hook:
 
 ## See also
 
-See [Event hooks](/docs/concepts/event-hooks/) for background conceptual information on event hooks.
+* See [Event hooks](/docs/concepts/event-hooks/) for background conceptual information on event hooks.
+* For information on using event hooks with Okta Workflows, see [Understanding Okta Workflows Events](https://www.okta.com/blog/product-innovation/okta-workflows-events/).

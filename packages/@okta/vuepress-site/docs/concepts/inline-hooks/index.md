@@ -30,6 +30,12 @@ Okta defines several different types of inline hooks. Each type of inline hook m
 | [Password import inline hook](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/InlineHook/#tag/InlineHook/operation/createPasswordImportInlineHook)  | Verifies a user-supplied password to support migration of users to Okta        |
 | [Telephony inline hook](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/InlineHook/#tag/InlineHook/operation/createTelephonyInlineHook) | Customizes the Okta flows that send SMS or voice messages |
 
+## Okta Workflows and inline hooks
+
+Okta Workflows is a no-code automation platform that enables you to solve complex identity challenges by automating data and actions. Okta inline hooks can extend the capabilities of Okta Workflows by adding custom logic to Okta processes. See [Okta Workflows](https://help.okta.com/okta_help.htm?type=wf&id=ext-okta-workflows). For an implementation of an inline hook with Okta Workflows, see the following tutorial:
+
+* [Create Unique Identities with an Inline Hook](https://help.okta.com/okta_help.htm?type=wf&id=ext-tutorials-id-creation)
+
 ## Process flow to use inline hooks
 
 ### Extension points
