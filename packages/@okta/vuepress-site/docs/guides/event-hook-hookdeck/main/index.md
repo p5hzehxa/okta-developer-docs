@@ -85,7 +85,7 @@ See [Hookdeck](https://hookdeck.com/) or their [Product docs](https://hookdeck.c
 
 ### Review Hookdeck dashboard
 
-The Hookdeck dashboard provides an opportunity to review all calls to your local app. Use the dashboard link provided by the Hookdeck utility to access details on your hook calls. For example, `http://dashboard..hookdeck.com?team_id=tm_DzF5wrNULyBG`. If you've not logged in to Hookdeck previously, you get a guest URL to Hookdeck console instead.
+The Hookdeck dashboard provides an opportunity to review all calls to your local app. Use the dashboard link provided by the Hookdeck utility to access details on your hook calls. For example, `http://dashboard..hookdeck.com?team_id=tm_DzF5wrNULyBG`. If you've not signed in to Hookdeck previously, you get a guest URL to Hookdeck console instead.
 
 Each call to your local app appears in the dashboard and includes the response body, header, and other details:
 

@@ -32,7 +32,7 @@ Okta defines several different types of inline hooks. Each type of inline hook m
 
 ## Okta Workflows and inline hooks
 
-Okta Workflows is a no-code automation platform that enables you to solve complex identity challenges by automating data and actions. Okta inline hooks can extend the capabilities of Okta Workflows by adding custom logic to Okta processes. For further information on Okta Workflows, see [Okta Workflows](https://help.okta.com/okta_help.htm?type=wf&id=ext-okta-workflows). See the following tutorial for an implementation of an inline hook with Okta Workflows:
+Okta Workflows is a no-code automation platform that enables you to solve complex identity challenges by automating data and actions. Okta inline hooks can extend the capabilities of Okta Workflows by adding custom logic to Okta processes. See [Okta Workflows](https://help.okta.com/okta_help.htm?type=wf&id=ext-okta-workflows). For an implementation of an inline hook with Okta Workflows, see the following tutorial:
 
 * [Create Unique Identities with an Inline Hook](https://help.okta.com/okta_help.htm?type=wf&id=ext-tutorials-id-creation)
 
