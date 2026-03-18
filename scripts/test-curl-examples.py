@@ -21,9 +21,9 @@ Environment Variables:
     OKTA_TOKEN          Default access token if --token not provided
 
 Examples:
-    python scripts/test-curl-examples.py docs/guides/secure-oauth-between-orgs/main/index.md --test
-    python scripts/test-curl-examples.py docs/guides/some-guide/index.md --test --domain example.okta.com --token YOUR_TOKEN
-    python scripts/test-curl-examples.py docs/guides/another-guide/index.md --execute --domain example.okta.com --token YOUR_TOKEN --verbose
+    python3 scripts/test-curl-examples.py packages/@okta/vuepress-site/docs/guides/manage-orgs-okta-edr/main/index.md --test
+    python3 scripts/test-curl-examples.py docs/guides/some-guide/index.md --test --domain duffer.oktapreview..com --token abcd123456789
+    python3 scripts/test-curl-examples.py docs/guides/another-guide/index.md --execute --domain example.okta.com --token YOUR_TOKEN --verbose
 """
 
 import re
@@ -253,18 +253,34 @@ if __name__ == "__main__":
     commands = [cmd for _, cmd in commands_with_lines]  # Extract just commands for testing
 
     print(f"📄 Analyzing: {md_file}")
+    
+    # Get values from command-line args or environment variables for display
+    domain = args.domain or os.getenv('OKTA_DOMAIN')
+    token = args.token or os.getenv('OKTA_TOKEN')
+    
+    # Prepare substitution for display
+    substitute_vars_display = {}
+    if domain:
+        substitute_vars_display['{yourOktaDomain}'] = domain
+        substitute_vars_display['{yourHubOktaDomain}'] = domain
+    if token:
+        substitute_vars_display['{yourAccessToken}'] = token
+        substitute_vars_display['{yourHubAccessToken}'] = token
+    
     print(f"Found {len(commands)} curl command(s):\n")
     for i, (line_num, cmd) in enumerate(commands_with_lines, 1):
+        display_cmd = cmd
+        # Apply substitutions for display if we have values
+        if substitute_vars_display:
+            for placeholder, value in substitute_vars_display.items():
+                display_cmd = display_cmd.replace(placeholder, value)
+        
         print(f"--- Command {i} (Line {line_num}) ---")
-        print(cmd)
+        print(display_cmd)
         print()
 
     # Run tests if requested
     if args.test or args.execute:
-        # Get values from command-line args or environment variables
-        domain = args.domain or os.getenv('OKTA_DOMAIN')
-        token = args.token or os.getenv('OKTA_TOKEN')
-
         # Basic syntax validation (no credentials needed)
         if args.test and not args.execute and not domain and not token:
             print("\n📋 Running basic syntax validation (no credentials needed)...")
@@ -280,12 +296,14 @@ if __name__ == "__main__":
 
             if domain:
                 substitute_vars['{yourOktaDomain}'] = domain
+                substitute_vars['{yourHubOktaDomain}'] = domain
                 print(f"✓ Using Okta domain: {domain}")
             else:
                 print("⚠ No Okta domain provided. Use --domain or set OKTA_DOMAIN env var")
 
             if token:
                 substitute_vars['{yourAccessToken}'] = token
+                substitute_vars['{yourHubAccessToken}'] = token
                 print(f"✓ Using access token")
             else:
                 print("⚠ No access token provided. Use --token or set OKTA_TOKEN env var")
