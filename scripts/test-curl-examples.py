@@ -22,7 +22,7 @@ Environment Variables:
 
 Examples:
     python3 scripts/test-curl-examples.py packages/@okta/vuepress-site/docs/guides/manage-orgs-okta-edr/main/index.md --test
-    python3 scripts/test-curl-examples.py docs/guides/some-guide/index.md --test --domain duffer.oktapreview..com --token abcd123456789
+    python3 scripts/test-curl-examples.py packages/@okta/vuepress-site/docs/guides/manage-orgs-okta-edr/main/index.md --test --domain duffer.oktapreview..com --token abcd123456789
     python3 scripts/test-curl-examples.py docs/guides/another-guide/index.md --execute --domain example.okta.com --token YOUR_TOKEN --verbose
 """
 
