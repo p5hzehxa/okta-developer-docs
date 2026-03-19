@@ -11,6 +11,21 @@ title: Okta Classic Engine API release notes 2026
 
 ## March
 
+### Weekly release 2026.03.2
+<!-- Published on: 2026-03-18T12:00:00Z -->
+
+| Change | Expected in Preview Orgs |
+|--------|--------------------------|
+| [Bugs fixed in 2026.03.2](#bugs-fixed-in-2026-03-2) | March 18, 2026 |
+
+#### Bugs fixed in 2026.03.2
+
+* The Agent Pools API returned a generic illegal argument exception when invalid parameters were provided. (OKTA-1112681)
+
+* Agent Pool update requests didn't verify that the provided pool ID was a valid app instance ID. (OKTA-890681)
+
+* An [update a user schema](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/schema/other/updateuserprofile) request failed with a timeout error when it included a large number of identity providers. (OKTA-1010509)
+
 ### Weekly release 2026.03.1
 <!-- Published on: 2026-03-11T12:00:00Z -->
 
