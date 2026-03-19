@@ -1,8 +1,8 @@
 ---
-title: Bulk migration with credentials
+title: Script your user migration with the Okta Users API
 meta:
   - name: description
-    content: Perform a bulk migration of users into Okta using the Okta API
+    content: Provides background and best practices to script your user migration from an external system to Okta using Okta APIs.
 layout: Guides
 sections:
   - main

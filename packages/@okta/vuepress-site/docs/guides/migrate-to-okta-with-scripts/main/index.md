@@ -56,7 +56,7 @@ Before migrating your users to Okta, careful planning and preparation are essent
 * Do not use real user data when testing
 * Use clients like Postman to securely test your script's user and group creation API requests
 
-## Migration scrips for specific use cases
+## Migration scripts for specific use cases
 
 ### Seamless, one-time migration
 
