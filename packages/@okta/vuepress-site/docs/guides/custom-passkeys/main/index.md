@@ -16,9 +16,9 @@ Learn how to configure passkeys with multiple domains.
 
 * [Okta Integrator Free Plan org](https://developer.okta.com/signup)
 * A valid and certified [custom domain](#how-to-configure-your-custom-domain-as-an-rp-id)
-* The [WebAuthn authenticator](https://help.okta.com/okta_help.htm?type=oie&id=csh-configure-webauthn) enabled for users in your org and assigned to an [app sign-in policy](/docs/guides/configure-signon-policy/main/#app-sign-in-policies)
+* The [Passkeys (FIDO2 WebAuthn) authenticator](https://help.okta.com/okta_help.htm?type=oie&id=csh-configure-webauthn) enabled for users in your org and assigned to an [app sign-in policy](/docs/guides/configure-signon-policy/main/#app-sign-in-policies)
 
-> **Note:** As of the `2026.04.0` release, the FIDO2 (WebAuthn) authenticator is now called Passkeys (FIDO2 WebAuthn) and there are new settings and updates to the authenticator page layout.
+> **Note:** As of the `2026.04.0` release, the FIDO2 (WebAuthn) authenticator is now called Passkeys (FIDO2 WebAuthn) and there are new settings and updates to the authenticator page layout. See [Passkeys and WebAuthn](/docs/guides/authenticators-web-authn/aspnet/main/#passkeys-and-okta).
 
 ---
 
@@ -28,17 +28,15 @@ Passkeys are based on the [FIDO2 Web Authentication (WebAuthn) standard](https:/
 
 Passkey credentials are cryptographically bound to a specific domain, known as the [Relying Party ID (RP ID)](https://www.w3.org/TR/webauthn/#relying-party-identifier).
 
-> **Note:** You can use passkeys in your org through the [Passkeys authenticator](https://help.okta.com/okta_help.htm?type=oie&id=csh-configure-webauthn).
-
 To create a seamless experience where one passkey can work across multiple domains, you can set up your org to use a single, unified RP ID and, for different custom domains, establish a trust relationship between them.
 
 ### Add the Passkeys authenticator to your org policies
 
-Before configuring passkeys with the steps in this guide, ensure that the WebAuthn authenticator is available in your org and added to your authenticator enrollment and app sign-in policies. Configuring the WebAuthn authenticator in your policies enables users to register and sign in with passkeys.
+Before configuring passkeys with the steps in this guide, ensure that the Passkeys (FIDO2 WebAuthn) authenticator is available in your org and added to your authenticator enrollment and app sign-in policies. Configuring the Passkeys (FIDO2 WebAuthn) authenticator in your policies enables users to register and sign in with passkeys.
 
-1. [Add the FIDO2 (WebAuthn) authenticator](https://help.okta.com/okta_help.htm?type=oie&id=csh-configure-webauthn) to your org.
-1. Add the WebAuthn authenticator to an [authenticator enrollment policy](https://help.okta.com/okta_help.htm?type=oie&id=ext-create-mfa-policy) to allow users to register passkeys.
-1. Include the WebAuthn authenticator in an [app sign-in policy](https://help.okta.com/okta_help.htm?type=oie&id=ext-create-auth-policy) to allow users to sign in with passkeys.
+1. [Add the Passkeys (FIDO2 WebAuthn) authenticator](https://help.okta.com/okta_help.htm?type=oie&id=csh-configure-webauthn) to your org.
+1. Add the Passkeys (FIDO2 WebAuthn) authenticator to an [authenticator enrollment policy](https://help.okta.com/okta_help.htm?type=oie&id=ext-create-mfa-policy) to allow users to register passkeys.
+1. Include the Passkeys (FIDO2 WebAuthn) authenticator in an [app sign-in policy](https://help.okta.com/okta_help.htm?type=oie&id=ext-create-auth-policy) to allow users to sign in with passkeys.
 
 ## Understand custom domains and passkeys
 
@@ -92,7 +90,7 @@ Before you create an RP ID, review these steps:
 >
 > If you use associated domains to share passkeys across different root domains, the `/.well-known/webauthn` file only needs to be hosted on the root domain that you use as the RP ID.
 
-Then, use the [Replace an authenticator method endpoint](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Authenticator/#tag/Authenticator/operation/replaceAuthenticatorMethod) to create an RP ID for the WebAuthn authenticator. The response includes the TXT record value that you need to add to your DNS provider to verify ownership of the root domain.
+Then, use the [Replace an authenticator method endpoint](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Authenticator/#tag/Authenticator/operation/replaceAuthenticatorMethod) to create an RP ID for the Passkeys authenticator. The response includes the TXT record value that you need to add to your DNS provider to verify ownership of the root domain.
 
 1. Use the following request example as a template.
 1. In the path parameters, set the following values:

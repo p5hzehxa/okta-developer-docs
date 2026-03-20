@@ -37,7 +37,7 @@ If you configured your Okta org correctly, you need to respond to two specific a
 * `AwaitingAuthenticatorEnrollment` that's covered in this section
 * `AwaitingChallengeAuthenticatorSelection` that's covered in the [challenge flow section](/docs/guides/authenticators-web-authn/aspnet/main/#integrate-sdk-for-authenticator-challenge).
 
-The names of the authenticators available for enrollment or challenge can be found in the `AuthenticationResponse` object's `Authenticators` collection. Redirect the user to a list of authenticators to select the Passkeys authenticator for enrollment.
+The names of the authenticators available for enrollment or challenge can be found in the `AuthenticationResponse` object's `Authenticators` collection. Redirect the user to a list of authenticators to select the Passkeys (FIDO2 WebAuthn) authenticator for enrollment.
 
 > **Note**: The `isChallengeFlow` session variable is set to `false` if the user needs to enroll the Passkeys authenticator, and `true` if they have already done so.
 
@@ -133,19 +133,19 @@ The `viewModel` parameter is then consumed in a Razor page.
 </section>
 ```
 
-The Passkeys factor option is listed as **Security Key or Biometric**, as shown in the following image.
+The Passkeys (FIDO2 WebAuthn) factor option is listed as **Security Key or Biometric**, as shown in the following image.
 
 <div class="three-quarter">
 
-![An authenticator list showing Passkeys Authenticator available for use](/img/authenticators/dotnet-authenticators-webauthn-authenticator-list.png)
+![An authenticator list showing Passkeys (FIDO2 WebAuthn) Authenticator available for use](/img/authenticators/dotnet-authenticators-webauthn-authenticator-list.png)
 
 </div>
 
 ### Retrieve encrypted challenge and user information
 
-When the user selects the Passkeys authenticator factor and clicks **Submit**, the form posts back to the `SelectAuthenticatorAsync` method. This checks whether the user is in challenge flow or enrollment flow.
+When the user selects the Passkeys (FIDO2 WebAuthn) factor and clicks **Submit**, the form posts back to the `SelectAuthenticatorAsync` method. This checks whether the user is in challenge flow or enrollment flow.
 
-When in Enrollment flow, a call is made to `idxClient.SelectEnrollAuthenticatorAsync`, using its `enrollAuthenticatorOptions` parameter to pass in the Passkeys authenticator factor ID.
+When in Enrollment flow, a call is made to `idxClient.SelectEnrollAuthenticatorAsync`, using its `enrollAuthenticatorOptions` parameter to pass in the Passkeys (FIDO2 WebAuthn) factor ID.
 
 ```csharp
 var enrollAuthenticatorOptions = new SelectEnrollAuthenticatorOptions
@@ -191,7 +191,7 @@ switch (enrollResponse?.AuthenticationStatus)
 
 ### Enroll authenticator through the browser
 
-Build a page with the challenge and user information from the website's backend servers. Then, call `navigator.credentials.create` to raise the prompt to enter a security key, validate with Windows Hello, Touch ID, or other WebAuthn authenticator. For example, in the sample app, a `EnrollWebAuthnViewModel` populates from the `currentAuthenticator` object that's returned by the `enrollResponse` in the previous step.
+Build a page with the challenge and user information from the website's backend servers. Then, call `navigator.credentials.create` to raise the prompt to enter a security key, validate with Windows Hello, Touch ID, or other Passkeys (FIDO2 WebAuthn) authenticator. For example, in the sample app, a `EnrollWebAuthnViewModel` populates from the `currentAuthenticator` object that's returned by the `enrollResponse` in the previous step.
 
 ```csharp
 var currentAuthenticator = (IAuthenticator)Session["currentWebAuthnAuthenticator"];
@@ -267,7 +267,7 @@ After the authenticator validates the user, it returns an `attestationObject` th
 
 ### Send verification credentials
 
-Send the verifying credentials back to the Okta server to finish enrolling the WebAuthn authenticator for the user. Okta decrypts the challenge using the user's public key. Okta then stores the user's credentials and the public key.
+Send the verifying credentials back to the Okta server to finish enrolling the Passkeys (FIDO2 WebAuthn) authenticator for the user. Okta decrypts the challenge using the user's public key. Okta then stores the user's credentials and the public key.
 
 ```js
         fetch("@Url.Action("EnrollWebAuthnAuthenticatorAsync", "Manage")", options)
@@ -307,7 +307,7 @@ Query the `AuthenticationStatus` property of the `AuthenticationResponse` object
 
 A status of `AwaitingAuthenticatorEnrollment` means that there are other authenticator types (Google, Okta Verify) the user has yet to enroll. Your app should then [display a list of those authenticators](#display-a-list-of-possible-authenticator-factors) that are still unenrolled and an option to skip further enrollment.
 
-A status of `Success` (or the user choosing to skip further authenticator enrollment) means that the user has now successfully enrolled their WebAuthn authenticator and is signed in to the app. Call `AuthenticationHelper.GetIdentityFromTokenResponseAsync` to retrieve the OIDC claims information about the user and pass them to your app.
+A status of `Success` (or the user choosing to skip further authenticator enrollment) means that the user has now successfully enrolled their Passkeys (FIDO2 WebAuthn) authenticator and is signed in to the app. Call `AuthenticationHelper.GetIdentityFromTokenResponseAsync` to retrieve the OIDC claims information about the user and pass them to your app.
 
 ```csharp
 var authnResponse = (IAuthenticationResponse)Session["webAuthnResponse"];
