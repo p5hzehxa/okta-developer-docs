@@ -65,7 +65,7 @@ catch (OktaException exception)
 
 ### Display a list of possible authenticator factors
 
-Build a page to display the list of authenticators (including a WebAuthn option). For example, in the sample app, a `SelectAuthenticatorViewModel` populates from the `Authenticators` collection that's returned by the `AuthenticationResponse`.
+Build a page to display the list of authenticators (including a WebAuthn option). For example, in the sample app, a `SelectAuthenticatorViewModel` populates from the `Authenticators` collection that's in the `AuthenticationResponse`.
 
 ```csharp
 public ActionResult SelectAuthenticator()
@@ -191,7 +191,7 @@ switch (enrollResponse?.AuthenticationStatus)
 
 ### Enroll authenticator through the browser
 
-Build a page with the challenge and user information from the website's backend servers. Then, call `navigator.credentials.create` to raise the prompt to enter a security key, validate with Windows Hello, Touch ID, or other Passkeys (FIDO2 WebAuthn) authenticator. For example, in the sample app, a `EnrollWebAuthnViewModel` populates from the `currentAuthenticator` object that's returned by the `enrollResponse` in the previous step.
+Build a page with the challenge and user information from the website's backend servers. Then, call `navigator.credentials.create` to raise the prompt to enter a security key, validate with Windows Hello, Touch ID, or other Passkeys (FIDO2 WebAuthn) authenticator. For example, in the sample app, a `EnrollWebAuthnViewModel` populates from the `currentAuthenticator` object that's from the `enrollResponse` in the previous step.
 
 ```csharp
 var currentAuthenticator = (IAuthenticator)Session["currentWebAuthnAuthenticator"];
@@ -300,7 +300,7 @@ Session["WebAuthnResponse"] = authnResponse;
 
 ### Enroll more authenticators or sign the user in
 
-Query the `AuthenticationStatus` property of the `AuthenticationResponse` object that's returned by `EnrollAuthenticatorAsync` to discover the status of the authentication process. Respond to two specific authenticator statuses:
+Query the `AuthenticationStatus` property of the `AuthenticationResponse` object that's in the `EnrollAuthenticatorAsync` to discover the status of the authentication process. Respond to two specific authenticator statuses:
 
 * `AwaitingAuthenticatorEnrollment`
 * `Success`
