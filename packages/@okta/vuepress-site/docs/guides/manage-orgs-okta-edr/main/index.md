@@ -22,7 +22,7 @@ This guide explains how to manage a failover and failback of your Okta org using
 - An Okta production org (Enhanced DR is not available for Okta Preview or Okta Integrator Free Plan orgs)
 - The Enhanced DR product enabled for your org
 - Super administrator privileges or Enhanced DR privileges
-- [Enhanced Disaster Recovery APIs](https://developer.okta.com/docs/api//openapi/okta-management/management/tag/DisasterRecovery/)
+- [Enhanced Disaster Recovery APIs](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/disasterrecovery)
 
 ---
 
