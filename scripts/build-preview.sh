@@ -11,15 +11,15 @@ if [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
   exit 1
 fi
 
-echo "Installing NVM..."
+# echo "Installing NVM..."
 
-export NVM_DIR="$HOME/.nvm"
+# export NVM_DIR="$HOME/.nvm"
 
-if [ ! -d "$NVM_DIR" ]; then
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
-fi
+# if [ ! -d "$NVM_DIR" ]; then
+#   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
+# fi
 
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+# [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
 echo "Installing Node 16..."
 # nvm install 16
