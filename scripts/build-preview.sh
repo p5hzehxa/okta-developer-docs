@@ -26,7 +26,7 @@ echo "Installing Node 16..."
 # nvm use 16
 
 setup_service node v16.20.2
-setup_service yarn 1.22.22
+setup_service yarn 1.21.1
 
 echo "Node version:"
 node -v
