@@ -13,3 +13,10 @@ test_suites:
     timeout: '50'
     criteria: OPTIONAL
     queue_name: small
+  - name: 'test-slack-notifications'
+    script_path: /root/okta/okta-developer-docs/scripts
+    script_name: test-slack-notifications
+    sort_order: '0'
+    timeout: '50'
+    criteria: OPTIONAL
+    queue_name: small
