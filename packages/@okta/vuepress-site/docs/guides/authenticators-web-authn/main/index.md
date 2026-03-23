@@ -72,15 +72,13 @@ In the previous example, the public and private keys are generated on the user's
 
 </div>
 
-As the Service Provider, you can provide WebAuthn support to your users. Enable Passkeys in your org and build out support for it in your app using the embedded SDK.
+As the Service Provider, you can provide WebAuthn support to your users. Enable the Passkeys (FIDO2 WebAuthn) authenticator in your org and build out support for it in your app using the embedded SDK.
 
 ## Update configurations
 
-Before you can start using Passkeys, enable it in your Okta org and create an app sign-in policy that requires it to be used.
+Before you can start using the Passkeys (FIDO2 WebAuthn) authenticator, enable it in your Okta org and create an app sign-in policy that requires it to be used.
 
-### Add WebAuthn to your org
-
-First, add the Passkeys authenticator to your org and enable it.
+### Add the Passkeys authenticator to your org
 
 1. In the **Admin Console**, go to **Security > Authenticators** to show the available authenticators.
 1. Follow these steps if **Passkeys (FIDO2 WebAuthn)** isn't in the list:
@@ -130,7 +128,7 @@ Create a policy specifically for your app for testing purposes.
 
 ## Integrate SDK for authenticator enrollment
 
-Integrate the embedded SDK to enroll a user with a Passkeys (FIDO2 WebAuthn) authenticator, such as a security key or biometric. This flow typically starts after a primary authentication method, like a password, when the SDK signals that enrollment is required. Your app then uses a challenge from Okta to call the browser's `navigator.credentials.create()` method. After the user creates the passkey, it's sent back to Okta to complete the enrollment process.
+Integrate the embedded SDK to enroll a user with a Passkeys (FIDO2 WebAuthn) authenticator, such as a security key or biometric. This flow typically starts after a primary authentication method, like a password, when the SDK signals that enrollment is required. Your app then uses a challenge from Okta to call the browser's `navigator.credentials.create()` method. After the user creates the authenticator enrollment, it's sent back to Okta to complete the enrollment process.
 
 ### Summary of steps
 

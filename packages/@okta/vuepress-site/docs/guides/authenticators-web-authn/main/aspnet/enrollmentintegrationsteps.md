@@ -137,7 +137,7 @@ The Passkeys (FIDO2 WebAuthn) factor option is listed as **Security Key or Biome
 
 <div class="three-quarter">
 
-![An authenticator list showing Passkeys (FIDO2 WebAuthn) Authenticator available for use](/img/authenticators/dotnet-authenticators-webauthn-authenticator-list.png)
+![An authenticator list showing Passkeys (FIDO2 WebAuthn) authenticator available for use](/img/authenticators/dotnet-authenticators-webauthn-authenticator-list.png)
 
 </div>
 

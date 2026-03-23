@@ -11,7 +11,7 @@ The first step is to initiate a use case that requires authentication. This guid
 
 ### Display the Passkeys (FIDO2 WebAuthn) option
 
-If you configure your Okta org as detailed in [Configuration updates](#update-configurations), `authenticate()` returns a response with Passkeys (FIDO2 WebAuthn) in the list of available authenticators. Specifically, `IdxTransaction` is returned with a `status` of `PENDING`, `nextStep.name` set to `select-authenticator-enroll`, and the passkeys authenticator included as an option in the `nextStep.options` array. See the following `IdxTransaction` example.
+If you configure your Okta org as detailed in [Configuration updates](#update-configurations), `authenticate()` returns a response with Passkeys (FIDO2 WebAuthn) in the list of available authenticators. Specifically, `IdxTransaction` is returned with a `status` of `PENDING`, `nextStep.name` set to `select-authenticator-enroll`, and the authenticator included as an option in the `nextStep.options` array. See the following `IdxTransaction` example.
 
 ```json
 {
