@@ -4,9 +4,7 @@ export SLACK_CHANNEL='#tmp-test-slack-notif'
 # Strip anything after @ in AUTHOR for slack handle
 export SLACK_CHANNEL_PERSONAL="@${AUTHOR}"
 
-echo "=== All Environment Variables ==="
-env | sort
-echo "================================="
+echo "Testing Slack notifications... ${SLACK_CHANNEL_PERSONAL}"
 
 # send_slack_message "${SLACK_CHANNEL}" \
 #     ":white_check_mark:" \
