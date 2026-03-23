@@ -21,6 +21,8 @@ fi
 
 # [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
+yum install -y gnupg2
+
 echo "Installing Node 16..."
 # nvm install 16
 # nvm use 16
