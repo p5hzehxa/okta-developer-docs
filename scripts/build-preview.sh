@@ -22,31 +22,37 @@ fi
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
 echo "Installing Node 16..."
-nvm install 16
-nvm use 16
+# nvm install 16
+# nvm use 16
+
+setup_service node v16.20.2
+setup_service yarn 1.22.22
 
 echo "Node version:"
 node -v
 echo "NPM version:"
 npm -v
 
-echo "Installing Yarn..."
-npm install -g yarn
+echo "Yarn version:"
+yarn -v
+
+# echo "Installing Yarn..."
+# npm install -g yarn
 
 echo "Installing dependencies..."
 yarn install --frozen-lockfile --ignore-platform
 
-echo "Building preview..."
-yarn build
+# echo "Building preview..."
+# yarn build
 
-echo "Deploying preview to Netlify..."
+# echo "Deploying preview to Netlify..."
 
-if [ -n "$BRANCH" ]; then
-  npx netlify-cli@17.23.5 deploy --alias="${BRANCH}" --filter @okta/vuepress-site --dir ../packages/@okta/vuepress-site/dist
+# if [ -n "$BRANCH" ]; then
+#   npx netlify-cli@17.23.5 deploy --alias="${BRANCH}" --filter @okta/vuepress-site --dir ../packages/@okta/vuepress-site/dist
 
-  echo "Preview link:"
-  echo "https://${BRANCH}--dev-docs-preview.netlify.app"
+#   echo "Preview link:"
+#   echo "https://${BRANCH}--dev-docs-preview.netlify.app"
 
-else
-  echo "No pull request detected. Not deploying to Netlify."
-fi
+# else
+#   echo "No pull request detected. Not deploying to Netlify."
+# fi
