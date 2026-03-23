@@ -2,13 +2,7 @@
 set -e
 export SLACK_CHANNEL='#tmp-test-slack-notif'
 # Strip anything after @ in AUTHOR for slack handle
-if [[ -n "$AUTHOR" ]]; then
-  AUTHOR_SLACK="${AUTHOR%@*}"
-  export SLACK_CHANNEL_PERSONAL="@${AUTHOR_SLACK}"
-else
-  export SLACK_CHANNEL_PERSONAL="@"
-fi
-export SLACK_CHANNEL_PERSONAL2='@Ishan Krishna'
+export SLACK_CHANNEL_PERSONAL="@${AUTHOR}"
 
 echo "=== All Environment Variables ==="
 env | sort
