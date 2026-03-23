@@ -11,16 +11,6 @@ if [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
   exit 1
 fi
 
-# echo "Installing NVM..."
-
-# export NVM_DIR="$HOME/.nvm"
-
-# if [ ! -d "$NVM_DIR" ]; then
-#   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
-# fi
-
-# [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-
 echo "Installing Node 16..."
 
 setup_service node v16.20.2
@@ -31,17 +21,24 @@ npm install -g yarn
 echo "Installing dependencies..."
 yarn install --frozen-lockfile --ignore-platform
 
-# echo "Building preview..."
-# yarn build
+echo "Building preview..."
 
-# echo "Deploying preview to Netlify..."
+if [ "$WITH_REDIRECTS" = "true" ]; then
+  echo "Building with redirects..."
+  yarn build-with-redirect
+else
+  echo "Building without redirects..."
+  yarn build
+fi
 
-# if [ -n "$BRANCH" ]; then
-#   npx netlify-cli@17.23.5 deploy --alias="${BRANCH}" --filter @okta/vuepress-site --dir ../packages/@okta/vuepress-site/dist
+echo "Deploying preview to Netlify..."
 
-#   echo "Preview link:"
-#   echo "https://${BRANCH}--dev-docs-preview.netlify.app"
+if [ -n "$BRANCH" ]; then
+  npx netlify-cli@17.23.5 deploy --alias="${BRANCH}" --filter @okta/vuepress-site --dir ../packages/@okta/vuepress-site/dist
 
-# else
-#   echo "No pull request detected. Not deploying to Netlify."
-# fi
+  echo "Preview link:"
+  echo "https://${BRANCH}--dev-docs-preview.netlify.app"
+
+else
+  echo "No pull request detected. Not deploying to Netlify."
+fi
