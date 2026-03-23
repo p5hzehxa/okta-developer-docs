@@ -2,7 +2,7 @@
 set -e
 export SLACK_CHANNEL='#tmp-test-slack-notif'
 # Strip anything after @ in AUTHOR for slack handle
-export SLACK_CHANNEL_PERSONAL="${AUTHOR}"
+export SLACK_CHANNEL_PERSONAL="@emikhasyak"
 
 echo "Testing Slack notifications... ${SLACK_CHANNEL_PERSONAL}"
 
