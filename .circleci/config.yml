@@ -3,14 +3,6 @@ version: 2.1
 orbs:
   platform-helpers-general: okta/general-platform-helpers@1.9.4
 
-parameters:
-  preview:
-    type: string
-    default: ""
-  preview_with_redirect:
-    type: string
-    default: ""
-
 commands:
   install-deps:
     steps:
@@ -128,96 +120,13 @@ jobs:
                     </p><h2 style='font-family: Arial, sans-serif; font-size: 16px; color: #333; line-height: 1.6; text-align: center;'>List of broken URLs:</h2>$formatted_broken_urls"
             fi
 
-  netlify_manual:
-    docker:
-      - image: cimg/node:14.21.3-browsers
-    resource_class: xlarge
-    steps:
-      - run:
-          name: Has secrets?
-          command: |
-            if [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
-              echo "Missing required secrets."
-              exit 1
-            fi
-      - checkout
-      - install-deps
-      - run:
-          name: Build preview
-          command: |
-            yarn build
-      - run:
-          name: Install Netlify CLI
-          command: |
-            npm install netlify-cli@17.23.5 -g
-      - run:
-          name: Deploy preview to Netlify
-          command: |
-            netlify deploy --alias=preview-${CIRCLE_PULL_REQUEST##*/} --filter @okta/vuepress-site
-      - run:
-          name: Log preview link
-          command: |
-            if [ -n "$CIRCLE_PULL_REQUEST" ]; then
-              PR_NUMBER="${CIRCLE_PULL_REQUEST##*/}"
-              echo "Preview link:"
-              echo "https://preview-${PR_NUMBER}--reverent-murdock-829d24.netlify.app"
-            else
-              echo "No pull request detected. Preview link not available."
-            fi
-
-  netlify_manual_with_redirects:
-    docker:
-      - image: cimg/node:14.21.3-browsers
-    resource_class: xlarge
-    steps:
-      - run:
-          name: Has secrets?
-          command: |
-            if [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
-              echo "Missing required secrets."
-              exit 1
-            fi
-      - checkout
-      - install-deps
-      - run:
-          name: Build preview
-          command: |
-            yarn build-with-redirect
-      - run:
-          name: Install Netlify CLI
-          command: |
-            npm install netlify-cli@17.23.5 -g
-      - run:
-          name: Deploy preview to Netlify
-          command: |
-            netlify deploy --alias=preview-${CIRCLE_PULL_REQUEST##*/} --filter @okta/vuepress-site
-      - run:
-          name: Log preview link
-          command: |
-            if [ -n "$CIRCLE_PULL_REQUEST" ]; then
-              PR_NUMBER="${CIRCLE_PULL_REQUEST##*/}"
-              echo "Preview link:"
-              echo "https://preview-${PR_NUMBER}--reverent-murdock-829d24.netlify.app"
-            else
-              echo "No pull request detected. Preview link not available."
-            fi
-
-
 workflows:
   linting:
-    when:
-      and:
-        - not: << pipeline.parameters.preview >>
-        - not: << pipeline.parameters.preview_with_redirect >>
     jobs:
       - inclusive-linting:
           name: "Inclusive Linting"
 
   build_checks:
-    when:
-      and:
-        - not: << pipeline.parameters.preview >>
-        - not: << pipeline.parameters.preview_with_redirect >>
     jobs:
       - node_build_checks:
           name: "Build and Checks"
@@ -243,15 +152,3 @@ workflows:
     jobs:
       - nightly_link_checker:
           name: "Nightly Link Checker"
-
-  netlify_manual:
-    when: << pipeline.parameters.preview >>
-    jobs:
-      - netlify_manual:
-          name: "Netlify Manual"
-
-  netlify_manual_with_redirects:
-    when: << pipeline.parameters.preview_with_redirect >>
-    jobs:
-      - netlify_manual_with_redirects:
-          name: "Netlify Manual With Redirects"

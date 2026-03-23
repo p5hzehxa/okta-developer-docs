@@ -11,24 +11,9 @@ if [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
   exit 1
 fi
 
-echo "Installing NVM..."
-
-export NVM_DIR="$HOME/.nvm"
-
-if [ ! -d "$NVM_DIR" ]; then
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
-fi
-
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-
 echo "Installing Node 16..."
-nvm install 16
-nvm use 16
 
-echo "Node version:"
-node -v
-echo "NPM version:"
-npm -v
+setup_service node v16.20.2
 
 echo "Installing Yarn..."
 npm install -g yarn
@@ -37,7 +22,14 @@ echo "Installing dependencies..."
 yarn install --frozen-lockfile --ignore-platform
 
 echo "Building preview..."
-yarn build
+
+if [ "$WITH_REDIRECTS" = "true" ]; then
+  echo "Building with redirects"
+  yarn build-with-redirect
+else
+  echo "Building without redirects"
+  yarn build
+fi
 
 echo "Deploying preview to Netlify..."
 
