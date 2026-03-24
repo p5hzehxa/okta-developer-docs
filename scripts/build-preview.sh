@@ -41,6 +41,7 @@ if [ -n "$BRANCH" ]; then
 
   export SHA_LINK="https://github.com/okta/okta-developer-docs/commit/${SHA}"
   export BACON_LINK="https://bacon-go.aue1e.saasure.net/commits?artifact=okta-developer-docs&sha=${SHA}"
+  export BRANCH_LINK="https://github.com/okta/okta-developer-docs/compare/${BRANCH}"
 
   if [[ -n "$AUTHOR" ]]; then
     AUTHOR_USERNAME="${AUTHOR%@*}"
@@ -54,7 +55,7 @@ if [ -n "$BRANCH" ]; then
   export PREVIEW_URL
 
   send_slack_message "${AUTHOR_SLACK_HANDLE}" \
-      "Preview for your topic branch <${SHA_LINK}|${BRANCH}> is ready :white_check_mark:" \
+      "Preview for your topic branch <${BRANCH_LINK}|${BRANCH}> is ready :white_check_mark:" \
       "Preview: ${PREVIEW_URL} \n Bacon: <${BACON_LINK}|${SHA}>"\
       "good"
 
