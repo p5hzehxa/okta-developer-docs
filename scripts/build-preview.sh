@@ -23,12 +23,12 @@ yarn install --frozen-lockfile --ignore-platform
 
 echo "Building preview..."
 
-if [ "$WITH_REDIRECTS" = "true" ]; then
-  echo "Building with redirects"
-  yarn build-with-redirect
-else
+if [ "$WITHOUT_REDIRECTS" = "true" ]; then
   echo "Building without redirects"
   yarn build
+else
+  echo "Building with redirects"
+  yarn build-with-redirect
 fi
 
 echo "Deploying preview to Netlify..."
@@ -38,6 +38,25 @@ if [ -n "$BRANCH" ]; then
 
   echo "Preview link:"
   echo "https://${BRANCH}--dev-docs-preview.netlify.app"
+
+  export SHA_LINK="https://github.com/okta/okta-developer-docs/commit/${SHA}"
+  export BACON_LINK="https://bacon-go.aue1e.saasure.net/commits?artifact=okta-developer-docs&sha=${SHA}"
+
+  if [[ -n "$AUTHOR" ]]; then
+    AUTHOR_USERNAME="${AUTHOR%@*}"
+    export AUTHOR_SLACK_HANDLE="@${AUTHOR_USERNAME}"
+  else
+    export AUTHOR_SLACK_HANDLE="@"
+  fi
+
+  PREVIEW_URL="https://${BRANCH}--dev-docs-preview.netlify.app"
+
+  export PREVIEW_URL
+
+  send_slack_message "${AUTHOR_SLACK_HANDLE}" \
+      "Preview for your topic branch \"${BRANCH}\" is ready :white_check_mark:" \
+      "Preview: ${PREVIEW_URL} \n Bacon: <${BACON_LINK}|${SHA}>"\
+      "good"
 
 else
   echo "No pull request detected. Not deploying to Netlify."
