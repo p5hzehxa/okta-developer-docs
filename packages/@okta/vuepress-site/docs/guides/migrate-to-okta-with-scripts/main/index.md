@@ -56,9 +56,9 @@ Before migrating your users to Okta, careful planning and preparation are essent
 * Do not use real user data when testing
 * Use clients like Postman to securely test your script's user and group creation API requests
 
-## Migration scripts for specific use cases
+## Import script for specific use cases
 
-The following JavaScript code imports users from your source data in the following three scenarios:
+The following JavaScript code imports users from your source data into Okta in one of the following three scenarios:
 
 * Seamless, one-time migration: This scenario imports users with their hashed password and makes their account active.
 
@@ -74,23 +74,23 @@ The following JavaScript file contains all three scenarios:
 // User data
 const users = [
   {
-    firstName: 'Bob',
-    lastName: 'Guerin3',
-    email: 'bob.guerin3@example.com',
+    firstName: 'Jessie',
+    lastName: 'Smith',
+    email: 'jessie.smith@example.com',
     salt: 'pwxb1yjwfpa6jcV0XKBtau', // Data for hashed password scenario
     hashedPassword: 'MnDMlKOOxMY4Tc.7wgpqFoAPYKi5wSe' // Data for hashed password scenario
   },
   {
     firstName: 'Kim',
-    lastName: 'Sanjay2',
-    email: 'kim.sanjay2@example.com',
+    lastName: 'Sato',
+    email: 'kim.sato@example.com',
     salt: 'pwxb1yjwfpa6jcV0XKBtau', // Data for hashed password scenario
     hashedPassword: 'MnDMlKOOxMY4Tc.7wgpqFoAPYKi5wSe' // Data for hashed password scenario
   },
   {
-    firstName: 'Raj',
-    lastName: 'Sharma2',
-    email: 'rajiv.sharma2@example.com',
+    firstName: 'Rajiv',
+    lastName: 'Tal',
+    email: 'rajiv.tal@example.com',
     salt: 'pwxb1yjwfpa6jcV0XKBtau', // Data for hashed password scenario
     hashedPassword: 'MnDMlKOOxMY4Tc.7wgpqFoAPYKi5wSe' // Data for hashed password scenario
   }
@@ -128,8 +128,7 @@ async function importUsersWithCredentials() {
 
   for (const user of users) {
     const query = new URLSearchParams({
-      activate: 'true',
-      provider: 'true'
+      activate: 'true'
     }).toString();
 
     const body = {
@@ -345,20 +344,133 @@ This script supports API access through scoped OAuth 2.0 access tokens, and uses
 
 ### Test data
 
-The test data for this example migration script appears at the beginning in the constant value, `const users`. This value is a prepopulated static array of usernames and passwords, as well as other data, depending on the user import scenario run. Modify this data with real-word values for your testing purposes. Or update this script to use your data source.
+The test data for this example migration script appears in the constant value, `const users`. This value is a prepopulated static array of usernames, passwords, and other profile data. The data used during the import process is dependent on the user import scenario run by the user. Modify this data with real-word values for your testing purposes, or update this script to use your data source.
 
-### Install and run the script
+### Create and run the script
 
-1. In your project directory, create the script (Note you need node version 18.17.0 or higher to run this javascript)
-1. Add your Okta Org URL and OAuth 2.0 Access Token as environment variables
+1. In your project directory, create a JavaScript file called `import-users-cli.js`.
+    > **Note:** You need Node.js version 18 or higher to run this script.
+1. Add your Okta Org URL and OAuth 2.0 Access Token as environment variables:
+
+    `export OKTA_ORG_URL="https://example.okta.com"`
+    `export OKTA_ACCESS_TOKEN="eyJraWQiOiJHUkp2ckJsTHFUOHR....qK3bcwjwG16NW87g"`
+
 1. If necessary, modify the static test data with users and values for your testing.
-1. Run it!
+1. Run the script with Node.js based on the scenario you'd like to implement:
+
+    * `node import-users-cli.js` for the migration of users with hashed passwords
+
+    * `node import-users-cli.js --staged` for the migration of staged users without credentials
+
+    * `node import-users-cli.js --hook` for the migration of users with a password import inline hook
+
+See the following sections for details on the Users API requests that complete each scenario.
 
 ## Seamless, one-time migration
-explain
+
+This scenario imports users with their existing hashed passwords and immediately activates their accounts. Users can sign in immediately after import without needing to reset their password. This approach is ideal when you want to minimize friction during migration and users can retain their existing credentials.
+
+The following example shows the Users API request body for this scenario:
+
+```json
+POST https://{yourOktaDomain}/api/v1/users?activate=true
+
+{
+  "profile": {
+    "firstName": "Jessie",
+    "lastName": "Smith",
+    "email": "jessie.smith@example.com",
+    "login": "jessie.smith@example.com"
+  },
+  "credentials": {
+    "password": {
+      "hash": {
+        "algorithm": "BCRYPT",
+        "workFactor": 10,
+        "salt": "pwxb1yjwfpa6jcV0XKBtau",
+        "value": "MnDMlKOOxMY4Tc.7wgpqFoAPYKi5wSe"
+      }
+    }
+  }
+}
+```
+
+#### Key values for this scenario:
+
+* **`activate=true`** - Immediately activates the user account
+* **`algorithm`** - The hashing algorithm used for the password. This script used BCRYPT by default.
+* **`workFactor`** - The cost factor for the algorithm. This example used 10 by default.
+* **`salt`** - The salt value used in the original password hash
+* **`value`** - The hashed password value from your source system
+
+See the [Create a User API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/user/section/create-user-with-password#section/Create-user-with-imported-hashed-password).
 
 ## One-time migration with authentication reset
+
+This scenario imports users without credentials and stages their accounts. Staged users don't have an active password and must complete an authentication reset through email before they can sign in. This approach is ideal when you don't have access to hashed passwords from your source system, or you want to force users to set a new password during their first sign-in to Okta.
+
+The following example shows the Users API request body for this scenario:
+
+```json
+POST https://{yourOktaDomain}/api/v1/users?activate=false
+
+{
+  "profile": {
+    "firstName": "Jessie",
+    "lastName": "Smith",
+    "email": "jessie.smith@example.com",
+    "login": "jessie.smith@example.com"
+  }
+}
+```
+
+**Key values for this scenario:**
+
+* **`activate=false`** - Stages the user account without activating it
+* **`profile`** - Contains only user profile information (name, email, login)
+
+After import, users receive an email with instructions to activate their account and set a new password.
+
+See the [Create a User API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/user/section/create-user-with-optional-password#section/Create-user-without-credentials).
 
 
 ## Migration program using inline password hooks
 
+This scenario imports users with active accounts and allows them to use their existing passwords on first sign-in through a password import inline hook. The user's password is validated through your custom hook logic, which can authenticate against your legacy system or hashed password database. This approach is ideal when you want users to retain their original passwords during migration and have a more gradual password transition period.
+
+> **Note:** This scenario requires the configuration of an [Okta Password import inline hook](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/inlinehook/webhooks/createpasswordimportinlinehook) before you run the import script.
+
+The following example shows the Users API request body for this scenario:
+
+```json
+POST https://{yourOktaDomain}/api/v1/users?activate=true
+
+{
+  "profile": {
+    "firstName": "Jessie",
+    "lastName": "Smith",
+    "email": "jessie.smith@example.com",
+    "login": "jessie.smith@example.com"
+  },
+  "credentials": {
+    "password": {
+      "hook": {
+        "type": "default"
+      }
+    }
+  }
+}
+```
+
+**Key values for this scenario:**
+
+* **`activate=true`** - Immediately activates the user account
+* **`hook.type: "default"`** - Specifies that a password import inline hook should be used for authentication
+* **`profile`** - Contains user profile information (name, email, login)
+
+On first sign-in, the user's credentials are sent to your configured password import inline hook, which validates them against your legacy system and either grants access or returns an error. See the [Create a user API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/user/section/create-user-with-imported-hashed-password#section/Create-user-with-password-import-inline-hook).
+
+For examples on how to implement the password import inline hook, see:
+
+* [Password import inline hook](/docs/guides/password-import-inline-hook/nodejs/main/)
+* [Migrate User Passwords with Okta's Password Hook](https://developer.okta.com/blog/2020/09/18/password-hook-migration)
