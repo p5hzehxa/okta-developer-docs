@@ -107,6 +107,12 @@ The Okta OIN team requires a dedicated account in your app to run their tests. E
 
 ### Configure integration type settings
 
+### <StackSnippet snippet="protocol-name" />
+
+<StackSnippet snippet="submit" />
+
+<br>
+
 As you add configuration information about your integration to the submission page, the indicators on the top right show your progress towards 100% completion.
 
 Include all required information before you click **Submit for Review** to move your integration into the submission phase.
@@ -167,5 +173,9 @@ If you need assistance with deleting a draft submission, contact the Okta OIN te
 If you want to remove an app integration that's already published in the OIN catalog, contact the Okta OIN team. Only the Okta OIN team can remove published integrations in the catalog. Send an email to <oin@okta.com> with the URL of your Integrator Free Plan org, the name of the app integration, and a link to its location in the OIN catalog.
 
 Removing an app integration from the OIN doesn't prohibit existing users from accessing it. The app integration isn't removed from End-User Dashboards until an admin for the customer's org removes the app integration from their org.
+
+## See also
+
+<StackSnippet snippet="see-also" />
 
 Finally, if you intend to remove your back-end app support for your Okta integration, alert your customer admins about the change. Inform your customers if you're deploying a replacement solution.
