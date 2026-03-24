@@ -2,11 +2,11 @@
 title: Script your user migration with the Okta Users API
 meta:
   - name: description
-    content: Provides background and best practices to script your user migration from an external system to Okta using Okta APIs.
+    content: Provides background and best practices to script your user import from an external system to Okta using Okta APIs.
 layout: Guides
 ---
 
-This guide explains how you can programmatically migrate users from an external system to Okta. Use the following scripting options with your source data to create users in Okta with the Okta Users API.
+This guide explains how you can programmatically import users from an external system to Okta. Use the following scripting options with your source data to create users in Okta with the Okta Users API.
 
 ---
 
@@ -17,19 +17,18 @@ Perform a bulk migration of users into Okta by using the Okta APIs.
 #### What you need
 
 * [Okta Integrator Free Plan org](https://developer.okta.com/signup)
-* Postman client to run API requests. See [Use Postman with the Okta REST APIs](https://developer.okta.com/docs/reference/rest/) for information on setting up Postman.
 * Example or test source data to test user and group creation requests. (Don't use real user data when testing.)
 * [A plan for migrating existing users to Okta](/docs/guides/migrate-to-okta-prerequisites/)
 
 #### Sample code
 
-<!-- Other than scripts used in this guide, is there other code we can reference? -->
+* Use the sample JavaScript sample code included in this guide to run three bulk-import scenarios
 
 ---
 
 ## Preparation and Best Practices
 
-Before migrating your users to Okta, careful planning and preparation are essential to ensure a smooth, secure, and efficient migration process. The following best practices cover key areas to consider throughout your migration project.
+Before importing your users to Okta, careful planning and preparation are essential to ensure a smooth, secure, and efficient migration process. The following best practices cover key areas to consider throughout your import project.
 
 ### Reading from the Source Provider
 
@@ -51,7 +50,7 @@ Before migrating your users to Okta, careful planning and preparation are essent
 
 ### Testing
 
-* Create test data sets with multiple batches of progressively larger loads before attempting a production migration
+* Create test data sets with multiple batches of progressively larger loads before attempting a production import
 * Use sample data that mimics your real user data to identify potential issues
 * Don’t use real user data when testing
 * Use clients like Postman to securely test your script's user and group creation API requests
@@ -62,7 +61,7 @@ The following JavaScript code imports users from your source data into Okta in o
 
 * Seamless, one-time migration: This scenario imports users with their hashed password and makes their account active.
 
-* One-time migration with authentication reset: This scenario imports users without credentials and their account is staged.
+* One-time migration with authentication reset: This scenario migrates users without credentials and their account is staged.
 
 * Migration program using Okta password inline hooks: This scenario imports users who can migrate their existing password on first sign-in. This requires the configuration of an [Okta password import inline hook](/docs/guides/password-import-inline-hook/nodejs/main/).
 
@@ -342,18 +341,18 @@ This script supports API access through scoped OAuth 2.0 access tokens, and uses
 
 <CreateOAuth2Token/>
 
-### Test data
+### Test data for user import
 
 The test data for this example migration script appears in the constant value, `const users`. This value is a prepopulated static array of usernames, passwords, and other profile data. The data used during the import process depends on the user import scenario run by the user. Modify this data with real-world values for your testing purposes, or update this script to use your data source.
 
 ### Create and run the script
 
-1. In your project directory, create a JavaScript file called `import-users-cli.js`.
+1. In your project directory, create a JavaScript file called `import-users-cli.js` and copy the previous JavaScript code into the file.
     > **Note:** You need Node.js version 18 or higher to run this script.
 1. Add your Okta Org URL and OAuth 2.0 Access Token as environment variables:
 
-    `export OKTA_ORG_URL="https://example.okta.com"`
-    `export OKTA_ACCESS_TOKEN="eyJraWQiOiJHUkp2ckJsTHFUOHR....qK3bcwjwG16NW87g"`
+    * `export OKTA_ORG_URL="https://example.okta.com"`
+    * `export OKTA_ACCESS_TOKEN="eyJraWQiOiJHUkp2ckJsTHFUOHR....qK3bcwjwG16NW87g"`
 
 1. If necessary, modify the static test data with users and values for your testing.
 1. Run the script with Node.js based on the scenario that you'd like to implement:
@@ -471,5 +470,5 @@ On first sign-in, the user's credentials are sent to your configured password im
 
 For examples on how to implement the password import inline hook, see:
 
-* [Password import inline hook](/docs/guides/password-import-inline-hook/nodejs/main/)
+* [Password import inline hook](/docs/guides/password-import-inline-hook/)
 * [Migrate User Passwords with Okta's Password Hook](https://developer.okta.com/blog/2020/09/18/password-hook-migration)
