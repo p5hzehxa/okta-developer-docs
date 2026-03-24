@@ -1,22 +1,21 @@
 #!/bin/bash
 set -e
-export SLACK_CHANNEL='#tmp-test-slack-notif'
-# Strip anything after @ in AUTHOR for slack handle
-export SLACK_CHANNEL_PERSONAL="@emikhasyak"
+if [[ -n "$AUTHOR" ]]; then
+  AUTHOR_USERNAME="${AUTHOR%@*}"
+  export AUTHOR_SLACK_HANDLE="@${AUTHOR_USERNAME}"
+else
+  export AUTHOR_SLACK_HANDLE="@"
+fi
 
-echo "Testing Slack notifications... ${SLACK_CHANNEL_PERSONAL}"
+PREVIEW_URL="https://${BRANCH}--dev-docs-preview.netlify.app"
 
-# send_slack_message "${SLACK_CHANNEL}" \
-#     ":white_check_mark:" \
-#     "Author: \n GH:  \n Bacon:"\
-#     "good"
+export PREVIEW_URL
 
-send_slack_message "${SLACK_CHANNEL_PERSONAL}" \
-    ":white_check_mark:" \
-    "Author2: \n GH:  \n Bacon:"\
+echo "=== All Environment Variables ==="
+env | sort
+echo "================================="
+
+send_slack_message "${AUTHOR_SLACK_HANDLE}" \
+    "Preview for your topic branch ${BRANCH} is ready :white_check_mark:" \
+    "Preview: ${PREVIEW_URL} \n GH:  \n Bacon: <${BACON_LINK}|${SHA}>"\
     "good"
-
-# send_slack_message "${SLACK_CHANNEL_PERSONAL2}" \
-#     ":white_check_mark:" \
-#     "Author3: \n GH:  \n Bacon:"\
-#     "good"
