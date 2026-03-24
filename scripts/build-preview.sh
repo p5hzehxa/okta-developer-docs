@@ -22,14 +22,7 @@ echo "Installing dependencies..."
 yarn install --frozen-lockfile --ignore-platform
 
 echo "Building preview..."
-
-if [ "$WITHOUT_REDIRECTS" = "true" ]; then
-  echo "Building without redirects"
-  yarn build
-else
-  echo "Building with redirects"
-  yarn build-with-redirect
-fi
+yarn build-with-redirect
 
 echo "Deploying preview to Netlify..."
 
@@ -47,12 +40,11 @@ if [ -n "$BRANCH" ]; then
     AUTHOR_USERNAME="${AUTHOR%@*}"
     export AUTHOR_SLACK_HANDLE="@${AUTHOR_USERNAME}"
   else
-    export AUTHOR_SLACK_HANDLE="@"
+    echo "Error: AUTHOR environment variable is not set. Cannot determine Slack handle for notifications. Exiting..."
+    exit 1
   fi
 
-  PREVIEW_URL="https://${BRANCH}--dev-docs-preview.netlify.app"
-
-  export PREVIEW_URL
+  export PREVIEW_URL="https://${BRANCH}--dev-docs-preview.netlify.app"
 
   send_slack_message "${AUTHOR_SLACK_HANDLE}" \
       "Preview for your topic branch <${BRANCH_LINK}|${BRANCH}> is ready :white_check_mark:" \
