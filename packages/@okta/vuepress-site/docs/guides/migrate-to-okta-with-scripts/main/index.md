@@ -396,7 +396,7 @@ POST https://{yourOktaDomain}/api/v1/users?activate=true
 
 #### Key values for this scenario:
 
-* `activate=true`: Immediately activates the user account
+* `activate=true`: Immediately activates the user account (the default value is `true`)
 * `algorithm`: The hashing algorithm used for the password. This script used BCRYPT by default.
 * `workFactor`: The cost factor for the algorithm. This example used 10 by default.
 * `salt`: The salt value used in the original password hash
@@ -462,7 +462,7 @@ POST https://{yourOktaDomain}/api/v1/users?activate=true
 
 **Key values for this scenario:**
 
-* `activate=true`: Immediately activates the user account
+* `activate=true`: Immediately activates the user account (the default value is `true`)
 * `hook.type: "default"`: Specifies that a password import inline hook should be used for authentication
 * `profile`: Contains user profile information (`name`, `email`, and `login`)
 
