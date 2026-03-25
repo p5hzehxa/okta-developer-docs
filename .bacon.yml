@@ -6,6 +6,13 @@ test_suites:
     timeout: '50'
     criteria: OPTIONAL
     queue_name: small
+  - name: 'demo-slack-notification'
+    script_path: /root/okta/okta-developer-docs/scripts
+    script_name: demo-slack-notif
+    sort_order: '0'
+    timeout: '50'
+    criteria: OPTIONAL
+    queue_name: small
   - name: 'publish-production'
     script_path: /root/okta/okta-developer-docs/scripts
     script_name: publish
