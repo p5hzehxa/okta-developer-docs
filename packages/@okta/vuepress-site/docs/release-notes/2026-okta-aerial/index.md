@@ -19,6 +19,16 @@ See also [Introduction to the Okta Aerial API](https://developer.okta.com/docs/a
 
 ## March
 
+### Weekly release
+<!-- Published on: 2026-03-25T12:00:00Z -->
+| Change | Expected in Aerial services preview | Expected in Aerial services production |
+|--------|-----------------------------| -----------------------------|
+| [Bug fixed in weekly release](#bug-fixed-in-weekly-release)| March 25, 2026  | March 30, 2026   |
+
+#### Bug fixed in weekly release
+
+The Aerial Console sometimes contained incorrect data on a client's associated orgs. (OKTA-112607)
+
 ### Monthly release
 <!-- Published on: 2026-03-05T12:00:00Z -->
 | Change | Expected in Aerial services preview | Expected in Aerial services production |
