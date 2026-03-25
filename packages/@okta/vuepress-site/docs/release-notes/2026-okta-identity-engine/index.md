@@ -18,7 +18,7 @@ title: Okta Identity Engine API release notes 2026
 
 | Change | Expected in Preview Orgs |
 |--------|--------------------------|
-| [Bugs fixed in 2026.03.3](#bugs-fixed-in-2026-03-2) | March 25, 2026 |
+| [Bugs fixed in 2026.03.3](#bugs-fixed-in-2026-03-3) | March 25, 2026 |
 
 * The Sign-In Widget didn't load the bot protection enforcement challenge required on some endpoints, leading to an incorrect user redirect to a 403 page. ([OKTA-1125106]) (OKTA-1136962)
 
