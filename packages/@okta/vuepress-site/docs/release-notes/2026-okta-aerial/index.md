@@ -17,10 +17,10 @@ These release notes list customer-visible changes to the Okta Aerial API. Okta A
 
 See also [Introduction to the Okta Aerial API](https://developer.okta.com/docs/api/openapi/aerial/guides/overview/).
 
-## March
+## April
 
-### Weekly release
-<!-- Published on: 2026-03-25T12:00:00Z -->
+### Monthly release
+<!-- Published on: 2026-04-xxT12:00:00Z -->
 | Change | Expected in Aerial services preview | Expected in Aerial services production |
 |--------|-----------------------------| -----------------------------|
 | [Bug fixed in weekly release](#bug-fixed-in-weekly-release)| March 25, 2026  | March 30, 2026   |
