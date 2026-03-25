@@ -222,7 +222,7 @@ module.exports = ctx => ({
     primary_right_nav: [
       { text: 'Okta Docs', target: '_blank', link: 'https://help.okta.com/' },
       { text: 'Okta.com', target: '_blank', link: 'https://www.okta.com/' },
-      { text: 'Log in', target: '_blank', link: '/login/' },
+      { text: 'Sign in to Okta', target: '_blank', link: '/login/' },
     ],
     primary_doc_nav: [
       { text: 'Guides', link: '/docs/guides/' },
