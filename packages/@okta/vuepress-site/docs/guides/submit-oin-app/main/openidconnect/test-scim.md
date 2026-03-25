@@ -23,7 +23,7 @@ You need to run three sets of tests for SCIM integrations:
 1. Depending on your selected integration type, download the corresponding CRUD test file:
 
     * SCIM only: [Okta SCIM 2.0 CRUD Test](/standards/SCIM/SCIMFiles/Okta-SCIM-20-CRUD-Test.json) file.
-    * SCIM with Entitlement Management: [Okta SCIM 2.0 Entitlement Management CRUD Test](/standards/SCIM/SCIMFiles/Okta-SCIM-20-With-Entitlements-CRUD-Test.json) file.
+    * SCIM with Entitlement Management: [Okta SCIM 2.0 Entitlement Management CRUD Test](/standards/SCIM/SCIMFiles/Okta-SCIM-20-with-entitlements-CRUD-test.json) file.
 
    This CRUD test file is built for the [BlazeMeter Runscope](https://www.runscope.com/) API monitoring tool. If you don't have a Runscope account, you can sign up with a [free trial to Runscope](https://www.runscope.com/okta) for Okta developers.
 1. In Runscope, click **Import Test**.

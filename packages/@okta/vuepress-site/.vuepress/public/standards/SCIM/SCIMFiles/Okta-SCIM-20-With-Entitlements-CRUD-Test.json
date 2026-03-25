@@ -81,7 +81,7 @@
     {
       "step_type": "request",
       "skipped": false,
-      "note": "Assign user to SCIM App",
+      "note": "Assign a user to a SCIM app",
       "auth": {},
       "body": "{\r\n  \"id\": \"{{okta_add_userid}}\",\r\n  \"scope\": \"USER\",\r\n  \"credentials\": {\r\n    \"userName\": \"{{okta_user_email}}\"\r\n  },\r\n  \"profile\": {\r\n      \"familyName\": \"{{okta_user_lastname}}\",\r\n      \"givenName\": \"{{okta_user_firstname}}\",\r\n      \"emailType\": \"work\",\r\n      \"email\": \"{{okta_user_email}}\"\r\n  }\r\n}\r\n",
       "form": {},
@@ -115,7 +115,7 @@
     {
       "step_type": "request",
       "skipped": false,
-      "note": "Assign grants to user",
+      "note": "Assign grants to a user",
       "auth": {},
       "body": "{\r\n    \"grantType\": \"CUSTOM\",\r\n    \"targetPrincipal\": {\r\n        \"externalId\": \"{{okta_add_userid}}\",\r\n        \"type\": \"OKTA_USER\"\r\n    },\r\n    \"actor\": \"ADMIN\",\r\n    \"target\": {\r\n        \"externalId\": \"{{oktaAppId}}\",\r\n        \"type\": \"APPLICATION\"\r\n    }\r\n}",
       "form": {},
@@ -154,7 +154,7 @@
     {
       "step_type": "request",
       "skipped": false,
-      "note": "Verify if user is created in SCIM App",
+      "note": "Verify if a user is created in a SCIM app",
       "auth": {},
       "multipart_form": [],
       "headers": {
@@ -250,7 +250,7 @@
     {
       "step_type": "request",
       "skipped": false,
-      "note": "Verify firstname update in SCIM App",
+      "note": "Verify the firstname update in the SCIM app",
       "auth": {},
       "multipart_form": [],
       "headers": {
@@ -283,7 +283,7 @@
     {
       "step_type": "request",
       "skipped": false,
-      "note": "Deactivate user in Okta",
+      "note": "Deactivate a user in Okta",
       "auth": {},
       "body": "",
       "form": {},
@@ -322,7 +322,7 @@
     {
       "step_type": "request",
       "skipped": false,
-      "note": "Verify if user is deactivated in SCIM App",
+      "note": "Verify if a user is deactivated in a SCIM app",
       "auth": {},
       "multipart_form": [],
       "headers": {
@@ -355,7 +355,7 @@
     {
       "step_type": "request",
       "skipped": false,
-      "note": "Reactivate user in okta",
+      "note": "Reactivate a user in Okta",
       "auth": {},
       "body": "",
       "form": {},
@@ -389,7 +389,7 @@
     {
       "step_type": "request",
       "skipped": false,
-      "note": "Assign user to SCIM App",
+      "note": "Assign a user to a SCIM app",
       "auth": {},
       "body": "{\r\n  \"id\": \"{{okta_add_userid}}\",\r\n  \"scope\": \"USER\",\r\n  \"credentials\": {\r\n    \"userName\": \"{{okta_user_email}}\"\r\n  },\r\n  \"profile\": {\r\n      \"familyName\": \"{{okta_user_lastname}}\",\r\n      \"givenName\": \"{{okta_user_firstname_update}}\",\r\n      \"emailType\": \"work\",\r\n      \"email\": \"{{okta_user_email}}\"\r\n  }\r\n}\r\n",
       "form": {},
@@ -428,7 +428,7 @@
     {
       "step_type": "request",
       "skipped": false,
-      "note": "Verify if user is reactivated in SCIM App",
+      "note": "Verify if a user is reactivated in a SCIM app",
       "auth": {},
       "multipart_form": [],
       "headers": {
@@ -474,7 +474,7 @@
     {
       "step_type": "request",
       "skipped": false,
-      "note": "Removes an assignment for a user in Okta",
+      "note": "Removes an assignment from a user in Okta",
       "auth": {},
       "body": "",
       "form": {},
@@ -513,7 +513,7 @@
     {
       "step_type": "request",
       "skipped": false,
-      "note": "Verify if user is deactivated in SCIM App",
+      "note": "Verify if a user is deactivated in a SCIM app",
       "auth": {},
       "multipart_form": [],
       "headers": {

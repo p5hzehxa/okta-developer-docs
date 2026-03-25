@@ -14,6 +14,6 @@ This guide covers submissions that use the following protocols and integrations:
 
 > **Notes:**
     > * Universal Logout integrations are only supported for the SAML 2.0 and OIDC protocols. If you want to submit a Universal Logout integration with SCIM provisioning, you must also submit an SSO integration with either SAML 2.0 or OIDC.
-    > * Entitlement Management is currently supported for integrations that manage entitlements through a SCIM server.
+    > * Entitlement Management is supported for integrations that manage entitlements through a SCIM server.
     > * SWA app integrations are no longer accepted for publication in the OIN catalog. However, the OIN team still maintains existing SWA apps.
     > * There are protocol-specific limitations on integrations in the OIN. See [OIN limitations](/docs/guides/submit-app-prereq/main/#oin-limitations).
