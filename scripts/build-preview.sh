@@ -32,6 +32,7 @@ if [ -n "$BRANCH" ]; then
   echo "Preview link:"
   echo "https://${BRANCH}--dev-docs-preview.netlify.app"
 
+
   export SHA_LINK="https://github.com/okta/okta-developer-docs/commit/${SHA}"
   export BACON_LINK="https://bacon-go.aue1e.saasure.net/commits?artifact=okta-developer-docs&sha=${SHA}"
   export BRANCH_LINK="https://github.com/okta/okta-developer-docs/compare/${BRANCH}"
