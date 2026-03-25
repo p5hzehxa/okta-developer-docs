@@ -9,6 +9,7 @@ else
     exit 1
 fi
 
+
 export PREVIEW_URL="https://${BRANCH}--dev-docs-preview.netlify.app"
 
 send_slack_message "${AUTHOR_SLACK_HANDLE}" \
