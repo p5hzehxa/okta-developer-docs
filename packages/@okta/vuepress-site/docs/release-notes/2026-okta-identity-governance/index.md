@@ -22,8 +22,7 @@ Okta Identity Governance is available for both Okta Classic Engine and Okta Iden
 
 #### Bug fixed in 2026.03.3
 
-* Sometimes, the `collectionsAssigningThisApp` field wasn't populated for campaigns that included apps with entitlements as the resource scope. (OKTA-1116439)
-
+* The response for `GET /governance/api/v1/requests` with a `lastUpdated` value for the `filter` query parameter, and without the `orderBy` parameter, was sorted by `createdAt` instead of `updatedAt`. (OKTA-1140026)
 ### Monthly release 2026.03.0
 <!-- Published on: 2026-03-04T12:00:00Z -->
 
