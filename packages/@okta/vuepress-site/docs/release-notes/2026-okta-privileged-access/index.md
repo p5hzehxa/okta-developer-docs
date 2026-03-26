@@ -13,6 +13,17 @@ Okta Privileged Access (OPA) is available for both Okta Classic Engine and Okta 
 
 ## March
 
+### Weekly release 2026.03.3
+<!-- Published on: 2026-03-26T12:00:00Z -->
+| Change | Expected in Preview Orgs |
+|--------|--------------------------|
+| [Enhancements for SSH connectivity for Active Directory domains](#enhancements-for-ssh-connectivity-for-active-directory-domains) | March 26, 2026 |
+
+#### Enhancements for SSH connectivity for Active Directory domains
+
+Security policies now support SSH session connectivity for Linux servers joined to an Active Directory domain. This feature allows you to enable server authentication using Active Directory accounts. See [Security Policy API](https://developer.okta.com/docs/api/openapi/opa/opa/security-policy).
+<!--OKTA-1003207, FF: pam_active_directory_server_ssh., GA Preview date: 26 March -->
+
 ### Weekly release 2026.03.2
 <!-- Published on: 2026-03-18T12:00:00Z -->
 
