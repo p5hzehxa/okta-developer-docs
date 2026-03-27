@@ -27,10 +27,14 @@ yarn build-with-redirect
 echo "Deploying preview to Netlify..."
 
 if [ -n "$BRANCH" ]; then
-  npx netlify-cli@17.23.5 deploy --alias="${BRANCH}" --filter @okta/vuepress-site --dir ../packages/@okta/vuepress-site/dist
+  NETLIFY_ALIAS="${BRANCH//./-}"
+
+  npx netlify-cli@17.23.5 deploy --alias="${NETLIFY_ALIAS}" --filter @okta/vuepress-site --dir ../packages/@okta/vuepress-site/dist
+
+  export PREVIEW_URL="https://${NETLIFY_ALIAS}--dev-docs-preview.netlify.app"
 
   echo "Preview link:"
-  echo "https://${BRANCH}--dev-docs-preview.netlify.app"
+  echo "${PREVIEW_URL}"
 
   export SHA_LINK="https://github.com/okta/okta-developer-docs/commit/${SHA}"
   export BACON_LINK="https://bacon-go.aue1e.saasure.net/commits?artifact=okta-developer-docs&sha=${SHA}"
@@ -43,8 +47,6 @@ if [ -n "$BRANCH" ]; then
     echo "Error: AUTHOR environment variable is not set. Cannot determine Slack handle for notifications. Exiting..."
     exit 1
   fi
-
-  export PREVIEW_URL="https://${BRANCH}--dev-docs-preview.netlify.app"
 
   send_slack_message "${AUTHOR_SLACK_HANDLE}" \
       "Preview for your topic branch <${BRANCH_LINK}|${BRANCH}> is ready :white_check_mark:" \
