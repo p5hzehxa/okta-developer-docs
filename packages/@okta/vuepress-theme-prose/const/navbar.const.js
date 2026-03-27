@@ -1211,6 +1211,10 @@ export const journeys = [
             title: "Add a sign-up form to your web app",
             journeyName: "OCI-web-sign-up"
           },
+          {
+            title: "Migrate users to Universal Directory",
+            path: "OCI-migrate-users",
+          },
         ]
       },
     ],
