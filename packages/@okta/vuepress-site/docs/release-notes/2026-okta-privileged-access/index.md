@@ -11,6 +11,18 @@ title: Okta Privileged Access API release notes 2026
 
 Okta Privileged Access (OPA) is available for both Okta Classic Engine and Okta Identity Engine.
 
+## April
+
+### Monthly release 2026.04.0
+
+| Change | Expected in Preview Orgs |
+|--------|--------------------------|
+|  | April 1, 2026 |
+| [Developer documentation updates in 2026.04.0](#developer-documentation-updates-in-2026-04-0) | April 1, 2026 |
+| [Bug fixed in 2026.04.0](#bug-fixed-in-2026-04-0)| April 1, 2026 |
+
+####
+
 ## March
 
 ### Weekly release 2026.03.3
