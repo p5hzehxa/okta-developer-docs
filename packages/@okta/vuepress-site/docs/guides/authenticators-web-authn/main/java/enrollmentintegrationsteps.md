@@ -11,7 +11,7 @@ authenticationResponse = idxAuthenticationWrapper.authenticate(
     new AuthenticationOptions(username, password.toCharArray()), proceedContext);
 ```
 
-### Display the Passkeys authenticatoroption
+### Display the Passkeys authenticator option
 
 If you configure your Okta org as detailed in [Configuration updates](#update-configurations) and Passkeys authenticator isn’t already [enrolled](#integrate-sdk-for-authenticator-enrollment) for the user, `authenticate()` returns an `AuthenticationResponse` object with `authenticationStatus` equal to `AWAITING_AUTHENTICATOR_ENROLLMENT_SELECTION` and a `webauthn` authenticator item in the `authenticators` array.
 
