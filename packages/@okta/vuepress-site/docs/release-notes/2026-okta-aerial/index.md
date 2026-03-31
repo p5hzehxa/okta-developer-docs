@@ -27,7 +27,7 @@ See also [Introduction to the Okta Aerial API](https://developer.okta.com/docs/a
 
 #### Bug fixed in weekly release
 
-The Aerial Console sometimes contained incorrect data on a client's associated orgs. (OKTA-112607)
+The Aerial Console sometimes contained incorrect data on a client's associated orgs. (OKTA-1126071)
 
 ### Monthly release
 <!-- Published on: 2026-03-05T12:00:00Z -->
