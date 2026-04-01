@@ -78,7 +78,7 @@ You can now use the `oelStatement` property to block words from being used in pa
 
 The new [Manage delegates for governance](/docs/guides/iga-delegates/main/) guide describes how to manage governance delegate assignments and settings using the Okta Identity Governance (OIG) APIs.
 
-The SCIM FAQ doc has been rewritten to better match the other Concepts guides. See [SCIM integration concepts and requirements](/docs/concepts/scim/faqs/).
+The contents of the SCIM FAQ doc have been added to the new [SCIM integration concepts and requirements](/docs/concepts/scim/faqs/) doc.
 
 #### Bugs fixed in 2026.04.0
 

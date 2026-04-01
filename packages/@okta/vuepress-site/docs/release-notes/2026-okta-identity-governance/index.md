@@ -68,6 +68,7 @@ The new [Manage delegates for governance](/docs/guides/iga-delegates/main/) guid
 #### Bug fixed in 2026.03.3
 
 * The response for `GET /governance/api/v1/requests` with a `lastUpdated` value for the `filter` query parameter, and without the `orderBy` parameter, was sorted by `createdAt` instead of `updatedAt`. (OKTA-1140026)
+
 ### Monthly release 2026.03.0
 <!-- Published on: 2026-03-04T12:00:00Z -->
 

@@ -42,7 +42,7 @@ When you create or edit access request conditions, you can now set `accessDurati
 
 #### Developer documentation updates in 2026.04.0
 
-The SCIM FAQ doc has been rewritten to better match the other Concepts guides. See [SCIM integration concepts and requirements](/docs/concepts/scim/faqs/).
+The contents of the SCIM FAQ doc have been added to the new [SCIM integration concepts and requirements](/docs/concepts/scim/faqs/) doc.
 
 #### Bug fixed in 2026.04.0
 
