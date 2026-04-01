@@ -142,6 +142,15 @@ The `commands` object is an array, which allows you to return more than one comm
 
 The names of the commands follow Java-style reverse DNS name format, beginning with `com.okta`, followed by an Okta object that the command operates on, and then an action.
 
+For details on the `commands` object for each inline hook type, see the following API references:
+
+* [Password import inline hook response](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/inlinehook/webhooks/createpasswordimportinlinehook#webhooks/createpasswordimportinlinehook/t=response&c=200&path=commands)
+* [Registration inline hook](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/inlinehook/webhooks/create-registration-hook#webhooks/create-registration-hook/t=response&c=200&path=commands)
+* [SAML assertion inline hook](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/inlinehook/webhooks/createsamlassertioninlinehook#webhooks/createsamlassertioninlinehook/t=response&c=200&path=commands)
+* [Telephony inline hook](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/inlinehook/webhooks/createtelephonyinlinehook#webhooks/createtelephonyinlinehook/t=response&c=200&path=commands)
+* [Token inline hook](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/inlinehook/webhooks/createtokeninlinehook#webhooks/createtokeninlinehook/t=response&c=200&path=commands)
+* [User import inline hook](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/inlinehook/webhooks/createuserimportinlinehook#webhooks/createuserimportinlinehook/t=response&c=200&path=commands)
+
 #### Error object
 
 This allows you to return error messages. How the error data is used varies by inline hook type.
