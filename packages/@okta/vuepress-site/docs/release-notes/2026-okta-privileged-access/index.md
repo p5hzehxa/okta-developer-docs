@@ -15,6 +15,7 @@ Okta Privileged Access (OPA) is available for both Okta Classic Engine and Okta 
 
 ### Weekly release 2026.03.3
 <!-- Published on: 2026-03-26T12:00:00Z -->
+
 | Change | Expected in Preview Orgs |
 |--------|--------------------------|
 | [Enhancements for SSH connectivity for Active Directory domains](#enhancements-for-ssh-connectivity-for-active-directory-domains) | March 26, 2026 |
@@ -80,6 +81,7 @@ Okta's [API reference pages](https://developer.okta.com/docs/api/) are undergoin
 A new System Log event (`pam.app.update`) has been added to track changes to the password rotation strategy for apps connected to Okta Privileged Access. You can use this event to track configuration changes that impact the management of credentials for connected app accounts. See [Event Types](/docs/reference/api/event-types/).
 
 ### New password management options for on-premises SaaS app accounts is EA
+<!-- Published on: 2026-04-01T12:00:00Z -->
 
 You can now configure password rotation for managed on-premises app accounts that require a current password to rotate. This enhancement also allows authorized users to manually override stored passwords in Okta Privileged Access to resolve out-of-sync credentials.
 New API endpoints allow you to list, retrieve, and update these strategies:
