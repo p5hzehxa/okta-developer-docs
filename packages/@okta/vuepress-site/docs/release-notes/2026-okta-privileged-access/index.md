@@ -11,6 +11,18 @@ title: Okta Privileged Access API release notes 2026
 
 Okta Privileged Access (OPA) is available for both Okta Classic Engine and Okta Identity Engine.
 
+## April
+
+### Monthly release 2026.04.0
+<!-- Published on: 2026-04-02T12:00:00Z -->
+| Change | Expected in Preview Orgs |
+|--------|--------------------------|
+| [Workload identity for automation is now available in Okta Privileged Access](#workload-identity-for-automation-is-now-available-in-okta-privileged-access)  | April 1, 2026 |
+
+#### Workload identity for automation is now available in Okta Privileged Access
+
+Workload identity for automation eliminates the need for hardcoded API keys or service account secrets. It does this by using a workload's native platform identity and a runtime OIDC token to securely authenticate automated workloads. This works with platforms like GitHub Actions, GitLab CI, Google Cloud Platform, and Azure Managed Identity. See [Workload Connections](https://developer.okta.com/docs/api/openapi/opa/opa/workload-connections) and [Workload Roles](https://developer.okta.com/docs/api/openapi/opa/opa/workload-roles).<!-- OKTA-1067447, FF: NHI, Preview release: March 30, 2026 -->
+
 ## March
 
 ### Weekly release 2026.03.3
