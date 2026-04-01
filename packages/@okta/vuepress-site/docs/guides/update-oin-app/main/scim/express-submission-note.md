@@ -1,1 +1,0 @@
-> **Note**: If your app uses Auth0 as the Service Provider, you can use Express Submission to automatically populate the configuration details. For more information, see [Submit an Auth0 app with Express Configuration](docs/guides/express-submission/main/).
