@@ -17,12 +17,12 @@ This guide provides an overview of the Express Submission workflow to submit Exp
 ### What you need
 
 * An [Okta Integrator Free Plan org](https://www.okta.com/integrator-free-plan/). The OIN Wizard is only available in Integrator Free Plan orgs.
-* An admin user in the Integrator Free Plan org with either the super admin or the app and org admin roles
+* An admin user in the Integrator Free Plan org with either the super admin or the app and org admin roles.
 * An Auth0 tenant with an integrated SSO (SAML and OIDC, or OIDC only), Universal Logout, or SCIM provisioning app.
 * Google Chrome browser with the Okta Browser Plugin installed (see [OIN Wizard requirements](https://developer.okta.com/docs/guides/submit-app-prereq/main/#oin-wizard-requirements)).
-* The various items necessary for submission in accordance with the OIN submission requirements
+* The various items necessary for submission in accordance with the OIN submission requirements.
 * Customer setup guide for your end users. See [Express Configuration customer configuration guide template](https://developer.okta.com/docs/guides/express-config-guide-template/main/).
-* Access to the OIN dashboard within your Auth0 tenant to generate your Express Configuration information
+* Access to the OIN dashboard within your Auth0 tenant to generate your Express Configuration information.
 
 ## Overview
 
