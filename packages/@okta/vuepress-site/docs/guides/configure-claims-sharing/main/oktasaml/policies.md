@@ -19,7 +19,7 @@ With trust claims enabled and your IdP org able to verify any two factors, you c
 
 * **Device claims:** <ApiLifecycle access="ea" />
 
-  **Registered** and **Managed** status: When a user authenticates with Okta Verify on the IdP org, device claims for the **registered** and **managed** statuses are extracted from the device context. These claims are included in the outbound SAML Assertion. The `okta_auth` payload within the SAML Assertion response contains the information about device claims.
+  **Registered** and **Managed** status: When a user authenticates with Okta Verify on the IdP org, device claims for the **registered** and **managed** statuses are extracted from the device context. These claims are included in the outbound SAML assertion. The `okta_auth` payload within the SAML assertion response contains the information about device claims.
 
   The SP org uses these claims to satisfy policies that require Okta Verify-specific device conditions, such as device state and device management.
 

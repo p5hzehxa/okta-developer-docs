@@ -4,7 +4,7 @@ The **Okta-to-Okta Claims Sharing** feature enables claims sharing between Okta 
 
 Okta supports the use of SAML 2.0 and OpenID Connect app integrations, and the Org2Org app in the OIN catalog. This is the app that you use for authenticating and authorizing your users. Use the app that you've configured in your Okta IdP org for this example use case. There are no configuration requirements for claims sharing for the Okta IdP org, except if you use a custom domain for the Okta IdP org.
 
-If you use a custom domain for the Okta IdP org, the certificate must be Okta-managed. If you use a self-managed certificate or a non-Okta-hosted custom domain, Okta ignores the `okta_auth` payload. See [Use an Okta-managed certificate](/docs/guides/custom-url-domain/main/#use-an-okta-managed-certificate).
+If you use a custom domain for the Okta IdP org, the certificate must be Okta-managed. If you use a self-managed certificate or a non-Okta-hosted custom domain, the downstream Okta SP org ignores the `okta_auth` claim in the SAML assertion. See [Use an Okta-managed certificate](/docs/guides/custom-url-domain/main/#use-an-okta-managed-certificate).
 
 Ensure that the `sso.url` in your [IdP configuration](#example-okta-idp-update-request) points to a standard Okta domain or a custom domain with an Okta-managed certificate. If your custom domain DNS does not resolve directly to Okta-managed infrastructure, claims sharing fails silently, and users are prompted for MFA in the SP org.
 
