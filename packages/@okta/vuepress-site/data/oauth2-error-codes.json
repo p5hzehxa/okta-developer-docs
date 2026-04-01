@@ -1,6 +1,6 @@
 {
-  "release" : "2026.03.1",
-  "build" : "2026.03.1-begin-163-g55170913d85d",
+  "release" : "2026.04.1",
+  "build" : "2026.04.1-begin-209-gb10cfad58fb2",
   "errors" : [ {
     "title" : "Access denied",
     "statusCode" : 403,
@@ -2423,6 +2423,13 @@
     "internalErrorCode" : "invalid_target",
     "errorCode" : "invalid_target",
     "errorDescription" : "The token request contains an invalid target."
+  }, {
+    "title" : "Rejected resource",
+    "statusCode" : 400,
+    "statusReasonPhrase" : "Bad Request",
+    "internalErrorCode" : "unsupported_resource",
+    "errorCode" : "invalid_target",
+    "errorDescription" : "The authorization server has rejected the 'resource' parameter: en"
   }, {
     "title" : "Token exchange invalid audience",
     "statusCode" : 400,
