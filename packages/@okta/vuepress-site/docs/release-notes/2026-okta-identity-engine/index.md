@@ -18,11 +18,11 @@ title: Okta Identity Engine API release notes 2026
 
 | Change | Expected in Preview Orgs |
 |--------|--------------------------|
-| [Slack integration for Identity Governance is GA in Production](#slack-integration-for-identity-governance-is-ga-in-production) | February 18, 2026 |
+| [Slack integration for Identity Governance](#slack-integration-for-identity-governance) | February 18, 2026 |
 | [Custom admin permissions for inline and event hooks is GA in Production](#custom-admin-permissions-for-inline-and-event-hooks-is-ga-in-production) | December 10, 2025 |
 | [Increase to the maximum access duration limit ](#increase-to-the-maximum-access-duration-limit) | April 1, 2026 |
 | [Skip counts for authenticator enrollment grace periods is GA in Preview](#skip-counts-for-authenticator-enrollment-grace-periods-is-ga-in-preview) | Feb 4, 2026 |
-| [Client update policy is GA in Preview is GA in Preview](#client-update-policy-is-ga-in-preview) | January 7, 2026 |
+| [Client update policy is GA in Preview](#client-update-policy-is-ga-in-preview) | January 7, 2026 |
 | [Detection settings in session protection is GA in Production](#detection-settings-in-session-protection-is-ga-in-production) | December 10, 2025 |
 | [Passkeys rebrand is GA in Preview](#passkeys-rebrand-is-ga-in-preview) | Feb 4, 2026 |
 | [Maximum consecutive characters setting for passwords is GA in Production](#maximum-consecutive-characters-setting-for-passwords-is-ga-in-production) | Dec 10, 2025 |
@@ -30,7 +30,7 @@ title: Okta Identity Engine API release notes 2026
 | [Developer documentation updates in 2026.04.0](#developer-documentation-updates-in-2026-04-0) | April 1, 2026 |
 | [Bugs fixed in 2026.04.0](#bugs-fixed-in-2026-04-0)| April 1, 2026 |
 
-#### Slack integration for Identity Governance is GA in Production
+#### Slack integration for Identity Governance
 
 Okta for Government Moderate and Government High customers who use commercial Slack instances can now integrate Slack with their org to streamline access management in Access Requests and Access Certifications. Users can now submit and approve requests in Slack, as well as receive Slack notifications for access requests and certification campaigns. Feature availability varies depending on whether the Unified requester experience feature is enabled. See [Okta Identity Governance Limitations for Public Sector Service](https://support.okta.com/help/s/article/okta-identity-governance-compatibility-limitations-for-public-sector-service?language=en_US ) and [Integrate Slack](https://help.okta.com/okta_help.htm?type=oie&id=csh-ar-integrate-slack).
 
@@ -38,7 +38,7 @@ The following APIs support governance Slack integration settings and are availab
 
 * Org Slack integration setting: **Org Governance Settings** > [Create an org integration](https://developer.okta.com/docs/api/iga/openapi/governance-production-reference/org-governance-settings/createorgintegration)
 * Access Certification Slack integration setting: **Org Governance Settings** > [Update the org certification settings](https://developer.okta.com/docs/api/iga/openapi/governance-production-reference/org-governance-settings/updateorgcertificationsettings)
-** Access Request Slack integration setting: **Access Request - V2** > **Request Settings** > [Update the org request settings](https://developer.okta.com/docs/api/iga/openapi/governance-production-requests-admin-v2-reference/request-settings/updateorgrequestsettingsv2) <!-- OKTA-1138055 Preview date: February 18, 2026 -->
+* Access Request Slack integration setting: **Access Request - V2** > **Request Settings** > [Update the org request settings](https://developer.okta.com/docs/api/iga/openapi/governance-production-requests-admin-v2-reference/request-settings/updateorgrequestsettingsv2) <!-- OKTA-1138055 Preview date: February 18, 2026 -->
 
 #### Custom admin permissions for inline and event hooks is GA in Production
 
@@ -76,9 +76,9 @@ You can now use the `oelStatement` property to block words from being used in pa
 
 #### Developer documentation updates in 2026.04.0
 
-The new [Manage delegates for governance](/docs/guides/iga-delegates/main/) guide describes how to manage governance delegate assignments and settings using the Okta Identity Governance (OIG) APIs.
+* The new [Manage delegates for governance](/docs/guides/iga-delegates/main/) guide describes how to manage governance delegate assignments and settings using the Okta Identity Governance (OIG) APIs.
 
-The contents of the SCIM FAQ doc have been added to the new [SCIM integration concepts and requirements](/docs/concepts/scim/faqs/) doc.
+* The contents of the SCIM FAQ doc have been added to the new [SCIM integration concepts and requirements](/docs/concepts/scim/faqs/) doc.
 
 #### Bugs fixed in 2026.04.0
 

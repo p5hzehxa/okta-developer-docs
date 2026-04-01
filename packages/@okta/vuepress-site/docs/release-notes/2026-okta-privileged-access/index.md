@@ -17,7 +17,7 @@ Okta Privileged Access (OPA) is available for both Okta Classic Engine and Okta 
 <!-- Published on: 2026-04-02T12:00:00Z -->
 | Change | Expected in Preview Orgs |
 |--------|--------------------------|
-| [Workload identity for automation is now available in Okta Privileged Access](#workload-identity-for-automation-is-now-available-in-okta-privileged-access)  | April 1, 2026 |
+| [Workload identity for automation is now available in Okta Privileged Access](#workload-identity-for-automation-is-now-available-in-okta-privileged-access)  | March 30, 2026 |
 
 #### Workload identity for automation is now available in Okta Privileged Access
 
