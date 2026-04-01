@@ -80,4 +80,4 @@ Before starting the submission in the OIN Wizard, you must generate the Express 
 
 ### Test and submit your integration
 
-The standard OIN testing process remains valid for Express Configuration submissions. After you successfully test your integration, you're ready to submit. See [Test your integration](https://developer.okta.com/docs/guides/submit-oin-app/openidconnect/main/#test-your-integration) and [Submit your integration](https://developer.okta.com/docs/guides/submit-oin-app/openidconnect/main/#submit-your-integration).
+The standard OIN testing process remains valid for Express Configuration submissions. Once you have created the app instance, run the Express Configuration on that specific instance to ensure the settings are applied correctly. See [Test your integration](https://developer.okta.com/docs/guides/submit-oin-app/openidconnect/main/#test-your-integration) and [Submit your integration](https://developer.okta.com/docs/guides/submit-oin-app/openidconnect/main/#submit-your-integration).
