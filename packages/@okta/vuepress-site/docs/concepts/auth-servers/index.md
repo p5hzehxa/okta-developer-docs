@@ -105,7 +105,7 @@ This table describes the capabilities supported by a custom authorization server
 | Use Okta Developer SDKs & Widgets for SSO  | Yes                                  | Yes                         |
 | Retrieve user profile in ID token          | Yes                                  | Yes                         |
 | Apply authorization policies to custom APIs| Yes                                  | No                          |
-| Add custom scopes or claims to tokens      | Yes                                  | No                          |
+| Add custom scopes or claims to tokens      | Yes                                  | Yes                         |
 | Integrate with an API Gateway              | Yes                                  | No                          |
 | Machine-to-machine or microservices        | Yes                                  | No                          |
 | Mint access tokens with Okta API scopes    | No                                   | Yes                         |
