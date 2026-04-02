@@ -23,7 +23,7 @@ Learn the basics that you need to lay the foundations for your work:
 * [Universal Directory (UD)](/docs/concepts/universal-directory/) is the central store for user information in your Okta org.
 * [The Users API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/user) provides operations to create new user accounts in your org. (info)
 * [The Groups API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/group) provides operations to manage Okta groups and their user members. (info)
-* [Password import inline hooks](h/docs/concepts/inline-hooks/) help to move users' password to UD from a source provider during migration. (info)
+* [Password import inline hooks](/docs/concepts/inline-hooks/) help to move users' password to UD from a source provider during migration. (info)
 
 ## Plan
 
@@ -45,51 +45,58 @@ You are now ready to build your migration solution. In this section, you execute
 
 ### Run your strategy
 
-To execute your migration strategy, begin by configuring the user account profiles for the new users, the groups they will belong to, and the applications they can access. Connect your apps and APIs to Okta, and then import your users.
-Configure Universal Directory
-Prepare Universal Directory to receive the new user accounts.
+To execute your migration strategy, begin by configuring the user account profiles for the new users, the groups they will belong to, and the apps they can access. Connect your apps and APIs to Okta, and then import your users.
 
-Create your needed user groups. Use the Admin Console (info) if you prefer a GUI or the Groups API if you prefer to script. (info)
-Create a user profile for the new user accounts. (info)
-Set the authentication factors (e.g., password, email, phone) that users must use to validate their identity with an authenticator enrollment policy. (info)
-Connect your apps and APIs to Okta
-Your apps and API won't be able to use your source provider to authenticate users post-migration. Ensure that your apps and API authenticate your users with Okta as well as your source provider. 
+#### Configure Universal Directory
 
-Search the OIN catalog for Okta-enabled versions of your third-party apps (info)
-Update your apps to use Okta as an identity provider
-Update your app's sign-in form to connect to Okta (info)
-Make your app a multi-tenant OIDC app with Okta as an additional identity provider (info)
-Update your APIs to use Okta as an identity provider (info)
-Create authentication policies for your apps and APIs that mirror the existing sign-in experience with the source provider, or that enhance it as you have planned. (info)
+Prepare Universal Directory to receive the new user accounts:
 
-> Note : Contact your Technical Account Manager for further assistance migrating your apps to Okta.
+* Create your needed user groups. Use the [Admin Console](https://help.okta.com/okta_help.htm?type=oie&id=ext-usgp-groups-main) if you prefer a GUI or the [Groups API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/group/group) if you prefer to script.
+* [Create a user profile](https://help.okta.com/okta_help.htm?type=oie&id=ext-usgp-about-profiles) for the new user accounts.
+* Set the authentication factors (for example, password, email, phone) that users must use to validate their identity with an [authenticator enrollment policy](https://help.okta.com/okta_help.htm?type=oie&id=ext-about-mfa-enrol-policies).
 
-Import your user accounts into Universal Directory
-Extract the user data from the source provider into an intermediate staging area. Clean up that data so that it's consistent and contains only valid information as you did for the test. (info)
+#### Connect your apps and APIs to Okta
 
-For a seamless, one-time migration, where users are unaware their account has been moved, import users' hashed password with their details, and make their account active:
+Your apps and API won't be able to use your source provider to authenticate users post-migration. Ensure that your apps and API can authenticate your users with both Okta and your source provider:
 
-Use the Users API to create active user accounts with the hashed password. (info)
-Send users notification to sign in normally.
+* [Search the OIN catalog](https://www.okta.com/integrations/) for Okta-enabled versions of your third-party apps.
+* Update your apps to use Okta as an identity provider:
+  * [Update your app's sign-in form to connect to Okta](/docs/journeys/OCI-web-sign-in/main/#add-a-way-for-users-to-sign-in).
+  * [Make your app a multi-tenant OIDC app with Okta as an additional identity provider](https://developer.okta.com/blog/2023/07/28/oidc_workshop).
+* [Update your APIs to use Okta as an identity provider](/docs/guides/protect-your-api)
+* [Create authentication policies for your apps and APIs](https://help.okta.com/okta_help.htm?type=oie&id=ext-about-asop) that mirror the existing sign-in experience with the source provider, or that enhance it as you have planned.
 
-For a one-time migration with authentication reset, where users must reset their authentication details to activate their account, import users' details, and make their account staged:
+> **Note**: Contact your Technical Account Manager for further assistance migrating your apps to Okta.
 
-Use the Users API to create staged user accounts without credentials. (info)
-Alternatively, you can bulk import user details from a CSV file. (info)
-Send users notification to reactivate their accounts. (Mass-select users in Okta and click Activate to send "Welcome/Set Password" emails.)
+#### Import your user accounts into Universal Directory
 
-For a migration program, where users passwords are migrated on their first sign-in to an application from the source provider:
+Extract the user data from the source provider into an intermediate staging area. [Clean up that data so that it's consistent and contains only valid information]() as you did for the test.
 
-Create a password import inline hook
-to a local Active Directory or LDAP server (info)
-to a third-party identity provider (info)
-Use the Okta Users API to create active user accounts with provider type and name set to IMPORT, and the inline hook attached. (info)
-Send that user a notification to sign in normally 
+For a seamless, one-time migration, where users are unaware their account has been moved, import each user's hashed password with their details, and make their account active:
 
-Note that if your system currently uses Active Directory agents to synchronize passwords with Okta for SSO, you can also use the AD Agent to migrate passwords to Okta. (info)
+* [Use the Users API to create active user accounts with the hashed password]().
+* Send users notification to sign in normally.
+
+For a one-time migration with authentication reset, where users must reset their authentication details to activate their account, import each user's details, and make their account staged:
+
+* [Use the Users API to create staged user accounts without credentials]().
+* Alternatively, you can [bulk import user details from a CSV file](https://help.okta.com/okta_help.htm?type=oie&id=ext_csv_import).
+* Send users notification to reactivate their accounts. (Mass-select users in Okta and click **Activate** to send Welcome/Set Password emails.)
+
+For a migration program, where user passwords are migrated when they first sign in to an app from the source provider:
+
+* Create a password import inline hook to one of the following places:
+  * Local Active Directory or LDAP server
+  * [Third-party identity provider](/docs/guides/password-import-inline-hook/nodejs/main/)
+* [Use the Okta Users API to create active user accounts with provider type and name set to IMPORT, and the inline hook attached]().
+* Send that user a notification to sign in through the standard Okta process.
+
+If your system currently uses Active Directory agents to synchronize passwords with Okta for SSO, you can also [use the AD Agent to migrate passwords to Okta]().
 
 If you have stored your user's non-IAM profile data in another system, use the User Id returned by the Users API as a reference point to connect it. Find the user IDs after creation by calling List All Users (info)
+
 End the migration program (if applicable)
+
 When planning a migration program, you set a fixed period to leave the inline hook in service. At the end of this period, the majority of your users have migrated their account. At this point, you can either:
 
 Use the User Credentials API to force a password reset for those users still with credentials.provider.type set to IMPORT. Those users would receive an email to set their password with a link to follow. (info)
