@@ -21,8 +21,10 @@ title: Okta Identity Engine API release notes 2026
 | [Slack integration for Identity Governance](#slack-integration-for-identity-governance) | February 18, 2026 |
 | [Custom admin permissions for inline and event hooks is GA in Production](#custom-admin-permissions-for-inline-and-event-hooks-is-ga-in-production) | December 10, 2025 |
 | [Increase to the maximum access duration limit ](#increase-to-the-maximum-access-duration-limit) | April 1, 2026 |
+| [Authentication requirement for OIN Manager migration is GA in Production](#authentication-requirement-for-oin-manager-migration-is-ga-in-production) | April 1, 2026 |
 | [Skip counts for authenticator enrollment grace periods is GA in Preview](#skip-counts-for-authenticator-enrollment-grace-periods-is-ga-in-preview) | Feb 4, 2026 |
 | [Client update policy is GA in Preview](#client-update-policy-is-ga-in-preview) | January 7, 2026 |
+| [Support for custom risk reasons in User Risk API](#support-for-custom-risk-reasons-in-user-risk-api) | April 1, 2026 |
 | [Detection settings in session protection is GA in Production](#detection-settings-in-session-protection-is-ga-in-production) | December 10, 2025 |
 | [Passkeys rebrand is GA in Preview](#passkeys-rebrand-is-ga-in-preview) | Feb 4, 2026 |
 | [Maximum consecutive characters setting for passwords is GA in Production](#maximum-consecutive-characters-setting-for-passwords-is-ga-in-production) | Dec 10, 2025 |
@@ -48,6 +50,10 @@ The inline hook and event hook framework now supports read and write permissions
 
 When you create or edit access request conditions, you can now set `accessDurationSettings.duration` or `accessDurationSettings.maximumDuration` to a maximum of 365 days or 52 weeks. <!-- OKTA-1081978 preview date: April 1, 2026-->
 
+#### Authentication requirement for OIN Manager migration is GA in Production
+
+After an admin migrates a SCIM integration from the OIN Manager to the OIN Wizard, the **Basic** option is visible in the **Authentication mode** dropdown list. However, you can't select this option for resubmission. Select a different authentication method to complete the submission.
+
 #### Skip counts for authenticator enrollment grace periods is GA in Preview
 
 This feature allows admins to define a number of skips end users can defer enrollment into an authenticator, as well as customizations to the prompt when end users see the grace period. See [Grace periods](/docs/concepts/policies/#grace-periods) and [type](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/policy/other/createpolicy#other/createpolicy/t=response&c=200&path=&d=1/settings/authenticators/enroll/graceperiod). <!-- OKTA-1044803 FF: ENROLLMENT_POLICY_GRACE_PERIOD_V2 preview date: Feb 4, 2026 -->
@@ -55,6 +61,10 @@ This feature allows admins to define a number of skips end users can defer enrol
 #### Client update policy is GA in Preview
 
 The Policies API now supports the `CLIENT_POLICY` type, enabling you to enforce or defer app updates across different device platforms. This lets you programmatically align app versions with internal change management processes. See the [Policies API](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Policy/#tag/Policy/operation/listPolicies) and [Release controls policy](https://help.okta.com/okta_help.htm?type=oie&id=ext-ov-release-controls). <!-- OKTA_VERIFY_RELEASE_CONTROL_POLICY OKTA-1036332 January 7, 2026 -->
+
+#### Support for custom risk reasons in User Risk API
+
+The PUT `/api/v1/users/{userId}/risk` [endpoint](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/userrisk/other/upsertuserrisk) now accepts an optional `riskReason` field in the request body that provides a custom reason for the risk level change. If a value isn't provided, the parameter defaults to `override.by.admin`. <!--OKTA-1104360, OKTA-1141971 -->
 
 #### Detection settings in session protection is GA in Production
 
