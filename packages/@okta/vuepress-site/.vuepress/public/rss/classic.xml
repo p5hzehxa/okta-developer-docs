@@ -4,8 +4,17 @@
   <title>Okta Classic Engine API release notes</title>
   <link>https://developer.okta.com/docs/release-notes/2026/</link>
   <description>Recent release notes for Okta Classic Engine API</description>
-  <pubDate>Wed, 25 Mar 2026 12:00:00 GMT</pubDate>
+  <pubDate>Thu, 02 Apr 2026 12:00:00 GMT</pubDate>
   
+    <item>
+      <title>Monthly release 2026.04.0</title>
+      <link>https://developer.okta.com/docs/release-notes/2026/#monthly-release-2026-04-0</link>
+      <guid>https://developer.okta.com/docs/release-notes/2026/#monthly-release-2026-04-0</guid>
+      <pubDate>Thu, 02 Apr 2026 12:00:00 GMT</pubDate>
+      <description><![CDATA[<a href="https://developer.okta.com/docs/release-notes/2026/#slack-integration-for-identity-governance">Slack integration for Identity Governance</a><br><a href="https://developer.okta.com/docs/release-notes/2026/#custom-admin-permissions-for-inline-and-event-hooks-is-ga-in-production">Custom admin permissions for inline and event hooks is GA in Production</a><br><a href="https://developer.okta.com/docs/release-notes/2026/#increase-to-the-maximum-access-duration-limit">Increase to the maximum access duration limit </a><br><a href="https://developer.okta.com/docs/release-notes/2026/#developer-documentation-update-in-2026-04-0">Developer documentation update in 2026.04.0</a><br><a href="https://developer.okta.com/docs/release-notes/2026/#bug-fixed-in-2026-04-0">Bug fixed in 2026.04.0</a>]]></description>
+    </item>
+  
+
     <item>
       <title>Weekly release 2026.03.3</title>
       <link>https://developer.okta.com/docs/release-notes/2026/#weekly-release-2026-03-3</link>
