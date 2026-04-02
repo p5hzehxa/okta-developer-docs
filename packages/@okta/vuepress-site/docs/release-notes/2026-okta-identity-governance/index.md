@@ -11,6 +11,53 @@ title: Okta Identity Governance API release notes 2026
 
 Okta Identity Governance is available for both Okta Classic Engine and Okta Identity Engine.
 
+## April
+
+### Monthly release 2026.04.0
+<!-- Published on: 2026-04-02T12:00:00Z -->
+
+| Change | Expected in Preview Orgs |
+|--------|--------------------------|
+| [Improvements access request experience for Slack is Beta](#improvements-access-request-experience-for-slack-is-beta) | April 1, 2026 |
+| [Updated access certification campaign filter](#updated-access-certification-campaign-filter) |  April 1, 2026 |
+| [Slack integration for Identity Governance](#slack-integration-for-identity-governance) | February 18, 2026 |
+| [Increase to the maximum access duration limit ](#increase-to-the-maximum-access-duration-limit) | April 1, 2026 |
+| [Developer documentation update in 2026.04.0](#developer-documentation-update-in-2026-04-0) |  |
+
+#### Improvements access request experience for Slack is Beta
+
+<ApiLifecycle access="beta" />
+
+If you've enabled the Unified Requester Experience feature, you can now configure whether users can submit and approve requests in Slack without being redirected to the End-user Dashboard. This applies to access requests that are managed by request types and to conditions. Additionally, when the `canApproveRequest` setting is enabled, users can approve Okta admin role bundle access requests from Slack. See [Configure settings for Slack](https://help.okta.com/okta_help.htm?type=oie&id=csh-ar-integrate-slack).
+
+The following settings have been updated to support the improved Slack integration, and are available as Beta:
+
+* Access Request - V2 > Request Settings > `integrations.settings.caninitiateRequest`: indicates that users can initiate a request from Slack
+* Access Request - V2 > Request Settings > `integrations.settings.canApproveRequest`: indicates that reviewers can approve a request from Slack
+<!-- OKTA-1143017, OKTA-1094247, Preview: April 1, 2026 -->
+
+#### Updated access certification campaign filter
+
+The `filter` query parameter in the [List all campaigns](https://developer.okta.com/docs/api/iga/openapi/governance-production-reference/campaigns/listcampaigns) API operation now supports `startDate` and `endDate` attributes. <!-- OKTA-1143387 Preview: April 1, 2026 -->
+
+#### Slack integration for Identity Governance
+
+Okta for Government Moderate and Government High customers who use commercial Slack instances can now integrate Slack with their org to streamline access management in Access Requests and Access Certifications. Users can now submit and approve requests in Slack, as well as receive Slack notifications for access requests and certification campaigns. Feature availability varies depending on whether the Unified requester experience feature is enabled. See [Okta Identity Governance Limitations for Public Sector Service](https://support.okta.com/help/s/article/okta-identity-governance-compatibility-limitations-for-public-sector-service?language=en_US ) and [Integrate Slack](https://help.okta.com/okta_help.htm?type=oie&id=csh-ar-integrate-slack).
+
+The following APIs support governance Slack integration settings and are available as Beta:
+
+* Org Slack integration setting: **Org Governance Settings** > [Create an org integration](https://developer.okta.com/docs/api/iga/openapi/governance-production-reference/org-governance-settings/createorgintegration)
+* Access Certification Slack integration setting: **Org Governance Settings** > [Update the org certification settings](https://developer.okta.com/docs/api/iga/openapi/governance-production-reference/org-governance-settings/updateorgcertificationsettings)
+* Access Request Slack integration setting: **Access Request - V2** > **Request Settings** > [Update the org request settings](https://developer.okta.com/docs/api/iga/openapi/governance-production-requests-admin-v2-reference/request-settings/updateorgrequestsettingsv2)<!-- OKTA-1138055 preview date: February 18, 2026 -->
+
+#### Increase to the maximum access duration limit
+
+When you create or edit access request conditions, you can now set `accessDurationSettings.duration` or `accessDurationSettings.maximumDuration` to a maximum of 365 days or 52 weeks. <!-- OKTA-1081978 -->
+
+#### Developer documentation update in 2026.04.0
+
+The new [Manage delegates for governance](/docs/guides/iga-delegates/main/) guide describes how to manage governance delegate assignments and settings using the Okta Identity Governance (OIG) APIs.
+
 ## March
 
 ### Weekly release 2026.03.3
@@ -23,6 +70,7 @@ Okta Identity Governance is available for both Okta Classic Engine and Okta Iden
 #### Bug fixed in 2026.03.3
 
 * The response for `GET /governance/api/v1/requests` with a `lastUpdated` value for the `filter` query parameter, and without the `orderBy` parameter, was sorted by `createdAt` instead of `updatedAt`. (OKTA-1140026)
+
 ### Monthly release 2026.03.0
 <!-- Published on: 2026-03-04T12:00:00Z -->
 

@@ -4,8 +4,17 @@
   <title>Okta Identity Governance API release notes</title>
   <link>https://developer.okta.com/docs/release-notes/2026-okta-identity-governance/</link>
   <description>Recent release notes for Okta Identity Governance API</description>
-  <pubDate>Wed, 25 Mar 2026 12:00:00 GMT</pubDate>
+  <pubDate>Thu, 02 Apr 2026 12:00:00 GMT</pubDate>
   
+    <item>
+      <title>Monthly release 2026.04.0</title>
+      <link>https://developer.okta.com/docs/release-notes/2026-okta-identity-governance/#monthly-release-2026-04-0</link>
+      <guid>https://developer.okta.com/docs/release-notes/2026-okta-identity-governance/#monthly-release-2026-04-0</guid>
+      <pubDate>Thu, 02 Apr 2026 12:00:00 GMT</pubDate>
+      <description><![CDATA[<a href="https://developer.okta.com/docs/release-notes/2026-okta-identity-governance/#improvements-access-request-experience-for-slack-is-beta">Improvements access request experience for Slack is Beta</a><br><a href="https://developer.okta.com/docs/release-notes/2026-okta-identity-governance/#updated-access-certification-campaign-filter">Updated access certification campaign filter</a><br><a href="https://developer.okta.com/docs/release-notes/2026-okta-identity-governance/#slack-integration-for-identity-governance">Slack integration for Identity Governance</a><br><a href="https://developer.okta.com/docs/release-notes/2026-okta-identity-governance/#increase-to-the-maximum-access-duration-limit">Increase to the maximum access duration limit </a><br><a href="https://developer.okta.com/docs/release-notes/2026-okta-identity-governance/#developer-documentation-update-in-2026-04-0">Developer documentation update in 2026.04.0</a>]]></description>
+    </item>
+  
+
     <item>
       <title>Weekly release 2026.03.3</title>
       <link>https://developer.okta.com/docs/release-notes/2026-okta-identity-governance/#weekly-release-2026-03-3</link>

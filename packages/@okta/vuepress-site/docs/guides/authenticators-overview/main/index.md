@@ -30,11 +30,8 @@ The following guides step through adding a type of authenticator to your app usi
 * [Okta Verify](/docs/guides/authenticators-okta-verify/aspnet/main/)
 * [Google Authenticator](/docs/guides/authenticators-google-authenticator/aspnet/main/)
 * [Temporary access code (TAC)](/docs/guides/authenticators-tac-authenticator/main/)
-* [FIDO2 (WebAuthn) authenticators](/docs/guides/authenticators-web-authn/aspnet/main/), such as a USB security key, fingerprint, FaceID, or Windows Hello
-   > <ApiLifecycle access="ea" />
-   > **Note:** When the **Passkeys Rebrand** self-service Early Access feature is enabled, the FIDO2 (WebAuthn) authenticator is called Passkeys (FIDO2 WebAuthn), and there are new settings and updates to the authenticator page layout.
-   >
-   > See [Configure the FIDO2 (WebAuthn) authenticator](https://help.okta.com/okta_help.htm?type=oie&id=csh-configure-webauthn) and [`settings`](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Authenticator/#tag/Authenticator/operation/replaceAuthenticatorMethod!path=8/settings&t=request). To enable the **Passkeys Rebrand** feature, see [Enable self-service features](https://help.okta.com/okta_help.htm?id=ext_Manage_Early_Access_features).
+* [Passkeys (FIDO2 WebAuthn) authenticators](/docs/guides/authenticators-web-authn/aspnet/main/), such as a passkey, USB security key, fingerprint, FaceID, or Windows Hello
+  > **Note:** As of the `2026.04.0` release, the FIDO2 (WebAuthn) authenticator is now called Passkeys (FIDO2 WebAuthn) and there are new settings and updates to the authenticator page layout. See [Passkeys and WebAuthn](/docs/guides/authenticators-web-authn/aspnet/main/#passkeys-and-webauthn).
 
 In each guide, you learn:
 

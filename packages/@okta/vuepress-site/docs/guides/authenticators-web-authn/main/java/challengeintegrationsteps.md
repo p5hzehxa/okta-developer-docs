@@ -12,9 +12,9 @@ authenticationResponse = idxAuthenticationWrapper.authenticate(
     proceedContext);
 ```
 
-### Display the WebAuthn option
+### Display the Passkeys authenticator option
 
- If you configure your Okta org as detailed in [Configuration updates](#update-configurations) and WebAuthn is already [enrolled](#integrate-sdk-for-authenticator-enrollment) for the user, `authenticate()` returns an `AuthenticationResponse` object with `authenticationStatus` equal to `AWAITING_AUTHENTICATOR_SELECTION` and a `webauthn` authenticator item in the `authenticators` array.
+ If you configure your Okta org as detailed in [Configuration updates](#update-configurations) and the Passkeys authenticator is already [enrolled](#integrate-sdk-for-authenticator-enrollment) for the user, `authenticate()` returns an `AuthenticationResponse` object with `authenticationStatus` equal to `AWAITING_AUTHENTICATOR_SELECTION` and a `webauthn` authenticator item in the `authenticators` array.
 
 ```json
 {
@@ -49,13 +49,13 @@ A simple authenticator selection page should look like this:
 
 <div class="three-quarter">
 
-![Image illustrating the select authenticator page showing the available sign-in authenticators, including the WebAuthn.](/img/authenticators/authenticators-webauthn-java-dropdown-selection.png)
+![Image illustrating the select authenticator page showing the available sign-in authenticators, including the Passkeys authenticator.](/img/authenticators/authenticators-webauthn-java-dropdown-selection.png)
 
 </div>
 
-### Submit the WebAuthn authenticator option
+### Submit the Passkeys authenticator option
 
-When the user selects the WebAuthn option, call `IDXAuthenticationWrapper.enrollAuthenticator()` passing in `ProceedContext` and the authenticator ID returned from `AuthenticationResponse.authenticators[n].factors[n].id`.
+When the user selects the Passkeys authenticator option, call `IDXAuthenticationWrapper.enrollAuthenticator()` passing in `ProceedContext` and the authenticator ID returned from `AuthenticationResponse.authenticators[n].factors[n].id`.
 
 ```java
 Optional<Authenticator> authenticatorOptional =

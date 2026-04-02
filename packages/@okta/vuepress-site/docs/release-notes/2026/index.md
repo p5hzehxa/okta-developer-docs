@@ -9,6 +9,45 @@ title: Okta Classic Engine API release notes 2026
   Subscribe to RSS
 </a>
 
+## April
+
+### Monthly release 2026.04.0
+<!-- Published on: 2026-04-02T12:00:00Z -->
+
+| Change | Expected in Preview Orgs |
+|--------|--------------------------|
+| [Slack integration for Identity Governance](#slack-integration-for-identity-governance) | February 18, 2026 |
+| [Custom admin permissions for inline and event hooks is GA in Production](#custom-admin-permissions-for-inline-and-event-hooks-is-ga-in-production) | December 10, 2025 |
+| [Increase to the maximum access duration limit ](#increase-to-the-maximum-access-duration-limit) | April 1, 2026 |
+| [Developer documentation update in 2026.04.0](#developer-documentation-update-in-2026-04-0) | April 1, 2026 |
+| [Bug fixed in 2026.04.0](#bug-fixed-in-2026-04-0)| April 1, 2026 |
+
+#### Slack integration for Identity Governance
+
+Okta for Government Moderate and Government High customers who use commercial Slack instances can now integrate Slack with their org to streamline access management in Access Requests and Access Certifications. Users can now submit and approve requests in Slack, as well as receive Slack notifications for access requests and certification campaigns. Feature availability varies depending on whether the Unified requester experience feature is enabled. See [Okta Identity Governance Limitations for Public Sector Service](https://support.okta.com/help/s/article/okta-identity-governance-compatibility-limitations-for-public-sector-service?language=en_US ) and [Integrate Slack](https://help.okta.com/okta_help.htm?type=oie&id=csh-ar-integrate-slack).
+
+The following APIs support governance Slack integration settings and are available as Beta:
+
+* Org Slack integration setting: **Org Governance Settings** > [Create an org integration](https://developer.okta.com/docs/api/iga/openapi/governance-production-reference/org-governance-settings/createorgintegration)
+* Access Certification Slack integration setting: **Org Governance Settings** > [Update the org certification settings](https://developer.okta.com/docs/api/iga/openapi/governance-production-reference/org-governance-settings/updateorgcertificationsettings)
+* Access Request Slack integration setting: **Access Request - V2** > **Request Settings** > [Update the org request settings](https://developer.okta.com/docs/api/iga/openapi/governance-production-requests-admin-v2-reference/request-settings/updateorgrequestsettingsv2) <!-- OKTA-1138055 preview date: February 18, 2026 -->
+
+#### Custom admin permissions for inline and event hooks is GA in Production
+
+The inline hook and event hook framework now supports read and write permissions for custom admin roles. This enhancement gives fine-grained access to manage inline and event hooks that previously required the super admin role. See [Hooks admin roles](https://developer.okta.com/docs/guides/hooks-best-practices/#hook-admin-roles). <!-- OKTA-1133787 HOOKS_PUBLIC_PERMISSIONS preview date: December 10, 2025 -->
+
+#### Increase to the maximum access duration limit
+
+When you create or edit access request conditions, you can now set `accessDurationSettings.duration` or `accessDurationSettings.maximumDuration` to a maximum of 365 days or 52 weeks. <!-- OKTA-1081978 preview date: April 1, 2026-->
+
+#### Developer documentation update in 2026.04.0
+
+The contents of the SCIM FAQ doc have been added to the new [SCIM integration concepts and requirements](/docs/concepts/scim/faqs/) doc.
+
+#### Bug fixed in 2026.04.0
+
+When an admin added users to read-only groups using the Groups API (`PUT /api/v1/groups/{groupId}/users/{userId}`), the endpoint incorrectly returned HTTP 501 (Not Implemented) instead of HTTP 403 (Forbidden). (OKTA-1139611)
+
 ## March
 
 ### Weekly release 2026.03.3

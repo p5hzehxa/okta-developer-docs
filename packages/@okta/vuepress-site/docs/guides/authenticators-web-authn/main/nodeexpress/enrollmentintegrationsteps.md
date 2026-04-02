@@ -9,9 +9,9 @@ The first step is to initiate a use case that requires authentication. This guid
   });
 ```
 
-### Display the WebAuthn option
+### Display the Passkeys authenticator option
 
-If you configure your Okta org as detailed in [Configuration updates](#update-configurations), `authenticate()` returns a response with WebAuthn in the list of available authenticators. Specifically, `IdxTransaction` is returned with a `status` of `PENDING`, `nextStep.name` set to `select-authenticator-enroll`, and WebAuthn included as an option in the `nextStep.options` array. See the following `IdxTransaction` example.
+If you configure your Okta org as detailed in [Configuration updates](#update-configurations), `authenticate()` returns a response with the Passkeys authenticator in the list of available authenticators. Specifically, `IdxTransaction` is returned with a `status` of `PENDING`, `nextStep.name` set to `select-authenticator-enroll`, and the authenticator included as an option in the `nextStep.options` array. See the following `IdxTransaction` example.
 
 ```json
 {
@@ -43,17 +43,16 @@ Use the `value` and `label` properties to show the available list of authenticat
   </select>
 ```
 
-The UI showing the WebAuthn Authenticator option:
+UI showing the Passkeys authenticator option:
 
 <div class="three-quarter">
 
-![WebAuthn option shown in UI](/img/authenticators/authenticators-webauthn-dropdown-selection.png)
-
+![Passkeys option shown in UI](/img/authenticators/authenticators-webauthn-dropdown-selection.png)
 </div>
 
-### Submit the WebAuthn option
+### Submit the Passkeys authenticator option
 
-When the user selects and submits the WebAuthn option, call `OktaAuth.idx.proceed()` and pass in the `webauthn` value from `IdxOption.value`.
+When the user selects and submits the Passkeys authenticator option, call `OktaAuth.idx.proceed()` and pass in the `webauthn` value from `IdxOption.value`.
 
 ```javascript
     const transaction = await authClient.idx.proceed({ authenticator });
