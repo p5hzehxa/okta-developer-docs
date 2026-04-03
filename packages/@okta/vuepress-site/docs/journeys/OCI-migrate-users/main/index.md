@@ -21,9 +21,9 @@ Devise a user migration strategy based on your company's needs, timelines, and s
 Learn the basics that you need to lay the foundations for your work:
 
 * [Universal Directory (UD)](/docs/concepts/universal-directory/) is the central store for user information in your Okta org.
-* [The Users API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/user) provides operations to create new user accounts in your org. (info)
-* [The Groups API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/group) provides operations to manage Okta groups and their user members. (info)
-* [Password import inline hooks](/docs/concepts/inline-hooks/) help to move users' password to UD from a source provider during migration. (info)
+* [The Users API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/user) provides operations to create new user accounts in your org.
+* [The Groups API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/group) provides operations to manage Okta groups and their user members.
+* [Password import inline hooks](/docs/concepts/inline-hooks/) help to move users' password to UD from a source provider during migration.
 
 ## Plan
 
@@ -45,7 +45,7 @@ You are now ready to build your migration solution. In this section, you execute
 
 ### Run your strategy
 
-To execute your migration strategy, begin by configuring the user account profiles for the new users, the groups they will belong to, and the apps they can access. Connect your apps and APIs to Okta, and then import your users.
+To execute your migration strategy, begin by configuring the user account profiles for the new users, the groups you want them to belong to, and the apps they can access. Connect your apps and APIs to Okta, and then import your users.
 
 #### Configure Universal Directory
 
@@ -70,7 +70,7 @@ Your apps and API won't be able to use your source provider to authenticate user
 
 #### Import your user accounts into Universal Directory
 
-Extract the user data from the source provider into an intermediate staging area. [Clean up that data so that it's consistent and contains only valid information]() as you did for the test.
+Extract the user data from the source provider into an intermediate staging area. [Clean up that data]() so that it's consistent and contains only valid information as you did for the [test](#plan).
 
 For a seamless, one-time migration, where users are unaware their account has been moved, import each user's hashed password with their details, and make their account active:
 
@@ -91,32 +91,31 @@ For a migration program, where user passwords are migrated when they first sign 
 * [Use the Okta Users API to create active user accounts with provider type and name set to IMPORT, and the inline hook attached]().
 * Send that user a notification to sign in through the standard Okta process.
 
-If your system currently uses Active Directory agents to synchronize passwords with Okta for SSO, you can also [use the AD Agent to migrate passwords to Okta]().
+If your system currently uses Active Directory agents to synchronize passwords with Okta for SSO, you can also [use the AD Agent to migrate passwords to Okta](https://help.okta.com/okta_help.htm?type=oie&id=ad-password-migration).
 
-If you have stored your user's non-IAM profile data in another system, use the User Id returned by the Users API as a reference point to connect it. Find the user IDs after creation by calling List All Users (info)
+If you have stored your user's non-IAM profile data in another system, use the User ID returned by the Users API as a reference point to connect it. Find the user IDs after creation by calling [List All Users](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/user/other/listusers).
 
-End the migration program (if applicable)
+#### End the migration program (if applicable)
 
-When planning a migration program, you set a fixed period to leave the inline hook in service. At the end of this period, the majority of your users have migrated their account. At this point, you can either:
+When you plan a migration program, you set a fixed period to leave the inline hook in service. At the end of this period, the majority of your users have migrated their account. At this point, you can do one of two things:
 
-Use the User Credentials API to force a password reset for those users still with credentials.provider.type set to IMPORT. Those users would receive an email to set their password with a link to follow. (info)
-Consider those users as stale accounts who must recreate their accounts to gain access to your applications again.
+* [Use the User Credentials API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/usercred/other/resetpassword) to force a password reset for users that still have `credentials.provider.type` set to `IMPORT`. Those users receive an email to set their password with a link to follow.
+* Consider those users as stale accounts who must recreate their accounts to gain access to your apps again.
 
 Finally, you can retire your legacy system from service.
 
-Congratulations - you have successfully designed and implemented a migration plan for your user accounts to Universal Directory. Once activated, your new user accounts will be stored and assigned the correct types, roles, groups and attributes. They will also link to the user's original account in the source data store if needed. The KPIs you have set as part of the plan will keep you mindful of the requirements for its success. Your users will not notice the migration has taken place unless you've designed it that way.
+Congratulations, you have successfully designed and implemented a migration plan for your user accounts to Universal Directory. After the accounts are activated, your new user accounts are stored and assigned the correct types, roles, groups, and attributes. These accounts also link to the user's original account in the source data store, if needed. The KPIs you have set as part of the plan keep you mindful of the requirements for its success. Your users won't notice the migration has taken place unless you've designed it that way.
 
 ## Related Topics
 
 To complement your user migration campaign, consider a way to provision and deprovision applications to your new users.
 
-Adding a SCIM interface to your apps allows admins to control user access centrally (info)
-Creating a custom provisioning flow for third party apps with Okta Workflows (info)
-Search the Okta Integration Network for provisioning flows and SCIM-ready apps that already exist. (info)
+* [Adding a SCIM interface to your apps](/docs/guides/scim-provisioning-integration-overview/main/) allows admins to control user access centrally
+* [Creating a custom provisioning flow]() for third party apps with Okta Workflows
+* [Search the Okta Integration Network](https://www.okta.com/integrations/) for provisioning flows and SCIM-ready apps that already exist.
 
-Learn more about working with non-human identities (NHIs)
+Learn more about working with non-human identities (NHIs):
 
-Okta secures AI (info)
-What is non-human identity security? (info)
-The non-human identity lifecycle (info)
-
+* [Okta secures AI](https://www.okta.com/solutions/secure-ai/)
+* [What is non-human identity security?](https://www.okta.com/identity-101/what-is-non-human-identity-security/)
+* [The non-human identity lifecycle](https://www.okta.com/identity-101/what-is-the-non-human-identity-lifecycle/)
