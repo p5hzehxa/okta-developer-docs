@@ -22,7 +22,7 @@ Perform a bulk migration of users into Okta by using the Okta APIs.
 
 #### Sample code
 
-* Use the sample JavaScript sample code included in this guide to run three bulk-import scenarios
+Use the JavaScript sample code included in this guide to run three bulk-import scenarios
 
 ---
 
@@ -30,30 +30,30 @@ Perform a bulk migration of users into Okta by using the Okta APIs.
 
 Before importing your users to Okta, careful planning and preparation are essential to ensure a smooth, secure, and efficient migration process. The following best practices cover key areas to consider throughout your import project.
 
-### Reading from the Source Provider
+### Read from the Source Provider
 
-* Gather your user data into a staging area, such as a secure database or a CSV file
-* Define the attribute mappings from your source system to the Okta user profile target fields
-* Clean up your data to ensure it's consistent and valid
+* Gather your user data into a staging area, such as a secure database or a CSV file.
+* Define the attribute mappings from your source system to the target fields of the Okta user profile.
+* Clean up your data to ensure it's consistent and valid.
 
 ### Handle Rate Limits
 
-* Rate limits apply to API requests depending on the level of service that you’ve purchased from Okta
-* Monitor rate limits in your script code using Okta rate limit headers
-* Work with Okta Support to plan your migration during a time when your rate limits can be temporarily adjusted
+* Rate limits apply to API requests depending on the level of service that you’ve purchased from Okta.
+* Monitor rate limits in your script code using Okta rate-limit headers.
+* Work with Okta Support to plan your migration during a time when your rate limits can be temporarily adjusted.
 
 ### Security Considerations
 
-* Ensure that passwords remain strictly encrypted to prevent exposure when handling sensitive data and hashed passwords
-* Verify that no user profile directories or legacy databases have direct exposure to the public internet
-* Remember that information security and protecting customer personally identifiable information (PII) is a critical priority
+* Ensure that passwords remain strictly encrypted to prevent exposure when handling sensitive data and hashed passwords.
+* Verify that no user profile directories or legacy databases have direct exposure to the public internet.
+* Remember that information security and protecting customer personally identifiable information (PII) is a critical priority.
 
-### Testing
+### Test your scripts
 
-* Create test data sets with multiple batches of progressively larger loads before attempting a production import
-* Use sample data that mimics your real user data to identify potential issues
-* Don’t use real user data when testing
-* Use clients like Postman to securely test your script's user and group creation API requests
+* Create test data sets with multiple batches of progressively larger loads before attempting a production import.
+* Use sample data that mimics your real user data to identify potential issues.
+* Don’t use real user data when testing.
+* Use clients like Postman to securely test your script's user and group creation API requests.
 
 ## Import script for specific use cases
 
@@ -63,7 +63,7 @@ The following JavaScript code imports users from your source data into Okta in o
 
 * One-time migration with authentication reset: This scenario migrates users without credentials and their account is staged.
 
-* Migration program using Okta password inline hooks: This scenario imports users who can migrate their existing password on first sign-in. This requires the configuration of an [Okta password import inline hook](/docs/guides/password-import-inline-hook/nodejs/main/).
+* Migration program using Okta password inline hooks: This scenario imports users who can migrate their existing password on first sign in. This requires the configuration of an [Okta password import inline hook](/docs/guides/password-import-inline-hook/nodejs/main/).
 
 The following JavaScript file contains all three scenarios:
 
@@ -406,7 +406,7 @@ See the [Create a User API](https://developer.okta.com/docs/api/openapi/okta-man
 
 ## One-time migration with authentication reset
 
-This scenario imports users without credentials and stages their accounts. Staged users don't have an active password and must complete an authentication reset through email before they can sign in. This approach is ideal when you don't have access to hashed passwords from your source system, or you want to force users to set a new password during their first sign-in to Okta.
+This scenario imports users without credentials and stages their accounts. Staged users don't have an active password and must complete an authentication reset through email before they can sign in. This approach is ideal when you don't have access to hashed passwords from your source system, or you want to force users to set a new password during their first sign in to Okta.
 
 The following example shows the Users API request body for this scenario:
 
@@ -434,7 +434,7 @@ See the [Create a User API](https://developer.okta.com/docs/api/openapi/okta-man
 
 ## Migration program using inline password hooks
 
-This scenario imports users with active accounts and allows them to use their existing passwords on first sign-in through a password import inline hook. The user's password is validated through your custom hook logic, which can authenticate against your legacy system or hashed password database. This approach is ideal when you want users to retain their original passwords during migration and have a more gradual password transition period.
+This scenario imports users with active accounts and allows them to use their existing passwords on first sign in through a password import inline hook. The user's password is validated through your custom hook logic, which can authenticate against your legacy system or hashed password database. This approach is ideal when you want users to retain their original passwords during migration and have a more gradual password transition period.
 
 > **Note:** This scenario requires the configuration of an [Okta password import inline hook](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/inlinehook/webhooks/createpasswordimportinlinehook) before you run the import script.
 
@@ -466,7 +466,7 @@ POST https://{yourOktaDomain}/api/v1/users?activate=true
 * `hook.type: "default"`: Specifies that a password import inline hook should be used for authentication
 * `profile`: Contains user profile information (`name`, `email`, and `login`)
 
-On first sign-in, the user's credentials are sent to your configured password import inline hook, which validates them against your legacy system and either grants access or returns an error. See the [Create a user API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/user/section/create-user-with-imported-hashed-password#section/Create-user-with-password-import-inline-hook).
+On first sign in, the user's credentials are sent to your configured password import inline hook, which validates them against your legacy system and either grants access or returns an error. See the [Create a user API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/user/section/create-user-with-imported-hashed-password#section/Create-user-with-password-import-inline-hook).
 
 For examples on how to implement the password import inline hook, see:
 
