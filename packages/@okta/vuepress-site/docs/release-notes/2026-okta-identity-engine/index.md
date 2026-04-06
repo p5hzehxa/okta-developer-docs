@@ -18,6 +18,9 @@ title: Okta Identity Engine API release notes 2026
 
 | Change | Expected in Preview Orgs |
 |--------|--------------------------|
+| [Entitlements Management and API service on the Admin Console Home page](#entitlements-management-and-api-service-on-the-admin-console-home-page) | |
+|[Authentication requirement for OIN Manager migration](#authentication-requirement-for-oin-manager-migration)||
+| [Submit entitlement management integrations is GA in Production](#submit-entitlement-management-integrations-is-ga-in-production) | Nov 5, 2025 |
 | [Slack integration for Identity Governance](#slack-integration-for-identity-governance) | February 18, 2026 |
 | [Custom admin permissions for inline and event hooks is GA in Production](#custom-admin-permissions-for-inline-and-event-hooks-is-ga-in-production) | December 10, 2025 |
 | [Increase to the maximum access duration limit ](#increase-to-the-maximum-access-duration-limit) | April 1, 2026 |
@@ -31,6 +34,19 @@ title: Okta Identity Engine API release notes 2026
 | [New password complexity property is GA in Production](#new-password-complexity-property-is-ga-in-production) | June 4, 2025 |
 | [Developer documentation updates in 2026.04.0](#developer-documentation-updates-in-2026-04-0) | April 1, 2026 |
 | [Bugs fixed in 2026.04.0](#bugs-fixed-in-2026-04-0)| April 1, 2026 |
+
+#### Entitlements Management and API service on the Admin Console Home page
+
+The **Home** page in the Admin Console now includes **Entitlements Management** and **API service** integrations. ISVs can initiate the full entitlements and API service integration flows and track progress directly from the **Home** page. A new **Entitlements** toggle enables fine-grained access control and real-time validation to ensure integrations are built with all security requirements. <!-- OKTA-1134610 -->
+
+#### Authentication requirement for OIN Manager migration
+
+After migrating a SCIM integration from the OIN Manager to the OIN Wizard, the **Basic** option is visible in the **Authentication mode** dropdown list. However, you can't select this option for resubmission. Select a different authentication method to complete the submission.
+<!-- OKTA-1114958 -->
+
+#### Submit entitlement management integrations is GA in Production
+
+Independent Software Vendors (ISVs) can now submit SCIM 2.0-based entitlement management integrations to the Okta Integration Network (OIN). This enhancement enables customers and IT admins to discover, manage, and assign fine-grained entitlements such as roles and permissions directly from Okta. By standardizing entitlement management, organizations can automate access assignments and streamline Identity Governance, ensuring that users receive the right access and roles without manual intervention. See [Submit an integration with the OIN Wizard](https://developer.okta.com/docs/guides/submit-oin-app/scim/main/). <!-- OKTA-1025782 ENTITLEMENTS_SUBMISSION Preview date: Nov 5, 2025 -->
 
 #### Slack integration for Identity Governance
 
@@ -95,6 +111,12 @@ You can now use the `oelStatement` property to block words from being used in pa
 * When an admin added users to read-only groups using the Groups API (`PUT /api/v1/groups/{groupId}/users/{userId}`), the endpoint incorrectly returned HTTP 501 (Not Implemented) instead of HTTP 403 (Forbidden). (OKTA-1139611)
 
 * The Factors API didn’t return enrollment information about the Okta FastPass factor (`signed_nonce`) for some users who didn’t have Okta Verify with push notifications enrolled or enabled. (OKTA-1052073)
+
+* ISVs were unable to submit their integrations for review despite passing all validation tests. (OKTA-1134528)
+
+* App instances incorrectly displayed the logo from the published version of a submission instead of the logo from the latest version. (OKTA-1136513)
+
+* Integrator Free Tier (IFT) orgs incorrectly showed and enforced a 5-instance limit in the OIN Wizard. (Okta-1044631)
 
 ## March
 
