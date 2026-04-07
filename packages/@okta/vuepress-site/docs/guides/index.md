@@ -144,6 +144,7 @@ guides:
  - terraform-organize-configuration
  - terraform-overview
  - terraform-syntax-tips
+ - test-your-migration-plan
  - token-inline-hook
  - unlock-mobile-app-with-biometrics
  - updating-saml-cert
@@ -256,6 +257,7 @@ If you're using Okta as an identity layer for the first time, start with [How Ok
     * [Pre-launch checklist](/docs/guides/deployment-checklist/)
     * [Deploy your app](/docs/guides/deploy-your-app/)
     * [Migrate to Okta](/docs/guides/migrate-to-okta-prerequisites/)
+    * [Test your migration plan](/docs/guides/test-your-migration-plan/)
 
 6. Automate management of your Okta org using Terraform:
 
