@@ -1,5 +1,28 @@
 #!/usr/bin/env node
 
+/*
+ * Adds a standardized publish-date HTML comment to the release-notes index files
+ * listed below.
+ *
+ * What it does:
+ * - Builds a UTC-style timestamp comment in the form:
+ *   <!-- Published on: YYYY-MM-DDT12:00:00Z -->
+ * - Scans each configured release-notes file for H3 headings (`### `)
+ * - Inserts the publish-date comment immediately after the heading when the
+ *   next line is blank and no publish-date comment already exists
+ * - Leaves existing publish-date comments unchanged, so the script is safe to
+ *   run multiple times
+ *
+ * How to run it from the repository root:
+ * - `yarn generate-pubdate`
+ * - or `node packages/@okta/vuepress-site/.vuepress/scripts/generate-pubdate.js`
+ *
+ * Notes:
+ * - This script only updates the hard-coded file list in `releaseNotesFiles`
+ * - It writes changes in place
+ * - Missing files are skipped and reported in the console output
+ */
+
 const fs = require('fs');
 const path = require('path');
 
