@@ -12,6 +12,19 @@ title: Okta Access Gateway API release notes 2026
 
 Access Gateway is available for both Okta Classic Engine and Okta Identity Engine.
 
+## April
+
+### Monthly release 2026.04.0
+<!-- Published on: 2026-04-08T12:00:00Z -->
+
+| Change | Expected in Preview Orgs |
+| ------ | ------------------------ |
+| [Bug fixed in 2026.04.0](#bug-fixed-in-2026-04-0) | April 8, 2026 |
+
+#### Bug fixed in 2026.04.0
+
+The `postLogoutUrl` for an app couldn’t be updated using the Replace the application behavior configuration [endpoint](https://developer.okta.com/docs/api/openapi/oag/oag/tags/application-behavior/other/replacebehavior).
+
 ## March
 
 ### Monthly release 2026.03.0
