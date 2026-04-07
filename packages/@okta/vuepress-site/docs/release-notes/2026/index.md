@@ -11,6 +11,17 @@ title: Okta Classic Engine API release notes 2026
 
 ## April
 
+### Weekly release 2026.04.1
+<!-- Published on: 2026-04-08T12:00:00Z -->
+
+| Change | Expected in Preview Orgs |
+| ------ | ------------------------ |
+| [Bug fixed in 2026.04.1](#bug-fixed-in-2026-04-1)| April 8, 2026 |
+
+#### Bug fixed in 2026.04.1
+
+The `AuthnRequestId` field wasn't included in authorization code flow and device code flow token request events in the System Log. (OKTA-1082636)
+
 ### Monthly release 2026.04.0
 <!-- Published on: 2026-04-02T12:00:00Z -->
 
