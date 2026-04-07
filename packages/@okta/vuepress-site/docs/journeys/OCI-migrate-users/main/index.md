@@ -93,7 +93,7 @@ For a migration program, where user passwords are migrated when they first sign 
 
 If your system currently uses Active Directory agents to synchronize passwords with Okta for SSO, you can also [use the AD Agent to migrate passwords to Okta](https://help.okta.com/okta_help.htm?type=oie&id=ad-password-migration).
 
-If you have stored your user's non-IAM profile data in another system, use the User ID returned by the Users API as a reference point to connect it. Find the user IDs after creation by calling [List All Users](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/user/other/listusers).
+If you have stored your user's non-IAM profile data in another system, use the User ID returned by the Users API as a reference point to connect it. Find the user IDs after creation by calling [List all users](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/user/other/listusers).
 
 #### End the migration program (if applicable)
 
@@ -106,7 +106,7 @@ Finally, you can retire your legacy system from service.
 
 Congratulations, you have successfully designed and implemented a migration plan for your user accounts to Universal Directory. After the accounts are activated, your new user accounts are stored and assigned the correct types, roles, groups, and attributes. These accounts also link to the user's original account in the source data store, if needed. The KPIs you have set as part of the plan keep you mindful of the requirements for its success. Your users won't notice the migration has taken place unless you've designed it that way.
 
-## Related Topics
+## Related topics
 
 To complement your user migration campaign, consider a way to provision and deprovision applications to your new users.
 
