@@ -53,6 +53,7 @@ guides:
  - event-hook-ngrok
  - express-configuration
  - express-config-guide-template
+ - express-submission
  - federated-claims
  - find-your-app-credentials
  - find-your-domain

@@ -92,6 +92,8 @@ Configure your OIN catalog properties:
 
 ### Configure your integration
 
+<StackSnippet snippet="express-submission-note" inline/>
+
 Continue with the OIN Wizard and configure your integration:
 
 #### Integration variables

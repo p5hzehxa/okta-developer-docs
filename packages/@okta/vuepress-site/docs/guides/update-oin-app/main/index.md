@@ -71,7 +71,8 @@ For published integrations that were migrated from the OIN Manager, if you need 
 
 ## Update your integration
 
-> **Note:** When you edit your published OIN integration, your previous PUBLISHED status and date are overwritten with the DRAFT status and current date.
+> **Notes:** When you edit your published OIN integration, your previous PUBLISHED status and date are overwritten with the DRAFT status and current date.
+</br><StackSnippet snippet="express-submission-note" inline/>
 
 To update a previously published OIN integration:
 

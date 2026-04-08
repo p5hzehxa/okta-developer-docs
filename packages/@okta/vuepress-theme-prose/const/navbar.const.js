@@ -838,6 +838,10 @@ export const guides = [
                 title: "Customer configuration guide template",
                 guideName: "express-config-guide-template",
               },
+               {
+                title: "Express Submission",
+                guideName: "express-submission",
+              },
             ]
           },
         ],
