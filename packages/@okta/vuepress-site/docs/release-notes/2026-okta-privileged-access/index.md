@@ -28,9 +28,9 @@ Workload identity for automation eliminates the need for hardcoded API keys or s
 ### Weekly release 2026.03.3
 <!-- Published on: 2026-03-26T12:00:00Z -->
 
-| Change | Expected in Preview Orgs |
-|--------|--------------------------|
-| [Enhancements for SSH connectivity for Active Directory domains](#enhancements-for-ssh-connectivity-for-active-directory-domains) | March 26, 2026 |
+| Change | Expected in Preview Orgs | Expected in Production |
+|--------|--------------------------|-----------------------|
+| [Enhancements for SSH connectivity for Active Directory domains](#enhancements-for-ssh-connectivity-for-active-directory-domains) | March 26, 2026 | April 8, 2026 |
 
 #### Enhancements for SSH connectivity for Active Directory domains
 
