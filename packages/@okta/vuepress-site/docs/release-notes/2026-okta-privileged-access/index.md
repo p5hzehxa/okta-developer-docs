@@ -26,7 +26,7 @@ Workload identity for automation eliminates the need for hardcoded API keys or s
 ## March
 
 ### Weekly release 2026.03.3
-<!-- Published on: 2026-04-08T12:00:00Z -->
+<!-- Published on: 2026-03-26T12:00:00Z -->
 
 | Change | Expected in Preview Orgs | Expected in Production |
 |--------|--------------------------|-----------------------|
