@@ -75,6 +75,7 @@ guides:
  - mfa
  - migrate-customizations
  - migrate-to-okta-prerequisites
+ - migrate-to-okta-plan
  - migrate-to-okta-bulk
  - migrate-to-okta-password-hooks
  - migrate-to-okta-with-scripts
