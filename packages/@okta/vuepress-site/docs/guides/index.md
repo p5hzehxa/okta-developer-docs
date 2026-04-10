@@ -77,6 +77,7 @@ guides:
  - migrate-to-okta-prerequisites
  - migrate-to-okta-bulk
  - migrate-to-okta-password-hooks
+ - migrate-to-okta-with-scripts
  - mobile-idx-sdk-overview
  - multiple-identifiers
  - mobile-swift-configure-redirect
