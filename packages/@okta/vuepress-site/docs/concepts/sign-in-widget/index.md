@@ -9,7 +9,7 @@ meta:
 
 The Sign-In Widget renders user-friendly experiences for both sign-in and sign-up (self-registration) throughout the identity verification lifecycle, from initial account creation to multifactor authentication. It acts as the front door to your app or website.
 
-As a JavaScript library, it can be integrated in several ways to authenticate and register users in web and mobile apps for your org. It provides complete, accessible, pre-built sign-in and sign-up experiences that you can use as is or customize based on your requirements.
+As a JavaScript library, it can be integrated in several ways to authenticate and register users in web and mobile apps for your org. It provides complete, accessible, pre-built sign-in and sign-up experiences. Use it as is, or customize it to meet your requirements.
 
 The following image shows the Okta Sign-In Widget as a sign-in form:
 
@@ -19,7 +19,7 @@ The following image shows the Okta Sign-In Widget as a sign-in form:
 
  </div>
 
-The following image shows the widget as a sign-up or self-registration form:
+The following image shows the Sign-In Widget as a sign-up or self-registration form:
 
 <div class="half">
 
@@ -29,21 +29,17 @@ The following image shows the widget as a sign-up or self-registration form:
 
 ## Benefits
 
-* Improve productivity and reduce development overhead
+* Improve productivity and reduce development overhead. You don't need to build complex authentication features from scratch. Sign-In Widget provides features like user registration, password reset, CAPTCHA, and multifactor authentication (MFA).
 
-   You don't need to build complex authentication features from scratch. Sign-In Widget provides features like user registration, password reset, CAPTCHA, and multifactor authentication (MFA).
+  You can easily integrate it with your web or mobile app in any of the following ways:
 
-   You can easily integrate it with your web or mobile app in any of the following ways:
+    * Redirect to a dedicated Okta-hosted page.
+    * Load it using the Okta CDN.
+    * Install it as an npm module.
 
-   * Redirect to a dedicated Okta-hosted page
+  Okta also provides SDKs for popular frameworks like Angular, React, and Vue, which further streamline the integration process.
 
-   * Load it using the Okta CDN
-
-   * Install it as an npm module
-
-   Okta also provides SDKs for popular frameworks like Angular, React, and Vue, which further streamline the integration process.
-
-* Provide a centralized and consistent sign-in experience
+* Provide a centralized and consistent sign-in experience.
 
    You can customize the sign-in form's appearance using the code editor to seamlessly integrate with your brand. Customization options include your company logo, color schemes, favicon, the text for various labels and links, and the ability to add or modify supported languages.
 
@@ -65,8 +61,8 @@ You can customize the look and feel of the standard sign-in form directly from t
 
 Use the standard sign-in form hosted at your unique Okta URL for a no-code implementation. You can make the following customizations:
 
-* Upload your own company logo, a background image, and a favicon
-* Define a primary and secondary color palette
+* Upload your own company logo, a background image, and a favicon.
+* Define a primary and secondary color palette.
 * Change the labels and text for various elements in the Sign-In Widget, such as headings, labels, and links. This includes customizing the **Username** field to specify what identifiers users can use, or adding a custom help link.
 
 The standard sign-in form also allows you to customize the sign-in experience for each app or website. For example, if you have multiple brands with distinct websites and domain names under a parent company, you can use distinct branding for each. You can also use distinct branding for each app that needs a different sign-in experience. See [Branding](https://help.okta.com/okta_help.htm?type=oie&id=ext-branding).
