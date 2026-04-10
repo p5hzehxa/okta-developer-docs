@@ -7,7 +7,9 @@ meta:
 
 # The Okta Sign-In Widget
 
-The Sign-In Widget renders a user-friendly sign-in form for all aspects of the identity verification lifecycle, from initial registration to multifactor authentication. It acts as the front door to your app or website.
+The Sign-In Widget renders user-friendly experiences for both sign-in and sign-up (self-registration) throughout the identity verification lifecycle, from initial account creation to multifactor authentication. It acts as the front door to your app or website.
+
+The following images show these primary use cases: a sign-in form and a sign-up form.
 
  <div class="half">
 
@@ -15,7 +17,13 @@ The Sign-In Widget renders a user-friendly sign-in form for all aspects of the i
 
  </div>
 
-The Sign-In Widget is a JavaScript library that you can integrate in several ways to authenticate users into web and mobile apps for your org. It provides a complete, accessible, pre-built sign-in experience that you can use as is or customize based on your requirements.
+<div class="half">
+
+ ![Sign-up widget](/img/siw/okta-sign-up.png)
+
+ </div>
+
+The Sign-In Widget is a JavaScript library that you can integrate in several ways to authenticate and register users in web and mobile apps for your org. It provides complete, accessible, pre-built sign-in and sign-up experiences that you can use as is or customize based on your requirements.
 
 ## Benefits
 
