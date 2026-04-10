@@ -193,6 +193,7 @@ guides:
  - pwd-optional-best-practices
  - pwd-optional-overview
  - build-api-integration
+ - build-api-actions
  - add-logingov-idp
  - policy-simulation
  - idv-integration
