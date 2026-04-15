@@ -19,11 +19,13 @@ Access Gateway is available for both Okta Classic Engine and Okta Identity Engin
 
 | Change | Expected in Preview Orgs |
 | ------ | ------------------------ |
-| [Bug fixed in 2026.04.0](#bug-fixed-in-2026-04-0) | April 8, 2026 |
+| [Bugs fixed in 2026.04.0](#bugs-fixed-in-2026-04-0) | April 8, 2026 |
 
-#### Bug fixed in 2026.04.0
+#### Bugs fixed in 2026.04.0
 
-The `postLogoutUrl` for an app couldn’t be updated using the Replace the application behavior configuration [endpoint](https://developer.okta.com/docs/api/openapi/oag/oag/tags/application-behavior/other/replacebehavior). (OKTA-1125316)
+* The `postLogoutUrl` for an app couldn’t be updated using the Replace the application behavior configuration [endpoint](https://developer.okta.com/docs/api/openapi/oag/oag/tags/application-behavior/other/replacebehavior). (OKTA-1125316)
+* The List all applications [endpoint](https://developer.okta.com/docs/api/openapi/oag/oag/tags/applications/other/listapplication) returned an error if an app had `STATUS_CODE_403` as the `policyDenied` value in its app behavior settings and the request was used with `?expand=behavior` as a query parameter. (OKTA-1128154)
+* When you used the Replace a protected resource [endpoint](https://developer.okta.com/docs/api/openapi/oag/oag/tags/application-protected-resources/other/replaceresource), it incorrectly returned an HTTP 404 Not Found error. (OKTA-1126600)
 
 ## March
 
