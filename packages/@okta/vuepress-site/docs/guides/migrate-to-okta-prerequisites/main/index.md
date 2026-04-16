@@ -120,4 +120,4 @@ If you discover any issues, use a consistent strategy to remedy for every issue 
 
 ### Next steps
 
-After you have created your migration plan, the next step is to test your approach before implementation. See [Test your migration plans](/docs/guides/test-your-migration-plan/).
+After you have created your migration plan, the next step is to test your approach before implementation. See [Test your migration plan](/docs/guides/test-your-migration-plan/).
