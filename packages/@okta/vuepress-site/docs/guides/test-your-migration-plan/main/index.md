@@ -50,7 +50,7 @@ Non-IAM data includes attributes that don't affect access control:
 
 ### Why this matters
 
-Consider a large enterprise with 300,000 users and 50,000 groups where only 10,000 groups actually impact IAM. Migrating all 50,000 groups could create up to 2.3 billion permutations. When a non-IAM attribute changes (like a preferred units field switching from metric to imperial), every affected user record is updated. If not optimized, this triggers unnecessary sync jobs, degrades performance, and increases maintenance overhead without providing any IAM benefit.
+Consider a large enterprise with 300,000 users and 50,000 groups where only 10,000 groups actually impact IAM. Migrating all 50,000 groups could create up to 2.3 billion permutations. When a non-IAM attribute changes, every affected user record is updated. If not optimized, this triggers unnecessary sync jobs, degrades performance, and increases maintenance overhead without providing any IAM benefit.
 
 Okta is optimized for identity and access management, not as a general-purpose database for reporting, analytics, or storing historical data. Okta recommends using a database that is tuned for the ad hoc queries in a data warehouse or integrating a security event purpose-built system directly with a Security Information and Event Management (SIEM) system.
 
