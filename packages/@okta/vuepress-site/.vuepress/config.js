@@ -303,6 +303,10 @@ module.exports = ctx => ({
           TEST_JUNK: 'this is a test replacement', // Leave for testing
         })
       });
+
+    // axios 0.31.0 uses Buffer (via node-libs-browser) which requires 'global'.
+    // VuePress client webpack config sets node.global = false, so re-enable it.
+    config.node.set('global', true);
   },
 
   evergreen: false,
