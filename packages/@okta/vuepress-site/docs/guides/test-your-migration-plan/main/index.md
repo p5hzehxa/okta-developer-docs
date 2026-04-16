@@ -36,7 +36,7 @@ IAM-relevant data includes attributes that directly impact authentication or aut
 
 * **Authentication**: Login credentials, multifactor authentication settings, password policies
 * **Authorization**: Group memberships that control access to apps or resources
-* **App access**: Attributes that areused for app assignment or provisioning
+* **App access**: Attributes that are used for app assignment or provisioning
 * **Security policies**: Level of assurance, authentication context, risk-based access policies
 
 #### What is NOT IAM-relevant data
@@ -50,9 +50,13 @@ Non-IAM data includes attributes that don't affect access control:
 
 ### Why this matters
 
-Consider a large enterprise with 300,000 users and 50,000 groups where only 10,000 groups actually impact IAM. Migrating all 50,000 groups creates 2.3 billion permutations. When a non-IAM attribute changes (like a "preferred units" field switching from metric to imperial), every affected user record updates. This triggers unnecessary sync jobs, degrades performance, and increases maintenance overhead without providing any IAM benefit.
+Consider a large enterprise with 300,000 users and 50,000 groups where only 10,000 groups actually impact IAM. Migrating all 50,000 groups could create up to 2.3 billion permutations. When a non-IAM attribute changes (like a "preferred units" field switching from metric to imperial), every affected user record update. If not optimized, this triggers unnecessary sync jobs, degrades performance, and increases maintenance overhead without providing any IAM benefit.
 
-Okta is optimized for identity and access management, not as a general-purpose database for reporting, analytics, or storing historical data.
+Okta is optimized for identity and access management, not as a general-purpose database for reporting, analytics, or storing historical data. Okta recommends using a database that is tuned for the ad hoc queries in a data warehouse or integrating a security event purpose-built system directly with a Security Information and Event Management (SIEM) system.
+
+**Note:**  Okta also has specific products tailored to intruder threat protection (ITP), Identity Security Posture Management (ISPM), governance, and lifecycle management (LCM) for end-to-end IAM outcomes.
+
+Okta treats this migration as an opportunity to sanitize and normalize source data to align strictly with IAM requirements, avoiding the ingestion of unnecessary or unclean records. To maintain data integrity for future needs, a reference to the origin system will be retained to facilitate downstream linking without bloating the identity directory.
 
 ### Recommended approach
 

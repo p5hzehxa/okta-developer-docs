@@ -969,6 +969,10 @@ export const guides = [
                 path: "/docs/guides/migrate-to-okta-plan/main/",
               },
               {
+                title: "Test your migration plan",
+                path: "/docs/guides/test-your-migration-plan/main/",
+              },
+              {
                 title: "Bulk migration with credentials",
                 path: "/docs/guides/migrate-to-okta-bulk/main/",
               },
