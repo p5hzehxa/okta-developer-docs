@@ -12,7 +12,7 @@ This guide explains how to create test scenarios and execute migration tests to 
 
 #### Learning outcomes
 
-Test your migration method before moving to production.
+Understand how to test your migration method before moving to production.
 
 #### What you need
 
