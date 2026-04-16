@@ -16,7 +16,7 @@ Test your migration method before moving to production.
 
 #### What you need
 
-* [A plan for migrating existing users to Okta](/docs/guides/migrate-to-okta-prerequisites/)
+* [A plan for migrating existing users to Okta](/docs/guides/migrate-to-okta-plan/main/)
 * User data extracted into a staging area
 * [Okta Integrator Free Plan org](https://developer.okta.com/signup) for testing
 * Understanding of which data attributes impact identity and access management
