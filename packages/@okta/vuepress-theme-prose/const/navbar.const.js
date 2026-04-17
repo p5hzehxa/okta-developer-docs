@@ -911,9 +911,9 @@ export const guides = [
           {
             title: "Set up an app provisioning connection",
             guideName: "app-provisioning-connection"
-          }
+          },
           {
-          title: "Migrate users",
+            title: "Migrate users",
           subLinks: [
               {
                 title: "Plan your user migration to Okta",
