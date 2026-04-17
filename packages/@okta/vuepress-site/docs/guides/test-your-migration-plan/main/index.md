@@ -175,9 +175,7 @@ This isolation prevents cascading issues and makes rollback simpler if needed.
 
 ## Next steps
 
-With a plan in place, you're ready to move on to implementation, which differs according to where your data is coming from and what method you chose to use. Use the [Okta API](https://developer.okta.com/docs/api).
-
-Have a look at our migration guides:
+With a plan in place, you're ready to move on to implementation, which differs according to where your data is coming from and what method you chose to use. See our following migration guides:
 
 * [Bulk migration with credentials](/docs/guides/migrate-to-okta-bulk/)
 * [Import Users with Inline Password Hooks](/docs/guides/migrate-to-okta-password-hooks/)
