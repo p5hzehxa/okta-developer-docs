@@ -6057,3 +6057,15 @@ redirects:
     to: /docs/concepts/universal-directory/
   - from: /docs/guides/submit-app/apiservice/main/
     to: /docs/guides/submit-oin-app/uapiservice/main/
+  - from: /docs/guides/migrate-to-okta-password-hooks/main/index.html
+    to: /docs/guides/migrate-to-okta-with-scripts/main/
+  - from: /docs/guides/migrate-to-okta-password-hooks/main
+    to: /docs/guides/migrate-to-okta-with-scripts/main/
+  - from: /docs/guides/migrate-to-okta-prerequisites/main/index.html
+    to: /docs/guides/migrate-to-okta-plan/main/
+  - from: docs/guides/migrate-to-okta-prerequisites/main
+    to: /docs/guides/migrate-to-okta-plan/main/
+  - from: /docs/guides/migrate-to-okta-bulk/main/index.html
+    to: /docs/guides/migrate-to-okta-with-scripts/main/
+  - from: /docs/guides/migrate-to-okta-bulk/main
+    to: /docs/guides/migrate-to-okta-with-scripts/main/
