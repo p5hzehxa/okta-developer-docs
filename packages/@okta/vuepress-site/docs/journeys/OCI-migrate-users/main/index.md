@@ -10,6 +10,8 @@ sections:
 - main
 ---
 
+# Migrate your human, non-Okta user accounts to Universal Directory
+
 ## Introduction
 
 Your company has adopted the Okta Platform and wants to use Universal Directory as the single point of identity access management information for all its users. This gives it access to Okta's full complement of [User Access Management](https://www.okta.com/identity-101/user-access-management/) features and functionality. To achieve this, you need to migrate human user identities from a source provider, which is a local Active Directory or LDAP server or another third-party identity provider.
@@ -29,14 +31,14 @@ Learn the basics that you need to lay the foundations for your work:
 
 Plan your migration around four key points:
 
-* [What data are you migrating?](): Identify the users and groups to migrate, the IAM data to import into UD vs the profile data that needs to go elsewhere, and the apps they need to access. Validate the data quality. Consider data privacy and regulations.
-* [Migration type](): Choose between a one-time migration and a phased program. The one-time approach moves all users and credentials at once. In contrast, a phased program moves data slowly over time. The source provider stays active during this on-demand process. Base your decision on your current user store and your deadlines.
-* [End-user experience](): Decide on the right migration experience for your users. Determine if you want to prioritize convenience or immediate security. Select a seamless migration to offer a frictionless user experience. This keeps users unaware that their accounts have been migrated. Select a staged migration to take advantage of Okta's features. This improves security right away but requires user action.
-* [Measuring success](): Define KPIs to measure the worth and success of your migration. Try to balance the inherent value of the project with a lack of user disruption and overall security goals.
+* [What data are you migrating?](/docs/guides/migrate-to-okta-plan/main/#consider-your-data): Identify the users and groups to migrate, the IAM data to import into UD vs the profile data that needs to go elsewhere, and the apps they need to access. Validate the data quality. Consider data privacy and regulations.
+* [Migration type](/docs/guides/migrate-to-okta-plan/main/#choose-your-migration-type): Choose between a one-time migration and a phased program. The one-time approach moves all users and credentials at once. In contrast, a phased program moves data slowly over time. The source provider stays active during this on-demand process. Base your decision on your current user store and your deadlines.
+* [End-user experience](/docs/guides/migrate-to-okta-plan/main/#plan-the-end-user-experience): Decide on the right migration experience for your users. Determine if you want to prioritize convenience or immediate security. Select a seamless migration to offer a frictionless user experience. This keeps users unaware that their accounts have been migrated. Select a staged migration to take advantage of Okta's features. This improves security right away but requires user action.
+* [Measuring success](/docs/guides/migrate-to-okta-plan/main/#define-success-metrics): Define KPIs to measure the worth and success of your migration. Try to balance the inherent value of the project with a lack of user disruption and overall security goals.
 
 With your strategy set using the guide above, and the implmentation using the guides in the next section, create the following test and rollback plans:
 
-* [Create a realistic set of test data and test your migration]().
+* [Create a realistic set of test data and test your migration](/docs/guides/test-your-migration-plan/main/).
 * Create a rollback plan for the migration.
 
 ## Build
@@ -70,16 +72,16 @@ Your apps and API won't be able to use your source provider to authenticate user
 
 #### Import your user accounts into Universal Directory
 
-Extract the user data from the source provider into an intermediate staging area. [Clean up that data]() so that it's consistent and contains only valid information as you did for the [test](#plan).
+Extract the user data from the source provider into an intermediate staging area. [Clean up that data](/docs/guides/test-your-migration-plan/main/#review-and-clean-your-data) so that it's consistent and contains only valid information as you did for the [test](#plan).
 
 For a seamless, one-time migration, where users are unaware their account has been moved, import each user's hashed password with their details, and make their account active:
 
-* [Use the Users API to create active user accounts with the hashed password]().
+* [Use the Users API to create active user accounts with the hashed password](/docs/guides/migrate-to-okta-with-scripts/main/#seamless-one-time-migration).
 * Send users notification to sign in normally.
 
 For a one-time migration with authentication reset, where users must reset their authentication details to activate their account, import each user's details, and make their account staged:
 
-* [Use the Users API to create staged user accounts without credentials]().
+* [Use the Users API to create staged user accounts without credentials](/docs/guides/migrate-to-okta-with-scripts/main/#one-time-migration-with-authentication-reset).
 * Alternatively, you can [bulk import user details from a CSV file](https://help.okta.com/okta_help.htm?type=oie&id=ext_csv_import).
 * Send users notification to reactivate their accounts. (Mass-select users in Okta and click **Activate** to send Welcome/Set Password emails.)
 
@@ -88,7 +90,7 @@ For a migration program, where user passwords are migrated when they first sign 
 * Create a password import inline hook to one of the following places:
   * Local Active Directory or LDAP server
   * [Third-party identity provider](/docs/guides/password-import-inline-hook/nodejs/main/)
-* [Use the Okta Users API to create active user accounts with provider type and name set to IMPORT, and the inline hook attached]().
+* [Use the Okta Users API to create active user accounts with provider type and name set to IMPORT, and the inline hook attached](/docs/guides/migrate-to-okta-with-scripts/main/#migration-program-using-inline-password-hooks).
 * Send that user a notification to sign in through the standard Okta process.
 
 If your system currently uses Active Directory agents to synchronize passwords with Okta for SSO, you can also [use the AD Agent to migrate passwords to Okta](https://help.okta.com/okta_help.htm?type=oie&id=ad-password-migration).
@@ -111,7 +113,7 @@ Congratulations, you have successfully designed and implemented a migration plan
 To complement your user migration campaign, consider a way to provision and deprovision applications to your new users.
 
 * [Adding a SCIM interface to your apps](/docs/guides/scim-provisioning-integration-overview/main/) allows admins to control user access centrally
-* [Creating a custom provisioning flow]() for third party apps with Okta Workflows
+<!-- * [Creating a custom provisioning flow]() for third party apps with Okta Workflows -->
 * [Search the Okta Integration Network](https://www.okta.com/integrations/) for provisioning flows and SCIM-ready apps that already exist.
 
 Learn more about working with non-human identities (NHIs):

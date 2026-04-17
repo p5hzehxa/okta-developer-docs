@@ -924,8 +924,8 @@ export const guides = [
                 path: "/docs/guides/test-your-migration-plan/main/",
               },
               {
-                title: "Bulk migration with credentials",
-                path: "/docs/guides/migrate-to-okta-bulk/main/",
+                title: "Script your user migration with the Okta Users API",
+                path: "/docs/guides/migrate-to-okta-with-scripts/main/",
               },
             ],
           },
@@ -1213,7 +1213,7 @@ export const journeys = [
           },
           {
             title: "Migrate users to Universal Directory",
-            path: "OCI-migrate-users",
+            journeyName: "OCI-migrate-users"
           },
         ]
       },
