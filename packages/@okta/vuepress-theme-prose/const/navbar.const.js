@@ -911,7 +911,24 @@ export const guides = [
           {
             title: "Set up an app provisioning connection",
             guideName: "app-provisioning-connection"
-          }
+          },
+          {
+            title: "Migrate users",
+          subLinks: [
+              {
+                title: "Plan your user migration to Okta",
+                path: "/docs/guides/migrate-to-okta-plan/main/",
+              },
+              {
+                title: "Test your migration plan",
+                path: "/docs/guides/test-your-migration-plan/main/",
+              },
+              {
+                title: "Bulk migration with credentials",
+                path: "/docs/guides/migrate-to-okta-bulk/main/",
+              },
+            ],
+          },
         ],
       },
       {
@@ -957,31 +974,6 @@ export const guides = [
             path: "/docs/guides/deployment-checklist/main/",
           },
           { title: "Deploy your app", guideName: "deploy-your-app" },
-          {
-            title: "Migrate to Okta",
-            subLinks: [
-              {
-                title: "Prerequisites",
-                path: "/docs/guides/migrate-to-okta-prerequisites/main/",
-              },
-              {
-                title: "Plan your user migration to Okta",
-                path: "/docs/guides/migrate-to-okta-plan/main/",
-              },
-              {
-                title: "Test your migration plan",
-                path: "/docs/guides/test-your-migration-plan/main/",
-              },
-              {
-                title: "Bulk migration with credentials",
-                path: "/docs/guides/migrate-to-okta-bulk/main/",
-              },
-              {
-                title: "Migrate users with pwd hooks",
-                path: "/docs/guides/migrate-to-okta-password-hooks/main/",
-              },
-            ],
-          },
         ],
       },
       {
