@@ -11,20 +11,8 @@
         @updateHeight="updateHeaderHeight"
       >
         <p>
-          Action required: React server components critical vulnerability
-          <a
-            href="https://react.dev/blog/2025/12/03/critical-security-vulnerability-in-react-server-components"
-            target="_blank"
-          >
-            (CVE-2025-55182)
-          </a>.
-          If you use Okta's React SDKs or samples,
-          <a
-            href="https://support.okta.com/help/s/article/Developer-Statement-React-Server-Components-Critical-Vulnerability-CVE-2025-55182-Action-Required-Okta?language=en_US"
-            target="_blank"
-          >
-            take action now
-          </a>.
+          Join us at <a href="https://luma.com/v2tmx6bf?utm_medium=website&utm_source=oktadevbanner">Okta Developer Connect San Francisco</a> on April 30 at Okta HQ to 
+          explore how Okta secures AI agents with modern identity.
         </p>
       </HeaderBanner>
       <Header />
@@ -165,8 +153,8 @@ export default {
   },
   computed: {
     showBanner() {
-      const bannerStartTime = new Date('2025-12-07T23:59:59-08:00'); // Start on December 7
-      const bannerEndTime = new Date('2025-12-11T23:59:59-08:00'); // End on 11 December
+      const bannerStartTime = new Date('2026-04-20T13:00:00Z'); // Start on April 20, 2026 9:00 AM EDT
+      const bannerEndTime = new Date('2026-05-01T11:00:00Z'); // End on May 1, 2026 7:00 AM EDT
 
       const bannerStartEpochSeconds = Math.floor(bannerStartTime.getTime() / 1000);
       const bannerEndEpochSeconds = Math.floor(bannerEndTime.getTime() / 1000);
