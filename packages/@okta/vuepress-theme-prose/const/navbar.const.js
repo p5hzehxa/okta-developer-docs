@@ -1017,6 +1017,10 @@ export const guides = [
             title: "Create and manage resources",
             subLinks: [
               {
+                title: "Import existing resources",
+                guideName: "terraform-import-existing-resources"
+              },
+              {
                 title: "Manage groups",
                 guideName: "terraform-manage-groups",
               },
@@ -1043,10 +1047,6 @@ export const guides = [
               {
                 title: "Manage custom domains",
                 guideName: "terraform-manage-multiple-domains"
-              },
-              {
-                title: "Import existing resources",
-                guideName: "terraform-import-existing-resources"
               },
               {
                 title: "Migrate to consolidated app sign-on policy rules",
