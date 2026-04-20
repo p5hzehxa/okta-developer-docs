@@ -12,7 +12,7 @@
       >
         <p>
           Join us at <a href="https://luma.com/v2tmx6bf?utm_medium=website&utm_source=oktadevbanner">Okta Developer Connect San Francisco</a> on April 30 at Okta HQ to 
-          explore how Okta secures AI agents with modern identity.”
+          explore how Okta secures AI agents with modern identity.
         </p>
       </HeaderBanner>
       <Header />
