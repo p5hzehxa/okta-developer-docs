@@ -255,7 +255,7 @@ If you're using Okta as an identity layer for the first time, start with [How Ok
 
     * [Pre-launch checklist](/docs/guides/deployment-checklist/)
     * [Deploy your app](/docs/guides/deploy-your-app/)
-    * [Migrate to Okta](/docs/guides/migrate-to-okta-prerequisites/)
+    * [Migrate to Okta](/docs/guides/migrate-to-okta-plan/)
     * [Test your migration plan](/docs/guides/test-your-migration-plan/)
 
 6. Automate management of your Okta org using Terraform:
