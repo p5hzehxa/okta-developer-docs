@@ -19,7 +19,7 @@ Perform a bulk migration of users into Okta by using the Okta APIs.
 * [Okta Integrator Free Plan org](https://developer.okta.com/signup)
 * Example or test source data to test user and group creation requests. (Don't use real user data when testing.)
 * Node version `v18.0` or higher
-* [A plan for migrating existing users to Okta](/docs/guides/migrate-to-okta-prerequisites/)
+* [A plan for migrating existing users to Okta](/docs/guides/migrate-to-okta-plan/)
 
 #### Sample code
 

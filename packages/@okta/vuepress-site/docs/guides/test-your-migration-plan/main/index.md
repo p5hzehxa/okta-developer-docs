@@ -177,5 +177,5 @@ This isolation prevents cascading issues and makes rollback simpler if needed.
 
 With a plan in place, you're ready to move on to implementation, which differs according to where your data is coming from and what method you chose to use. See our following migration guides:
 
-* [Bulk migration with credentials](/docs/guides/migrate-to-okta-bulk/)
-* [Import Users with Inline Password Hooks](/docs/guides/migrate-to-okta-password-hooks/)
+* [Bulk migration with credentials](/docs/guides/migrate-to-okta-with-scripts/)
+* [Import Users with Inline Password Hooks](/docs/guides/migrate-to-okta-with-scripts/)

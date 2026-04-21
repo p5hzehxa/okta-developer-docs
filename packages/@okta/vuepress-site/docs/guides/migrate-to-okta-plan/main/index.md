@@ -138,9 +138,7 @@ The bulk import strategy uses CSV imports or the Okta Users API to migrate a tar
 
 Bulk imports offer maximum control over data quality before go-live. However, because all users migrate simultaneously, teams should prepare for a potential spike in support volume during the initial launch.
 
-See [Bulk migration with credentials](/docs/guides/migrate-to-okta-bulk/main/) for detailed instructions.
-
-See [Import Users with Inline Password Hooks](/docs/guides/migrate-to-okta-password-hooks/main/) for implementation details on bulk loading the profile and then doing JIT password verification per user.
+See [Script your user migration with the Okta Users API](/docs/guides/migrate-to-okta-with-scripts/main/) for detailed instructions. This guide also includes implementation details on bulk loading the user profile and then doing JIT password verification per user.
 
 ### Just-In-Time Provisioning
 
