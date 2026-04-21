@@ -34,13 +34,13 @@ The [Okta Terraform provider](https://registry.terraform.io/providers/okta/okta/
 
 * **Network zones:** Configure boundaries to control access based on location, IP, or ASN.
 * **Policies:** Define policies for continuous threat evaluation.
-* **User risk**: Define user risk levels that require mitigation .
+* **User risk**: Define user risk levels that require mitigation.
 * **Shared Signals:** Configure third-party security vendor connections to receive security-related events.
 
 > **Note**:
 > To configure remediation action for apps, such as Universal Logout, you must use the Admin Console. You can’t configure Okta app integrations with Universal Logout through Terraform at this time. See how to [Configure Universal Logout in ITP](https://help.okta.com/oie/en-us/content/topics/itp/config-universal-logout) from the Admin Console in the product documentation.
 
-Before you can configure ITP with Terraform, you need to set up Terraform access for ITP resources. See [Set up Terraform access for ITP](#set-up-terraform-access-for-itp).
+Before you can configure ITP with Terraform, you need to set up Terraform access for ITP resources. 
 
 ## Set up Terraform access for ITP
 
@@ -72,7 +72,7 @@ Grant the super admin role (`SUPER_ADMIN`) to your Terraform API service app int
 
 ### Terraform files
 
-For guidance on organizing your files, see [Organizing your configuration](/docs/guides/terraform-organize-configuration/main/). Consider organizing your Terraform code so that related resources are grouped together. For example, you could create a Terraform file called `policies.tf` that contains all your policy resources, and `ssf.tf` to configure your shared signal vendors.
+For guidance on organizing your files, see [Organizing your configuration](/docs/guides/terraform-organize-configuration/main/). Consider organizing your Terraform code so that related resources are grouped together. For example, you could create a Terraform file called `policies.tf` that contains all of your policy resources, and `ssf.tf` to configure your shared signal vendors.
 
 ## Manage ITP resources in Terraform
 
@@ -267,7 +267,7 @@ resource "okta_security_events_provider" "example_issuer" {
 
 ## Apply the configuration
 
-Once your Terraform configuration is complete, run the standard deployment flow:
+After your Terraform configuration is complete, run the standard deployment flow:
 
 1. Initialize the Terraform configuration:
 
@@ -287,7 +287,7 @@ Once your Terraform configuration is complete, run the standard deployment flow:
    terraform apply
    ```
 
-Review your Okta org for the configuration changes. Filter for ITP events in the System Logs. See [Identity Threat Protection Event Types](https://developer.okta.com/docs/reference/api/itp-et/).
+Review your Okta org for the configuration changes by filtering for ITP events in the System Logs. See [Identity Threat Protection Event Types](https://developer.okta.com/docs/reference/api/itp-et/).
 
 ## Additional resources
 
