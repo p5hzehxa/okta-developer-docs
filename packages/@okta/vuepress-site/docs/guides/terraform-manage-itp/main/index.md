@@ -28,19 +28,20 @@ Use Terraform to configure ITP resources in your org, such as policies, shared s
 
 Identity Threat Protection with Okta AI (ITP) is a continuous identity threat detection and response solution that detects and responds to threats as they occur. ITP continuously evaluates users and their sessions, receiving risk signals from the Okta risk engine and security event providers. When ITP identifies changes in a user's risk, network zone, device, or behavior, it launches automated mitigation and remediation actions, such as Universal Logout. See [Identity Threat Protection with Okta AI](https://help.okta.com/okta_help.htm?type=oie&id=ext-itp-overview).
 
-ITP features that can be managed through the Okta API and, consequently, the Terraform Provider include:
-
 The [Okta Terraform provider](https://registry.terraform.io/providers/okta/okta/latest) now supports ITP resource configuration, as well as existing IAM resource configuration, such as groups, users, devices, and authentication services. The following ITP resources can be managed through the Okta Terraform provider:
 
-* **Network zones:** Configure boundaries to control access based on location, IP, or ASN.
-* **Policies:** Define policies for continuous threat evaluation.
+* **Network zones**: Configure boundaries to control access based on location, IP, or ASN.
+* **Policies**: Define policies for continuous threat evaluation.
+* **Behavior detection rules**: Define rules for the sign-in policy.
 * **User risk**: Define user risk levels that require mitigation.
-* **Shared Signals:** Configure third-party security vendor connections to receive security-related events.
+* **Shared Signals**: Configure third-party security vendor connections to receive security-related events.
 
-> **Note**:
-> To configure remediation action for apps, such as Universal Logout, you must use the Admin Console. You can’t configure Okta app integrations with Universal Logout through Terraform at this time. See how to [Configure Universal Logout in ITP](https://help.okta.com/oie/en-us/content/topics/itp/config-universal-logout) from the Admin Console in the product documentation.
+> **Note:** The following ITP resources aren't available through the Okta Terraform provider:
+> * **Universal Logout**: To configure remediation action for apps, such as Universal Logout, you must use the Admin Console. See how to [Configure Universal Logout in ITP](https://help.okta.com/oie/en-us/content/topics/itp/config-universal-logout) from the Admin Console in the product documentation.
+> * **Bot protection**: Configure bot protection through the [Okta APIs](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/botprotection) or the Admin Console. See [Bot protection](https://help.okta.com/oie/en-us/content/topics/itp/bot-protection.htm).
+> * **Workflows**: Configure ITP Workflows through the Okta Workflows Console. See [Workflows for Identity Threat Protection](https://help.okta.com/oie/en-us/content/topics/itp/workflows-for-itp.htm).
 
-Before you can configure ITP with Terraform, you need to set up Terraform access for ITP resources. 
+Before you can configure ITP with Terraform, you need to set up Terraform access for ITP resources.
 
 ## Set up Terraform access for ITP
 
@@ -212,6 +213,51 @@ See [Entity risk policy](https://help.okta.com/oie/en-us/content/topics/itp/enti
       terminate_all_sessions = true
     }
     ```
+
+### Behavior detection rules
+
+Behavior detection rules are used to configure location, device, IP address, or velocity behavior rules for a sign-in policy. Use the [`okta_behavior`](https://registry.terraform.io/providers/okta/okta/latest/docs/data-sources/behavior) or [`okta_behaviors`](https://registry.terraform.io/providers/okta/okta/latest/docs/data-sources/behaviors) data sources to retrieve and configure the `okta_behavior` resource.
+
+> **Note**: If you have existing behavior rule configurations, you need to import the behavior rule resources before configuring them.
+
+See [Configure behavior detection](https://help.okta.com/oie/en-us/content/topics/security/behavior-detection/configure-behavior-detection.htm) in the product documentation.
+
+**Example**: Configure behavior detection rules
+
+```bash
+resource "okta_behavior" "my_location" {
+  name                      = "My Location"
+  type                      = "ANOMALOUS_LOCATION"
+  number_of_authentications = 50
+  location_granularity_type = "LAT_LONG"
+  radius_from_location      = 20
+}
+
+resource "okta_behavior" "my_city" {
+  name                      = "My City"
+  type                      = "ANOMALOUS_LOCATION"
+  number_of_authentications = 50
+  location_granularity_type = "CITY"
+}
+
+resource "okta_behavior" "my_device" {
+  name                      = "My Device"
+  type                      = "ANOMALOUS_DEVICE"
+  number_of_authentications = 50
+}
+
+resource "okta_behavior" "my_ip" {
+  name                      = "My IP"
+  type                      = "ANOMALOUS_IP"
+  number_of_authentications = 50
+}
+
+resource "okta_behavior" "my_velocity" {
+  name     = "My Velocity"
+  type     = "VELOCITY"
+  velocity = 25
+}
+```
 
 ### User risk
 
