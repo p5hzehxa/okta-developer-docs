@@ -506,7 +506,12 @@ export default {
       }
     },
     getTheme: function() {
-      return JSON.parse(storage.getItem(THEME_MODE_KEY)) === true ? "dark" : "light";
+      const stored = storage.getItem(THEME_MODE_KEY);
+      try {
+        return JSON.parse(stored) === true ? "dark" : "light";
+      } catch {
+        return "light";
+      }
     },
     async submitForm(e) {
       e.preventDefault();
