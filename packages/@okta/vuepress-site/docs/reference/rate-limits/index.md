@@ -10,7 +10,7 @@ Rate limits are essential for maintaining both service continuity and effective 
 
 Fundamentally, rate limits define how many requests can be made to an endpoint within a specific time window. They help protect platform reliability and performance by preventing excessive traffic that could degrade service or introduce security risks like DDoS attacks. Rate limits also promote fairness by ensuring all users have equitable access to the service.
 
-Okta implements rate limits using buckets. A rate limiting bucket is a collection of one or more endpoints that share a defined quota of calls per unit of time. This quota is consumed by a set of clients associated with the bucket&mdash;this association is known as the scope of the bucket. The most general scope for a bucket is the entire org. This bucket is shared by every client in the org that uses the associated APIs. Other, more specific buckets can be nested beneath a broader bucket and may be applicable to a subset of APIs for a subset of clients.
+Okta implements rate limits using buckets. A rate limiting bucket is a collection of one or more endpoints that share a defined quota of calls per unit of time. A set of clients associated with the bucket consumes this quota.&mdash;this association is known as the scope of the bucket. The most general scope for a bucket is the entire org. Every client in the org that uses the associated APIs shares this bucket. Other, more specific buckets can be nested beneath a broader bucket and may be applicable to a subset of APIs for a subset of clients.
 
 For example, there may be a bucket for `/oauth2/v1/authorize` with a quota of 1200 requests per minute for the entire org. Nested beneath it, there could be a bucket for `/oauth2/v1/authorize` with a quota of 600 requests per minute assigned to a specific client app `APP_123`. When `APP_123` calls `/oauth2/v1/authorize`, the remaining quota status is 1,199 for that minute for the org, and 599 remaining for `APP_123`.
 
@@ -49,7 +49,7 @@ The logic behind the Okta implementation of rate limits can be summarized in the
 
 ### Match requests
 
-When a request is made, Okta’s algorithm attempts to match the HTTP method (GET, POST, and so on.) request with a configured rate limit bucket. The most specific configuration always wins. There are two commonly used matches:
+When a request is made, Okta’s algorithm attempts to match the HTTP method (GET, POST, and so on) request with a configured rate limit bucket. The most specific configuration always wins. There are two commonly used matches:
 
 * Exact match: The endpoint requested matches exactly to the configured rate limit bucket. The matching algorithm processes all exact match endpoints first.
 
