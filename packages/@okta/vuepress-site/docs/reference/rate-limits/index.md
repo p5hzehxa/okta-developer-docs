@@ -12,7 +12,7 @@ Fundamentally, rate limits define how many requests can be made to an endpoint w
 
 Okta implements rate limits using buckets. A rate limiting bucket is a collection of one or more endpoints that share a defined quota of calls per unit of time. This quota is consumed by a set of clients associated with the bucket&mdash;this association is known as the scope of the bucket. The most general scope for a bucket is the entire org. This bucket is shared by every client in the org that uses the associated APIs. Other, more specific buckets can be nested beneath a broader bucket and may be applicable to a subset of APIs for a subset of clients.
 
-For example, there may be a bucket for `/oauth2/api/v1/authorize` with a quota of 1200 requests per minute for the entire org. Nested beneath it, there could be a bucket for `/oauth2/api/v1/authorize` with a quota of 600 requests per minute assigned to a specific client app `APP_123`. When `APP_123` calls `/oauth2/api/v1/authorize`, the remaining quota status is 1,199 for that minute for the org, and 599 remaining for `APP_123`.
+For example, there may be a bucket for `/oauth2/v1/authorize` with a quota of 1200 requests per minute for the entire org. Nested beneath it, there could be a bucket for `/oauth2/v1/authorize` with a quota of 600 requests per minute assigned to a specific client app `APP_123`. When `APP_123` calls `/oauth2/v1/authorize`, the remaining quota status is 1,199 for that minute for the org, and 599 remaining for `APP_123`.
 
 <div >
 
