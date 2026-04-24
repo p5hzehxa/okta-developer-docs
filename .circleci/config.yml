@@ -129,7 +129,7 @@ workflows:
   nightly_link_checker:
     jobs:
       - nightly_link_checker:
-          name: "Nightly Link Checker
+          name: "Nightly Link Checker"
 
   build_checks:
     jobs:
