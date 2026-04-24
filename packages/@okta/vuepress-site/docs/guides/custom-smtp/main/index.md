@@ -38,7 +38,7 @@ For information about custom email providers, see [Use your own email provider](
 
 SMTP with OAuth 2.0 authentication provides a more secure way to connect your org to your email provider.
 
-[Google](https://support.google.com/a/answer/14114704?hl=en) and [Microsoft](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online) are deprecating or have already deprecated Basic Authentication (username and password) for their SMTP servers due to limitations of password-based authentication. OAuth 2.0 authentication is the recommended authentication method for those SMTP services.
+[Google](https://knowledge.workspace.google.com/admin/sync/transition-from-less-secure-apps-to-oauth) and [Microsoft](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online) are deprecating or have already deprecated Basic Authentication (username and password) for their SMTP servers due to limitations of password-based authentication. OAuth 2.0 authentication is the recommended authentication method for those SMTP services.
 
 > **Note:** Not all email providers support OAuth 2.0 authentication for SMTP. Check with your email provider to confirm that they support OAuth 2.0 for SMTP. This guide only applies to providers that support OAuth 2.0.
 
@@ -243,7 +243,7 @@ This example uses the **OAuth 2.0 JWT bearer token flow** to connect your org to
 For more information about OAuth 2.0 for Google Workspace SMTP, see:
 
 * [IMAP, POP, and SMTP](https://developers.google.com/workspace/gmail/imap/imap-smtp)
-* [Domain-wide delegation](https://support.google.com/a/answer/162106)
+* [Domain-wide delegation](https://knowledge.workspace.google.com/admin/apps/control-api-access-with-domain-wide-delegation)
 * [Service accounts overview](https://docs.cloud.google.com/iam/docs/service-account-overview)
 
 #### Create a service account and generate key pair
@@ -261,7 +261,7 @@ For more information about OAuth 2.0 for Google Workspace SMTP, see:
 #### Grant email sending scope
 
 1. Sign in to the [Google Admin Console](https://admin.google.com/) with your admin account.
-1. Go to **Domain-wide Delegation**. See [Set up domain-wide delegation for a client](https://support.google.com/a/answer/162106?sjid=6859758194021594224-NA#zippy=%2Cset-up-domain-wide-delegation-for-a-client)
+1. Go to **Domain-wide Delegation**. See [Set up domain-wide delegation for a client](https://knowledge.workspace.google.com/admin/apps/control-api-access-with-domain-wide-delegation?visit_id=639126428528897144-1893462322&rd=1#setup)
 1. Enter the service account's client ID.
 1. In the OAuth scopes field, enter `https://mail.google.com/`.
 1. Click **Authorize**.
@@ -317,4 +317,4 @@ You've now configured your org to use a custom email provider with OAuth 2.0 aut
 * [Authenticate an IMAP, POP or SMTP connection using OAuth (Microsoft)](https://learn.microsoft.com/en-gb/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth)
 * [Set up SPF to identify valid email sources for your custom cloud domains (Microsoft)](https://learn.microsoft.com/en-us/defender-office-365/email-authentication-spf-configure)
 * [IMAP, POP, and SMTP (Google)](https://developers.google.com/workspace/gmail/imap/imap-smtp)
-* [Domain-wide delegation (Google)](https://support.google.com/a/answer/162106)
+* [Domain-wide delegation (Google)](https://knowledge.workspace.google.com/admin/apps/control-api-access-with-domain-wide-delegation)

@@ -75,7 +75,7 @@ See [ngrok](https://ngrok.com) or their [documentation](https://ngrok.com/docs) 
 
 ### Review ngrok inspection interface
 
-The ngrok inspection interface provides an opportunity to review all calls to your local app. See [ngrok documentation](https://ngrok.com/docs#inspect-requests) for details on using this interface. With the ngrok utility running, open the following URL in a browser: `http://localhost:4040`.
+The ngrok inspection interface provides an opportunity to review all calls to your local app. See [ngrok documentation](https://ngrok.com/docs/guides/share-localhost/inspection#inspect-traffic-and-replay-requests) for details on using this interface. With the ngrok utility running, open the following URL in a browser: `http://localhost:4040`.
 
 Each call to your local app appears in the interface and includes the response body, header, replay functionality, and other details. Proceed to the following sections to see an example request.
 
@@ -181,7 +181,7 @@ The ngrok inspection interface provides a replay function that you can use to te
 
 1. Your local app receives the modified request to process and provide a response.
 
-See also [ngrok Documentation](https://ngrok.com/docs#inspect-replay).
+See also [ngrok Documentation](https://ngrok.com/docs/obs/traffic-inspection#replay).
 
 ## See also
 
