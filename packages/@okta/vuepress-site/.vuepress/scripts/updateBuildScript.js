@@ -17,7 +17,7 @@ const createClientConfig = require('../webpack/createClientConfig')
 const createServerConfig = require('../webpack/createServerConfig')
 const { applyUserWebpackConfig } = require('../util/index')
 
-const MAX_WORKER_THREADS = 6;
+const MAX_WORKER_THREADS = parseInt(process.env.BUILD_WORKER_THREADS, 10) || 6;
 const PAGES_PER_THREAD = 25;
 
 /**
