@@ -359,7 +359,7 @@
         </div>
       </div>
       <div class="signup-hero__features">
-         <SignUpFeatureCard
+        <SignUpFeatureCard
           title="Build for Security"
           description="Leverage industry standards to meet enterprise identity demands like SSO, provisioning, AI governance, session termination, and more."
           :icon="theme === 'dark' ? '/img/icons/secured-laptop-dark.svg' : '/img/icons/secured-laptop.svg'"
