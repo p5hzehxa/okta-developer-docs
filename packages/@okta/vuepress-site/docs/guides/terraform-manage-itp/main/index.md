@@ -28,7 +28,7 @@ Use Terraform to configure ITP resources in your org, such as policies, shared s
 
 Identity Threat Protection with Okta AI (ITP) is a continuous identity threat detection and response solution that detects and responds to threats as they occur. ITP continuously evaluates users and their sessions, receiving risk signals from the Okta risk engine and security event providers. When ITP identifies changes in a user's risk, network zone, device, or behavior, it launches automated mitigation and remediation actions, such as Universal Logout. See [Identity Threat Protection with Okta AI](https://help.okta.com/okta_help.htm?type=oie&id=ext-itp-overview).
 
-The [Okta Terraform provider](https://registry.terraform.io/providers/okta/okta/latest) now supports ITP resource configuration, as well as existing IAM resource configuration, such as groups, users, devices, and authentication services. The following ITP resources can be managed through the Okta Terraform provider:
+The [Okta Terraform provider](https://registry.terraform.io/providers/okta/okta/latest) now supports ITP resource configuration, and existing IAM resource configuration, such as groups, users, devices, and authentication services. The following ITP resources can be managed through the Okta Terraform provider:
 
 * **Network zones**: Configure boundaries to control access based on location, IP, or ASN.
 * **Policies**: Define policies for continuous threat evaluation.
@@ -37,10 +37,10 @@ The [Okta Terraform provider](https://registry.terraform.io/providers/okta/okta/
 * **Shared Signals**: Configure third-party security vendor connections to receive security-related events.
 
 > **Note:** The following ITP resources aren't available through the Okta Terraform provider:
-> * **Universal Logout**: To configure remediation action for apps, such as Universal Logout, you must use the Admin Console. See how to [Configure Universal Logout in ITP](https://help.okta.com/oie/en-us/content/topics/itp/config-universal-logout) from the Admin Console in the product documentation.
+> * **Universal Logout**: To configure remediation action for apps, such as Universal Logout, you must use the Admin Console. See how to [Configure Universal Logout in ITP](https://help.okta.com/okta_help.htm?type=oie&id=csh-universal-logout) from the Admin Console in the product documentation.
 > * **Bot protection**: Configure bot protection through the [Okta APIs](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/botprotection) or the Admin Console. See [Bot protection](https://help.okta.com/oie/en-us/content/topics/itp/bot-protection.htm).
-> * **Workflows**: Configure ITP Workflows through the Okta Workflows Console. See [Workflows for Identity Threat Protection](https://help.okta.com/oie/en-us/content/topics/itp/workflows-for-itp.htm).
-> **Custom admin roles for ITP**: Configre custom admin roles for ITP through the Admin Console. See [Admin roles for ITP](https://help.okta.com/oie/en-us/content/topics/itp/admin-roles.htm).
+> * **Workflows**: Configure ITP Workflows through the Okta Workflows console. See [Workflows for Identity Threat Protection](https://help.okta.com/okta_help.htm?type=oie&id=csh-workflows-for-itp).
+> **Custom admin roles for ITP**: Configure custom admin roles for ITP through the Admin Console. See [Admin roles for ITP](https://help.okta.com/okta_help.htm?type=oie&id=csh-itp-rbac).
 
 Before you can configure ITP with Terraform, you need to set up Terraform access for ITP resources.
 
@@ -74,7 +74,7 @@ Grant the super admin role (`SUPER_ADMIN`) to your Terraform API service app int
 
 ### Terraform files
 
-For guidance on organizing your files, see [Organizing your configuration](/docs/guides/terraform-organize-configuration/main/). Consider organizing your Terraform code so that related resources are grouped together. For example, you could create a Terraform file called `policies.tf` that contains all of your policy resources, and `ssf.tf` to configure your shared signal vendors.
+For guidance on organizing your files, see [Organizing your configuration](/docs/guides/terraform-organize-configuration/main/). Consider organizing your Terraform code so that related resources are grouped. For example, you could create a Terraform file called `policies.tf` that contains all of your policy resources, and `ssf.tf` to configure your shared signal vendors.
 
 ## Manage ITP resources in Terraform
 
@@ -84,7 +84,7 @@ Use the following sections to configure network zones, risk policies, and shared
 
 Network zones define security boundaries for your org. You can use these zones in policies to allow or restrict access based on geographical location, specific IP addresses, or Autonomous System Numbers (ASNs).
 
-See [Network zones](https://help.okta.com/oie/en-us/content/topics/security/network/network-zones.htm) in the product documentation and the [Network Zones API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/networkzone).
+See [network zones](https://help.okta.com/okta_help.htm?type=oie&id=ext-network-zones) in the product documentation and the [Network Zones API](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/networkzone).
 
 To create a network zone for a specific IP range or a dynamic location, use the `okta_network_zone` resource. See [Terraform resource: okta_network_zone](https://registry.terraform.io/providers/okta/okta/latest/docs/resources/network_zone).
 
@@ -112,11 +112,11 @@ resource "okta_network_zone" "blocked_countries" {
 
 ITP policies assess risk by continuously evaluating sessions. See the following resources to configure [session violation detection](#session-violation-detection-policy), [session violation enforcement](#session-violation-enforcement-policy), and [entity risk](#entity-risk-policy) policies.
 
-For more information on policies, see [Session protection](https://help.okta.com/oie/en-us/content/topics/itp/continuous-access-evaluation.htm) and [Entity risk policy](https://help.okta.com/oie/en-us/content/topics/itp/entity-risk-policy.htm) in the product documentation.
+For more information on policies, see [Session protection](https://help.okta.com/okta_help.htm?type=oie&id=csh-continuous-access-evaluation) and [Entity risk policy](https://help.okta.com/okta_help.htm?type=oie&id=csh-entity-risk-policy) in the product documentation.
 
 ### Session violation detection policy
 
-Okta ITP is configured with a system default session violation policy (`SESSION_VIOLATION_DETECTION`) that continuously detects changes to IP addresses or device contexts. You can’t create or edit this policy, but you can modify the corresponding session violation policy rule. Use the `okta_session_violation_policy` data source to retrieve and configure the `okta_session_violation_policy_rule`.
+Okta ITP is configured with a default session violation policy (`SESSION_VIOLATION_DETECTION`) that continuously detects changes to IP addresses or device context. You can't create or edit this policy, but you can modify the corresponding session violation policy rule. Use the `okta_session_violation_policy` data source to retrieve and configure the `okta_session_violation_policy_rule`.
 
 1. Before configuring the `okta_session_violation_policy_rule` resource, you need to import the existing system rule. You can use the [List all policies](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/policy/other/listpolicies) API operation to find the `SESSION_VIOLATION_DETECTION` policy ID, and the [List all policy rules](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/policy/other/listpolicyrules) API to find the  `SESSION_VIOLATION_DETECTION` policy rule ID.
 
@@ -126,9 +126,9 @@ Okta ITP is configured with a system default session violation policy (`SESSION_
     terraform import okta_session_violation_policy_rule.svp_rule <policy_id>/<rule_id>
     ```
 
-3. Configure your session violation policy rule. See [Terraform data source: okta\_session\_violation\_policy](https://registry.terraform.io/providers/okta/okta/latest/docs/data-sources/session_violation_policy) and [Terraform resource: okta\_session\_violation\_policy\_rule](https://registry.terraform.io/providers/okta/okta/latest/docs/resources/session_violation_policy_rule).
+3. Configure your session violation policy rule. See [Terraform data source: okta_session_violation_policy](https://registry.terraform.io/providers/okta/okta/latest/docs/data-sources/session_violation_policy) and [Terraform resource: okta_session_violation_policy_rule](https://registry.terraform.io/providers/okta/okta/latest/docs/resources/session_violation_policy_rule).
 
-    **Example:** Configure the session violation policy rule
+    **Example:** Configure the session violation policy rule.
 
     ```bash
     data "okta_session_violation_policy" "sv_policy" {
@@ -144,7 +144,7 @@ Okta ITP is configured with a system default session violation policy (`SESSION_
 
  Alternatively, you can add an import block to your `.tf` file. See [Import existing resources](https://developer.okta.com/docs/guides/terraform-import-existing-resources/main/).
 
-**Example:** Import and configure the default session violation policy rule in your `.tf` file
+**Example:** Import and configure the default session violation policy rule in your `.tf` file.
 
 ```bash
 # In your .tf file
@@ -164,13 +164,13 @@ resource "okta_session_violation_policy_rule" "svp_rule" {
 
 ### Session violation enforcement policy
 
-There is only one immutable session-violation enforcement policy (`POST_AUTH_SESSION`) in an ITP-enabled Okta org. You can modify the corresponding policy rule for the `POST_AUTH_SESSION` policy. This policy and rule allow you to enforce the session protection policy with a remediation action. Use the `okta_post_auth_session_policy` data source to retrieve and configure the `okta_post_auth_session_policy_rule`.
+There’s only one immutable session-violation enforcement policy (`POST_AUTH_SESSION`) in an ITP-enabled Okta org. You can modify the corresponding policy rule for the `POST_AUTH_SESSION` policy. This policy and rule allow you to enforce the session protection policy with a remediation action. Use the `okta_post_auth_session_policy` data source to retrieve and configure the `okta_post_auth_session_policy_rule`.
 
 1. Before configuring the `okta_post_auth_session_policy_rule` resource, you need to import the existing system default rule. You can use the [List all policies](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/policy/other/listpolicies) API operation to find the `POST_AUTH_SESSION` policy ID, and the [List all policy rules](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/policy/other/listpolicyrules) API to find the `POST_AUTH_SESSION` policy rule ID.
 
 1. Import the object to your Terraform state. See [okta_post_auth_session_policy_rule example](https://github.com/okta/terraform-provider-okta/tree/master/examples/resources/okta_post_auth_session_policy_rule) in the terraform-provider-okta GH repository.
 
-    **Example:** Import the default session violation enforcement policy rule
+    **Example:** Import the default session violation enforcement policy rule.
 
     ```bash
     terraform import okta_post_auth_session_policy_rule.pas_rule <policy_id>/<rule_id>
@@ -178,7 +178,7 @@ There is only one immutable session-violation enforcement policy (`POST_AUTH_SES
 
 1. Configure your session violation policy rule. See [Terraform data source: okta_post_auth_session_policy](https://registry.terraform.io/providers/okta/okta/latest/docs/data-sources/post_auth_session_policy) and [Terraform resource: okta_post_auth_session_policy_rule](https://registry.terraform.io/providers/okta/okta/latest/docs/resources/post_auth_session_policy_rule).
 
-    **Example:** Configure the session violation policy rule
+    **Example:** Configure the session violation policy rule.
 
     ```bash
     data "okta_post_auth_session_policy" "pas_policy" {
@@ -195,13 +195,13 @@ There is only one immutable session-violation enforcement policy (`POST_AUTH_SES
 
 An ITP-enabled Okta org contains one immutable system entity risk (`ENTITY_RISK`) policy. You can add a policy rule to the `ENTITY_RISK` system policy. This entity risk policy rule allows you to customize your response to risk changes for an entity (typically, a user). Use the [`okta_entity_risk_policy`](https://registry.terraform.io/providers/okta/okta/latest/docs/data-sources/entity_risk_policy) data source to retrieve and configure the [`okta_entity_risk_policy_rule`](https://registry.terraform.io/providers/okta/okta/latest/docs/resources/entity_risk_policy_rule) resource.
 
-See [Entity risk policy](https://help.okta.com/oie/en-us/content/topics/itp/entity-risk-policy.htm) in the product documentation.
+See [Entity risk policy](https://help.okta.com/okta_help.htm?type=oie&id=csh-entity-risk-policy) in the product documentation.
 
 > **Note**: An ITP-enabled Okta org contains a default immutable entity risk policy rule with `priority` 99. This rule is intended as a catch-all if none of the higher-priority rules are triggered. Therefore, you must create your custom rule with a higher priority (lower number in the `priority` field, for example: `priority < 99`).
 
 1. Configure your entity risk policy rule. See [Terraform data source: okta_entity_risk_policy](https://registry.terraform.io/providers/okta/okta/latest/docs/data-sources/entity_risk_policy) and [Terraform resource: okta_entity_risk_policy_rule](https://registry.terraform.io/providers/okta/okta/latest/docs/resources/entity_risk_policy_rule).
 
-    **Example:** Configure an entity risk rule
+    **Example:** Configure an entity risk rule.
 
     ```bash
     data "okta_entity_risk_policy" "er_policy" {
@@ -221,11 +221,11 @@ Behavior detection rules are used to configure location, device, IP address, or 
 
 > **Note**: If you have existing behavior rule configurations, you need to import the behavior rule resources before configuring them.
 
-See [Configure behavior detection](https://help.okta.com/oie/en-us/content/topics/security/behavior-detection/configure-behavior-detection.htm) in the product documentation.
+See [About Behavior Detection](https://help.okta.com/okta_help.htm?type=oie&id=ext-about-behavior-detection) in the product documentation.
 
 1. Configure the `okta_behavior` resource. See [okta_behavior](https://registry.terraform.io/providers/okta/okta/latest/docs/resources/behavior).
 
-    **Example**: Configure behavior detection rules
+    **Example**: Configure behavior detection rules.
 
     ```bash
     resource "okta_behavior" "my_location" {
@@ -264,7 +264,7 @@ See [Configure behavior detection](https://help.okta.com/oie/en-us/content/topic
 
 2. Add the behavior-detection conditions to your global session policy rule. Use the [`okta_policy_rule_signon`](https://registry.terraform.io/providers/okta/okta/latest/docs/resources/policy_rule_signon) resource to add your behavior.
 
-    **Example**: Configure the behaviour rule to a global session policy rule
+    **Example**: Configure the behaviour rule to a global session policy rule.
 
     ```bash
     data "okta_policy" "global_policy" {
@@ -307,7 +307,7 @@ User risk levels are determined based on behavioral patterns and entity-level si
 
 1. (Optional) Import the user risk object to your Terraform state. See [okta\_user\_risk example](https://github.com/okta/terraform-provider-okta/tree/master/examples/resources/okta_user_risk) in the terraform-provider-okta GH repository.
 
-    **Example:** Import the existing user risk level
+    **Example:** Import the existing user risk level.
 
     ```bash
     terraform import okta_user_risk.example <user_id>
@@ -317,7 +317,7 @@ User risk levels are determined based on behavioral patterns and entity-level si
 
 1. Configure the user's risk level. See [Terraform data source: okta_user_risk](https://registry.terraform.io/providers/okta/okta/latest/docs/data-sources/user_risk) and [Terraform resource: okta_user_risk](https://registry.terraform.io/providers/okta/okta/latest/docs/resources/user_risk).
 
-    **Example:** Configure a user's risk level
+    **Example:** Configure a user's risk level.
 
     ```bash
     resource "okta_user_risk" "example" {
@@ -330,13 +330,13 @@ User risk levels are determined based on behavioral patterns and entity-level si
 
 The Shared Signals Framework (SSF) allows Okta to receive security events from third-party vendors (such as EDR or CASB providers). This provides ITP with a broader context of the user’s security posture outside of Okta.
 
-See [Shared Signals Framework](https://help.okta.com/oie/en-us/content/topics/itp/shared-signals.htm) in the product documentation.
-
 ### SSF receiver
 
 You can set up Okta as an SSF receiver by configuring a security events provider resource to connect Okta and the SSF transmitting vendor. Use the `okta_security_events_provider` resource to establish the connection with your security vendor.
 
-**Example:** Configure the security events provider resource
+See [Configure a shared signal receiver](https://help.okta.com/okta_help.htm?type=oie&id=csh-config-shared-signal-provider) in the product documentation.
+
+**Example:** Configure the security events provider resource.
 
 ```bash
 resource "okta_security_events_provider" "example_issuer" {
@@ -377,7 +377,7 @@ Review your Okta org for the configuration changes by filtering for ITP events i
 
 ## Additional resources
 
-* [Identity Threat Protection with Okta AI](https://help.okta.com/oie/en-us/content/topics/itp/overview.htm) product documentation
-* [Okta Terraform Provider Github repository](https://github.com/okta/terraform-provider-okta/tree/master)
-* [Okta Admin Mangement APIs](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/policy)
+* [Identity Threat Protection with Okta AI](https://help.okta.com/okta_help.htm?type=oie&id=ext-itp-overview) product documentation
+* [Okta Terraform Provider GitHub repository](https://github.com/okta/terraform-provider-okta/tree/master)
+* [Okta Admin Management APIs](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/policy)
 * Contact [Okta Support](https://support.okta.com)
