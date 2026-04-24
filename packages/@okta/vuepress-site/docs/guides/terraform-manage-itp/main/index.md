@@ -40,6 +40,7 @@ The [Okta Terraform provider](https://registry.terraform.io/providers/okta/okta/
 > * **Universal Logout**: To configure remediation action for apps, such as Universal Logout, you must use the Admin Console. See how to [Configure Universal Logout in ITP](https://help.okta.com/oie/en-us/content/topics/itp/config-universal-logout) from the Admin Console in the product documentation.
 > * **Bot protection**: Configure bot protection through the [Okta APIs](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/botprotection) or the Admin Console. See [Bot protection](https://help.okta.com/oie/en-us/content/topics/itp/bot-protection.htm).
 > * **Workflows**: Configure ITP Workflows through the Okta Workflows Console. See [Workflows for Identity Threat Protection](https://help.okta.com/oie/en-us/content/topics/itp/workflows-for-itp.htm).
+> **Custom admin roles for ITP**: Configre custom admin roles for ITP through the Admin Console. See [Admin roles for ITP](https://help.okta.com/oie/en-us/content/topics/itp/admin-roles.htm).
 
 Before you can configure ITP with Terraform, you need to set up Terraform access for ITP resources.
 
@@ -216,48 +217,87 @@ See [Entity risk policy](https://help.okta.com/oie/en-us/content/topics/itp/enti
 
 ### Behavior detection rules
 
-Behavior detection rules are used to configure location, device, IP address, or velocity behavior rules for a sign-in policy. Use the [`okta_behavior`](https://registry.terraform.io/providers/okta/okta/latest/docs/data-sources/behavior) or [`okta_behaviors`](https://registry.terraform.io/providers/okta/okta/latest/docs/data-sources/behaviors) data sources to retrieve and configure the `okta_behavior` resource.
+Behavior detection rules are used to configure location, device, IP address, or velocity behavior rules for a sign-in policy. Use the `okta_behavior` or `okta_behaviors` data sources to retrieve and configure the `okta_behavior` resource.
 
 > **Note**: If you have existing behavior rule configurations, you need to import the behavior rule resources before configuring them.
 
 See [Configure behavior detection](https://help.okta.com/oie/en-us/content/topics/security/behavior-detection/configure-behavior-detection.htm) in the product documentation.
 
-**Example**: Configure behavior detection rules
+1. Configure the `okta_behavior` resource. See [okta_behavior](https://registry.terraform.io/providers/okta/okta/latest/docs/resources/behavior).
 
-```bash
-resource "okta_behavior" "my_location" {
-  name                      = "My Location"
-  type                      = "ANOMALOUS_LOCATION"
-  number_of_authentications = 50
-  location_granularity_type = "LAT_LONG"
-  radius_from_location      = 20
-}
+    **Example**: Configure behavior detection rules
 
-resource "okta_behavior" "my_city" {
-  name                      = "My City"
-  type                      = "ANOMALOUS_LOCATION"
-  number_of_authentications = 50
-  location_granularity_type = "CITY"
-}
+    ```bash
+    resource "okta_behavior" "my_location" {
+      name                      = "My Location"
+      type                      = "ANOMALOUS_LOCATION"
+      number_of_authentications = 50
+      location_granularity_type = "LAT_LONG"
+      radius_from_location      = 20
+    }
 
-resource "okta_behavior" "my_device" {
-  name                      = "My Device"
-  type                      = "ANOMALOUS_DEVICE"
-  number_of_authentications = 50
-}
+    resource "okta_behavior" "my_city" {
+      name                      = "My City"
+      type                      = "ANOMALOUS_LOCATION"
+      number_of_authentications = 50
+      location_granularity_type = "CITY"
+    }
 
-resource "okta_behavior" "my_ip" {
-  name                      = "My IP"
-  type                      = "ANOMALOUS_IP"
-  number_of_authentications = 50
-}
+    resource "okta_behavior" "my_device" {
+      name                      = "My Device"
+      type                      = "ANOMALOUS_DEVICE"
+      number_of_authentications = 50
+    }
 
-resource "okta_behavior" "my_velocity" {
-  name     = "My Velocity"
-  type     = "VELOCITY"
-  velocity = 25
-}
-```
+    resource "okta_behavior" "my_ip" {
+      name                      = "My IP"
+      type                      = "ANOMALOUS_IP"
+      number_of_authentications = 50
+    }
+
+    resource "okta_behavior" "my_velocity" {
+      name     = "My Velocity"
+      type     = "VELOCITY"
+      velocity = 25
+    }
+    ```
+
+2. Add the behavior-detection conditions to your global session policy rule. Use the [`okta_policy_rule_signon`](https://registry.terraform.io/providers/okta/okta/latest/docs/resources/policy_rule_signon) resource to add your behavior.
+
+    **Example**: Configure the behaviour rule to a global session policy rule
+
+    ```bash
+    data "okta_policy" "global_policy" {
+      name = "Global session policy"
+      type = "OKTA_SIGN_ON"
+    }
+    resource "okta_policy_rule_signon" "global_policy_rule" {
+      access             = "CHALLENGE"
+      authtype           = "RADIUS"
+      name               = "Example Policy Rule"
+      network_connection = "ANYWHERE"
+      policy_id          = okta_policy_signon.global_policy.id
+      status             = "ACTIVE"
+      risc_level         = "HIGH"
+      behaviors          = [data.okta_behavior.my_device.id]
+      factor_sequence {
+        primary_criteria_factor_type = "token:hotp" // TOTP
+        primary_criteria_provider    = "CUSTOM"
+        secondary_criteria {
+          factor_type = "token:software:totp" // Okta Verify
+            provider    = "OKTA"
+        }
+        secondary_criteria { // Okta Verify Push
+          factor_type = "push"
+          provider    = "OKTA"
+        }
+        secondary_criteria { // SMS
+          factor_type = "sms"
+          provider    = "OKTA"
+       }
+      }
+    }
+    ```
 
 ### User risk
 
