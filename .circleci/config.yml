@@ -83,9 +83,9 @@ jobs:
     steps:
       - checkout
       - install-deps
-      # - run:
-      #     name: Run script and capture logs
-      #     command: yarn build
+      - run:
+          name: Run script and capture logs
+          command: yarn build
       - run:
           name: Run link checker
           command: yarn broken-link-checker:external > output.txt 2>&1 || true; cat output.txt
@@ -125,11 +125,6 @@ workflows:
     jobs:
       - inclusive-linting:
           name: "Inclusive Linting"
-  
-  nightly_link_checker:
-    jobs:
-      - nightly_link_checker:
-          name: "Nightly Link Checker"
 
   build_checks:
     jobs:

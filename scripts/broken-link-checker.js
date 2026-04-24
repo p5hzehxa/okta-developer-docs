@@ -49,7 +49,7 @@ if (linkCheckMode == 'internal') {
 }
 
 var siteUrl = "http://localhost:8080";
-const sitemapPath = path.resolve("packages/docs-sitemap.xml");
+const sitemapPath = path.resolve("packages/@okta/vuepress-site/dist/docs-sitemap.xml");
 
 var customData = {
   outputGoodLinks: false,
@@ -121,7 +121,7 @@ async function runChecker() {
 
   // Replace prod domain with localhost:8080
   const localUrls = urls.map((u) =>
-    u.replace("https://developer.okta.com", 'https://developer.okta.com')
+    u.replace("https://developer.okta.com", siteUrl)
   ).filter((url) => !EXCLUDED_PAGES.some(page => url.endsWith(page)));
 
   let processed = 0;
@@ -153,10 +153,10 @@ async function runChecker() {
               console.log(chalk.cyan("  Page: " + innerKey + " (" + innerValue + ")"));
             }
           }
-          server.close(() => process.exit(1));
+          process.exit(1);
         } else {
           console.log("Broken Links: " + chalk.bold.green(0));
-          server.close(() => process.exit(0));
+          process.exit(0);
         }
       }
     },
