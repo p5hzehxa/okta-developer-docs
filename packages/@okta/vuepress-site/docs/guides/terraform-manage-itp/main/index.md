@@ -36,11 +36,11 @@ The [Okta Terraform provider](https://registry.terraform.io/providers/okta/okta/
 * **User risk**: Define user risk levels that require mitigation.
 * **Shared Signals**: Configure third-party security vendor connections to receive security-related events.
 
-> **Note:** The following ITP resources aren't available through the Okta Terraform provider:
-> * **Universal Logout**: To configure remediation action for apps, such as Universal Logout, you must use the Admin Console. See how to [Configure Universal Logout in ITP](https://help.okta.com/okta_help.htm?type=oie&id=csh-universal-logout) from the Admin Console in the product documentation.
+> **Note:** The following ITP configurations aren't available through the Okta Terraform provider:
+> * **Universal Logout**: To configure remediation action for apps, such as Universal Logout, you must use the Admin Console. See [Configure Universal Logout in ITP](https://help.okta.com/okta_help.htm?type=oie&id=csh-universal-logout).
 > * **Bot protection**: Configure bot protection through the [Okta APIs](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/botprotection) or the Admin Console. See [Bot protection](https://help.okta.com/oie/en-us/content/topics/itp/bot-protection.htm).
 > * **Workflows**: Configure ITP Workflows through the Okta Workflows console. See [Workflows for Identity Threat Protection](https://help.okta.com/okta_help.htm?type=oie&id=csh-workflows-for-itp).
-> **Custom admin roles for ITP**: Configure custom admin roles for ITP through the Admin Console. See [Admin roles for ITP](https://help.okta.com/okta_help.htm?type=oie&id=csh-itp-rbac).
+> * **Custom admin roles for ITP**: Configure custom admin roles for ITP through the Admin Console. See [Admin roles for ITP](https://help.okta.com/okta_help.htm?type=oie&id=csh-itp-rbac).
 
 Before you can configure ITP with Terraform, you need to set up Terraform access for ITP resources.
 
@@ -59,6 +59,8 @@ Grant the super admin role (`SUPER_ADMIN`) to your Terraform API service app int
     * `okta.securityEventsProviders.manage`
     * `okta.networkZones.manage`
     * `okta.policies.manage`
+    * `okta.behaviors.manage`
+
 2. Add the same scopes to your Okta provider Terraform configuration:
 
     ```bash
