@@ -35,7 +35,8 @@
     "eslint": "eslint \"packages/@okta/vuepress-theme-prose/**/*.vue\"",
     "lint-all": "yarn eslint --max-warnings=0 && yarn stylelint",
     "rss": "node packages/@okta/vuepress-site/.vuepress/scripts/generate-rss.js",
-    "generate-pubdate": "node packages/@okta/vuepress-site/.vuepress/scripts/generate-pubdate.js"
+    "generate-pubdate": "node packages/@okta/vuepress-site/.vuepress/scripts/generate-pubdate.js",
+    "install-dev": "bash scripts/yarn-install-dev.sh"
   },
   "repository": "git@github.com:okta/okta-developer-docs",
   "author": "Brian Retterer <brian.retterer@okta.com>",
@@ -68,7 +69,6 @@
     "cypress/**/async": "3.2.4",
     "qs": "6.11.0",
     "vuepress/**/css-what": "^6.1.0",
-    "vuepress/**/glob-parent": "^6.0.2",
     "vuepress/**/got": "11.8.5",
     "vuepress/**/ini": "^1.3.7",
     "vuepress/**/json-schema": "^0.4.0",
@@ -86,7 +86,10 @@
     "**/chalk/**/ansi-regex": "^3.0.1",
     "robots-txt-guard": "1.0.0",
     "tough-cookie": "^4.1.3",
-    "semver": "^7.5.2"
+    "semver": "^7.5.2",
+    "minimatch" :"3.1.2",
+    "luxon": "3.2.1",
+    "check-error": "1.0.3"
   },
   "version": "0.0.0"
 }
