@@ -32,7 +32,7 @@ The [Okta Terraform provider](https://registry.terraform.io/providers/okta/okta/
 
 * **Network zones**: Configure boundaries to control access based on location, IP, or ASN.
 * **Policies**: Define policies for continuous threat evaluation.
-* **Behavior detection rules**: Define rules for the sign-in policy.
+* **Behavior detection rules**: Define rules for the sign-on policy.
 * **User risk**: Define user risk levels that require mitigation.
 * **Shared Signals**: Configure third-party security vendor connections to receive security-related events.
 
@@ -144,7 +144,7 @@ Okta ITP is configured with a default session violation policy (`SESSION_VIOLATI
     }
     ```
 
- Alternatively, you can add an import block to your `.tf` file. See [Import existing resources](https://developer.okta.com/docs/guides/terraform-import-existing-resources/main/).
+Alternatively, you can add an import block to your `.tf` file. See [Import existing resources](https://developer.okta.com/docs/guides/terraform-import-existing-resources/main/).
 
 **Example:** Import and configure the default session violation policy rule in your `.tf` file.
 
@@ -219,7 +219,7 @@ See [Entity risk policy](https://help.okta.com/okta_help.htm?type=oie&id=csh-ent
 
 ### Behavior detection rules
 
-Behavior detection rules are used to configure location, device, IP address, or velocity behavior rules for a sign-in policy. Use the `okta_behavior` or `okta_behaviors` data sources to retrieve and configure the `okta_behavior` resource.
+Behavior detection rules are used to configure location, device, IP address, or velocity behavior rules for a sign-on policy. Use the `okta_behavior` or `okta_behaviors` data sources to retrieve and configure the `okta_behavior` resource.
 
 > **Note**: If you have existing behavior rule configurations, you need to import the behavior rule resources before configuring them.
 
