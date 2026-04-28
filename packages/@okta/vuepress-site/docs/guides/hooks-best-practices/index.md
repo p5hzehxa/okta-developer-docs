@@ -70,6 +70,8 @@ Okta event hooks also require a response. To prevent unnecessary delays or timeo
 
 A timeout of three seconds is enforced on all outbound requests for event and inline hooks. One request retry is sent in the event of a timeout or an error response from the external service. If a successful response isn't received after that, an HTTP 400 error is returned with more information about the failure.
 
+> **Note:** The token inline hook and the telephony inline hook don't support retries.
+
 See inline hook [Time out and retry](/docs/concepts/inline-hooks/#timeout-and-retry) and event hook [Time out and retry](/docs/concepts/event-hooks/#timeout-and-retry).
 
 ## Limits, duplicates, and order of hook calls

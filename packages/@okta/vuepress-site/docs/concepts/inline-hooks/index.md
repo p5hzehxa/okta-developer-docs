@@ -184,6 +184,8 @@ This allows you to specify additional information to make available in the Okta 
 
 When Okta calls an external service, it enforces a default timeout of three seconds. Okta attempts at most one retry. A request isn't retried if the external service endpoint responds with a 2xx HTTP success code or a 4xx HTTP error code. If the external service endpoint responds with a redirect, it isn't followed.
 
+> **Note:** The token inline hook and the telephony inline hook don't support retries.
+
 ### Inline hooks and concurrent rate limits
 
 The Okta process flow that triggered the inline hook remains in progress until a response from your external service is received. For process flows initiated by calls to Okta APIs, slow processing times by your external service can cause open API transactions to accumulate. That accumulation can potentially cause you to exceed [Concurrent Rate Limits](/docs/reference/rl2-concurrency/).
