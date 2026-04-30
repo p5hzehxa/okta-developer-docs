@@ -69,7 +69,7 @@ Automating permissions ensures that users have immediate access without manual a
 A visual disconnect between your app and the registration form can reduce user trust:
 
 * **The question:** How should you apply your brand’s look and feel to the form?
-* **The recommended path:** Use the [Okta Hosted Sign-In Widget](/docs/concepts/sign-in-widget/). It is the most secure way to maintain consistency. Use the [Okta Branding Tool](/docs/concepts/brands/) (or custom CSS) to match your company’s colors and logos, providing a seamless transition from your app to the login flow.
+* **The recommended path:** Use the [Okta Hosted Sign-In Widget](/docs/concepts/sign-in-widget/). It's the most secure way to maintain consistency. Use the [Okta Branding Tool](/docs/concepts/brands/) (or custom CSS) to match your company’s colors and logos, providing a seamless transition from your app to the sign-in flow.
 
 ## The end-to-end UX and communication
 
