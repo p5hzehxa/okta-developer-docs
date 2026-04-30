@@ -52,7 +52,7 @@ Gathering data is essential for segmentation, but long forms deter users:
 Modernize the flow by promoting friction-free authentication methods:
 
 * **The question:** How can you move away from traditional passwords to improve security and UX?
-* **The recommended path:** Promote **Passwordless and Passkeys** early in the flow. By using the [Okta Authentication Policy (OAMP)](/docs/concepts/policies/), you can allow users to sign up using biometric factors or email magic links. This significantly reduces the risk of credential-based attacks while speeding up the login process.
+* **The recommended path:** Promote **Passwordless and Passkeys** early in the flow. By using the [Okta Authentication Policy (OAMP)](/docs/concepts/policies/), you can allow users to sign up using biometric factors or email magic links. This significantly reduces the risk of credential-based attacks while speeding up the sign-in process.
 
 ## Group assignment and automation
 
