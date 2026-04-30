@@ -78,5 +78,5 @@ The registration flow doesn't end when the user clicks **Submit**:
 * **The question:** Is email verification required, and what do your automated communications say?
 * **The recommended path:**
   * **Verification:** Always require [email verification](/docs/guides/authenticators-okta-email/) to prevent spam accounts.
-  * **Success landing page:** Upon successful registration, redirect users to a specific "Welcome" or "Getting Started" dashboard rather than just the generic login page.
+  * **Success landing page:** Upon successful registration, redirect users to a specific "Welcome" or "Getting Started" dashboard rather than just the generic sign-in page.
   * **Branded prompts:** Ensure [SMS](/docs/guides/custom-sms-messaging/) and [email](/docs/guides/custom-email/) prompts are concise and branded. Match the "From" address and "Display Name" to your app name to prevent users from flagging messages as phishing.
