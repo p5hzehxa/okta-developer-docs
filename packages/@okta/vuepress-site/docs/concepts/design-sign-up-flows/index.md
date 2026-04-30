@@ -36,7 +36,7 @@ The following diagram shows an out-of-band sign-up flow, where registration is i
 
 Every registration step is a potential drop-off point. Decide where to place the onus on the user:
 
-* **The question:** Which authenticators must users enroll in during sign-up, and what level of assurance is required to ensure these are real accounts?
+* **The question:** Which authenticators that users must enroll in when they sign up, and what level of assurance is required to ensure that these are real accounts?
 * **The recommended path:** Implement **progressive enrollment**. For the best user experience (UX), require only a password and email verification during initial registration. Prompt for stronger factors, such as [Okta Verify](/docs/guides/authenticators-okta-verify/) or [WebAuthn](/docs/guides/authenticators-web-authn/), only when the user attempts to access sensitive resources.
 * **Toll Fraud Mitigation:** To reduce noise and avoid erroneous fees (including SMS toll fraud), implement bot detection like **reCAPTCHA** or strict [Rate Limiting](/docs/reference/rate-limits/) during the initial sign-up.
 
