@@ -20,6 +20,10 @@ export const concepts = [
         path: "/docs/concepts/brands/",
       },
       {
+        title: "Sign-up flows",
+        path: "/docs/concepts/sign-up-flows/",
+      },
+      {
         title: "Direct authentication",
         path: "/docs/concepts/direct-authentication/",
       },
