@@ -60,7 +60,7 @@ Automating permissions ensures that users have immediate access without manual a
 
 * **The question:** How should you assign groups and handle specific MFA requirements?
 * **The recommended path:** Use a [Role-Based Access Control (RBAC)](/docs/concepts/iam-overview-authorization-factors/) approach:
-  * **Assign with a policy:** Use the Profile Enrollment Policy to automatically add all new registrants to a "New Users" group.
+  * **Assign with a policy:** Use the Profile Enrollment Policy to automatically add all new registrants to a New Users group.
   * **Automate with rules:** Use [Group Rules](/docs/concepts/universal-directory/) to move users into functional groups (for example, "MFA_Required") based on attributes provided during sign-up.
   * **Opt-in flow:** If MFA is optional, map a "Use_2FA" checkbox to a custom boolean attribute. A Group Rule can then automatically add the user to a group targeted by a specific MFA policy.
 
