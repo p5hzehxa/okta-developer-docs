@@ -1021,6 +1021,10 @@ export const guides = [
             title: "Create and manage resources",
             subLinks: [
               {
+                title: "Import existing resources",
+                guideName: "terraform-import-existing-resources"
+              },
+              {
                 title: "Manage groups",
                 guideName: "terraform-manage-groups",
               },
@@ -1049,16 +1053,16 @@ export const guides = [
                 guideName: "terraform-manage-multiple-domains"
               },
               {
-                title: "Import existing resources",
-                guideName: "terraform-import-existing-resources"
-              },
-              {
                 title: "Migrate to consolidated app sign-on policy rules",
                 guideName: "terraform-migrate-consolidated-app-sign-on-policy-rules"
               },
               {
                 title: "Manage Okta Identity Governance resources",
                 guideName: "terraform-oig-resources",
+              },
+              {
+                title: "Manage Identity Threat Protection with Okta AI resources",
+                guideName: "terraform-manage-itp",
               },
             ],
           },
