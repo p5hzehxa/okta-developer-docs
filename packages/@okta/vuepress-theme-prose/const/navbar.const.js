@@ -1089,8 +1089,8 @@ export const guides = [
         title: "Hooks",
         subLinks: [
           {
-            title: "Common hook set-up steps",
-            guideName: "common-hook-set-up-steps",
+            title: "Secure your hooks",
+            guideName: "secure-hooks",
           },
           {
             title: "Hooks best practices",

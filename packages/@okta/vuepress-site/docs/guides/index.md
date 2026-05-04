@@ -18,7 +18,6 @@ guides:
  - build-self-signed-jwt
  - check-for-session
  - client-secret-rotation-key
- - common-hook-set-up-steps
  - configure-access-policy
  - configure-claims-sharing
  - configure-ciba
@@ -88,6 +87,7 @@ guides:
  - scim-with-entitlements
  - sign-in-overview
  - secure-oauth-between-orgs
+ - secure-hooks
  - single-logout
  - signup-oktahosted
  - build-sso-integration
