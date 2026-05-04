@@ -64,7 +64,7 @@ You can now configure password rotation for managed on-premises app accounts tha
 * `GET /v1/teams/{team_name}/connections/saas_apps/{saas_app_instance_id}`
 * `PATCH /v1/teams/{team_name}/connections/saas_apps/{saas_app_instance_id}`
 
-See the [SaaS Application Accounts](https://preview.redoc.ly/oktadev/jg-OKTA-1095144-rotate_saas_pwd_with_last_pwd/openapi/opa/opa/tag/saas-app-accounts/#tag/saas-app-accounts).
+See the [SaaS Application Accounts](https://developer.okta.com/docs/api/openapi/opa/opa/saas-app-accounts).
 <!-- OKTA-1010336, FF: rotate_saas_pwd_with_last_pwd , Prod date: March 18 -->
 
 ### Weekly release 2026.03.1
