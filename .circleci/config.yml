@@ -1,154 +1,31 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/reference/configuration-reference
 version: 2.1
 
-orbs:
-  platform-helpers-general: okta/general-platform-helpers@1.9.4
-
-commands:
-  install-deps:
-    steps:
-      - restore_cache:
-          name: Restore Yarn dependency cache
-          keys:
-            - v6-yarn-deps-{{ checksum "yarn.lock" }}
-            # allow for partial cache hits
-            - v6-yarn-deps-
-      - run:
-          name: Install dependencies with Yarn
-          command: yarn install --frozen-lockfile --ignore-platform
-      - save_cache:
-          name: Save Yarn dependency cache
-          key: v6-yarn-deps-{{ checksum "yarn.lock" }}
-          paths:
-            - node_modules/
-            - packages/@okta/vuepress-plugin-active-header-links/node_modules/
-            - packages/@okta/vuepress-site/node_modules/
-            - ~/.cache/
-
+# Define a job to be invoked later in a workflow.
+# See: https://circleci.com/docs/guides/orchestrate/jobs-steps/#jobs-overview & https://circleci.com/docs/reference/configuration-reference/#jobs
 jobs:
-  snyk-scan:
+  say-hello:
+    # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
+    # See: https://circleci.com/docs/guides/execution-managed/executor-intro/ & https://circleci.com/docs/reference/configuration-reference/#executor-job
     docker:
-      - image: cimg/python:3.10
-    steps:
-      - attach_workspace:
-          at: ~/project
-      - checkout
-      - platform-helpers-general/step-load-dependencies
-      - platform-helpers-general/step-run-snyk-monitor:
-          scan-all-projects: true
-          skip-unresolved: false
-          run-on-non-main: true
-
-  inclusive-linting:
-    docker:
+      # Specify the version you desire here
+      # See: https://circleci.com/developer/images/image/cimg/base
       - image: cimg/base:current
-    resource_class: small
+
+    # Add steps to the job
+    # See: https://circleci.com/docs/guides/orchestrate/jobs-steps/#steps-overview & https://circleci.com/docs/reference/configuration-reference/#steps
     steps:
+      # Checkout the code as the first step.
       - checkout
-      - run: bash ./scripts/inclusive-lint.sh
+      - run:
+          name: "Say hello"
+          command: "echo Hello, World!"
 
-  node_build_checks:
-      docker:
-        - image: cimg/node:14.21.3-browsers
-      resource_class: large
-      environment:
-        NODE_OPTIONS: '--max_old_space_size=3584'
-      steps:
-        - checkout
-        - install-deps
-        - run:
-            name: Lint
-            command: yarn lint-all
-        - run:
-            name: Build
-            command: yarn build
-        - run:
-            name: Run checks
-            command: ./scripts/yarn-checks-ci.sh
-        - store_test_results:
-            path: test_results
-        - store_artifacts:
-            path: /tests/cypress/screenshots
-        - persist_to_workspace:
-            root: ~/project
-            paths:
-              - .
-              - .git
-
-  nightly_link_checker:
-    docker:
-      - image: cimg/node:14.21.3-browsers
-    resource_class: large
-    environment:
-      NODE_OPTIONS: '--max_old_space_size=3584'
-    steps:
-      - checkout
-      - install-deps
-      - run:
-          name: Run script and capture logs
-          command: yarn build
-      - run:
-          name: Run link checker
-          command: yarn broken-link-checker:external > output.txt 2>&1 || true; cat output.txt
-      - run:
-          name: Extract URLs from log
-          command: |
-            grep -o 'Link: https\?://[^[:space:]]*' output.txt | sed 's/Link: //' > urls.txt
-            cat urls.txt
-          when: always
-      - run:
-          name: Remove False Positives
-          command: |
-            comm -23 <(sort urls.txt | uniq) <(sort falsepos.txt | uniq) > broken_external_urls.txt
-      - run:
-          name: Print urls to log
-          command: |
-            cat broken_external_urls.txt
-      - run:
-          name: Send failure email if broken URLs found
-          when: on_success
-          command: |
-            broken_urls=$(comm -23 <(sort urls.txt | uniq) <(sort falsepos.txt | uniq))
-            broken_urls=$(echo "$broken_urls" | sed 's/ /\n/g')
-            formatted_broken_urls=$(echo "$broken_urls" | awk '{printf "<a href=\"%s\">%s</a><br/>\n", $0, $0}')
-
-            if [ -n "$broken_urls" ]; then
-                curl --location --request POST 'https://www.cinotify.cc/api/notify' \
-                        -d "to=${NOTIFY_EMAIL}&subject=BROKEN URLS DETECTED: Dev Docs Nightly Job&type=text/html&body=<p style='font-family: Arial, sans-serif; font-size: 16px; color: #333; line-height: 1.6; text-align: center; background-color: #ffcccc; padding: 10px;'>
-                        <span style='font-weight: bold;'>Nightly link checker job complete. See the list of broken URLs below.</span><br><br>
-                        <a href='https://app.circleci.com/pipelines/github/okta/okta-developer-docs/<< pipeline.number >>' style='display: inline-block; padding: 5px 10px; background-color: #4caf50; color: white; text-decoration: none;'>Click here</a>
-                        to see job details.<br>
-                    </p><h2 style='font-family: Arial, sans-serif; font-size: 16px; color: #333; line-height: 1.6; text-align: center;'>List of broken URLs:</h2>$formatted_broken_urls"
-            fi
-
+# Orchestrate jobs using workflows
+# See: https://circleci.com/docs/guides/orchestrate/workflows/ & https://circleci.com/docs/reference/configuration-reference/#workflows
 workflows:
-  linting:
+  say-hello-workflow: # This is the name of the workflow, feel free to change it to better match your workflow.
+    # Inside the workflow, you define the jobs you want to run.
     jobs:
-      - inclusive-linting:
-          name: "Inclusive Linting"
-
-  build_checks:
-    jobs:
-      - node_build_checks:
-          name: "Build and Checks"
-      - snyk-scan:
-          context:
-            - static-analysis
-          name: execute-snyk
-          requires:
-            - Build and Checks
-          filters:
-            branches:
-              only:
-                - master
-
-  nightly:
-    triggers:
-      - schedule:
-          cron: "1 5 * * *"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - nightly_link_checker:
-          name: "Nightly Link Checker"
+      - say-hello
